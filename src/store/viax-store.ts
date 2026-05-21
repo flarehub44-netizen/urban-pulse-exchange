@@ -21,7 +21,7 @@ export interface Market {
 
 export interface FeedPost {
   id: string;
-  user: { name: string; handle: string; verified: boolean; avatar: string; division: Division };
+  user: Trader & { verified?: boolean };
   text: string;
   time: number;
   marketId?: string;
