@@ -90,10 +90,10 @@ Grid estilo Bloomberg:
 `src/lib/parimutuel.ts`:
 
 ```ts
-prob(side) = pool[side] / poolTotal
-prizePool = poolTotal * 0.9
-payout(stake, side) = stake + (stake / pool[side]) * pool[other] * 0.9
-roi = (payout - stake) / stake
+prob(side) = pool[side] / poolTotal;
+prizePool = poolTotal * 0.9;
+payout(stake, side) = stake + (stake / pool[side]) * pool[other] * 0.9;
+roi = (payout - stake) / stake;
 ```
 
 Nunca mostrar "taxa" — só **Prize Pool** e **Pool Distribuível**. Store Zustand atualiza pools a cada 1.5s com micro-flutuações.

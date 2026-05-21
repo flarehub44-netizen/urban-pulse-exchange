@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/supabase/loose";
 import type { FeedPost } from "@/store/viax-store";
 
 function mapPost(row: Record<string, unknown>): FeedPost {
@@ -34,15 +34,20 @@ export function useFeed(marketId?: string) {
   return useQuery({
     queryKey: ["feed", marketId ?? "all"],
     queryFn: async () => {
-      let query = supabase
+      let query = db
         .from("feed_posts")
-        .select("*, profiles(id, name, handle, avatar, division, accuracy, roi, streak, volume_24h, city, neighborhood)")
+        .select(
+          "*, profiles(id, name, handle, avatar, division, accuracy, roi, streak, volume_24h, city, neighborhood)",
+        )
         .order("created_at", { ascending: false })
         .limit(40);
       if (marketId) {
         query = query.eq("market_id", marketId);
       }
-      const { data, error } = await query;
+      const { data, error } = (await query) as {
+        data: Record<string, unknown>[] | null;
+        error: Error | null;
+      };
       if (error) throw error;
       return (data ?? []).map(mapPost);
     },

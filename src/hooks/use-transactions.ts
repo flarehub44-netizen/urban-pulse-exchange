@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/supabase/loose";
 import type { Transaction } from "@/store/viax-store";
 
 function mapTransaction(row: Record<string, unknown>): Transaction {
@@ -16,11 +16,11 @@ export function useTransactions() {
   return useQuery({
     queryKey: ["transactions"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = (await db
         .from("transactions")
         .select("*")
         .order("created_at", { ascending: false })
-        .limit(100);
+        .limit(100)) as { data: Record<string, unknown>[] | null; error: Error | null };
       if (error) throw error;
       return (data ?? []).map(mapTransaction);
     },

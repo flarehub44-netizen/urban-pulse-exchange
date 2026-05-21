@@ -14,13 +14,18 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppWalletRouteImport } from './routes/_app/wallet'
 import { Route as AppUrbanmindRouteImport } from './routes/_app/urbanmind'
+import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppRankingRouteImport } from './routes/_app/ranking'
 import { Route as AppProfileRouteImport } from './routes/_app/profile'
+import { Route as AppPositionsRouteImport } from './routes/_app/positions'
+import { Route as AppNotificationsRouteImport } from './routes/_app/notifications'
 import { Route as AppMarketsRouteImport } from './routes/_app/markets'
 import { Route as AppLiveRouteImport } from './routes/_app/live'
 import { Route as AppFeedRouteImport } from './routes/_app/feed'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
+import { Route as AppProfileUserIdRouteImport } from './routes/_app/profile.$userId'
 import { Route as AppMarketsMarketIdRouteImport } from './routes/_app/markets.$marketId'
+import { Route as AppFeedPostIdRouteImport } from './routes/_app/feed.$postId'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -46,6 +51,11 @@ const AppUrbanmindRoute = AppUrbanmindRouteImport.update({
   path: '/urbanmind',
   getParentRoute: () => AppRoute,
 } as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppRankingRoute = AppRankingRouteImport.update({
   id: '/ranking',
   path: '/ranking',
@@ -54,6 +64,16 @@ const AppRankingRoute = AppRankingRouteImport.update({
 const AppProfileRoute = AppProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPositionsRoute = AppPositionsRouteImport.update({
+  id: '/positions',
+  path: '/positions',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNotificationsRoute = AppNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => AppRoute,
 } as any)
 const AppMarketsRoute = AppMarketsRouteImport.update({
@@ -76,37 +96,57 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
+const AppProfileUserIdRoute = AppProfileUserIdRouteImport.update({
+  id: '/$userId',
+  path: '/$userId',
+  getParentRoute: () => AppProfileRoute,
+} as any)
 const AppMarketsMarketIdRoute = AppMarketsMarketIdRouteImport.update({
   id: '/$marketId',
   path: '/$marketId',
   getParentRoute: () => AppMarketsRoute,
+} as any)
+const AppFeedPostIdRoute = AppFeedPostIdRouteImport.update({
+  id: '/$postId',
+  path: '/$postId',
+  getParentRoute: () => AppFeedRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AppDashboardRoute
-  '/feed': typeof AppFeedRoute
+  '/feed': typeof AppFeedRouteWithChildren
   '/live': typeof AppLiveRoute
   '/markets': typeof AppMarketsRouteWithChildren
-  '/profile': typeof AppProfileRoute
+  '/notifications': typeof AppNotificationsRoute
+  '/positions': typeof AppPositionsRoute
+  '/profile': typeof AppProfileRouteWithChildren
   '/ranking': typeof AppRankingRoute
+  '/settings': typeof AppSettingsRoute
   '/urbanmind': typeof AppUrbanmindRoute
   '/wallet': typeof AppWalletRoute
+  '/feed/$postId': typeof AppFeedPostIdRoute
   '/markets/$marketId': typeof AppMarketsMarketIdRoute
+  '/profile/$userId': typeof AppProfileUserIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AppDashboardRoute
-  '/feed': typeof AppFeedRoute
+  '/feed': typeof AppFeedRouteWithChildren
   '/live': typeof AppLiveRoute
   '/markets': typeof AppMarketsRouteWithChildren
-  '/profile': typeof AppProfileRoute
+  '/notifications': typeof AppNotificationsRoute
+  '/positions': typeof AppPositionsRoute
+  '/profile': typeof AppProfileRouteWithChildren
   '/ranking': typeof AppRankingRoute
+  '/settings': typeof AppSettingsRoute
   '/urbanmind': typeof AppUrbanmindRoute
   '/wallet': typeof AppWalletRoute
+  '/feed/$postId': typeof AppFeedPostIdRoute
   '/markets/$marketId': typeof AppMarketsMarketIdRoute
+  '/profile/$userId': typeof AppProfileUserIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -114,14 +154,19 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_app/dashboard': typeof AppDashboardRoute
-  '/_app/feed': typeof AppFeedRoute
+  '/_app/feed': typeof AppFeedRouteWithChildren
   '/_app/live': typeof AppLiveRoute
   '/_app/markets': typeof AppMarketsRouteWithChildren
-  '/_app/profile': typeof AppProfileRoute
+  '/_app/notifications': typeof AppNotificationsRoute
+  '/_app/positions': typeof AppPositionsRoute
+  '/_app/profile': typeof AppProfileRouteWithChildren
   '/_app/ranking': typeof AppRankingRoute
+  '/_app/settings': typeof AppSettingsRoute
   '/_app/urbanmind': typeof AppUrbanmindRoute
   '/_app/wallet': typeof AppWalletRoute
+  '/_app/feed/$postId': typeof AppFeedPostIdRoute
   '/_app/markets/$marketId': typeof AppMarketsMarketIdRoute
+  '/_app/profile/$userId': typeof AppProfileUserIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -132,11 +177,16 @@ export interface FileRouteTypes {
     | '/feed'
     | '/live'
     | '/markets'
+    | '/notifications'
+    | '/positions'
     | '/profile'
     | '/ranking'
+    | '/settings'
     | '/urbanmind'
     | '/wallet'
+    | '/feed/$postId'
     | '/markets/$marketId'
+    | '/profile/$userId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -145,11 +195,16 @@ export interface FileRouteTypes {
     | '/feed'
     | '/live'
     | '/markets'
+    | '/notifications'
+    | '/positions'
     | '/profile'
     | '/ranking'
+    | '/settings'
     | '/urbanmind'
     | '/wallet'
+    | '/feed/$postId'
     | '/markets/$marketId'
+    | '/profile/$userId'
   id:
     | '__root__'
     | '/'
@@ -159,11 +214,16 @@ export interface FileRouteTypes {
     | '/_app/feed'
     | '/_app/live'
     | '/_app/markets'
+    | '/_app/notifications'
+    | '/_app/positions'
     | '/_app/profile'
     | '/_app/ranking'
+    | '/_app/settings'
     | '/_app/urbanmind'
     | '/_app/wallet'
+    | '/_app/feed/$postId'
     | '/_app/markets/$marketId'
+    | '/_app/profile/$userId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -209,6 +269,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppUrbanmindRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/ranking': {
       id: '/_app/ranking'
       path: '/ranking'
@@ -221,6 +288,20 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/positions': {
+      id: '/_app/positions'
+      path: '/positions'
+      fullPath: '/positions'
+      preLoaderRoute: typeof AppPositionsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/notifications': {
+      id: '/_app/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AppNotificationsRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/markets': {
@@ -251,6 +332,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/profile/$userId': {
+      id: '/_app/profile/$userId'
+      path: '/$userId'
+      fullPath: '/profile/$userId'
+      preLoaderRoute: typeof AppProfileUserIdRouteImport
+      parentRoute: typeof AppProfileRoute
+    }
     '/_app/markets/$marketId': {
       id: '/_app/markets/$marketId'
       path: '/$marketId'
@@ -258,8 +346,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMarketsMarketIdRouteImport
       parentRoute: typeof AppMarketsRoute
     }
+    '/_app/feed/$postId': {
+      id: '/_app/feed/$postId'
+      path: '/$postId'
+      fullPath: '/feed/$postId'
+      preLoaderRoute: typeof AppFeedPostIdRouteImport
+      parentRoute: typeof AppFeedRoute
+    }
   }
 }
+
+interface AppFeedRouteChildren {
+  AppFeedPostIdRoute: typeof AppFeedPostIdRoute
+}
+
+const AppFeedRouteChildren: AppFeedRouteChildren = {
+  AppFeedPostIdRoute: AppFeedPostIdRoute,
+}
+
+const AppFeedRouteWithChildren =
+  AppFeedRoute._addFileChildren(AppFeedRouteChildren)
 
 interface AppMarketsRouteChildren {
   AppMarketsMarketIdRoute: typeof AppMarketsMarketIdRoute
@@ -273,24 +379,42 @@ const AppMarketsRouteWithChildren = AppMarketsRoute._addFileChildren(
   AppMarketsRouteChildren,
 )
 
+interface AppProfileRouteChildren {
+  AppProfileUserIdRoute: typeof AppProfileUserIdRoute
+}
+
+const AppProfileRouteChildren: AppProfileRouteChildren = {
+  AppProfileUserIdRoute: AppProfileUserIdRoute,
+}
+
+const AppProfileRouteWithChildren = AppProfileRoute._addFileChildren(
+  AppProfileRouteChildren,
+)
+
 interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
-  AppFeedRoute: typeof AppFeedRoute
+  AppFeedRoute: typeof AppFeedRouteWithChildren
   AppLiveRoute: typeof AppLiveRoute
   AppMarketsRoute: typeof AppMarketsRouteWithChildren
-  AppProfileRoute: typeof AppProfileRoute
+  AppNotificationsRoute: typeof AppNotificationsRoute
+  AppPositionsRoute: typeof AppPositionsRoute
+  AppProfileRoute: typeof AppProfileRouteWithChildren
   AppRankingRoute: typeof AppRankingRoute
+  AppSettingsRoute: typeof AppSettingsRoute
   AppUrbanmindRoute: typeof AppUrbanmindRoute
   AppWalletRoute: typeof AppWalletRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
-  AppFeedRoute: AppFeedRoute,
+  AppFeedRoute: AppFeedRouteWithChildren,
   AppLiveRoute: AppLiveRoute,
   AppMarketsRoute: AppMarketsRouteWithChildren,
-  AppProfileRoute: AppProfileRoute,
+  AppNotificationsRoute: AppNotificationsRoute,
+  AppPositionsRoute: AppPositionsRoute,
+  AppProfileRoute: AppProfileRouteWithChildren,
   AppRankingRoute: AppRankingRoute,
+  AppSettingsRoute: AppSettingsRoute,
   AppUrbanmindRoute: AppUrbanmindRoute,
   AppWalletRoute: AppWalletRoute,
 }

@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/supabase/loose";
 import type { Market } from "@/store/viax-store";
 
 function mapMarket(row: Record<string, unknown>): Market {
@@ -28,10 +28,10 @@ export function useMarkets() {
   return useQuery({
     queryKey: ["markets"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("markets")
-        .select("*")
-        .order("created_at");
+      const { data, error } = (await db.from("markets").select("*").order("created_at")) as {
+        data: Record<string, unknown>[] | null;
+        error: Error | null;
+      };
       if (error) throw error;
       return (data ?? []).map(mapMarket);
     },

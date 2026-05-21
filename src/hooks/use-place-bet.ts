@@ -16,7 +16,11 @@ export function usePlaceBet() {
       useViaX.setState((s) => ({
         markets: s.markets.map((m) =>
           m.id === marketId
-            ? { ...m, pool: { ...m.pool, [side]: m.pool[side] + stake }, participants: m.participants + 1 }
+            ? {
+                ...m,
+                pool: { ...m.pool, [side]: m.pool[side] + stake },
+                participants: m.participants + 1,
+              }
             : m,
         ),
       }));
@@ -35,7 +39,11 @@ export function usePlaceBet() {
       useViaX.setState((s) => ({
         markets: s.markets.map((m) =>
           m.id === marketId
-            ? { ...m, pool: { ...m.pool, [side]: m.pool[side] - stake }, participants: m.participants - 1 }
+            ? {
+                ...m,
+                pool: { ...m.pool, [side]: m.pool[side] - stake },
+                participants: m.participants - 1,
+              }
             : m,
         ),
       }));

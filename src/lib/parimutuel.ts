@@ -53,8 +53,7 @@ export const formatBRL = (n: number) =>
     maximumFractionDigits: n >= 1000 ? 0 : 2,
   });
 
-export const formatPct = (n: number, digits = 1) =>
-  `${(n * 100).toFixed(digits)}%`;
+export const formatPct = (n: number, digits = 1) => `${(n * 100).toFixed(digits)}%`;
 
 export const formatCompact = (n: number) =>
   Intl.NumberFormat("pt-BR", { notation: "compact", maximumFractionDigits: 1 }).format(n);

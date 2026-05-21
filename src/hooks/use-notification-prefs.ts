@@ -1,0 +1,58 @@
+import { useCallback, useEffect, useState } from "react";
+import { db } from "@/integrations/supabase/loose";
+import { useAnonAuth } from "@/hooks/use-anon-auth";
+
+export type NotificationPrefs = {
+  wins: boolean;
+  markets: boolean;
+  ranking: boolean;
+  alerts: boolean;
+};
+
+const STORAGE_KEY = "viax_notification_prefs";
+const defaults: NotificationPrefs = { wins: true, markets: true, ranking: false, alerts: true };
+
+function loadLocal(): NotificationPrefs {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return { ...defaults, ...JSON.parse(raw) };
+  } catch {
+    /* ignore */
+  }
+  return defaults;
+}
+
+export function useNotificationPrefs() {
+  const { userId } = useAnonAuth();
+  const [prefs, setPrefs] = useState<NotificationPrefs>(loadLocal);
+
+  useEffect(() => {
+    if (!userId) return;
+    (async () => {
+      const { data } = await db
+        .from("profiles")
+        .select("notification_prefs")
+        .eq("id", userId)
+        .single();
+      if (data?.notification_prefs) {
+        const merged = { ...defaults, ...data.notification_prefs };
+        setPrefs(merged);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+      }
+    })();
+  }, [userId]);
+
+  const update = useCallback(
+    async (patch: Partial<NotificationPrefs>) => {
+      const next = { ...prefs, ...patch };
+      setPrefs(next);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      if (userId) {
+        await db.from("profiles").update({ notification_prefs: next }).eq("id", userId);
+      }
+    },
+    [prefs, userId],
+  );
+
+  return { prefs, update };
+}

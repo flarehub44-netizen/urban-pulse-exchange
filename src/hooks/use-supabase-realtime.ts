@@ -21,15 +21,19 @@ export function useSupabaseRealtime() {
           const updated = mapMarket(payload.new as Record<string, unknown>);
 
           // Update TanStack Query cache
-          queryClient.setQueryData<Market[]>(["markets"], (old) =>
-            old?.map((m) => (m.id === updated.id ? { ...m, pool: updated.pool, participants: updated.participants } : m)) ?? old,
+          queryClient.setQueryData<Market[]>(
+            ["markets"],
+            (old) =>
+              old?.map((m) =>
+                m.id === updated.id
+                  ? { ...m, pool: updated.pool, participants: updated.participants }
+                  : m,
+              ) ?? old,
           );
 
           // Sync Zustand so tick() stays anchored to real values
           useViaX.setState((s) => ({
-            markets: s.markets.map((m) =>
-              m.id === updated.id ? { ...m, pool: updated.pool } : m,
-            ),
+            markets: s.markets.map((m) => (m.id === updated.id ? { ...m, pool: updated.pool } : m)),
           }));
         },
       )
@@ -38,20 +42,18 @@ export function useSupabaseRealtime() {
     // Channel 2 — new feed posts
     const feedCh = supabase
       .channel("feed-live")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "feed_posts" },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["feed"] });
-        },
-      )
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "feed_posts" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["feed"] });
+      })
       .subscribe();
 
     // Channel 3 — notifications for current user
     let notifCh: ReturnType<typeof supabase.channel> | null = null;
 
     const setupNotifChannel = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const userId = session?.user?.id;
       if (!userId) return;
 
@@ -67,9 +69,10 @@ export function useSupabaseRealtime() {
           },
           (payload) => {
             const notif = mapNotification(payload.new as Record<string, unknown>);
-            queryClient.setQueryData<ViaXNotification[]>(["notifications"], (old) =>
-              [notif, ...(old ?? [])],
-            );
+            queryClient.setQueryData<ViaXNotification[]>(["notifications"], (old) => [
+              notif,
+              ...(old ?? []),
+            ]);
             toast(notif.text);
           },
         )

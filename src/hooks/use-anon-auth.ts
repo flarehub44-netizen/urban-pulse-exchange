@@ -11,7 +11,9 @@ export function useAnonAuth() {
     initialized.current = true;
 
     const init = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session) {
         setUserId(session.user.id);
         setAuthReady(true);
@@ -24,7 +26,9 @@ export function useAnonAuth() {
 
     init();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_, session) => {
       setUserId(session?.user?.id ?? null);
       if (session) setAuthReady(true);
     });

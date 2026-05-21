@@ -2,7 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 
 const BASE_URL = "";
 
-interface E { path: string; changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly"; priority?: string; }
+interface E {
+  path: string;
+  changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly";
+  priority?: string;
+}
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
@@ -19,8 +23,9 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/wallet", changefreq: "daily", priority: "0.5" },
           { path: "/profile", changefreq: "daily", priority: "0.5" },
         ];
-        const urls = entries.map((e) =>
-          `  <url><loc>${BASE_URL}${e.path}</loc>${e.changefreq ? `<changefreq>${e.changefreq}</changefreq>` : ""}${e.priority ? `<priority>${e.priority}</priority>` : ""}</url>`
+        const urls = entries.map(
+          (e) =>
+            `  <url><loc>${BASE_URL}${e.path}</loc>${e.changefreq ? `<changefreq>${e.changefreq}</changefreq>` : ""}${e.priority ? `<priority>${e.priority}</priority>` : ""}</url>`,
         );
         const xml = [
           `<?xml version="1.0" encoding="UTF-8"?>`,

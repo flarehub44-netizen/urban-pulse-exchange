@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/supabase/loose";
 import type { Division } from "@/store/viax-store";
 
 export interface Profile {
@@ -44,11 +44,11 @@ export function useProfile(userId?: string | null) {
   return useQuery({
     queryKey: ["me", userId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = (await db
         .from("profiles")
         .select("*")
         .eq("id", userId!)
-        .single();
+        .single()) as { data: Record<string, unknown> | null; error: Error | null };
       if (error) throw error;
       return mapProfile(data as Record<string, unknown>);
     },

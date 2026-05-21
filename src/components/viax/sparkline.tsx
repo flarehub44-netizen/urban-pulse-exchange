@@ -5,7 +5,12 @@ interface Props {
   height?: number;
 }
 
-export function Sparkline({ data, stroke = "var(--color-primary)", width = 120, height = 32 }: Props) {
+export function Sparkline({
+  data,
+  stroke = "var(--color-primary)",
+  width = 120,
+  height = 32,
+}: Props) {
   if (data.length < 2) return null;
   const min = Math.min(...data);
   const max = Math.max(...data);
@@ -18,7 +23,12 @@ export function Sparkline({ data, stroke = "var(--color-primary)", width = 120, 
   const d = `M ${pts.join(" L ")}`;
   const gradId = `sg-${Math.random().toString(36).slice(2, 8)}`;
   return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
+    <svg
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+      className="overflow-visible"
+    >
       <defs>
         <linearGradient id={gradId} x1="0" x2="0" y1="0" y2="1">
           <stop offset="0%" stopColor={stroke} stopOpacity="0.35" />
@@ -26,7 +36,14 @@ export function Sparkline({ data, stroke = "var(--color-primary)", width = 120, 
         </linearGradient>
       </defs>
       <path d={`${d} L ${width},${height} L 0,${height} Z`} fill={`url(#${gradId})`} />
-      <path d={d} fill="none" stroke={stroke} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d={d}
+        fill="none"
+        stroke={stroke}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }

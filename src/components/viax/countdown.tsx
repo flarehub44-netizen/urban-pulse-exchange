@@ -13,8 +13,11 @@ export function Countdown({ to, className }: { to: number; className?: string })
   const s = Math.floor((diff % 60_000) / 1000);
   const urgent = diff < 5 * 60_000;
   return (
-    <span className={cn("mono tabular-nums", urgent ? "text-warn" : "text-muted-foreground", className)}>
-      {h > 0 ? `${h}h ` : ""}{String(m).padStart(2,"0")}m {String(s).padStart(2,"0")}s
+    <span
+      className={cn("mono tabular-nums", urgent ? "text-warn" : "text-muted-foreground", className)}
+    >
+      {h > 0 ? `${h}h ` : ""}
+      {String(m).padStart(2, "0")}m {String(s).padStart(2, "0")}s
     </span>
   );
 }

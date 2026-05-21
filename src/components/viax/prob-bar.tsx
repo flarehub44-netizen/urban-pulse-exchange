@@ -4,7 +4,7 @@ export function ProbBar({ yes, no }: { yes: number; no: number }) {
   const total = yes + no;
   const py = total === 0 ? 0.5 : yes / total;
   return (
-    <div className="relative h-2 w-full overflow-hidden rounded-full bg-surface-2">
+    <div className="relative h-2 w-full overflow-hidden rounded-full bg-surface-2 animate-[pool-grow_1.2s_ease-out]">
       <motion.div
         className="absolute inset-y-0 left-0 bg-gradient-to-r from-up to-up/70"
         animate={{ width: `${py * 100}%` }}

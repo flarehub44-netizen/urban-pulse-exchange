@@ -13,7 +13,14 @@ interface Props {
 }
 
 export function AnimatedNumber({
-  value, prefix, suffix, decimals = 0, className, format, duration = 600, flicker = true,
+  value,
+  prefix,
+  suffix,
+  decimals = 0,
+  className,
+  format,
+  duration = 600,
+  flicker = true,
 }: Props) {
   const [display, setDisplay] = useState(value);
   const fromRef = useRef(value);
@@ -37,7 +44,9 @@ export function AnimatedNumber({
       setPulse((p) => p + 1);
       lastVal.current = value;
     }
-    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
@@ -46,7 +55,14 @@ export function AnimatedNumber({
     : `${prefix ?? ""}${display.toLocaleString("pt-BR", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}${suffix ?? ""}`;
 
   return (
-    <span key={pulse} className={cn("mono tabular-nums inline-block", flicker && "animate-[number-flicker_0.18s_ease-out]", className)}>
+    <span
+      key={pulse}
+      className={cn(
+        "mono tabular-nums inline-block",
+        flicker && "animate-[number-flicker_0.18s_ease-out]",
+        className,
+      )}
+    >
       {out}
     </span>
   );

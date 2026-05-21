@@ -22,7 +22,9 @@ export function Ticker() {
             <div key={idx} className="flex items-center gap-2 px-6 text-xs">
               <span className="text-muted-foreground">{it.label}</span>
               <span className="mono text-foreground">{(it.prob * 100).toFixed(1)}%</span>
-              <span className={up ? "text-up" : "text-down"}>{up ? "▲" : "▼"} {(Math.abs(it.trend) * 5).toFixed(2)}%</span>
+              <span className={up ? "text-up" : "text-down"}>
+                {up ? "▲" : "▼"} {(Math.abs(it.trend) * 5).toFixed(2)}%
+              </span>
               <span className="size-1 rounded-full bg-border" />
             </div>
           );

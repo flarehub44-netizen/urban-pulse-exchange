@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { SupabaseFnContext } from "@/integrations/supabase/loose";
 
 const createPostSchema = z.object({
   text: z.string().min(1).max(280),
@@ -12,7 +13,7 @@ export const createFeedPostFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator(createPostSchema)
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context as { supabase: any; userId: string };
+    const { supabase, userId } = context as SupabaseFnContext;
     const { error } = await supabase.from("feed_posts").insert({
       user_id: userId,
       text: data.text,
@@ -21,4 +22,47 @@ export const createFeedPostFn = createServerFn({ method: "POST" })
     });
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+const postIdSchema = z.object({ postId: z.string().uuid() });
+
+export const likeFeedPostFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator(postIdSchema)
+  .handler(async ({ data, context }) => {
+    const { data: likes, error } = await (context as SupabaseFnContext).supabase.rpc(
+      "like_feed_post",
+      { p_post_id: data.postId },
+    );
+    if (error) throw new Error(error.message);
+    return { likes: likes as number };
+  });
+
+export const repostFeedPostFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator(postIdSchema)
+  .handler(async ({ data, context }) => {
+    const { data: reposts, error } = await (context as SupabaseFnContext).supabase.rpc(
+      "repost_feed_post",
+      { p_post_id: data.postId },
+    );
+    if (error) throw new Error(error.message);
+    return { reposts: reposts as number };
+  });
+
+const commentSchema = z.object({
+  postId: z.string().uuid(),
+  text: z.string().min(1).max(280),
+});
+
+export const commentFeedPostFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator(commentSchema)
+  .handler(async ({ data, context }) => {
+    const { data: comments, error } = await (context as SupabaseFnContext).supabase.rpc(
+      "comment_feed_post",
+      { p_post_id: data.postId, p_text: data.text },
+    );
+    if (error) throw new Error(error.message);
+    return { comments: comments as number };
   });
