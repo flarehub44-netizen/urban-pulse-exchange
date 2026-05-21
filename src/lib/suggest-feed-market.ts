@@ -12,7 +12,7 @@ const REGION_KEYWORDS: Record<string, string[]> = {
 export function suggestMarketForPost(text: string, markets: Market[]): Market | undefined {
   if (!markets.length) return undefined;
   const lower = text.toLowerCase();
-  const active = markets.filter((m) => m.status !== "resolved");
+  const active = markets.filter((m) => m.status === "live" || m.status === "closing");
 
   for (const m of active) {
     const regionParts = m.region

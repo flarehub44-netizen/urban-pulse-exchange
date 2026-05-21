@@ -230,7 +230,7 @@ function Feed() {
                             </span>
                           </div>
                         </Link>
-                        {mkt.status !== "resolved" && (
+                        {(mkt.status === "live" || mkt.status === "closing") && (
                           <div className="mt-3 grid grid-cols-2 gap-2">
                             <button
                               type="button"

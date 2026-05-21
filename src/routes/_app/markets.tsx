@@ -11,10 +11,11 @@ import { MobileMarketsCarousel } from "@/components/viax/mobile-markets-carousel
 import { Search, Star, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { loadMarketsFilters, saveMarketsFilters } from "@/lib/markets-filter-persist";
+import { isOpenBetStatus, isSettledDisplay } from "@/lib/market-status";
 
 export type MarketsSearch = {
   region?: string;
-  status?: "all" | "live" | "closing" | "resolved";
+  status?: "all" | "live" | "closing" | "dispute" | "resolved";
   category?: "Fluxo" | "Velocidade" | "Congestionamento";
   favorites?: "1";
   hasPosition?: "1";
@@ -32,7 +33,12 @@ export const Route = createFileRoute("/_app/markets")({
   validateSearch: (search: Record<string, unknown>): MarketsSearch => {
     const status = search.status;
     const validStatus =
-      status === "live" || status === "closing" || status === "resolved" ? status : undefined;
+      status === "live" ||
+      status === "closing" ||
+      status === "dispute" ||
+      status === "resolved"
+        ? status
+        : undefined;
     const cat = search.category;
     const validCat =
       cat === "Fluxo" || cat === "Velocidade" || cat === "Congestionamento" ? cat : undefined;
@@ -56,6 +62,7 @@ const statusFilters = [
   { key: "all" as const, label: "Todos" },
   { key: "live" as const, label: "Ao vivo" },
   { key: "closing" as const, label: "Encerrando" },
+  { key: "dispute" as const, label: "Em disputa" },
   { key: "resolved" as const, label: "Resolvidos" },
 ];
 const categoryFilters = ["Fluxo", "Velocidade", "Congestionamento"] as const;
@@ -70,7 +77,7 @@ function Markets() {
   const { ids: watchlist } = useWatchlist();
   const { data: bets } = useBets();
   const openMarketIds = useMemo(
-    () => new Set((bets ?? []).filter((b) => b.marketStatus !== "resolved").map((b) => b.marketId)),
+    () => new Set((bets ?? []).filter((b) => isOpenBetStatus(b.marketStatus)).map((b) => b.marketId)),
     [bets],
   );
 
@@ -150,9 +157,11 @@ function Markets() {
       if (statusKey === "live") return m.status === "live";
       if (statusKey === "closing")
         return (
-          m.status === "closing" || (m.status !== "resolved" && m.endsAt - Date.now() < 30 * 60_000)
+          m.status === "closing" ||
+          (isOpenBetStatus(m.status) && m.endsAt - Date.now() < 30 * 60_000)
         );
-      if (statusKey === "resolved") return m.status === "resolved";
+      if (statusKey === "dispute") return m.status === "dispute";
+      if (statusKey === "resolved") return isSettledDisplay(m.status);
       return true;
     });
     const now = Date.now();
@@ -162,8 +171,8 @@ function Markets() {
       if (sortKey === "closing") {
         const aLeft = a.endsAt - now;
         const bLeft = b.endsAt - now;
-        if (a.status === "resolved" && b.status !== "resolved") return 1;
-        if (b.status === "resolved" && a.status !== "resolved") return -1;
+        if (isSettledDisplay(a.status) && !isSettledDisplay(b.status)) return 1;
+        if (isSettledDisplay(b.status) && !isSettledDisplay(a.status)) return -1;
         return aLeft - bLeft;
       }
       return Math.abs(b.trend) - Math.abs(a.trend);

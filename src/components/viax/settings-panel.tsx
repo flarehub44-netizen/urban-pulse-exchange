@@ -1,14 +1,29 @@
 import { Link } from "@tanstack/react-router";
-import { Bell, Moon, Shield, Info } from "lucide-react";
+import { Bell, Moon, Shield, Info, Scale } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { copy } from "@/copy/pt-BR";
 import { useNotificationPrefs } from "@/hooks/use-notification-prefs";
+import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useProfile } from "@/hooks/use-profile";
+import { AdminDisputePanel } from "@/components/viax/admin-dispute-panel";
+import { AdminCreateMarketForm } from "@/components/viax/admin-create-market-form";
+import { AdminOpsPanel } from "@/components/viax/admin-ops-panel";
 
 export function SettingsPanel() {
   const { prefs, update } = useNotificationPrefs();
+  const { userId } = useAnonAuth();
+  const { data: profile } = useProfile(userId);
 
   return (
     <div className="space-y-6">
+      {profile?.isAdmin && (
+        <Section icon={<Scale className="size-4" />} title={copy.settings.adminTitle}>
+          <p className="text-xs text-muted-foreground">{copy.settings.adminDesc}</p>
+          <AdminOpsPanel />
+          <AdminCreateMarketForm />
+          <AdminDisputePanel />
+        </Section>
+      )}
       <Section icon={<Bell className="size-4" />} title="Notificações">
         <Toggle
           label={copy.settings.winsGains}

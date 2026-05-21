@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { HOUSE_RETENTION } from "@/lib/parimutuel";
+import type { MarketStatus } from "@/lib/market-status";
 
 export type Side = "YES" | "NO";
 
@@ -15,7 +16,9 @@ export interface Market {
   history: { t: number; p: number }[]; // probability history
   trend: number; // -1..1
   aiPrediction: { value: number; confidence: number; side: Side };
-  status: "live" | "closing" | "resolved";
+  status: MarketStatus;
+  acceptBets?: boolean;
+  frozen?: boolean;
   resolved?: Side;
 }
 
@@ -61,7 +64,7 @@ export interface RegionData {
 
 export interface ViaXNotification {
   id: string;
-  kind: "win" | "alert" | "rank" | "market" | "closing";
+  kind: "win" | "alert" | "rank" | "market" | "closing" | "refund" | "void";
   text: string;
   time: number;
   read?: boolean;
@@ -70,7 +73,7 @@ export interface ViaXNotification {
 
 export interface Transaction {
   id: string;
-  type: "deposit" | "withdraw" | "entry" | "payout";
+  type: "deposit" | "withdraw" | "entry" | "payout" | "refund";
   market?: string;
   amount: number;
   time: number;
@@ -517,7 +520,7 @@ export const useViaX = create<ViaXState>((set, get) => ({
     const s = get();
     // Visual animation only — real pool values are anchored by Supabase Realtime
     const updated = s.markets.map((m) => {
-      if (m.status === "resolved") return m;
+      if (m.status === "settled" || m.status === "resolved" || m.status === "void") return m;
       const driftY = (Math.random() - 0.49) * 600 + m.trend * 80;
       const driftN = (Math.random() - 0.49) * 600 - m.trend * 80;
       const YES = Math.max(2000, m.pool.YES + driftY);

@@ -7,13 +7,14 @@ import { copy } from "@/copy/pt-BR";
 import { formatBRL, PRIZE_RATIO } from "@/lib/parimutuel";
 import { Activity, ArrowUpRight, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { isOpenBetStatus, statusLabel, type MarketStatus } from "@/lib/market-status";
 
 export function PositionsPanel({ embedded }: { embedded?: boolean }) {
   const { data: bets, isLoading } = useBets();
   const markets = useViaX((s) => s.markets);
 
-  const open = (bets ?? []).filter((b) => b.marketStatus !== "resolved");
-  const resolved = (bets ?? []).filter((b) => b.marketStatus === "resolved");
+  const open = (bets ?? []).filter((b) => isOpenBetStatus(b.marketStatus));
+  const resolved = (bets ?? []).filter((b) => !isOpenBetStatus(b.marketStatus));
 
   const totalAtStake = open.reduce((s, b) => s + b.stake, 0);
 
@@ -240,25 +241,23 @@ function Stat({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-function StatusPill({ status }: { status: "live" | "closing" | "resolved" }) {
+function StatusPill({ status }: { status: MarketStatus }) {
+  const live = status === "live";
+  const closing = status === "closing";
   return (
     <span
       className={cn(
         "inline-flex items-center gap-1",
-        status === "live"
-          ? "text-up"
-          : status === "closing"
-            ? "text-warn"
-            : "text-muted-foreground",
+        live ? "text-up" : closing ? "text-warn" : "text-muted-foreground",
       )}
     >
       <span
         className={cn(
           "size-1.5 rounded-full",
-          status === "live" ? "bg-up" : status === "closing" ? "bg-warn" : "bg-muted-foreground",
+          live ? "bg-up" : closing ? "bg-warn" : "bg-muted-foreground",
         )}
       />
-      {status === "live" ? "Ao vivo" : status === "closing" ? "Encerrando" : "Resolvido"}
+      {statusLabel(status)}
     </span>
   );
 }

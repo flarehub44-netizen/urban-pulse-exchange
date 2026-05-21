@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useBets } from "@/hooks/use-bets";
+import { isOpenBetStatus } from "@/lib/market-status";
 import { supabase } from "@/integrations/supabase/client";
 
 export function useNavBadges() {
   const { data: bets } = useBets();
-  const openPositions = (bets ?? []).filter((b) => b.marketStatus !== "resolved").length;
+  const openPositions = (bets ?? []).filter((b) => isOpenBetStatus(b.marketStatus)).length;
 
   const { data: unreadNotifications = 0 } = useQuery({
     queryKey: ["notifications", "unread-count"],

@@ -5,6 +5,7 @@ import { useAnonAuth } from "@/hooks/use-anon-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { useNotifications } from "@/hooks/use-notifications";
 import { useBets } from "@/hooks/use-bets";
+import { isOpenBetStatus } from "@/lib/market-status";
 import { markNotificationsReadFn } from "@/actions/notifications";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatBRL } from "@/lib/parimutuel";
@@ -29,7 +30,7 @@ export function Topbar() {
   const notifications = dbNotifications ?? zustandNotifications;
 
   const { data: bets } = useBets();
-  const openPositions = (bets ?? []).filter((b) => b.marketStatus !== "resolved").length;
+  const openPositions = (bets ?? []).filter((b) => isOpenBetStatus(b.marketStatus)).length;
 
   const queryClient = useQueryClient();
   const xpPct = (me.xp / ("xpToNext" in me ? me.xpToNext : 2000)) * 100;

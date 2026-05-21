@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import { useWalletDeposit, useWalletWithdraw } from "@/hooks/use-wallet-rpc";
 import { useTransactions } from "@/hooks/use-transactions";
 import { useBalanceSeries } from "@/hooks/use-balance-series";
 import { useProfile } from "@/hooks/use-profile";
@@ -14,6 +16,7 @@ import { formatBRL } from "@/lib/parimutuel";
 import { ArrowDownLeft, ArrowUpRight, Plus, Minus, Trophy } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { cn } from "@/lib/utils";
+import { isOpenBetStatus } from "@/lib/market-status";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -34,6 +37,9 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
   const allMarkets = dbMarkets ?? zustandMarkets;
   const [tab, setTab] = useState<WalletTab>("Visão geral");
   const [betFilter, setBetFilter] = useState<"todos" | "wins" | "losses">("todos");
+  const [walletAmount, setWalletAmount] = useState("200");
+  const depositMut = useWalletDeposit();
+  const withdrawMut = useWalletWithdraw();
 
   const balanceSeries = useBalanceSeries(tx);
   const balanceCurve = balanceSeries.length
@@ -204,14 +210,35 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
             <span className="text-muted-foreground">R$</span>
             <input
               type="number"
-              defaultValue={200}
+              min={1}
+              value={walletAmount}
+              onChange={(e) => setWalletAmount(e.target.value)}
               className="w-full bg-transparent mono text-lg outline-none"
             />
           </div>
           <button
             type="button"
+            disabled={depositMut.isPending || withdrawMut.isPending}
+            onClick={async () => {
+              const amount = Number(walletAmount);
+              if (!amount || amount <= 0) {
+                toast.error("Informe um valor válido.");
+                return;
+              }
+              try {
+                if (tab === "Depositar") {
+                  await depositMut.mutateAsync(amount);
+                  toast.success(copy.wallet.deposit);
+                } else {
+                  await withdrawMut.mutateAsync(amount);
+                  toast.success(copy.wallet.withdraw);
+                }
+              } catch (err: unknown) {
+                toast.error(err instanceof Error ? err.message : "Operação falhou.");
+              }
+            }}
             className={cn(
-              "mt-4 w-full rounded-xl px-4 py-3 font-medium",
+              "mt-4 w-full rounded-xl px-4 py-3 font-medium disabled:opacity-50",
               tab === "Depositar" ? "bg-up text-up-foreground" : "bg-down text-down-foreground",
             )}
           >
@@ -238,9 +265,13 @@ function EnrichedHistory({
   betFilter: BetFilter;
   setBetFilter: (f: BetFilter) => void;
 }) {
-  const resolved = bets.filter((b) => b.marketStatus === "resolved");
+  const resolved = bets.filter((b) => !isOpenBetStatus(b.marketStatus));
   const wins = resolved.filter((b) => b.payout != null && b.payout > 0);
-  const losses = resolved.filter((b) => b.payout == null || b.payout === 0);
+  const losses = resolved.filter(
+    (b) =>
+      (b.marketStatus === "settled" || b.marketStatus === "resolved") &&
+      (b.payout == null || b.payout === 0),
+  );
   const deposits = tx.filter((t) => t.type === "deposit" || t.type === "withdraw");
 
   const shown = betFilter === "wins" ? wins : betFilter === "losses" ? losses : resolved;
@@ -287,7 +318,7 @@ function EnrichedHistory({
             b.payout != null && b.stake > 0 ? ((b.payout - b.stake) / b.stake) * 100 : null;
           const mkt = markets.find((m) => m.id === b.marketId);
           const vsAi =
-            mkt && b.marketStatus === "resolved"
+            mkt && b.marketStatus === "settled"
               ? b.side === mkt.aiPrediction.side
                 ? "Com IA"
                 : "Contra IA"
@@ -363,7 +394,8 @@ function RecentTx({ tx }: { tx: ReturnType<typeof useViaX.getState>["transaction
       <div className="border-b px-4 py-3 text-sm font-medium">Transações</div>
       <ul>
         {tx.map((t) => {
-          const positive = t.type === "deposit" || t.type === "payout";
+          const positive =
+            t.type === "deposit" || t.type === "payout" || t.type === "refund";
           return (
             <li
               key={t.id}
@@ -407,10 +439,11 @@ function RecentTx({ tx }: { tx: ReturnType<typeof useViaX.getState>["transaction
 function labelTx(t: string) {
   return (
     {
-      deposit: "Depósito",
-      withdraw: "Saque",
+      deposit: copy.wallet.deposit,
+      withdraw: copy.wallet.withdraw,
       entry: copy.wallet.entry,
       payout: copy.wallet.payout,
+      refund: copy.wallet.refund,
     }[t] ?? t
   );
 }

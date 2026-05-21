@@ -5,7 +5,7 @@ import { Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function EdgeBadge({ m, className }: { m: Market; className?: string }) {
-  if (m.status === "resolved") return null;
+  if (m.status !== "live" && m.status !== "closing") return null;
   const { edgePp, label, aiSide } = getMarketEdge(m);
   const positive = edgePp >= 0;
 

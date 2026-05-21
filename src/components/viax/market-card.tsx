@@ -21,6 +21,7 @@ import { OrderBox } from "./order-box";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useWatchlist } from "@/hooks/use-watchlist";
 import { cn } from "@/lib/utils";
+import { statusLabel } from "@/lib/market-status";
 
 export function MarketCard({ m, compact }: { m: Market; compact?: boolean }) {
   const pY = probability(m.pool, "YES");
@@ -46,6 +47,18 @@ export function MarketCard({ m, compact }: { m: Market; compact?: boolean }) {
               {m.category}
             </span>
             <EdgeBadge m={m} />
+            {(m.status === "dispute" || m.status === "draft" || m.status === "void") && (
+              <span
+                className={cn(
+                  "rounded-md px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider",
+                  m.status === "dispute" && "border border-warn/40 bg-warn/10 text-warn",
+                  m.status === "draft" && "border border-muted-foreground/30 bg-surface text-muted-foreground",
+                  m.status === "void" && "border border-down/30 bg-down/10 text-down",
+                )}
+              >
+                {statusLabel(m.status)}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">

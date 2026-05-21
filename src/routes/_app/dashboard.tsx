@@ -7,6 +7,7 @@ import { useViaX } from "@/store/viax-store";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { useBets } from "@/hooks/use-bets";
+import { isOpenBetStatus } from "@/lib/market-status";
 import { useMarkets } from "@/hooks/use-markets";
 import { useTransactions } from "@/hooks/use-transactions";
 import { useTraders } from "@/hooks/use-traders";
@@ -73,7 +74,7 @@ function Dashboard() {
   }, [highlight, navigate]);
 
   const { data: bets } = useBets();
-  const openBets = (bets ?? []).filter((b) => b.marketStatus !== "resolved");
+  const openBets = (bets ?? []).filter((b) => isOpenBetStatus(b.marketStatus));
   const topOpen = openBets.slice(0, 3);
 
   const { data: dbTx } = useTransactions();

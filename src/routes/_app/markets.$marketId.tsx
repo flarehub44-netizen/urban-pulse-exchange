@@ -20,9 +20,11 @@ import { ArrowLeft, Brain, Users, MapPin, Activity, BarChart2 } from "lucide-rea
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { isSettledDisplay, statusLabel } from "@/lib/market-status";
+import { MarketAuditPanel } from "@/components/viax/market-audit-panel";
 
 export type MarketDetailSearch = {
-  tab?: "chart" | "book" | "comments";
+  tab?: "chart" | "book" | "comments" | "audit";
   side?: "YES" | "NO";
 };
 
@@ -38,7 +40,8 @@ export const Route = createFileRoute("/_app/markets/$marketId")({
   }),
   validateSearch: (search: Record<string, unknown>): MarketDetailSearch => {
     const tab = search.tab;
-    const validTab = tab === "chart" || tab === "book" || tab === "comments" ? tab : undefined;
+    const validTab =
+      tab === "chart" || tab === "book" || tab === "comments" || tab === "audit" ? tab : undefined;
     const side = search.side === "YES" || search.side === "NO" ? search.side : undefined;
     return { tab: validTab, side };
   },
@@ -49,6 +52,7 @@ const tabs = [
   { key: "chart" as const, label: "Gráfico" },
   { key: "book" as const, label: copy.markets.tabBook },
   { key: "comments" as const, label: "Comentários" },
+  { key: "audit" as const, label: copy.markets.tabAudit },
 ];
 
 function MarketDetail() {
@@ -115,11 +119,20 @@ function MarketDetail() {
           <MapPin className="size-3" />
           {m.region}
         </span>
-        {m.status === "resolved" && (
-          <span className="rounded-md border border-warn/30 bg-warn/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-warn">
-            Resolvido
-          </span>
-        )}
+        <span
+          className={cn(
+            "rounded-md border px-2 py-0.5 text-[10px] uppercase tracking-wider",
+            isSettledDisplay(m.status)
+              ? "border-warn/30 bg-warn/10 text-warn"
+              : m.status === "dispute"
+                ? "border-down/30 bg-down/10 text-down"
+                : m.status === "resolving" || m.status === "closed"
+                  ? "border-primary/30 bg-primary/10 text-primary"
+                  : "border-border bg-surface/60 text-muted-foreground",
+          )}
+        >
+          {statusLabel(m.status)}
+        </span>
         <EdgeBadge m={m} />
         <Link
           to="/urbanmind"
@@ -304,6 +317,12 @@ function MarketDetail() {
               <Link to="/feed" className="mt-4 inline-block text-xs text-primary hover:underline">
                 Ver feed completo →
               </Link>
+            </div>
+          )}
+
+          {activeTab === "audit" && (
+            <div className="rounded-2xl border bg-card/60 p-5 backdrop-blur">
+              <MarketAuditPanel marketId={marketId} />
             </div>
           )}
         </div>

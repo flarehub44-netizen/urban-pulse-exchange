@@ -1,13 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { db } from "@/integrations/supabase/loose";
 import type { Side } from "@/store/viax-store";
+import { normalizeMarketStatus, type MarketStatus } from "@/lib/market-status";
 
 export interface OpenBet {
   id: string;
   marketId: string;
   marketQuestion: string;
   marketRegion: string;
-  marketStatus: "live" | "closing" | "resolved";
+  marketStatus: MarketStatus;
   marketEndsAt: number;
   poolYes: number;
   poolNo: number;
@@ -25,7 +26,7 @@ function mapBet(row: Record<string, unknown>): OpenBet {
     marketId: row.market_id as string,
     marketQuestion: (market?.question as string) ?? "",
     marketRegion: (market?.region as string) ?? "",
-    marketStatus: ((market?.status as string) ?? "live") as OpenBet["marketStatus"],
+    marketStatus: normalizeMarketStatus((market?.status as string) ?? "live"),
     marketEndsAt: market?.ends_at ? new Date(market.ends_at as string).getTime() : 0,
     poolYes: Number(market?.pool_yes ?? 0),
     poolNo: Number(market?.pool_no ?? 0),

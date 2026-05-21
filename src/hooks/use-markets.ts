@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { db } from "@/integrations/supabase/loose";
 import type { Market } from "@/store/viax-store";
+import { normalizeMarketStatus } from "@/lib/market-status";
 
 function mapMarket(row: Record<string, unknown>): Market {
   return {
@@ -19,7 +20,9 @@ function mapMarket(row: Record<string, unknown>): Market {
       confidence: Number(row.ai_confidence),
       side: row.ai_side as "YES" | "NO",
     },
-    status: row.status as Market["status"],
+    status: normalizeMarketStatus(row.status as string),
+    acceptBets: row.accept_bets !== false,
+    frozen: Boolean(row.frozen),
     resolved: row.resolved as Market["resolved"],
   };
 }

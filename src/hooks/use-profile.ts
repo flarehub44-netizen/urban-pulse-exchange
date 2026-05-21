@@ -18,6 +18,7 @@ export interface Profile {
   volume24h: number;
   city: string;
   neighborhood: string;
+  isAdmin: boolean;
 }
 
 function mapProfile(row: Record<string, unknown>): Profile {
@@ -37,6 +38,7 @@ function mapProfile(row: Record<string, unknown>): Profile {
     volume24h: Number(row.volume_24h),
     city: row.city as string,
     neighborhood: row.neighborhood as string,
+    isAdmin: Boolean(row.is_admin),
   };
 }
 

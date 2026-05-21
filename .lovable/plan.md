@@ -1,6 +1,8 @@
 ## ViaX — Plano da v1 (demo premium)
 
-Plataforma de **prediction exchange parimutuel de inteligência urbana**, totalmente front-end, com dados mockados que pulsam em tempo real (intervals + animações Framer Motion) para simular uma bolsa viva. Sem autenticação, sem banco — tudo client-side via Zustand. Estética fintech dark, mistura Bloomberg + TradingView + Polymarket + Robinhood.
+> **Atualização:** a v1 em produção usa **Supabase** (auth anônima, `place_bet`, motor de resolução pg_cron). Ver [`docs/RESOLUTION_ENGINE.md`](../docs/RESOLUTION_ENGINE.md). O texto abaixo descreve o protótipo visual original (Zustand mock); a UI mantém animações locais apenas quando o banco ainda não carregou.
+
+Plataforma de **prediction exchange parimutuel de inteligência urbana**, com estética fintech dark (Bloomberg + TradingView + Polymarket). Dados ao vivo vêm do Postgres; Zustand serve como fallback/landing.
 
 ---
 

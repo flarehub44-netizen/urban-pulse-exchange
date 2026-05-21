@@ -11,7 +11,7 @@ export function useBalanceSeries(transactions: Transaction[] | undefined) {
       if (tx.type === "deposit") bal += tx.amount;
       else if (tx.type === "withdraw") bal -= tx.amount;
       else if (tx.type === "entry") bal -= tx.amount;
-      else if (tx.type === "payout") bal += tx.amount;
+      else if (tx.type === "payout" || tx.type === "refund") bal += tx.amount;
       return {
         d: i,
         v: bal,

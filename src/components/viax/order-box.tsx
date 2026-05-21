@@ -10,7 +10,15 @@ import { useViaX } from "@/store/viax-store";
 import { usePlaceBet } from "@/hooks/use-place-bet";
 import { supabase } from "@/integrations/supabase/client";
 import { copy, toastBetSuccess } from "@/copy/pt-BR";
-import { estimatePayout, probability, formatBRL, formatPct, prizePool } from "@/lib/parimutuel";
+import {
+  estimatePayout,
+  probability,
+  formatBRL,
+  formatPct,
+  prizePool,
+  poolImbalanceWarning,
+} from "@/lib/parimutuel";
+import { canPlaceBets, isSettledDisplay } from "@/lib/market-status";
 import { EdgeBadge } from "@/components/viax/edge-badge";
 import { AnimatedNumber } from "./animated-number";
 import { cn } from "@/lib/utils";
@@ -41,7 +49,8 @@ export function OrderBox({
     setSide(initialSide);
   }, [initialSide, m.id]);
 
-  const resolved = m.status === "resolved";
+  const settled = isSettledDisplay(m.status);
+  const canBet = canPlaceBets(m.status, m.acceptBets ?? true, m.endsAt);
   const est = estimatePayout(m.pool, side, stake);
   const pY = probability(m.pool, "YES");
   const fixedPresets = [50, 100, 250, 500];
@@ -55,9 +64,10 @@ export function OrderBox({
   );
   const insufficient = stake > balance;
   const maxAffordable = Math.max(10, Math.floor(balance));
+  const imbalanceWarn = poolImbalanceWarning(m.pool.YES, m.pool.NO);
 
   const submit = async () => {
-    if (resolved) return;
+    if (!canBet) return;
     if (stake <= 0) {
       toast.error("Informe um valor válido");
       return;
@@ -105,7 +115,59 @@ export function OrderBox({
     }
   };
 
-  if (resolved) {
+  if (m.status === "draft") {
+    return (
+      <div className={cn("rounded-2xl border bg-card/60 p-5 backdrop-blur", className)}>
+        <h4 className="text-sm font-medium">{copy.bet.draftTitle}</h4>
+        <p className="mt-2 text-sm text-muted-foreground">{copy.bet.draftDesc}</p>
+      </div>
+    );
+  }
+
+  if (m.status === "closed") {
+    return (
+      <div className={cn("rounded-2xl border bg-card/60 p-5 backdrop-blur", className)}>
+        <h4 className="text-sm font-medium">{copy.bet.closedTitle}</h4>
+        <p className="mt-2 text-sm text-muted-foreground">{copy.bet.closedDesc}</p>
+      </div>
+    );
+  }
+
+  if (m.status === "resolving") {
+    return (
+      <div className={cn("rounded-2xl border border-primary/30 bg-primary/5 p-5 backdrop-blur", className)}>
+        <h4 className="text-sm font-medium">{copy.bet.resolvingTitle}</h4>
+        <p className="mt-2 text-sm text-muted-foreground">{copy.bet.resolvingDesc}</p>
+      </div>
+    );
+  }
+
+  if (m.status === "dispute") {
+    return (
+      <div className={cn("rounded-2xl border border-warn/30 bg-warn/5 p-5 backdrop-blur", className)}>
+        <h4 className="text-sm font-medium">{copy.bet.disputeTitle}</h4>
+        <p className="mt-2 text-sm text-muted-foreground">{copy.bet.disputeDesc}</p>
+      </div>
+    );
+  }
+
+  if (m.status === "void") {
+    return (
+      <div className={cn("rounded-2xl border bg-card/60 p-5 backdrop-blur", className)}>
+        <h4 className="text-sm font-medium">{copy.bet.voidTitle}</h4>
+        <p className="mt-2 text-sm text-muted-foreground">{copy.bet.voidDesc}</p>
+        <Link
+          to="/profile"
+          search={{ tab: "carteira" }}
+          className="mt-4 inline-block rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs text-primary hover:bg-primary/15"
+        >
+          {copy.bet.viewWallet}
+        </Link>
+      </div>
+    );
+  }
+
+  if (settled) {
     const winSide = m.resolved;
     return (
       <div className={cn("rounded-2xl border bg-card/60 p-5 backdrop-blur", className)}>
@@ -147,6 +209,12 @@ export function OrderBox({
         <h4 className="text-sm font-medium">{copy.bet.operateMarket}</h4>
         <EdgeBadge m={m} />
       </div>
+
+      {imbalanceWarn && (
+        <p className="mt-3 rounded-lg border border-warn/30 bg-warn/5 px-3 py-2 text-xs text-warn">
+          {imbalanceWarn}
+        </p>
+      )}
 
       <div className="mt-4 grid grid-cols-2 gap-2">
         {(["YES", "NO"] as const).map((s) => {

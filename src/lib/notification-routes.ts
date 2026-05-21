@@ -16,6 +16,8 @@ export function getNotificationLink(n: ViaXNotification): NotificationLink {
   }
   switch (n.kind) {
     case "win":
+    case "refund":
+    case "void":
       return { to: "/profile", search: { tab: "carteira" } };
     case "rank":
       return { to: "/ranking" };

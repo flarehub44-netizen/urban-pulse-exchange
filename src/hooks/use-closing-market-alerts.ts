@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { useBets } from "@/hooks/use-bets";
 import { useMarkets } from "@/hooks/use-markets";
 import { useViaX } from "@/store/viax-store";
+import { isOpenBetStatus, isSettledDisplay } from "@/lib/market-status";
 
 const ALERT_KEY = "viax_closing_alerted";
 const WINDOW_MS = 10 * 60 * 1000;
@@ -31,13 +32,13 @@ export function useClosingMarketAlerts() {
   const zustandMarkets = useViaX((s) => s.markets);
   const markets = dbMarkets ?? zustandMarkets;
   useEffect(() => {
-    const open = (bets ?? []).filter((b) => b.marketStatus !== "resolved");
+    const open = (bets ?? []).filter((b) => isOpenBetStatus(b.marketStatus));
     if (!open.length || !markets.length) return;
 
     const now = Date.now();
     for (const bet of open) {
       const m = markets.find((x) => x.id === bet.marketId);
-      if (!m || m.status === "resolved") continue;
+      if (!m || isSettledDisplay(m.status)) continue;
       const msLeft = m.endsAt - now;
       if (msLeft <= 0 || msLeft > WINDOW_MS) continue;
       const key = `${m.id}-${Math.floor(m.endsAt / 60_000)}`;

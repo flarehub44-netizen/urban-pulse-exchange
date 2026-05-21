@@ -5,12 +5,13 @@ import { copy } from "@/copy/pt-BR";
 import { formatBRL, PRIZE_RATIO } from "@/lib/parimutuel";
 import { Countdown } from "@/components/viax/countdown";
 import { cn } from "@/lib/utils";
+import { isOpenBetStatus } from "@/lib/market-status";
 import { Briefcase } from "lucide-react";
 
 export function OpenPositionStrip({ marketId }: { marketId: string }) {
   const { data: bets } = useBets();
   const markets = useViaX((s) => s.markets);
-  const bet = (bets ?? []).find((b) => b.marketId === marketId && b.marketStatus !== "resolved");
+  const bet = (bets ?? []).find((b) => b.marketId === marketId && isOpenBetStatus(b.marketStatus));
   if (!bet) return null;
 
   const live = markets.find((m) => m.id === bet.marketId);
