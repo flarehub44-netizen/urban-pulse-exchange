@@ -5,7 +5,9 @@ Plataforma de **prediction exchange parimutuel de inteligência urbana**, totalm
 ---
 
 ### 1. Design system (`src/styles.css`)
+
 Dark fintech premium em `oklch`:
+
 - `--background` grafite profundo `oklch(0.16 0.015 250)`
 - `--surface` / `--card` levemente elevados com glassmorphism sutil
 - `--primary` azul elétrico ViaX `oklch(0.68 0.20 250)`
@@ -19,6 +21,7 @@ Dark fintech premium em `oklch`:
 - Keyframes: `pulse-glow`, `ticker-scroll`, `number-flicker`, `pool-grow`, `heatmap-pulse`, `fade-in-up`, `shimmer`
 
 ### 2. Rotas (TanStack Start, file-based)
+
 ```
 src/routes/
   __root.tsx                 → shell + providers (QueryClient já existe)
@@ -37,6 +40,7 @@ src/routes/
 ```
 
 ### 3. Landing page (`/`)
+
 - **Nav** flutuante com glass, logo ViaX (mark custom SVG)
 - **Hero**: título "Transforme movimento urbano em inteligência coletiva", subtítulo, 3 CTAs (Entrar Agora → /dashboard, Ver Mercados → /markets, Ver Ranking → /ranking). À direita, **mock de terminal vivo** com odds piscando, mini chart e pool crescendo
 - **Ticker bar** horizontal com eventos rolando (`ticker-scroll`)
@@ -50,12 +54,15 @@ src/routes/
 - **Footer** minimalista
 
 ### 4. Layout do app (sidebar fintech)
+
 - **Sidebar** colapsável (shadcn sidebar), 56–240px, ícones lucide, item ativo com barra azul + glow
 - **Topbar**: saldo virtual animado, XP/divisão (badge), streak 🔥, volume diário, sino de notificações (popover com 5 notifs mock), avatar
 - **Outlet** com fundo grafite e grid responsivo
 
 ### 5. Dashboard (`/dashboard`)
+
 Grid estilo Bloomberg:
+
 - KPIs topo (saldo, lucro 24h, accuracy, ranking)
 - Painel "Mercados em alta" (4 cards)
 - Mini-mapa de SP com heatmap (link para /live)
@@ -64,6 +71,7 @@ Grid estilo Bloomberg:
 - Feed compacto (últimas 5)
 
 ### 6. Mercados (`/markets` e detalhe)
+
 - **Lista**: filtros (Todos / Ao vivo / Encerrando / Resolvidos), busca, cards Polymarket-style com:
   - Pergunta + região + tempo restante (countdown)
   - Pool SIM (verde) / Pool NÃO (vermelho) em barra dividida animada
@@ -78,39 +86,48 @@ Grid estilo Bloomberg:
   - **Comentários** abaixo
 
 ### 7. Engine Parimutuel (visual, client-side)
+
 `src/lib/parimutuel.ts`:
+
 ```ts
 prob(side) = pool[side] / poolTotal
 prizePool = poolTotal * 0.9
 payout(stake, side) = stake + (stake / pool[side]) * pool[other] * 0.9
 roi = (payout - stake) / stake
 ```
+
 Nunca mostrar "taxa" — só **Prize Pool** e **Pool Distribuível**. Store Zustand atualiza pools a cada 1.5s com micro-flutuações.
 
 ### 8. Mapa realtime (`/live`)
+
 Mapa SVG estilizado de São Paulo (silhueta de bairros simplificada + ruas principais como Paulista, Marginal, Faria Lima, 23 de Maio):
+
 - Heatmap por região (verde/amarelo/vermelho) que recalcula a cada 2s
 - **Pulsos** circulares animados em pontos de evento ativo
 - Tooltip ao hover com fluxo/velocidade média
 - Sidebar de eventos ativos com link para o mercado
 
 ### 9. Ranking (`/ranking`)
+
 - Tabs: Global / Cidade / Bairro / Amigos
 - Tabela esports: posição, avatar, nome, divisão (badge colorida), accuracy, ROI, streak, volume, crescimento semanal (seta verde/vermelha)
 - Top 3 em destaque com cards grandes
 
 ### 10. Feed social (`/feed`)
+
 - Feed estilo Twitter: avatar, handle, verificado, conteúdo, tags de mercado, likes, comentários, reposts
 - Composer no topo
 - Mistura: análises, alertas (acidente, chuva), previsões
 
 ### 11. UrbanMind AI (`/urbanmind`)
+
 - Hero com "previsão atual" gigante e barra de confiança
 - Gráfico IA vs Humanos (accuracy histórica)
 - Lista de previsões ativas da IA
 - Histórico com hits/misses
 
 ### 12. Carteira (`/wallet`)
+
 - Saldo grande animado (R$ virtual)
 - Tabs: Visão geral / Histórico / Depositar (CTA mock) / Sacar (CTA mock)
 - Chart de evolução do saldo
@@ -118,6 +135,7 @@ Mapa SVG estilizado de São Paulo (silhueta de bairros simplificada + ruas princ
 - KPIs: ROI total, volume movimentado, lucro mensal
 
 ### 13. Perfil (`/profile`)
+
 - Avatar grande, nome, divisão, XP bar
 - Grid de badges (Mestre da Paulista, Rei do Rush, etc.) com lock/unlock
 - Calendário de atividade estilo GitHub
@@ -125,14 +143,17 @@ Mapa SVG estilizado de São Paulo (silhueta de bairros simplificada + ruas princ
 - Mercados favoritos
 
 ### 14. Gamificação e notificações
+
 - Divisões: Bronze → Elite com cores próprias
 - Toast (`sonner`) para wins/streaks com confete (`canvas-confetti`) — som **desabilitado por padrão**
 - Notification popover na topbar com 5 exemplos mockados
 
 ### 15. Realtime (mock store Zustand)
+
 `src/store/marketStore.ts` — fonte única para mercados, pools, odds, feed, ranking, mapa. Hooks de intervalo (`useEffect` + `setInterval`) emitem updates pseudo-aleatórios (random walk) para todos os componentes consumirem. Números animam com Framer Motion `animate` + componente `<AnimatedNumber/>`.
 
 ### 16. Mobile
+
 - Sidebar vira drawer + **bottom nav** (Home, Mercados, Live, Ranking, Perfil)
 - Cards full-width, swipe horizontal em listas com `embla` (já incluído via carousel)
 - Topbar compacta com saldo + sino
@@ -140,6 +161,7 @@ Mapa SVG estilizado de São Paulo (silhueta de bairros simplificada + ruas princ
 ---
 
 ### Detalhes técnicos
+
 - **Stack real**: TanStack Start (não Next 15 — é o stack do projeto), TypeScript, Tailwind v4, shadcn/ui, **Framer Motion** (`motion`), **Recharts**, **Zustand**, **canvas-confetti**, **embla-carousel** (já presente). Sem Socket.io nesta v1 — realtime é simulado com intervals.
 - **Sem Supabase nesta v1** (escolha do escopo "demo sem auth"). Schema parimutuel fica documentado em `src/lib/parimutuel.ts` para futura migração.
 - **Sem mapa geográfico real** — SVG custom de SP.
@@ -148,8 +170,9 @@ Mapa SVG estilizado de São Paulo (silhueta de bairros simplificada + ruas princ
 - **Imagens**: avatares gerados (4–6) + hero abstrato urbano via `imagegen` em `src/assets/`.
 
 ### Fora do escopo da v1 (próximas iterações)
+
 - Auth + Supabase schema real (events, pools, predictions, wallets, xp_history, etc.)
-- Stripe / pagamento real
+- syncpayments / pagamento real
 - Mapbox geográfico
 - WebSockets reais
 - Integração YOLO/OpenCV para contagem real
