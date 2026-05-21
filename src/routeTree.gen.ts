@@ -9,38 +9,185 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppWalletRouteImport } from './routes/_app/wallet'
+import { Route as AppUrbanmindRouteImport } from './routes/_app/urbanmind'
+import { Route as AppRankingRouteImport } from './routes/_app/ranking'
+import { Route as AppProfileRouteImport } from './routes/_app/profile'
+import { Route as AppMarketsRouteImport } from './routes/_app/markets'
+import { Route as AppLiveRouteImport } from './routes/_app/live'
+import { Route as AppFeedRouteImport } from './routes/_app/feed'
+import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
+import { Route as AppMarketsMarketIdRouteImport } from './routes/_app/markets.$marketId'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppWalletRoute = AppWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppUrbanmindRoute = AppUrbanmindRouteImport.update({
+  id: '/urbanmind',
+  path: '/urbanmind',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRankingRoute = AppRankingRouteImport.update({
+  id: '/ranking',
+  path: '/ranking',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMarketsRoute = AppMarketsRouteImport.update({
+  id: '/markets',
+  path: '/markets',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLiveRoute = AppLiveRouteImport.update({
+  id: '/live',
+  path: '/live',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFeedRoute = AppFeedRouteImport.update({
+  id: '/feed',
+  path: '/feed',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMarketsMarketIdRoute = AppMarketsMarketIdRouteImport.update({
+  id: '/$marketId',
+  path: '/$marketId',
+  getParentRoute: () => AppMarketsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/feed': typeof AppFeedRoute
+  '/live': typeof AppLiveRoute
+  '/markets': typeof AppMarketsRouteWithChildren
+  '/profile': typeof AppProfileRoute
+  '/ranking': typeof AppRankingRoute
+  '/urbanmind': typeof AppUrbanmindRoute
+  '/wallet': typeof AppWalletRoute
+  '/markets/$marketId': typeof AppMarketsMarketIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/feed': typeof AppFeedRoute
+  '/live': typeof AppLiveRoute
+  '/markets': typeof AppMarketsRouteWithChildren
+  '/profile': typeof AppProfileRoute
+  '/ranking': typeof AppRankingRoute
+  '/urbanmind': typeof AppUrbanmindRoute
+  '/wallet': typeof AppWalletRoute
+  '/markets/$marketId': typeof AppMarketsMarketIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/feed': typeof AppFeedRoute
+  '/_app/live': typeof AppLiveRoute
+  '/_app/markets': typeof AppMarketsRouteWithChildren
+  '/_app/profile': typeof AppProfileRoute
+  '/_app/ranking': typeof AppRankingRoute
+  '/_app/urbanmind': typeof AppUrbanmindRoute
+  '/_app/wallet': typeof AppWalletRoute
+  '/_app/markets/$marketId': typeof AppMarketsMarketIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/sitemap.xml'
+    | '/dashboard'
+    | '/feed'
+    | '/live'
+    | '/markets'
+    | '/profile'
+    | '/ranking'
+    | '/urbanmind'
+    | '/wallet'
+    | '/markets/$marketId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/sitemap.xml'
+    | '/dashboard'
+    | '/feed'
+    | '/live'
+    | '/markets'
+    | '/profile'
+    | '/ranking'
+    | '/urbanmind'
+    | '/wallet'
+    | '/markets/$marketId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/sitemap.xml'
+    | '/_app/dashboard'
+    | '/_app/feed'
+    | '/_app/live'
+    | '/_app/markets'
+    | '/_app/profile'
+    | '/_app/ranking'
+    | '/_app/urbanmind'
+    | '/_app/wallet'
+    | '/_app/markets/$marketId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +195,112 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/wallet': {
+      id: '/_app/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof AppWalletRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/urbanmind': {
+      id: '/_app/urbanmind'
+      path: '/urbanmind'
+      fullPath: '/urbanmind'
+      preLoaderRoute: typeof AppUrbanmindRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/ranking': {
+      id: '/_app/ranking'
+      path: '/ranking'
+      fullPath: '/ranking'
+      preLoaderRoute: typeof AppRankingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/markets': {
+      id: '/_app/markets'
+      path: '/markets'
+      fullPath: '/markets'
+      preLoaderRoute: typeof AppMarketsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/live': {
+      id: '/_app/live'
+      path: '/live'
+      fullPath: '/live'
+      preLoaderRoute: typeof AppLiveRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/feed': {
+      id: '/_app/feed'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof AppFeedRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/markets/$marketId': {
+      id: '/_app/markets/$marketId'
+      path: '/$marketId'
+      fullPath: '/markets/$marketId'
+      preLoaderRoute: typeof AppMarketsMarketIdRouteImport
+      parentRoute: typeof AppMarketsRoute
+    }
   }
 }
 
+interface AppMarketsRouteChildren {
+  AppMarketsMarketIdRoute: typeof AppMarketsMarketIdRoute
+}
+
+const AppMarketsRouteChildren: AppMarketsRouteChildren = {
+  AppMarketsMarketIdRoute: AppMarketsMarketIdRoute,
+}
+
+const AppMarketsRouteWithChildren = AppMarketsRoute._addFileChildren(
+  AppMarketsRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppFeedRoute: typeof AppFeedRoute
+  AppLiveRoute: typeof AppLiveRoute
+  AppMarketsRoute: typeof AppMarketsRouteWithChildren
+  AppProfileRoute: typeof AppProfileRoute
+  AppRankingRoute: typeof AppRankingRoute
+  AppUrbanmindRoute: typeof AppUrbanmindRoute
+  AppWalletRoute: typeof AppWalletRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppDashboardRoute: AppDashboardRoute,
+  AppFeedRoute: AppFeedRoute,
+  AppLiveRoute: AppLiveRoute,
+  AppMarketsRoute: AppMarketsRouteWithChildren,
+  AppProfileRoute: AppProfileRoute,
+  AppRankingRoute: AppRankingRoute,
+  AppUrbanmindRoute: AppUrbanmindRoute,
+  AppWalletRoute: AppWalletRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
