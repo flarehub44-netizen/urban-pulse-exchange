@@ -11,7 +11,7 @@ const placeBetSchema = z.object({
 
 export const placeBetFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator(placeBetSchema)
+  .inputValidator(placeBetSchema)
   .handler(async ({ data, context }) => {
     const { supabase } = context as SupabaseFnContext;
     const { data: result, error } = await supabase.rpc("place_bet", {

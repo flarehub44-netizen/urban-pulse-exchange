@@ -4,12 +4,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const followingIdSchema = z.object({ followingId: z.string().uuid() });
 
-export const toggleTraderFollowFn = (
-  createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]) as ReturnType<
-    typeof createServerFn
-  >
-)
-  .validator(followingIdSchema)
+export const toggleTraderFollowFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(followingIdSchema)
   .handler(
     async ({
       data,

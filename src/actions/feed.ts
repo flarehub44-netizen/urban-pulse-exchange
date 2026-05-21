@@ -11,7 +11,7 @@ const createPostSchema = z.object({
 
 export const createFeedPostFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator(createPostSchema)
+  .inputValidator(createPostSchema)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context as SupabaseFnContext;
     const { error } = await supabase.from("feed_posts").insert({
@@ -28,7 +28,7 @@ const postIdSchema = z.object({ postId: z.string().uuid() });
 
 export const likeFeedPostFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator(postIdSchema)
+  .inputValidator(postIdSchema)
   .handler(async ({ data, context }) => {
     const { data: likes, error } = await (context as SupabaseFnContext).supabase.rpc(
       "like_feed_post",
@@ -40,7 +40,7 @@ export const likeFeedPostFn = createServerFn({ method: "POST" })
 
 export const repostFeedPostFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator(postIdSchema)
+  .inputValidator(postIdSchema)
   .handler(async ({ data, context }) => {
     const { data: reposts, error } = await (context as SupabaseFnContext).supabase.rpc(
       "repost_feed_post",
@@ -57,7 +57,7 @@ const commentSchema = z.object({
 
 export const commentFeedPostFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator(commentSchema)
+  .inputValidator(commentSchema)
   .handler(async ({ data, context }) => {
     const { data: comments, error } = await (context as SupabaseFnContext).supabase.rpc(
       "comment_feed_post",
