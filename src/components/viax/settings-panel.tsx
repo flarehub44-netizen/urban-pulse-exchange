@@ -8,6 +8,7 @@ import { useProfile } from "@/hooks/use-profile";
 import { AdminDisputePanel } from "@/components/viax/admin-dispute-panel";
 import { AdminCreateMarketForm } from "@/components/viax/admin-create-market-form";
 import { AdminOpsPanel } from "@/components/viax/admin-ops-panel";
+import { AdminClaimPanel } from "@/components/viax/admin-claim-panel";
 
 export function SettingsPanel() {
   const { prefs, update } = useNotificationPrefs();
@@ -16,6 +17,11 @@ export function SettingsPanel() {
 
   return (
     <div className="space-y-6">
+      {!profile?.isAdmin && (
+        <Section icon={<Shield className="size-4" />} title={copy.settings.adminClaimTitle}>
+          <AdminClaimPanel />
+        </Section>
+      )}
       {profile?.isAdmin && (
         <Section icon={<Scale className="size-4" />} title={copy.settings.adminTitle}>
           <p className="text-xs text-muted-foreground">{copy.settings.adminDesc}</p>

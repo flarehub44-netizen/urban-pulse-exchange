@@ -20,6 +20,7 @@ export interface Market {
   acceptBets?: boolean;
   frozen?: boolean;
   resolved?: Side;
+  archived?: boolean;
 }
 
 export interface FeedPost {

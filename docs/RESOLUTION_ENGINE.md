@@ -6,7 +6,7 @@
 npm run db:push
 ```
 
-Migrations: `20260522000000`–`20260524000002` (engine, ledger, gaps, security, oracle ops, wallet RPC).
+Migrations: `20260522000000`–`20260525000001` (engine, ledger, security, oracle ops, admin bootstrap, catalog archive).
 
 ## pg_cron
 
@@ -30,7 +30,7 @@ npm run db:tick -- "select public.tick_market_lifecycle();"
 `draft` → `live` → `closing` → `closed` → `resolving` → `settled` | `dispute` | `void`
 
 - **draft**: `create_market` (admin); `open_market` abre para apostas
-- **dispute**: `admin_resolve_market` na UI (Configurações, admins `mc_oracle` / `lucasalpha`)
+- **dispute**: `admin_resolve_market` na UI (Configurações, usuário com `is_admin`)
 
 ## Auditoria
 
@@ -39,7 +39,11 @@ Aba **Auditoria** no detalhe do mercado → RPC `get_market_audit` (ledger da ca
 ## Segurança
 
 - Trigger `profiles_guard_sensitive` impede alterar `is_admin`, `balance` e stats via cliente.
-- Admin: apenas perfis com `is_admin = true` (seed); use `service_role` para promoções.
+- **Virar operador (admin):**
+  1. **Convite (recomendado):** em Configurações, informe o código de uso único (seed: `VIAX-OPS-2026` em dev — rotacionar em produção via SQL).
+  2. **Allowlist por e-mail:** inserir em `admin_allowlist` com `service_role`, vincular e-mail no perfil, clicar “Sincronizar e-mail”.
+  3. **SQL manual:** `update public.profiles set is_admin = true where id = '<seu-auth-uuid>';` (Dashboard → Authentication → Users).
+- Perfis seed (`10000000-...`) **não** são admin após migration `20260525000000`.
 
 ## Observabilidade
 

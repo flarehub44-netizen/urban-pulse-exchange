@@ -5,7 +5,9 @@ import { useCreateMarket } from "@/hooks/use-create-market";
 import { copy } from "@/copy/pt-BR";
 import type { Market } from "@/store/viax-store";
 
-const categories = ["Fluxo", "Velocidade", "Congestionamento"] as const;
+import { MARKET_CATEGORY_FILTERS } from "@/lib/markets-catalog";
+
+const categories = MARKET_CATEGORY_FILTERS;
 
 function slugId(regionId: string) {
   const ts = Date.now().toString(36);

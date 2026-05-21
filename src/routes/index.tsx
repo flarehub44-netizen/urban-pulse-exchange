@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useViaX } from "@/store/viax-store";
+import { useCatalogMarkets } from "@/hooks/use-markets";
 import { useRealtimeTick } from "@/hooks/use-realtime-tick";
 import { MarketCard } from "@/components/viax/market-card";
 import { MobileMarketsCarousel } from "@/components/viax/mobile-markets-carousel";
@@ -52,7 +53,7 @@ function Landing() {
     });
   }, [navigate]);
 
-  const markets = useViaX((s) => s.markets);
+  const markets = useCatalogMarkets();
   const traders = useViaX((s) => s.traders);
   const aiAcc = useViaX((s) => s.aiAccuracy);
   const totalVol = markets.reduce((a, m) => a + m.pool.YES + m.pool.NO, 0);
@@ -544,7 +545,7 @@ function SectionHeader({
 }
 
 function TerminalMock() {
-  const markets = useViaX((s) => s.markets);
+  const markets = useCatalogMarkets();
   const top = markets[0];
   if (!top) return null;
   return (
@@ -618,7 +619,7 @@ function TerminalMock() {
 }
 
 function PhoneMock() {
-  const markets = useViaX((s) => s.markets);
+  const markets = useCatalogMarkets();
   return (
     <div className="relative h-[520px] w-[260px] rounded-[44px] border border-border bg-surface/80 p-3 shadow-[var(--shadow-elevated)]">
       <div className="absolute left-1/2 top-3 z-10 h-5 w-24 -translate-x-1/2 rounded-full bg-background" />

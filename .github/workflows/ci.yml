@@ -20,6 +20,8 @@ jobs:
       - run: npm ci
       - run: npm run test
       - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
       - name: SQL acceptance (optional, needs DATABASE_URL)
         if: ${{ secrets.DATABASE_URL != '' }}
         env:

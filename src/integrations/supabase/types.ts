@@ -98,6 +98,8 @@ export type Database = {
       wallet_withdraw: { Args: { p_amount: number }; Returns: Json };
       get_lifecycle_health: { Args: Record<string, never>; Returns: Json };
       get_platform_ledger_summary: { Args: Record<string, never>; Returns: Json };
+      claim_admin_invite: { Args: { p_code: string }; Returns: Json };
+      try_sync_admin_allowlist: { Args: Record<string, never>; Returns: Json };
       create_market: {
         Args: {
           p_id: string;

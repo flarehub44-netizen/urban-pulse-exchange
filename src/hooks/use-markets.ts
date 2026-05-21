@@ -1,7 +1,9 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { db } from "@/integrations/supabase/loose";
+import { useViaX } from "@/store/viax-store";
 import type { Market } from "@/store/viax-store";
 import { normalizeMarketStatus } from "@/lib/market-status";
+import { filterCatalogMarkets } from "@/lib/markets-catalog";
 
 function mapMarket(row: Record<string, unknown>): Market {
   return {
@@ -24,6 +26,7 @@ function mapMarket(row: Record<string, unknown>): Market {
     acceptBets: row.accept_bets !== false,
     frozen: Boolean(row.frozen),
     resolved: row.resolved as Market["resolved"],
+    archived: Boolean(row.archived),
   };
 }
 
@@ -31,12 +34,16 @@ export function useMarkets() {
   return useQuery({
     queryKey: ["markets"],
     queryFn: async () => {
-      const { data, error } = (await db.from("markets").select("*").order("created_at")) as {
+      const { data, error } = (await db
+        .from("markets")
+        .select("*")
+        .eq("archived", false)
+        .order("created_at")) as {
         data: Record<string, unknown>[] | null;
         error: Error | null;
       };
       if (error) throw error;
-      return (data ?? []).map(mapMarket);
+      return filterCatalogMarkets((data ?? []).map(mapMarket));
     },
     staleTime: 30_000,
   });
@@ -45,6 +52,13 @@ export function useMarkets() {
 export function useMarket(id: string) {
   const { data: markets } = useMarkets();
   return markets?.find((m) => m.id === id);
+}
+
+/** DB markets when loaded, else filtered Zustand fallback (landing + app). */
+export function useCatalogMarkets(): Market[] {
+  const { data: dbMarkets } = useMarkets();
+  const zustandMarkets = useViaX((s) => s.markets);
+  return dbMarkets ?? filterCatalogMarkets(zustandMarkets);
 }
 
 export { mapMarket };

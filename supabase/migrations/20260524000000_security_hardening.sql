@@ -10,7 +10,7 @@ security definer
 set search_path = public
 as $$
 begin
-  if current_setting('role', true) = 'service_role' then
+  if current_setting('role', true) in ('service_role', 'postgres', 'supabase_admin') then
     return new;
   end if;
   if tg_op = 'UPDATE' then

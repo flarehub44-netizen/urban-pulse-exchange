@@ -220,6 +220,16 @@ export const copy = {
     adminOpsDisputes: "Mercados em disputa",
     adminOpsLedger: "Receita da casa (ledger)",
     adminOpsLedgerEntries: "lançamentos",
+    adminClaimTitle: "Painel operador",
+    adminClaimDesc:
+      "Use o código de convite da equipe (uso único) ou sincronize após vincular e-mail na allowlist.",
+    adminClaimPlaceholder: "Ex.: VIAX-OPS-2026",
+    adminClaimBtn: "Ativar admin",
+    adminClaimSyncEmail: "Sincronizar e-mail",
+    adminClaimSuccess: "Acesso de operador ativado.",
+    adminClaimError: "Não foi possível ativar. Verifique o código.",
+    adminClaimNeedCode: "Informe o código de convite.",
+    adminClaimNoAllowlist: "E-mail ainda não está na lista de operadores.",
   },
 
   markets: {

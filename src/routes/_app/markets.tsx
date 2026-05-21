@@ -1,10 +1,9 @@
 import { copy } from "@/copy/pt-BR";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useEffect, useState } from "react";
-import { useMarkets } from "@/hooks/use-markets";
+import { useCatalogMarkets } from "@/hooks/use-markets";
 import { useBets } from "@/hooks/use-bets";
 import { getMarketEdge } from "@/lib/market-edge";
-import { useViaX } from "@/store/viax-store";
 import { useWatchlist } from "@/hooks/use-watchlist";
 import { MarketCard } from "@/components/viax/market-card";
 import { MobileMarketsCarousel } from "@/components/viax/mobile-markets-carousel";
@@ -12,11 +11,18 @@ import { Search, Star, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { loadMarketsFilters, saveMarketsFilters } from "@/lib/markets-filter-persist";
 import { isOpenBetStatus, isSettledDisplay } from "@/lib/market-status";
+import {
+  MARKET_CATEGORY_FILTERS,
+  matchesStatusFilter,
+  type MarketCategoryFilter,
+} from "@/lib/markets-catalog";
+import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useProfile } from "@/hooks/use-profile";
 
 export type MarketsSearch = {
   region?: string;
-  status?: "all" | "live" | "closing" | "dispute" | "resolved";
-  category?: "Fluxo" | "Velocidade" | "Congestionamento";
+  status?: "all" | "live" | "closing" | "dispute" | "resolved" | "draft";
+  category?: MarketCategoryFilter;
   favorites?: "1";
   hasPosition?: "1";
   sort?: "edge" | "closing" | "trend";
@@ -36,12 +42,14 @@ export const Route = createFileRoute("/_app/markets")({
       status === "live" ||
       status === "closing" ||
       status === "dispute" ||
-      status === "resolved"
+      status === "resolved" ||
+      status === "draft"
         ? status
         : undefined;
     const cat = search.category;
-    const validCat =
-      cat === "Fluxo" || cat === "Velocidade" || cat === "Congestionamento" ? cat : undefined;
+    const validCat = MARKET_CATEGORY_FILTERS.includes(cat as MarketCategoryFilter)
+      ? (cat as MarketCategoryFilter)
+      : undefined;
     return {
       region: typeof search.region === "string" && search.region ? search.region : undefined,
       status: validStatus,
@@ -58,22 +66,24 @@ export const Route = createFileRoute("/_app/markets")({
   component: Markets,
 });
 
-const statusFilters = [
+const baseStatusFilters = [
   { key: "all" as const, label: "Todos" },
   { key: "live" as const, label: "Ao vivo" },
   { key: "closing" as const, label: "Encerrando" },
   { key: "dispute" as const, label: "Em disputa" },
   { key: "resolved" as const, label: "Resolvidos" },
 ];
-const categoryFilters = ["Fluxo", "Velocidade", "Congestionamento"] as const;
-type CatF = (typeof categoryFilters)[number];
+const draftFilter = { key: "draft" as const, label: "Rascunhos" };
 
 function Markets() {
   const navigate = useNavigate({ from: "/_app/markets" });
   const search = Route.useSearch();
-  const { data: dbMarkets } = useMarkets();
-  const zustandMarkets = useViaX((s) => s.markets);
-  const markets = dbMarkets ?? zustandMarkets;
+  const { userId } = useAnonAuth();
+  const { data: profile } = useProfile(userId);
+  const markets = useCatalogMarkets();
+  const statusFilters = profile?.isAdmin
+    ? [...baseStatusFilters, draftFilter]
+    : baseStatusFilters;
   const { ids: watchlist } = useWatchlist();
   const { data: bets } = useBets();
   const openMarketIds = useMemo(
@@ -153,16 +163,7 @@ function Markets() {
       )
         return false;
       if (category && m.category !== category) return false;
-      if (statusKey === "all") return true;
-      if (statusKey === "live") return m.status === "live";
-      if (statusKey === "closing")
-        return (
-          m.status === "closing" ||
-          (isOpenBetStatus(m.status) && m.endsAt - Date.now() < 30 * 60_000)
-        );
-      if (statusKey === "dispute") return m.status === "dispute";
-      if (statusKey === "resolved") return isSettledDisplay(m.status);
-      return true;
+      return matchesStatusFilter(m.status, statusKey, m.endsAt);
     });
     const now = Date.now();
     return [...filtered].sort((a, b) => {
@@ -305,7 +306,7 @@ function Markets() {
             </button>
           ))}
         {!showFavorites &&
-          categoryFilters.map((f) => (
+          MARKET_CATEGORY_FILTERS.map((f) => (
             <button
               key={f}
               type="button"
