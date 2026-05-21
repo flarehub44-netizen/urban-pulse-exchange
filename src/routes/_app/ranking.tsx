@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useTraders } from "@/hooks/use-traders";
 import { useViaX } from "@/store/viax-store";
 import { DivisionBadge } from "@/components/viax/division-badge";
 import { formatBRL } from "@/lib/parimutuel";
@@ -15,7 +16,9 @@ const tabs = ["Global", "Cidade", "Bairro", "Amigos"] as const;
 type T = (typeof tabs)[number];
 
 function Ranking() {
-  const traders = useViaX((s) => s.traders);
+  const { data: dbTraders } = useTraders();
+  const zustandTraders = useViaX((s) => s.traders);
+  const traders = dbTraders ?? zustandTraders;
   const [tab, setTab] = useState<T>("Global");
 
   const list = tab === "Cidade"  ? traders.filter((t) => t.city === "São Paulo")

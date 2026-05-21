@@ -3,14 +3,21 @@ import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { toast } from "sonner";
 import type { Market, Side } from "@/store/viax-store";
+import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useProfile } from "@/hooks/use-profile";
 import { useViaX } from "@/store/viax-store";
+import { usePlaceBet } from "@/hooks/use-place-bet";
 import { estimatePayout, probability, formatBRL, formatPct, prizePool, poolTotal } from "@/lib/parimutuel";
 import { AnimatedNumber } from "./animated-number";
 import { cn } from "@/lib/utils";
 
 export function OrderBox({ m }: { m: Market }) {
-  const placeBet = useViaX((s) => s.placeBet);
-  const balance = useViaX((s) => s.me.balance);
+  const { userId } = useAnonAuth();
+  const { data: profile } = useProfile(userId);
+  const zustandBalance = useViaX((s) => s.me.balance);
+  const balance = profile?.balance ?? zustandBalance;
+
+  const { mutateAsync: placeBet, isPending } = usePlaceBet();
   const [side, setSide] = useState<Side>("YES");
   const [stake, setStake] = useState(100);
 
@@ -19,21 +26,25 @@ export function OrderBox({ m }: { m: Market }) {
 
   const presets = [50, 100, 250, 500];
 
-  const submit = () => {
+  const submit = async () => {
     if (stake <= 0 || stake > balance) {
       toast.error("Saldo insuficiente");
       return;
     }
-    placeBet(m.id, side, stake);
-    confetti({
-      particleCount: 60,
-      spread: 70,
-      origin: { y: 0.7 },
-      colors: side === "YES" ? ["#22d3a8", "#86efac"] : ["#f87171", "#fb7185"],
-    });
-    toast.success(`Posição ${side} · ${formatBRL(stake)}`, {
-      description: `Payout potencial ${formatBRL(est.payout)}`,
-    });
+    try {
+      await placeBet({ marketId: m.id, side, stake });
+      confetti({
+        particleCount: 60,
+        spread: 70,
+        origin: { y: 0.7 },
+        colors: side === "YES" ? ["#22d3a8", "#86efac"] : ["#f87171", "#fb7185"],
+      });
+      toast.success(`Posição ${side} · ${formatBRL(stake)}`, {
+        description: `Payout potencial ${formatBRL(est.payout)}`,
+      });
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Erro ao colocar aposta");
+    }
   };
 
   return (
@@ -103,14 +114,15 @@ export function OrderBox({ m }: { m: Market }) {
       <motion.button
         whileTap={{ scale: 0.98 }}
         onClick={submit}
+        disabled={isPending}
         className={cn(
-          "mt-4 w-full rounded-xl px-4 py-3 font-medium transition",
+          "mt-4 w-full rounded-xl px-4 py-3 font-medium transition disabled:opacity-60",
           side === "YES"
             ? "bg-gradient-to-r from-up to-up/80 text-up-foreground hover:shadow-[var(--shadow-glow-up)]"
             : "bg-gradient-to-r from-down to-down/80 text-down-foreground hover:shadow-[var(--shadow-glow-down)]",
         )}
       >
-        Operar {side === "YES" ? "SIM" : "NÃO"} · {formatBRL(stake)}
+        {isPending ? "Processando..." : `Operar ${side === "YES" ? "SIM" : "NÃO"} · ${formatBRL(stake)}`}
       </motion.button>
 
       <p className="mt-3 text-center text-[10px] text-muted-foreground">

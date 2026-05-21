@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useMarkets } from "@/hooks/use-markets";
 import { useViaX } from "@/store/viax-store";
 import { MarketCard } from "@/components/viax/market-card";
 import { Search } from "lucide-react";
@@ -14,7 +15,9 @@ const filters = ["Todos", "Ao vivo", "Encerrando", "Fluxo", "Velocidade", "Conge
 type F = (typeof filters)[number];
 
 function Markets() {
-  const markets = useViaX((s) => s.markets);
+  const { data: dbMarkets } = useMarkets();
+  const zustandMarkets = useViaX((s) => s.markets);
+  const markets = dbMarkets ?? zustandMarkets;
   const [filter, setFilter] = useState<F>("Todos");
   const [q, setQ] = useState("");
 

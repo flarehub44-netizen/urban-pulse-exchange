@@ -3,13 +3,22 @@ import { AppSidebar } from "@/components/viax/sidebar";
 import { Topbar } from "@/components/viax/topbar";
 import { BottomNav } from "@/components/viax/bottom-nav";
 import { useRealtimeTick } from "@/hooks/use-realtime-tick";
+import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useSupabaseRealtime } from "@/hooks/use-supabase-realtime";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
 });
 
 function AppLayout() {
+  const { authReady } = useAnonAuth();
   useRealtimeTick();
+  useSupabaseRealtime();
+
+  if (!authReady) {
+    return <div className="min-h-screen w-full bg-background" />;
+  }
+
   return (
     <div className="min-h-screen w-full bg-background">
       <div className="flex">

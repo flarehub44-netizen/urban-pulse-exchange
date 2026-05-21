@@ -20,6 +20,10 @@ dist-ssr
 .wrangler/
 .dev.vars
 
+# Environment secrets — never commit service role keys
+.env
+.env.*
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -1,4 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useMarkets } from "@/hooks/use-markets";
+import { useFeed } from "@/hooks/use-feed";
 import { useViaX } from "@/store/viax-store";
 import { ProbChart } from "@/components/viax/prob-chart";
 import { OrderBox } from "@/components/viax/order-box";
@@ -17,8 +19,13 @@ export const Route = createFileRoute("/_app/markets/$marketId")({
 
 function MarketDetail() {
   const { marketId } = Route.useParams();
-  const m = useViaX((s) => s.markets.find((x) => x.id === marketId));
-  const feed = useViaX((s) => s.feed.filter((p) => p.marketId === marketId));
+  const { data: dbMarkets } = useMarkets();
+  const zustandMarkets = useViaX((s) => s.markets);
+  const markets = dbMarkets ?? zustandMarkets;
+  const m = markets.find((x) => x.id === marketId);
+  const { data: dbFeed } = useFeed(marketId);
+  const zustandFeed = useViaX((s) => s.feed.filter((p) => p.marketId === marketId));
+  const feed = dbFeed ?? zustandFeed;
   if (!m) throw notFound();
 
   const pY = probability(m.pool, "YES");

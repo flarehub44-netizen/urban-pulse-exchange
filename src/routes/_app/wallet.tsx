@@ -1,5 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useTransactions } from "@/hooks/use-transactions";
+import { useProfile } from "@/hooks/use-profile";
+import { useAnonAuth } from "@/hooks/use-anon-auth";
 import { useViaX } from "@/store/viax-store";
 import { AnimatedNumber } from "@/components/viax/animated-number";
 import { formatBRL } from "@/lib/parimutuel";
@@ -18,8 +21,13 @@ const tabs = ["Visão geral", "Histórico", "Depositar", "Sacar"] as const;
 type T = (typeof tabs)[number];
 
 function Wallet() {
-  const me = useViaX((s) => s.me);
-  const tx = useViaX((s) => s.transactions);
+  const { userId } = useAnonAuth();
+  const { data: profile } = useProfile(userId);
+  const zustandMe = useViaX((s) => s.me);
+  const me = profile ?? zustandMe;
+  const { data: dbTx } = useTransactions();
+  const zustandTx = useViaX((s) => s.transactions);
+  const tx = dbTx ?? zustandTx;
   const [tab, setTab] = useState<T>("Visão geral");
 
   const balanceCurve = Array.from({ length: 30 }, (_, i) => ({

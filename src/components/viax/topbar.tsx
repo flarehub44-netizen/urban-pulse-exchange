@@ -1,5 +1,10 @@
 import { Bell, Flame, TrendingUp, Wallet as WalletIcon } from "lucide-react";
 import { useViaX } from "@/store/viax-store";
+import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useProfile } from "@/hooks/use-profile";
+import { useNotifications } from "@/hooks/use-notifications";
+import { markNotificationsReadFn } from "@/actions/notifications";
+import { useQueryClient } from "@tanstack/react-query";
 import { formatBRL } from "@/lib/parimutuel";
 import { AnimatedNumber } from "./animated-number";
 import { DivisionBadge } from "./division-badge";
@@ -8,9 +13,30 @@ import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export function Topbar() {
-  const me = useViaX((s) => s.me);
-  const notifications = useViaX((s) => s.notifications);
-  const xpPct = (me.xp / me.xpToNext) * 100;
+  const { userId } = useAnonAuth();
+  const { data: profile } = useProfile(userId);
+  const zustandMe = useViaX((s) => s.me);
+  const me = profile ?? zustandMe;
+
+  const { data: dbNotifications } = useNotifications();
+  const zustandNotifications = useViaX((s) => s.notifications);
+  const notifications = dbNotifications ?? zustandNotifications;
+
+  const queryClient = useQueryClient();
+  const xpPct = (me.xp / (("xpToNext" in me ? me.xpToNext : 2000))) * 100;
+  const unread = notifications.filter((n) => !n.read).length;
+
+  const handleBellOpen = async () => {
+    if (unread > 0) {
+      try {
+        await markNotificationsReadFn({ data: undefined });
+        queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      } catch {
+        // silent — not critical
+      }
+    }
+  };
+
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/60 bg-background/70 px-4 backdrop-blur lg:px-6">
       <div className="hidden lg:flex items-center gap-2 text-xs">
@@ -23,7 +49,7 @@ export function Topbar() {
           <AnimatedNumber value={me.balance} format={formatBRL} className="text-foreground" />
         </Stat>
         <Stat icon={<TrendingUp className="size-3.5" />} label="Volume 24h" hideSm>
-          <AnimatedNumber value={me.volume24h} format={formatBRL} className="text-foreground" />
+          <AnimatedNumber value={"volume24h" in me ? me.volume24h : 0} format={formatBRL} className="text-foreground" />
         </Stat>
         <div className="hidden md:flex items-center gap-2 rounded-full border bg-card px-3 py-1.5">
           <span className="text-[10px] uppercase tracking-wider text-muted-foreground">XP</span>
@@ -38,16 +64,21 @@ export function Topbar() {
           <span className="mono">{me.streak}</span>
         </div>
 
-        <Popover>
+        <Popover onOpenChange={(open) => { if (open) handleBellOpen(); }}>
           <PopoverTrigger asChild>
             <button className="relative flex size-9 items-center justify-center rounded-full border bg-card hover:bg-surface-2">
               <Bell className="size-4" />
-              <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-primary shadow-[var(--shadow-glow-primary)]" />
+              {unread > 0 && (
+                <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-primary shadow-[var(--shadow-glow-primary)]" />
+              )}
             </button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-80 p-0">
             <div className="border-b px-3 py-2 text-sm font-medium">Notificações</div>
             <ul className="max-h-80 overflow-auto">
+              {notifications.length === 0 && (
+                <li className="px-3 py-4 text-sm text-muted-foreground text-center">Nenhuma notificação</li>
+              )}
               {notifications.map((n) => (
                 <li key={n.id} className="border-b px-3 py-2 text-sm last:border-0 hover:bg-surface/60">
                   <div className="text-foreground/90">{n.text}</div>

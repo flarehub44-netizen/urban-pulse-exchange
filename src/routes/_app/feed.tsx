@@ -1,5 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useFeed } from "@/hooks/use-feed";
+import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useProfile } from "@/hooks/use-profile";
+import { createFeedPostFn } from "@/actions/feed";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { useViaX } from "@/store/viax-store";
 import { DivisionBadge } from "@/components/viax/division-badge";
 import { Heart, MessageCircle, Repeat2, BadgeCheck } from "lucide-react";
@@ -19,8 +25,14 @@ const tagTone: Record<string, string> = {
 };
 
 function Feed() {
-  const feed = useViaX((s) => s.feed);
-  const me = useViaX((s) => s.me);
+  const { data: dbFeed } = useFeed();
+  const zustandFeed = useViaX((s) => s.feed);
+  const feed = dbFeed ?? zustandFeed;
+  const { userId } = useAnonAuth();
+  const { data: profile } = useProfile(userId);
+  const zustandMe = useViaX((s) => s.me);
+  const me = profile ?? zustandMe;
+  const queryClient = useQueryClient();
   const [text, setText] = useState("");
 
   return (
@@ -40,8 +52,17 @@ function Feed() {
             <div className="mt-2 flex items-center justify-between">
               <div className="text-[11px] text-muted-foreground">{text.length}/280</div>
               <button
-                onClick={() => setText("")}
-                disabled={!text}
+                onClick={async () => {
+                  if (!text.trim()) return;
+                  try {
+                    await createFeedPostFn({ data: { text: text.trim() } });
+                    setText("");
+                    queryClient.invalidateQueries({ queryKey: ["feed"] });
+                  } catch {
+                    toast.error("Erro ao publicar. Tente novamente.");
+                  }
+                }}
+                disabled={!text.trim()}
                 className="rounded-lg bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground disabled:opacity-40 hover:bg-primary/90"
               >
                 Publicar

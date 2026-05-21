@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMarkets } from "@/hooks/use-markets";
+import { useRegions } from "@/hooks/use-regions";
 import { useViaX } from "@/store/viax-store";
 import { CityHeatmap } from "@/components/viax/city-heatmap";
 import { AnimatedNumber } from "@/components/viax/animated-number";
@@ -10,8 +12,12 @@ export const Route = createFileRoute("/_app/live")({
 });
 
 function Live() {
-  const markets = useViaX((s) => s.markets);
-  const regions = useViaX((s) => s.regions);
+  const { data: dbMarkets } = useMarkets();
+  const zustandMarkets = useViaX((s) => s.markets);
+  const markets = dbMarkets ?? zustandMarkets;
+  const { data: dbRegions } = useRegions();
+  const zustandRegions = useViaX((s) => s.regions);
+  const regions = dbRegions ?? zustandRegions;
 
   const events = [
     { kind: "alerta", text: "Acidente reportado na Marginal Tietê altura Cebolão", time: "agora" },
