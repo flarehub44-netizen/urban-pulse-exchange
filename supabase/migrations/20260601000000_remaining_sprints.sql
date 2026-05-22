@@ -45,7 +45,7 @@ create table if not exists platform_events (
 
 alter table platform_events enable row level security;
 create policy "events_select" on platform_events for select using (true);
-create policy "events_insert" on platform_events for insert using (
+create policy "events_insert" on platform_events for insert with check (
   exists (select 1 from profiles where id = auth.uid() and is_admin = true)
 );
 
