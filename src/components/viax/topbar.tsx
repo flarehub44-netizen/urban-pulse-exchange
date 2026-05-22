@@ -105,7 +105,7 @@ export function Topbar() {
           />
         </Stat>
         <div className="hidden md:flex items-center gap-2 rounded-full border bg-card px-3 py-1.5">
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">XP</span>
+          <span className="text-xs uppercase tracking-wider text-muted-foreground">XP</span>
           <div className="h-1.5 w-20 overflow-hidden rounded-full bg-surface-2">
             <div
               className="h-full bg-gradient-to-r from-primary to-primary-glow"
@@ -140,7 +140,7 @@ export function Topbar() {
           <PopoverContent align="end" className="w-80 p-0">
             <div className="flex items-center justify-between border-b px-3 py-2">
               <span className="text-sm font-medium">Notificações</span>
-              <Link to="/notifications" className="text-[10px] text-primary hover:underline">
+              <Link to="/notifications" className="text-xs text-primary hover:underline">
                 Ver todas
               </Link>
             </div>
@@ -158,7 +158,7 @@ export function Topbar() {
                     className="w-full border-b px-3 py-2 text-left text-sm last:border-0 hover:bg-surface/60"
                   >
                     <div className="text-foreground/90">{n.text}</div>
-                    <div className="mt-0.5 text-[10px] text-muted-foreground">
+                    <div className="mt-0.5 text-xs text-muted-foreground">
                       {formatDistanceToNow(n.time, { locale: ptBR, addSuffix: true })}
                     </div>
                   </button>
@@ -195,7 +195,7 @@ function Stat({
       className={`items-center gap-1.5 rounded-full border bg-card px-3 py-1.5 text-xs transition hover:bg-surface-2 ${hideSm ? "hidden md:flex" : "hidden sm:flex"}`}
     >
       <span className="text-muted-foreground">{icon}</span>
-      <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</span>
+      <span className="text-xs uppercase tracking-wider text-muted-foreground">{label}</span>
       <span className="ml-1">{children}</span>
     </div>
   );

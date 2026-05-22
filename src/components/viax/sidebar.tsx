@@ -25,7 +25,7 @@ function SidebarNav({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate
     <>
       <div
         className={cn(
-          "px-3 text-[10px] uppercase tracking-[0.16em] text-muted-foreground/70 mb-2",
+          "px-3 text-xs uppercase tracking-[0.16em] text-muted-foreground/70 mb-2",
           collapsed && "sr-only",
         )}
       >

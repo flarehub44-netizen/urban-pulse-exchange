@@ -51,7 +51,7 @@ export function AdminCreateMarketForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-3 rounded-xl border bg-card/40 p-4">
       <p className="text-xs font-medium text-muted-foreground">{copy.settings.adminCreateTitle}</p>
-      <label className="block text-[10px] uppercase tracking-wider text-muted-foreground">
+      <label className="block text-xs uppercase tracking-wider text-muted-foreground">
         {copy.settings.adminCreateQuestion}
       </label>
       <input
@@ -62,7 +62,7 @@ export function AdminCreateMarketForm() {
       />
       <div className="grid gap-2 sm:grid-cols-2">
         <div>
-          <label className="block text-[10px] uppercase tracking-wider text-muted-foreground">
+          <label className="block text-xs uppercase tracking-wider text-muted-foreground">
             Região
           </label>
           <select
@@ -80,7 +80,7 @@ export function AdminCreateMarketForm() {
           </select>
         </div>
         <div>
-          <label className="block text-[10px] uppercase tracking-wider text-muted-foreground">
+          <label className="block text-xs uppercase tracking-wider text-muted-foreground">
             Categoria
           </label>
           <select
@@ -98,7 +98,7 @@ export function AdminCreateMarketForm() {
       </div>
       <div className="grid gap-2 sm:grid-cols-2">
         <div>
-          <label className="block text-[10px] uppercase tracking-wider text-muted-foreground">
+          <label className="block text-xs uppercase tracking-wider text-muted-foreground">
             Meta (valor)
           </label>
           <input
@@ -110,7 +110,7 @@ export function AdminCreateMarketForm() {
           />
         </div>
         <div>
-          <label className="block text-[10px] uppercase tracking-wider text-muted-foreground">
+          <label className="block text-xs uppercase tracking-wider text-muted-foreground">
             Encerra em (horas)
           </label>
           <input

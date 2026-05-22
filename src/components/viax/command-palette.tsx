@@ -135,7 +135,7 @@ export function CommandPalette() {
                 navigate({ to: "/profile/$userId", params: { userId: t.id } });
               }}
             >
-              <img src={t.avatar} alt="" className="mr-2 size-6 rounded-full" />
+              <img src={t.avatar} alt={t.name} className="mr-2 size-6 rounded-full" />
               {t.name} <span className="text-muted-foreground">@{t.handle}</span>
             </CommandItem>
           ))}

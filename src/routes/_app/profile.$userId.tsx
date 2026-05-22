@@ -10,11 +10,10 @@ import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
 import { useFollowedTraders } from "@/hooks/use-followed-traders";
 import { toast } from "sonner";
-import { ArrowLeft, Lock, UserPlus, UserMinus, Zap, Link2 } from "lucide-react";
+import { ArrowLeft, Lock, UserPlus, UserMinus, Zap, Link2, BarChart2, Activity } from "lucide-react";
 import { usePublicTraderBets } from "@/hooks/use-public-trader-bets";
 import { copyShareUrl } from "@/lib/share-url";
 import { cn } from "@/lib/utils";
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 export const Route = createFileRoute("/_app/profile/$userId")({
   head: () => ({
@@ -67,12 +66,8 @@ function PublicProfile() {
 
   const xpPct = xpToNext > 0 ? (xp / xpToNext) * 100 : 0;
 
-  const pnlData = Array.from({ length: 60 }, (_, i) => ({
-    d: i,
-    v: Math.max(0, i * 18 + Math.sin(i / 5) * 200 + (Math.random() - 0.45) * 60),
-  }));
-
-  const calendar = Array.from({ length: 84 }, () => Math.random());
+  const hasPnlHistory = false; // replaced when real history API is available
+  const hasActivityHistory = false; // replaced when real activity API is available
 
   const isMe = myId === targetId;
   const { isFollowing, toggle, isPending } = useFollowedTraders();
@@ -132,7 +127,7 @@ function PublicProfile() {
 
       <div className="rounded-2xl border bg-gradient-to-br from-primary/10 via-card/60 to-card/40 p-6 backdrop-blur">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-          <img src={avatar} className="size-20 rounded-2xl border bg-surface" alt="" />
+          <img src={avatar} className="size-20 rounded-2xl border bg-surface" alt={name} />
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-semibold">{name}</h1>
@@ -186,77 +181,22 @@ function PublicProfile() {
       <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
         <div className="rounded-2xl border bg-card/60 p-5 backdrop-blur">
           <h2 className="text-sm font-medium">{copy.profile.gains60d}</h2>
-          <div className="mt-3" style={{ width: "100%", height: 260 }}>
-            <ResponsiveContainer>
-              <AreaChart data={pnlData}>
-                <defs>
-                  <linearGradient id="ppub" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stopColor="var(--color-up)" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="var(--color-up)" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <XAxis
-                  dataKey="d"
-                  tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }}
-                  axisLine={false}
-                  tickLine={false}
-                  width={40}
-                />
-                <Tooltip
-                  contentStyle={{
-                    background: "var(--color-popover)",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: 12,
-                    fontSize: 12,
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="v"
-                  stroke="var(--color-up)"
-                  strokeWidth={1.8}
-                  fill="url(#ppub)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+          {hasPnlHistory ? null : (
+            <div className="mt-3 flex flex-col items-center justify-center gap-2 py-12 text-center text-muted-foreground">
+              <BarChart2 className="size-8 opacity-25" />
+              <p className="text-sm">Histórico disponível após apostas resolvidas</p>
+            </div>
+          )}
         </div>
 
         <div className="rounded-2xl border bg-card/60 p-5 backdrop-blur">
           <h2 className="text-sm font-medium">Atividade · 12 semanas</h2>
-          <div className="mt-4 grid grid-cols-12 gap-1">
-            {calendar.map((v, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "aspect-square rounded-[3px] transition",
-                  v > 0.85
-                    ? "bg-primary shadow-[var(--shadow-glow-primary)]"
-                    : v > 0.6
-                      ? "bg-primary/70"
-                      : v > 0.35
-                        ? "bg-primary/40"
-                        : v > 0.15
-                          ? "bg-primary/20"
-                          : "bg-surface-2",
-                )}
-              />
-            ))}
-          </div>
-          <div className="mt-3 flex items-center justify-between text-[10px] text-muted-foreground">
-            <span>Menos</span>
-            <div className="flex gap-1">
-              {[0.1, 0.3, 0.5, 0.8].map((o) => (
-                <span key={o} className="size-2 rounded-[2px] bg-primary" style={{ opacity: o }} />
-              ))}
+          {hasActivityHistory ? null : (
+            <div className="mt-3 flex flex-col items-center justify-center gap-2 py-10 text-center text-muted-foreground">
+              <Activity className="size-8 opacity-25" />
+              <p className="text-sm">A atividade do trader aparecerá aqui</p>
             </div>
-            <span>Mais</span>
-          </div>
+          )}
         </div>
       </div>
 
@@ -361,7 +301,7 @@ function PublicProfile() {
 function KPI({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="rounded-xl border bg-card/40 p-3">
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="mt-1 text-xl font-semibold">{value}</div>
     </div>
   );

@@ -121,11 +121,11 @@ function Ranking() {
               <div className="absolute right-4 top-4">
                 <Icon className={cn("size-6", tone)} />
               </div>
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              <div className="text-xs uppercase tracking-wider text-muted-foreground">
                 #{i + 1}
               </div>
               <div className="mt-3 flex items-center gap-3">
-                <img src={t.avatar} className="size-14 rounded-full border bg-surface" alt="" />
+                <img src={t.avatar} className="size-14 rounded-full border bg-surface" alt={t.name} />
                 <div>
                   <div className="font-medium">{t.name}</div>
                   <div className="text-xs text-muted-foreground">@{t.handle}</div>
@@ -148,7 +148,7 @@ function Ranking() {
 
       <div className="overflow-hidden rounded-2xl border bg-card/60 backdrop-blur">
         <table className="w-full text-sm">
-          <thead className="bg-surface/60 text-[10px] uppercase tracking-wider text-muted-foreground">
+          <thead className="bg-surface/60 text-xs uppercase tracking-wider text-muted-foreground">
             <tr>
               <th className="px-4 py-3 text-left">#</th>
               <th className="px-4 py-3 text-left">Trader</th>
@@ -170,7 +170,7 @@ function Ranking() {
                 <td className="px-4 py-3 mono text-muted-foreground">{i + 4}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
-                    <img src={t.avatar} className="size-8 rounded-full bg-surface" alt="" />
+                    <img src={t.avatar} className="size-8 rounded-full bg-surface" alt={t.name} />
                     <div>
                       <div className="font-medium">{t.name}</div>
                       <div className="text-[11px] text-muted-foreground">

@@ -5,8 +5,12 @@ import type { SupabaseFnContext } from "@/integrations/supabase/loose";
 export const markNotificationsReadFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabase } = context as SupabaseFnContext;
-    const { error } = await supabase.from("notifications").update({ read: true }).eq("read", false);
+    const { supabase, userId } = context as SupabaseFnContext;
+    const { error } = await supabase
+      .from("notifications")
+      .update({ read: true })
+      .eq("user_id", userId)
+      .eq("read", false);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

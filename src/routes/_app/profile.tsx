@@ -165,7 +165,7 @@ function Profile() {
 
       <div className="rounded-2xl border bg-gradient-to-br from-primary/10 via-card/60 to-card/40 p-6 backdrop-blur">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-          <img src={me.avatar} className="size-20 rounded-2xl border bg-surface" alt="" />
+          <img src={me.avatar} className="size-20 rounded-2xl border bg-surface" alt={me.name} />
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-semibold">{me.name}</h1>
@@ -303,7 +303,7 @@ function Profile() {
                 />
               ))}
             </div>
-            <div className="mt-3 flex items-center justify-between text-[10px] text-muted-foreground">
+            <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
               <span>Menos</span>
               <div className="flex gap-1">
                 {[0.1, 0.3, 0.5, 0.8].map((o) => (
@@ -408,7 +408,7 @@ function Profile() {
                 Vincule um e-mail para não perder seu saldo e histórico ao trocar de dispositivo.
               </p>
               <div>
-                <label className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground">
+                <label className="mb-1 block text-xs uppercase tracking-wider text-muted-foreground">
                   E-mail
                 </label>
                 <input
@@ -440,7 +440,7 @@ function Profile() {
 function KPI({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="rounded-xl border bg-card/40 p-3">
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="mt-1 text-xl font-semibold">{value}</div>
     </div>
   );

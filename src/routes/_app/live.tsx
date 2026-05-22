@@ -128,7 +128,7 @@ function Live() {
                       e.text
                     )}
                   </div>
-                  <span className="text-[10px] mono text-muted-foreground">{e.time}</span>
+                  <span className="text-xs mono text-muted-foreground">{e.time}</span>
                 </li>
               ))}
             </ul>

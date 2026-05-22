@@ -365,7 +365,7 @@ function Landing() {
                   <td className="px-4 py-3 mono text-muted-foreground">{i + 1}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <img src={t.avatar} className="size-8 rounded-full bg-surface" alt="" />
+                      <img src={t.avatar} className="size-8 rounded-full bg-surface" alt={t.name} />
                       <div>
                         <div className="font-medium">{t.name}</div>
                         <div className="text-[11px] text-muted-foreground">@{t.handle}</div>

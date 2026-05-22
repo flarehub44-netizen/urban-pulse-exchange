@@ -112,7 +112,7 @@ function Feed() {
 
       <div className="rounded-2xl border bg-card/60 p-4 backdrop-blur">
         <div className="flex gap-3">
-          <img src={me.avatar} className="size-9 rounded-full bg-surface" alt="" />
+          <img src={me.avatar} className="size-9 rounded-full bg-surface" alt={me.name} />
           <div className="flex-1">
             <textarea
               value={text}
@@ -157,7 +157,7 @@ function Feed() {
               className="rounded-2xl border bg-card/60 p-4 backdrop-blur transition hover:bg-surface/30"
             >
               <div className="flex gap-3">
-                <img src={p.user.avatar} className="size-10 rounded-full bg-surface" alt="" />
+                <img src={p.user.avatar} className="size-10 rounded-full bg-surface" alt={p.user.name} />
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2 text-sm">
                     <span className="font-medium">{p.user.name}</span>
@@ -168,7 +168,7 @@ function Feed() {
                       · {formatDistanceToNow(p.time, { locale: ptBR, addSuffix: true })}
                     </span>
                     {isRepost && (
-                      <span className="ml-auto text-[10px] uppercase tracking-wider text-muted-foreground">
+                      <span className="ml-auto text-xs uppercase tracking-wider text-muted-foreground">
                         Repost
                       </span>
                     )}
@@ -183,7 +183,7 @@ function Feed() {
                       type="button"
                       title="Copiar link do post"
                       onClick={() => copyShareUrl("/feed", { post: p.id })}
-                      className="ml-auto inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] text-muted-foreground hover:bg-surface-2 hover:text-foreground"
+                      className="ml-auto inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs text-muted-foreground hover:bg-surface-2 hover:text-foreground"
                     >
                       <Link2 className="size-3" /> Link
                     </button>
@@ -199,7 +199,7 @@ function Feed() {
                     return (
                       <div className="mt-3 rounded-xl border bg-surface/60 p-3">
                         {suggested && (
-                          <div className="mb-2 text-[10px] uppercase tracking-wider text-primary">
+                          <div className="mb-2 text-xs uppercase tracking-wider text-primary">
                             Mercado sugerido para este post
                           </div>
                         )}
@@ -210,7 +210,7 @@ function Feed() {
                         >
                           <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0">
-                              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                              <div className="text-xs uppercase tracking-wider text-muted-foreground">
                                 {mkt.region}
                               </div>
                               <div className="mt-0.5 text-sm line-clamp-1 font-medium">
@@ -355,12 +355,12 @@ function Feed() {
             {!commentsLoading &&
               threadComments?.map((c) => (
                 <li key={c.id} className="flex gap-2 text-sm">
-                  <img src={c.user.avatar} className="size-8 rounded-full bg-surface" alt="" />
+                  <img src={c.user.avatar} className="size-8 rounded-full bg-surface" alt={c.user.name} />
                   <div>
                     <span className="font-medium">{c.user.name}</span>{" "}
                     <span className="text-muted-foreground">@{c.user.handle}</span>
                     <p className="mt-0.5">{c.text}</p>
-                    <span className="text-[10px] text-muted-foreground">
+                    <span className="text-xs text-muted-foreground">
                       {formatDistanceToNow(c.time, { locale: ptBR, addSuffix: true })}
                     </span>
                   </div>

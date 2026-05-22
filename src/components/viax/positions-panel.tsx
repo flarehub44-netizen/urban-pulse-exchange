@@ -108,7 +108,7 @@ export function PositionsPanel({ embedded }: { embedded?: boolean }) {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground">
+                    <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
                       <span>{bet.marketRegion}</span>
                       <StatusPill status={bet.marketStatus} />
                     </div>
@@ -171,7 +171,7 @@ export function PositionsPanel({ embedded }: { embedded?: boolean }) {
                 <div key={bet.id} className="rounded-xl border bg-card/60 p-4 backdrop-blur">
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                      <div className="text-xs uppercase tracking-wider text-muted-foreground">
                         {bet.marketRegion}
                       </div>
                       <div className="mt-0.5 line-clamp-1 text-sm">{bet.marketQuestion}</div>
@@ -224,7 +224,7 @@ export function PositionsPanel({ embedded }: { embedded?: boolean }) {
 function KPI({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="rounded-2xl border bg-card/60 p-4 backdrop-blur">
-      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+      <div className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted-foreground">
         <TrendingUp className="size-3" /> {label}
       </div>
       <div className="mt-2 text-xl font-semibold">{value}</div>

@@ -10,7 +10,7 @@ import { copy } from "@/copy/pt-BR";
 import { formatBRL, formatPct, probability } from "@/lib/parimutuel";
 import { EdgeBadge } from "@/components/viax/edge-badge";
 import { getMarketEdge } from "@/lib/market-edge";
-import { Brain, CheckCircle2, XCircle, Zap } from "lucide-react";
+import { Brain, Clock, Zap } from "lucide-react";
 import {
   Area,
   AreaChart,
@@ -51,10 +51,6 @@ function UrbanMind() {
     (marketIdFromUrl ? markets.find((m) => m.id === marketIdFromUrl) : undefined) ??
     markets.find((m) => m.status === "live" || m.status === "closing") ??
     markets[0];
-  const history = Array.from({ length: 12 }, (_, i) => ({
-    m: markets[i % Math.max(markets.length, 1)]?.region ?? "—",
-    hit: i % 4 !== 3,
-  }));
   const [betTarget, setBetTarget] = useState<{ market: Market; side: Side } | null>(null);
 
   if (!top) {
@@ -128,7 +124,7 @@ function UrbanMind() {
         <div className="rounded-2xl border bg-card/60 p-5 backdrop-blur">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-medium">{copy.urbanmind.iaPrecisionChart}</h2>
-            <div className="flex items-center gap-3 text-[10px] uppercase tracking-wider">
+            <div className="flex items-center gap-3 text-xs uppercase tracking-wider">
               <span className="text-primary">● UrbanMind</span>
               <span className="text-muted-foreground">● Comunidade</span>
             </div>
@@ -229,25 +225,13 @@ function UrbanMind() {
 
           <div className="rounded-2xl border bg-card/60 p-4 backdrop-blur">
             <h2 className="mb-3 text-sm font-medium">Histórico recente</h2>
-            <ul className="space-y-1.5 text-sm">
-              {history.map((h, i) => (
-                <li
-                  key={i}
-                  className="flex items-center justify-between rounded-md border bg-surface/50 px-3 py-2"
-                >
-                  <span>{h.m}</span>
-                  {h.hit ? (
-                    <span className="inline-flex items-center gap-1 text-up text-xs">
-                      <CheckCircle2 className="size-3.5" /> hit
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 text-down text-xs">
-                      <XCircle className="size-3.5" /> miss
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
+            <div className="flex flex-col items-center gap-2 py-6 text-center text-muted-foreground">
+              <Clock className="size-7 opacity-30" />
+              <p className="text-sm">Histórico sendo coletado</p>
+              <p className="text-xs opacity-70">
+                Os acertos e erros aparecerão aqui conforme os mercados forem resolvidos.
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -288,7 +272,7 @@ function KPI({ label, value, tone }: { label: string; value: React.ReactNode; to
     <div
       className={`rounded-xl border p-3 ${tone === "primary" ? "border-primary/40 bg-primary/15" : "bg-card/40"}`}
     >
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
       <div
         className={`mt-1 text-xl font-semibold mono ${tone === "primary" ? "text-primary" : ""}`}
       >

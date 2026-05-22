@@ -27,13 +27,13 @@ export function SocialBook({ m }: { m: Market }) {
           feedFallback.map((p) => (
             <div key={p.id} className="flex items-center justify-between gap-2">
               <div className="flex min-w-0 items-center gap-2">
-                <img src={p.user.avatar} alt="" className="size-6 rounded-full bg-surface" />
+                <img src={p.user.avatar} alt={p.user.handle} className="size-6 rounded-full bg-surface" />
                 <span className="truncate text-muted-foreground">@{p.user.handle}</span>
               </div>
               <span className="truncate text-foreground/80 max-w-[120px]">
                 {p.text.slice(0, 40)}…
               </span>
-              <span className="shrink-0 text-[10px] text-muted-foreground">
+              <span className="shrink-0 text-xs text-muted-foreground">
                 {formatDistanceToNow(p.time, { locale: ptBR, addSuffix: true })}
               </span>
             </div>
@@ -45,7 +45,7 @@ export function SocialBook({ m }: { m: Market }) {
           bets?.map((b, i) => (
             <div key={`${b.createdAt}-${i}`} className="flex items-center justify-between gap-2">
               <div className="flex min-w-0 items-center gap-2">
-                <img src={b.avatar} alt="" className="size-6 rounded-full bg-surface" />
+                <img src={b.avatar} alt={b.handle} className="size-6 rounded-full bg-surface" />
                 <span className="truncate text-muted-foreground">@{b.handle}</span>
               </div>
               <span className={`mono shrink-0 ${b.side === "YES" ? "text-up" : "text-down"}`}>
@@ -55,7 +55,7 @@ export function SocialBook({ m }: { m: Market }) {
               <span className="shrink-0 text-muted-foreground">
                 {formatPct(b.side === "YES" ? pY : 1 - pY, 0)}
               </span>
-              <span className="shrink-0 text-[10px] text-muted-foreground/70">
+              <span className="shrink-0 text-xs text-muted-foreground/70">
                 {formatDistanceToNow(b.createdAt, { locale: ptBR, addSuffix: true })}
               </span>
             </div>

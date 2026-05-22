@@ -203,7 +203,7 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
           <p className="mt-1 text-xs text-muted-foreground">
             Saldo virtual de demonstração. Integração de pagamento real virá em breve.
           </p>
-          <label className="mt-4 block text-[10px] uppercase tracking-wider text-muted-foreground">
+          <label className="mt-4 block text-xs uppercase tracking-wider text-muted-foreground">
             Valor
           </label>
           <div className="mt-1 flex items-center gap-2 rounded-xl border bg-surface px-3 py-2">
@@ -451,7 +451,7 @@ function labelTx(t: string) {
 function KPI({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="rounded-2xl border bg-card/60 p-4 backdrop-blur">
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="mt-1 text-xl font-semibold">{value}</div>
     </div>
   );

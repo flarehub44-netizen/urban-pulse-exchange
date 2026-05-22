@@ -26,6 +26,8 @@ export const createFeedPostFn = createServerFn({ method: "POST" })
 
 const postIdSchema = z.object({ postId: z.string().uuid() });
 
+const safeNum = (v: unknown): number => (typeof v === "number" ? v : 0);
+
 export const likeFeedPostFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(postIdSchema)
@@ -35,7 +37,7 @@ export const likeFeedPostFn = createServerFn({ method: "POST" })
       { p_post_id: data.postId },
     );
     if (error) throw new Error(error.message);
-    return { likes: likes as number };
+    return { likes: safeNum(likes) };
   });
 
 export const repostFeedPostFn = createServerFn({ method: "POST" })
@@ -47,7 +49,7 @@ export const repostFeedPostFn = createServerFn({ method: "POST" })
       { p_post_id: data.postId },
     );
     if (error) throw new Error(error.message);
-    return { reposts: reposts as number };
+    return { reposts: safeNum(reposts) };
   });
 
 const commentSchema = z.object({
@@ -64,5 +66,5 @@ export const commentFeedPostFn = createServerFn({ method: "POST" })
       { p_post_id: data.postId, p_text: data.text },
     );
     if (error) throw new Error(error.message);
-    return { comments: comments as number };
+    return { comments: safeNum(comments) };
   });

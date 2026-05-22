@@ -252,7 +252,7 @@ export function OrderBox({
       </div>
 
       <div className="mt-4">
-        <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Valor</label>
+        <label className="text-xs uppercase tracking-wider text-muted-foreground">Valor</label>
         <div className="mt-1 flex items-center gap-2 rounded-xl border bg-surface px-3 py-2">
           <span className="text-muted-foreground">R$</span>
           <input

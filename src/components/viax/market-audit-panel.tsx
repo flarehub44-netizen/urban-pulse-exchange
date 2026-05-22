@@ -5,6 +5,22 @@ import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+
+const VALIDATION_LABELS: Record<string, string> = {
+  consistency:       "Consistência",
+  tie:               "Empate detectado",
+  window_data:       "Janela de dados",
+  snapshot_count:    "Snapshots suficientes",
+  sanity_ratio:      "Índice de sanidade",
+  confidence_value:  "Confiança IA",
+  crowd_conflict:    "Conflito de consenso",
+};
+
+// Keys where true = passed (green), false = failed (red)
+const GOOD_WHEN_TRUE  = new Set(["consistency", "window_data", "snapshot_count"]);
+// Keys where false = passed (green), true = failed (red)
+const GOOD_WHEN_FALSE = new Set(["tie", "crowd_conflict"]);
 
 export function MarketAuditPanel({ marketId }: { marketId: string }) {
   const { userId } = useAnonAuth();
@@ -48,6 +64,43 @@ export function MarketAuditPanel({ marketId }: { marketId: string }) {
                     {copy.markets.auditRaw}: {r.raw_value}
                     {r.confidence != null && ` · conf. ${(r.confidence * 100).toFixed(0)}%`}
                   </p>
+                )}
+                {r.validation && Object.keys(r.validation).length > 0 && (
+                  <div className="mt-2 space-y-1 border-t border-border/50 pt-2">
+                    <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                      Checks de validação
+                    </p>
+                    {Object.entries(r.validation).map(([k, v]) => {
+                      const label = VALIDATION_LABELS[k] ?? k;
+                      const isBool = typeof v === "boolean";
+                      const passed = isBool
+                        ? GOOD_WHEN_TRUE.has(k)
+                          ? (v === true ? true : false)
+                          : GOOD_WHEN_FALSE.has(k)
+                            ? (v === false ? true : false)
+                            : null
+                        : null;
+                      return (
+                        <div key={k} className="flex justify-between text-[10px]">
+                          <span className="text-muted-foreground">{label}</span>
+                          <span
+                            className={cn(
+                              "mono",
+                              passed === true && "text-up",
+                              passed === false && "text-down",
+                              passed === null && "text-muted-foreground",
+                            )}
+                          >
+                            {isBool
+                              ? passed === true ? "✓" : passed === false ? "✗" : String(v)
+                              : typeof v === "number"
+                                ? v.toFixed(2)
+                                : String(v)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
                 <p className="mt-1 text-[10px] text-muted-foreground">
                   {formatDistanceToNow(new Date(r.created_at), { addSuffix: true, locale: ptBR })}

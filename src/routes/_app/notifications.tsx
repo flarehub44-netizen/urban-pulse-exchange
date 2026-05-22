@@ -7,8 +7,8 @@ import { markNotificationsReadFn } from "@/actions/notifications";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Bell } from "lucide-react";
-import { useEffect } from "react";
+import { Bell, CheckCheck } from "lucide-react";
+import { useState } from "react";
 
 export const Route = createFileRoute("/_app/notifications")({
   head: () => ({
@@ -26,14 +26,28 @@ function NotificationsPage() {
   const { data: dbNotifications } = useNotifications();
   const zustandNotifications = useViaX((s) => s.notifications);
   const notifications = dbNotifications ?? zustandNotifications;
+  const [markingAll, setMarkingAll] = useState(false);
 
-  useEffect(() => {
-    markNotificationsReadFn({ data: undefined })
-      .then(() => queryClient.invalidateQueries({ queryKey: ["notifications"] }))
-      .catch(() => {});
-  }, [queryClient]);
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["notifications"] });
 
-  const go = (n: (typeof notifications)[0]) => {
+  const markAllRead = async () => {
+    setMarkingAll(true);
+    try {
+      await markNotificationsReadFn({ data: undefined });
+      await invalidate();
+    } catch (e) {
+      console.error("mark-read failed", e);
+    } finally {
+      setMarkingAll(false);
+    }
+  };
+
+  const go = async (n: (typeof notifications)[0]) => {
+    if (!n.read) {
+      markNotificationsReadFn({ data: undefined })
+        .then(invalidate)
+        .catch((e) => console.error("mark-read failed", e));
+    }
     const link = getNotificationLink(n);
     if (!link) return;
     if (link.to === "/markets/$marketId") {
@@ -45,11 +59,31 @@ function NotificationsPage() {
     }
   };
 
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
   return (
     <div className="mx-auto max-w-xl space-y-5">
-      <div className="flex items-center gap-2">
-        <Bell className="size-5 text-primary" />
-        <h1 className="text-2xl font-semibold tracking-tight">Notificações</h1>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Bell className="size-5 text-primary" />
+          <h1 className="text-2xl font-semibold tracking-tight">Notificações</h1>
+          {unreadCount > 0 && (
+            <span className="rounded-full bg-primary/20 px-2 py-0.5 text-xs font-medium text-primary">
+              {unreadCount} nova{unreadCount !== 1 ? "s" : ""}
+            </span>
+          )}
+        </div>
+        {unreadCount > 0 && (
+          <button
+            type="button"
+            disabled={markingAll}
+            onClick={markAllRead}
+            className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs text-muted-foreground transition hover:bg-surface-2 hover:text-foreground disabled:opacity-50"
+          >
+            <CheckCheck className="size-3.5" />
+            Marcar todas como lidas
+          </button>
+        )}
       </div>
       <p className="text-sm text-muted-foreground">
         Toque em um item para ir ao mercado, carteira ou ranking.
@@ -68,12 +102,16 @@ function NotificationsPage() {
               onClick={() => go(n)}
               className="w-full rounded-xl border bg-card/60 p-4 text-left backdrop-blur transition hover:bg-surface/60 hover:border-primary/30"
             >
+              {!n.read && (
+                <div className="mb-1.5 inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-medium text-primary">
+                  Nova
+                </div>
+              )}
               <div className="text-sm">{n.text}</div>
-              <div className="mt-1 flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground">
+              <div className="mt-1 flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
                 <span>{n.kind}</span>
                 <span>·</span>
                 <span>{formatDistanceToNow(n.time, { locale: ptBR, addSuffix: true })}</span>
-                {!n.read && <span className="text-primary">Nova</span>}
               </div>
             </button>
           </li>

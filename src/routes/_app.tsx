@@ -4,6 +4,7 @@ import { Topbar } from "@/components/viax/topbar";
 import { BottomNav } from "@/components/viax/bottom-nav";
 import { OnboardingModal } from "@/components/viax/onboarding-modal";
 import { CommandPalette } from "@/components/viax/command-palette";
+import { AppLoadingSkeleton } from "@/components/viax/app-loading-skeleton";
 import { useRealtimeTick } from "@/hooks/use-realtime-tick";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
 import { useSupabaseRealtime } from "@/hooks/use-supabase-realtime";
@@ -22,7 +23,7 @@ function AppLayout() {
   useClosingMarketAlerts();
 
   if (!authReady) {
-    return <div className="min-h-screen w-full bg-background" />;
+    return <AppLoadingSkeleton />;
   }
 
   return (

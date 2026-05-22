@@ -16,7 +16,7 @@ import { AnimatedNumber } from "@/components/viax/animated-number";
 import { Countdown } from "@/components/viax/countdown";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL, formatCompact, poolTotal, prizePool, probability } from "@/lib/parimutuel";
-import { ArrowLeft, Brain, Users, MapPin, Activity, BarChart2 } from "lucide-react";
+import { ArrowLeft, Brain, Users, MapPin, Activity, BarChart2, Scale } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -169,7 +169,7 @@ function MarketDetail() {
 
             <div className="mt-5 grid grid-cols-2 gap-3">
               <div className="rounded-xl border border-up/30 bg-up/5 p-3">
-                <div className="text-[10px] uppercase tracking-wider text-up">↑ SIM</div>
+                <div className="text-xs uppercase tracking-wider text-up">↑ SIM</div>
                 <div className="mt-1 flex items-baseline gap-2">
                   <AnimatedNumber
                     value={pY * 100}
@@ -183,7 +183,7 @@ function MarketDetail() {
                 </div>
               </div>
               <div className="rounded-xl border border-down/30 bg-down/5 p-3">
-                <div className="text-[10px] uppercase tracking-wider text-down">↓ NÃO</div>
+                <div className="text-xs uppercase tracking-wider text-down">↓ NÃO</div>
                 <div className="mt-1 flex items-baseline gap-2">
                   <AnimatedNumber
                     value={(1 - pY) * 100}
@@ -201,6 +201,45 @@ function MarketDetail() {
             <div className="mt-3">
               <ProbBar yes={m.pool.YES} no={m.pool.NO} />
             </div>
+
+            {m.status === "resolving" && (
+              <div className="mt-3 rounded-xl border border-primary/30 bg-primary/5 px-4 py-3 text-xs">
+                <div className="flex items-center gap-2 text-primary">
+                  <Activity className="size-3 animate-pulse" />
+                  <span>Oracle coletando dados…</span>
+                </div>
+                <p className="mt-1 text-muted-foreground">
+                  IA confiança:{" "}
+                  <span className="mono">
+                    {(m.aiPrediction.confidence * 100).toFixed(0)}%
+                  </span>{" "}
+                  · Previsão:{" "}
+                  <span className={m.aiPrediction.side === "YES" ? "text-up" : "text-down"}>
+                    {m.aiPrediction.side === "YES" ? "↑ SIM" : "↓ NÃO"}
+                  </span>
+                </p>
+              </div>
+            )}
+
+            {m.status === "dispute" && (
+              <div className="mt-3 rounded-xl border border-warn/30 bg-warn/5 px-4 py-3 text-xs">
+                <div className="flex items-center gap-2 text-warn">
+                  <Scale className="size-3" />
+                  <span>Em disputa — aguardando revisão admin</span>
+                </div>
+                <p className="mt-1 text-muted-foreground">
+                  Ver aba{" "}
+                  <button
+                    type="button"
+                    onClick={() => setTab("audit")}
+                    className="text-primary underline"
+                  >
+                    Auditoria
+                  </button>{" "}
+                  para detalhes dos checks de validação.
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="flex gap-1 rounded-xl border bg-card/40 p-1">
@@ -228,7 +267,7 @@ function MarketDetail() {
                   <div className="flex items-center gap-2 text-sm">
                     <Activity className="size-4 text-primary" /> Probabilidade ao vivo
                   </div>
-                  <div className="flex items-center gap-3 text-[10px] uppercase tracking-wider">
+                  <div className="flex items-center gap-3 text-xs uppercase tracking-wider">
                     <span className="text-up">● SIM</span>
                     <span className="text-down">● NÃO</span>
                   </div>
@@ -302,7 +341,7 @@ function MarketDetail() {
                     key={p.id}
                     className="flex gap-3 border-t border-border/60 pt-3 first:border-0 first:pt-0"
                   >
-                    <img src={p.user.avatar} className="size-9 rounded-full bg-surface" alt="" />
+                    <img src={p.user.avatar} className="size-9 rounded-full bg-surface" alt={p.user.name} />
                     <div className="min-w-0 flex-1">
                       <div className="text-xs text-muted-foreground">
                         <span className="font-medium text-foreground">{p.user.name}</span> @
