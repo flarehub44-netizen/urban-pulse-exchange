@@ -1,180 +1,132 @@
-## ViaX — Plano da v1 (demo premium)
+# Plano de QA Sênior — Plataforma ViaX
 
-> **Atualização:** a v1 em produção usa **Supabase** (auth anônima, `place_bet`, motor de resolução pg_cron). Ver [`docs/RESOLUTION_ENGINE.md`](../docs/RESOLUTION_ENGINE.md). O texto abaixo descreve o protótipo visual original (Zustand mock); a UI mantém animações locais apenas quando o banco ainda não carregou.
+Auditoria end-to-end estruturada em 4 fases. Entrega final: relatório consolidado em `/mnt/documents/QA_REPORT_2026-05-22.md` + CSV de evidências atualizado, com diagnóstico geral, lista de bugs priorizados e roadmap de correção.
 
-Plataforma de **prediction exchange parimutuel de inteligência urbana**, com estética fintech dark (Bloomberg + TradingView + Polymarket). Dados ao vivo vêm do Postgres; Zustand serve como fallback/landing.
+## Escopo mapeado (do código)
 
----
+**App (16 rotas usuário):** `/`, `/dashboard`, `/markets`, `/markets/:id`, `/feed`, `/feed/:postId`, `/leagues`, `/live`, `/notifications`, `/positions`, `/profile`, `/profile/:userId`, `/ranking`, `/settings`, `/urbanmind`, `/wallet`
+**Admin (11):** overview, finance, intelligence, markets, partners, risk, settlement, simulator, sources, system, users
+**Partner (10):** index, analytics, campaigns, creatives, invites, leaderboard, payouts, performance, revenue, sub-affiliates
+**APIs/webhooks:** `/api/webhooks/syncpay`, `/r/:slug` (partner attribution), `/sitemap.xml`
+**Server fns / integrações:** bets, casino, events, feed, follows, leagues, notifications, payments (SyncPay), polls, retention
 
-### 1. Design system (`src/styles.css`)
+## Fase 1 — Diagnóstico estático (sem alterar código)
 
-Dark fintech premium em `oklch`:
+1. Verificar build (`bun run build` deve estar verde — relatado pelo harness).
+2. Rodar unit tests: `bun run test` (vitest — 10 specs esperados).
+3. Conferir tipos: `tsc --noEmit` (somente leitura do output já existente).
+4. Auditar console/network do preview atual (`/`) — capturar erros já visíveis (já vi `Missing SUPABASE_URL` no published; preview parece OK).
+5. Rodar `supabase--linter` e revisar RLS / políticas.
+6. Listar secrets configurados (sem expor) para validar SyncPay, AI Gateway.
 
-- `--background` grafite profundo `oklch(0.16 0.015 250)`
-- `--surface` / `--card` levemente elevados com glassmorphism sutil
-- `--primary` azul elétrico ViaX `oklch(0.68 0.20 250)`
-- `--up` verde alta `oklch(0.74 0.18 150)`
-- `--down` vermelho baixa `oklch(0.66 0.22 25)`
-- `--warn` amarelo alerta `oklch(0.82 0.17 85)`
-- `--muted-foreground` cinza azulado
-- Gradientes: `--gradient-primary`, `--gradient-up`, `--gradient-down`, `--gradient-glow`
-- Sombras com glow: `--shadow-glow-primary`, `--shadow-elevated`
-- Fontes: **Inter** (UI) + **JetBrains Mono** (números/odds/tickers) via Google Fonts
-- Keyframes: `pulse-glow`, `ticker-scroll`, `number-flicker`, `pool-grow`, `heatmap-pulse`, `fade-in-up`, `shimmer`
+## Fase 2 — Testes automatizados (Playwright)
 
-### 2. Rotas (TanStack Start, file-based)
+Executar a suite e2e já existente contra o preview (`PLAYWRIGHT_BASE_URL=<preview>`):
 
-```
-src/routes/
-  __root.tsx                 → shell + providers (QueryClient já existe)
-  index.tsx                  → Landing page
-  _app.tsx                   → Layout do app (sidebar + topbar + Outlet)
-  _app/dashboard.tsx         → Home do terminal
-  _app/markets.tsx           → Lista de mercados ao vivo
-  _app/markets.$marketId.tsx → Detalhe do mercado (odds panel + parimutuel)
-  _app/live.tsx              → Mapa realtime + eventos ativos
-  _app/ranking.tsx           → Leaderboards
-  _app/feed.tsx              → Feed social
-  _app/urbanmind.tsx         → UrbanMind AI
-  _app/wallet.tsx            → Carteira
-  _app/profile.tsx           → Perfil
-  sitemap[.]xml.ts + public/robots.txt
-```
+- `smoke.spec.ts` — landing, markets, dashboard, redirects
+- `qa-matrix.spec.ts` — T01–T13 (matriz QA completa)
+- `auth-wallet.spec.ts` — auth anônima, carteira, abas perfil
+- `bet-flow.spec.ts` — placement de aposta, saldo, double-click
+- `markets-filters.spec.ts` — filtros, busca, ordenação
+- `gamification.spec.ts` — daily pulse, missions, spin
+- `social.spec.ts` — feed, follows, comments
+- `admin-guards.spec.ts` — guards admin/partner
+- `camera-stream.spec.ts` — câmeras live
 
-### 3. Landing page (`/`)
+Capturar pass/fail por spec, anexar logs de falhas.
 
-- **Nav** flutuante com glass, logo ViaX (mark custom SVG)
-- **Hero**: título "Transforme movimento urbano em inteligência coletiva", subtítulo, 3 CTAs (Entrar Agora → /dashboard, Ver Mercados → /markets, Ver Ranking → /ranking). À direita, **mock de terminal vivo** com odds piscando, mini chart e pool crescendo
-- **Ticker bar** horizontal com eventos rolando (`ticker-scroll`)
-- **Como Funciona**: 4 passos com ícones Lucide e micro-animação
-- **Prediction Exchange**: cards estilo Polymarket com SIM/NÃO e barras de pool animadas
-- **IA vs Humanos**: gráfico de accuracy (Recharts) com duas linhas comparando UrbanMind vs comunidade
-- **Mercados em Tempo Real**: grid de 6 cards conectados ao mesmo mock store
-- **Rankings**: top 5 mini-tabela com avatares
-- **Estatísticas globais**: contadores animados (volume 24h, mercados ativos, usuários, accuracy IA)
-- **Mobile Experience**: mockup de telefone com cards swipe
-- **Footer** minimalista
+## Fase 3 — Validação manual via browser tool
 
-### 4. Layout do app (sidebar fintech)
+Para cada fluxo crítico, navegar via `browser--navigate_to_sandbox` + `act/observe` + screenshot:
 
-- **Sidebar** colapsável (shadcn sidebar), 56–240px, ícones lucide, item ativo com barra azul + glow
-- **Topbar**: saldo virtual animado, XP/divisão (badge), streak 🔥, volume diário, sino de notificações (popover com 5 notifs mock), avatar
-- **Outlet** com fundo grafite e grid responsivo
+**3.1 Auth & onboarding**
+- Primeira visita → sign-in anônimo automático → banner de upgrade aparece
+- Upgrade anon → email (form em `/profile?tab=config`)
+- Logout / re-login
 
-### 5. Dashboard (`/dashboard`)
+**3.2 Core: mercados e apostas**
+- Listar `/markets?status=live` (≥3 cards esperados)
+- Abrir detalhe, ver order-box, candles, prob-bar
+- Tentar apostar com saldo 0 (deve bloquear + mostrar deposit bar)
+- Depositar via wallet (mock), apostar YES e NO, verificar pool atualiza
+- Double-click no botão de aposta (não duplicar)
+- Cancelar / re-abrir bet confirm dialog
 
-Grid estilo Bloomberg:
+**3.3 Carteira & transações**
+- `/profile?tab=carteira` — saldo, depósito, saque, histórico de tx
+- `/positions` — posições abertas, P&L
+- Liquidação manual via admin → conferir payout no histórico do user
 
-- KPIs topo (saldo, lucro 24h, accuracy, ranking)
-- Painel "Mercados em alta" (4 cards)
-- Mini-mapa de SP com heatmap (link para /live)
-- Chart de PnL pessoal (Recharts area)
-- UrbanMind callout com previsão atual
-- Feed compacto (últimas 5)
+**3.4 Gamificação & retention**
+- Daily check-in (2x → segundo bloqueado)
+- Roleta diária (`casino_daily_spin`) 2x
+- Missões diárias, weekly challenge, badges, divisão
+- Streak risk banner
 
-### 6. Mercados (`/markets` e detalhe)
+**3.5 IA / UrbanMind**
+- `/urbanmind` — digest, accuracy chart, archetype card
+- AI prediction em market-card / order-box (consistência YES/NO + confiança)
+- Suggest feed market
 
-- **Lista**: filtros (Todos / Ao vivo / Encerrando / Resolvidos), busca, cards Polymarket-style com:
-  - Pergunta + região + tempo restante (countdown)
-  - Pool SIM (verde) / Pool NÃO (vermelho) em barra dividida animada
-  - Probabilidades (%), volume total, participantes, mini sparkline
-  - Botões SIM/NÃO
-- **Detalhe** (`/markets/:id`): layout TradingView
-  - Header com pergunta, status, time left
-  - **Painel de odds**: chart de probabilidade ao longo do tempo (Recharts line/area) + volume bars + candles mockados
-  - **Order box** (parimutuel): input de valor, escolha SIM/NÃO, mostra payout potencial, ROI estimado, % de participação no pool, "Prize Pool" (90% do total)
-  - **Book social**: últimas previsões dos usuários rolando
-  - **UrbanMind insight**: previsão da IA + confiança
-  - **Comentários** abaixo
+**3.6 Social**
+- `/feed` — listar posts, comentar, curtir
+- `/feed/:postId` — detalhe
+- `/ranking`, `/leagues`, `/profile/:userId` (perfil público)
 
-### 7. Engine Parimutuel (visual, client-side)
+**3.7 Live / câmeras / mapa**
+- `/live` — strip de câmeras, heatmap, neighborhood widget
+- Reprodução de stream (HLS)
 
-`src/lib/parimutuel.ts`:
+**3.8 Notificações**
+- `/notifications` — listar, marcar lida, prefs em `/settings`
 
-```ts
-prob(side) = pool[side] / poolTotal;
-prizePool = poolTotal * 0.9;
-payout(stake, side) = stake + (stake / pool[side]) * pool[other] * 0.9;
-roi = (payout - stake) / stake;
-```
+**3.9 Partner**
+- `/r/:slug` válido + inválido (atribuição + redirect)
+- `/partner` portal: campaigns, creatives, invites, payouts, revenue
+- Comissão após settlement (manual com 2 contas)
 
-Nunca mostrar "taxa" — só **Prize Pool** e **Pool Distribuível**. Store Zustand atualiza pools a cada 1.5s com micro-flutuações.
+**3.10 Admin**
+- `/admin` shell, settlement, dispute, ops panel, audit log, claim
+- Criar mercado, freeze, resolve expired
+- Tabela de mercados, region volume
 
-### 8. Mapa realtime (`/live`)
+**3.11 Pagamentos (SyncPay)**
+- Criar pagamento → callback webhook `/api/webhooks/syncpay`
+- Verificar assinatura do webhook, atualização de saldo, tx_id idempotente
+- Casos: aprovado, recusado, timeout, payload inválido
 
-Mapa SVG estilizado de São Paulo (silhueta de bairros simplificada + ruas principais como Paulista, Marginal, Faria Lima, 23 de Maio):
+**3.12 Mobile (375×812)**
+- Bottom nav, scroll, order-box, carousel de mercados
+- Performance em CPU throttle 4×
 
-- Heatmap por região (verde/amarelo/vermelho) que recalcula a cada 2s
-- **Pulsos** circulares animados em pontos de evento ativo
-- Tooltip ao hover com fluxo/velocidade média
-- Sidebar de eventos ativos com link para o mercado
+## Fase 4 — Edge cases & não-funcionais
 
-### 9. Ranking (`/ranking`)
+- Campos vazios em todos os forms (settings, bet, deposit, feed comment)
+- Inputs inválidos (stake negativa, > saldo, valores absurdos)
+- Network offline mid-bet (DevTools)
+- Rate limit: 20 cliques rápidos
+- Dois usuários simultâneos no mesmo mercado
+- Lighthouse na landing (LCP, CLS, TBT) — preview e produção
+- SEO: title/meta/og por rota, sitemap.xml, robots.txt
 
-- Tabs: Global / Cidade / Bairro / Amigos
-- Tabela esports: posição, avatar, nome, divisão (badge colorida), accuracy, ROI, streak, volume, crescimento semanal (seta verde/vermelha)
-- Top 3 em destaque com cards grandes
+## Entregáveis
 
-### 10. Feed social (`/feed`)
+1. `/mnt/documents/QA_REPORT_2026-05-22.md`
+   - Diagnóstico geral (✅ / ⚠️ / ❌)
+   - Bugs por gravidade (Crítico / Alto / Médio / Baixo) com: funcionalidade, página, ação, esperado, obtido, impacto, evidência (screenshot/log)
+   - UX issues
+   - Performance findings
+   - Falhas em IA & pagamentos
+   - Plano de correção priorizado (com effort estimate)
+   - Sugestões de produto: conversão, retenção, escala
+2. `/mnt/documents/QA_EVIDENCE_2026-05-22.csv` — matriz atualizada com resultados reais
+3. Screenshots em `/mnt/documents/qa-screenshots/`
 
-- Feed estilo Twitter: avatar, handle, verificado, conteúdo, tags de mercado, likes, comentários, reposts
-- Composer no topo
-- Mistura: análises, alertas (acidente, chuva), previsões
+## Observações
 
-### 11. UrbanMind AI (`/urbanmind`)
+- **Sem alterações de código nesta fase** — modo plano. Bugs encontrados viram tickets no relatório; correção em fase posterior se aprovado.
+- Testes destrutivos (settle real, cobrança real) marcados como MANUAL e pulados se afetarem dados de produção.
+- Erro `Missing SUPABASE_URL` visto no console pertence ao **published site** (`viax.lovable.app` — build antigo). Preview tem `.env` correto. Republicar resolve — incluído no plano de correção.
+- Duração estimada: ~30–45 min de execução (Playwright + browser manual + relatório).
 
-- Hero com "previsão atual" gigante e barra de confiança
-- Gráfico IA vs Humanos (accuracy histórica)
-- Lista de previsões ativas da IA
-- Histórico com hits/misses
-
-### 12. Carteira (`/wallet`)
-
-- Saldo grande animado (R$ virtual)
-- Tabs: Visão geral / Histórico / Depositar (CTA mock) / Sacar (CTA mock)
-- Chart de evolução do saldo
-- Lista de transações (entrada em pool, payout, depósito, saque)
-- KPIs: ROI total, volume movimentado, lucro mensal
-
-### 13. Perfil (`/profile`)
-
-- Avatar grande, nome, divisão, XP bar
-- Grid de badges (Mestre da Paulista, Rei do Rush, etc.) com lock/unlock
-- Calendário de atividade estilo GitHub
-- Chart de PnL
-- Mercados favoritos
-
-### 14. Gamificação e notificações
-
-- Divisões: Bronze → Elite com cores próprias
-- Toast (`sonner`) para wins/streaks com confete (`canvas-confetti`) — som **desabilitado por padrão**
-- Notification popover na topbar com 5 exemplos mockados
-
-### 15. Realtime (mock store Zustand)
-
-`src/store/marketStore.ts` — fonte única para mercados, pools, odds, feed, ranking, mapa. Hooks de intervalo (`useEffect` + `setInterval`) emitem updates pseudo-aleatórios (random walk) para todos os componentes consumirem. Números animam com Framer Motion `animate` + componente `<AnimatedNumber/>`.
-
-### 16. Mobile
-
-- Sidebar vira drawer + **bottom nav** (Home, Mercados, Live, Ranking, Perfil)
-- Cards full-width, swipe horizontal em listas com `embla` (já incluído via carousel)
-- Topbar compacta com saldo + sino
-
----
-
-### Detalhes técnicos
-
-- **Stack real**: TanStack Start (não Next 15 — é o stack do projeto), TypeScript, Tailwind v4, shadcn/ui, **Framer Motion** (`motion`), **Recharts**, **Zustand**, **canvas-confetti**, **embla-carousel** (já presente). Sem Socket.io nesta v1 — realtime é simulado com intervals.
-- **Sem Supabase nesta v1** (escolha do escopo "demo sem auth"). Schema parimutuel fica documentado em `src/lib/parimutuel.ts` para futura migração.
-- **Sem mapa geográfico real** — SVG custom de SP.
-- **SEO**: `head()` único por rota, sitemap.xml + robots.txt.
-- **Componentes novos**: `AnimatedNumber`, `LivePool`, `OddsChart`, `MarketCard`, `Ticker`, `Heatmap`, `Sidebar`, `Topbar`, `BottomNav`, `RankingTable`, `FeedItem`, `UrbanMindCard`, `BadgeChip`, `DivisionBadge`, `OrderBox`.
-- **Imagens**: avatares gerados (4–6) + hero abstrato urbano via `imagegen` em `src/assets/`.
-
-### Fora do escopo da v1 (próximas iterações)
-
-- Auth + Supabase schema real (events, pools, predictions, wallets, xp_history, etc.)
-- syncpayments / pagamento real
-- Mapbox geográfico
-- WebSockets reais
-- Integração YOLO/OpenCV para contagem real
+Aprove para eu iniciar a execução.
