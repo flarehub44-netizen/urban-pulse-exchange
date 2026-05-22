@@ -3,6 +3,28 @@ import { db as supabase } from "@/integrations/supabase/loose";
 import { getStoredPartnerRef, clearStoredPartnerRef } from "@/lib/partner-attribution";
 import { getBoundReferralSlug, markReferralBound } from "@/lib/anon-account-storage";
 
+type DemoAuthState = { authReady: boolean; userId: string | null };
+
+let initPromise: Promise<DemoAuthState> | null = null;
+
+async function initDemoAuth(): Promise<DemoAuthState> {
+  try {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (session) {
+      void tryBindPartnerRef();
+      return { authReady: true, userId: session.user.id };
+    }
+
+    return { authReady: true, userId: null };
+  } catch {
+    console.warn("[anon-auth] Session lookup failed; continuing in local demo mode.");
+    return { authReady: true, userId: null };
+  }
+}
+
 export function useAnonAuth() {
   const [authReady, setAuthReady] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -13,19 +35,10 @@ export function useAnonAuth() {
     initialized.current = true;
 
     const init = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (session) {
-        setUserId(session.user.id);
-        setAuthReady(true);
-        void tryBindPartnerRef();
-      } else {
-        const { data } = await supabase.auth.signInAnonymously();
-        setUserId(data.user?.id ?? null);
-        setAuthReady(true);
-        void tryBindPartnerRef();
-      }
+      initPromise ??= initDemoAuth();
+      const state = await initPromise;
+      setUserId(state.userId);
+      setAuthReady(true);
     };
 
     init();
@@ -34,7 +47,7 @@ export function useAnonAuth() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_, session) => {
       setUserId(session?.user?.id ?? null);
-      if (session) setAuthReady(true);
+      setAuthReady(true);
     });
 
     return () => subscription.unsubscribe();
