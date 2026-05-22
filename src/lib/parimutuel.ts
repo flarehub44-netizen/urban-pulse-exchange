@@ -7,7 +7,6 @@ export const HOUSE_RETENTION = 0.1;
 export const PRIZE_RATIO = 1 - HOUSE_RETENTION;
 /** Minimum share of total pool on minority side; below → void/refund. */
 export const MIN_MINORITY_RATIO = 0.05;
-export const MIN_ORACLE_CONFIDENCE = 0.85;
 
 export type SettlementAction = "settle" | "void";
 

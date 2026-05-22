@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { lazy, Suspense, useMemo, useState } from "react";
+import { useViaX } from "@/store/viax-store";
 import { toast } from "sonner";
 import { useWalletDeposit, useWalletWithdraw } from "@/hooks/use-wallet-rpc";
 import { useCasinoEnabled } from "@/hooks/use-casino-enabled";

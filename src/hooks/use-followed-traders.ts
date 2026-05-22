@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { db as supabase } from "@/integrations/supabase/loose";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
 import { toggleTraderFollowFn } from "@/actions/follows";
 

@@ -15,7 +15,7 @@ export type PlatformEvent = {
 export const getActiveEventsFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabase } = context as SupabaseFnContext;
+    const { supabase } = context as unknown as SupabaseFnContext;
     const { data, error } = await supabase.rpc("get_active_events");
     if (error) throw new Error(error.message);
     return (Array.isArray(data) ? data : []) as PlatformEvent[];

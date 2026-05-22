@@ -38,7 +38,7 @@ const tabs = [
 ];
 
 function Ranking() {
-  const navigate = useNavigate({ from: "/_app/ranking" });
+  const navigate = useNavigate({ from: "/ranking" });
   const { tab = "global" } = Route.useSearch();
   const { userId } = useAnonAuth();
   const { ids: followedIds } = useFollowedTraders();

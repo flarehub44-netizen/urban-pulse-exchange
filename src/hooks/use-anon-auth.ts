@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { db as supabase } from "@/integrations/supabase/loose";
 import { getStoredPartnerRef, clearStoredPartnerRef } from "@/lib/partner-attribution";
 import { getBoundReferralSlug, markReferralBound } from "@/lib/anon-account-storage";
 

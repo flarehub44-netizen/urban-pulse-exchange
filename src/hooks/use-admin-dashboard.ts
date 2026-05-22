@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { db as supabase } from "@/integrations/supabase/loose";
 
 export function useAdminDashboardMetrics(enabled = true) {
   return useQuery({

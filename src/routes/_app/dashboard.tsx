@@ -1,6 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useEffect, useState, useRef, lazy, Suspense } from "react";
-import { useRegions } from "@/hooks/use-regions";
 import { findTopMarketForRegion } from "@/lib/region-market";
 import { toast } from "sonner";
 import { useViaX } from "@/store/viax-store";
@@ -92,7 +91,7 @@ export const Route = createFileRoute("/_app/dashboard")({
 });
 
 function Dashboard() {
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: "/dashboard" });
   const deferredReady = useDeferredMount(150);
   const { enabled: casinoEnabled } = useCasinoEnabled();
   const { from, highlight } = Route.useSearch();
@@ -111,7 +110,7 @@ function Dashboard() {
       toast.message(copy.dashboard.welcomeToast, {
         description: copy.dashboard.welcomeToastDesc,
       });
-      navigate({ search: {}, replace: true });
+      navigate({ search: () => ({}), replace: true });
     }
   }, [from, navigate]);
 

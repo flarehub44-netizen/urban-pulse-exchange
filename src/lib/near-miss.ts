@@ -7,18 +7,6 @@ export type NearMissMeta = {
   share?: number;
 };
 
-/** Heurística client-side (espelha trigger no servidor) para UI em tempo real. */
-export function wouldNearMissBetLoss(
-  market: Pick<Market, "pool">,
-  stake: number,
-  share?: number,
-): boolean {
-  const total = market.pool.YES + market.pool.NO;
-  if (total <= 0) return stake >= 50;
-  const yesRatio = market.pool.YES / total;
-  return (share ?? 0) >= 0.35 || Math.abs(yesRatio - 0.5) <= 0.08 || stake / total >= 0.08;
-}
-
 export function nearMissGapPercent(market: Pick<Market, "pool">): number {
   const total = market.pool.YES + market.pool.NO;
   if (total <= 0) return 8;

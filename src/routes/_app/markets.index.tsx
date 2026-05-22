@@ -73,7 +73,7 @@ const baseStatusFilters = [
 const draftFilter = { key: "draft" as const, label: "Rascunhos" };
 
 function MarketsList() {
-  const navigate = useNavigate({ from: "/_app/markets/" });
+  const navigate = useNavigate({ from: "/markets/" });
   const search = Route.useSearch();
   const { userId } = useAnonAuth();
   const { data: profile } = useProfile(userId);

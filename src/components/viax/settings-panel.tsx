@@ -30,7 +30,7 @@ export function SettingsPanel() {
 
   const onCasinoIntenseToggle = async (on: boolean) => {
     try {
-      await setCasinoOptOutFn({ optOut: !on });
+      await setCasinoOptOutFn({ data: { optOut: !on } });
       await refetchCasino();
       toast.success(copy.responsiblePlay.optOutSaved);
     } catch (e: unknown) {

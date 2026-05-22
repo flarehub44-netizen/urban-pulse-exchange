@@ -65,7 +65,7 @@ const tagTone: Record<string, string> = {
 };
 
 function Feed() {
-  const navigate = useNavigate({ from: "/_app/feed" });
+  const navigate = useNavigate({ from: "/feed" });
   const { post: postFromUrl } = Route.useSearch();
   useFeed();
   const { feed } = useResolvedFeed();

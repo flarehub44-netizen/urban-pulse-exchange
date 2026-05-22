@@ -64,7 +64,7 @@ const profileTabs = [
 ];
 
 function Profile() {
-  const navigate = useNavigate({ from: "/_app/profile" });
+  const navigate = useNavigate({ from: "/profile" });
   const { tab = "visao" } = Route.useSearch();
   const zustandMe = useViaX((s) => s.me);
   const { userId } = useAnonAuth();

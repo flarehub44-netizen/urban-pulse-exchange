@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { db as supabase } from "@/integrations/supabase/loose";
 import type { Market } from "@/store/viax-store";
 
 export type CreateMarketInput = {

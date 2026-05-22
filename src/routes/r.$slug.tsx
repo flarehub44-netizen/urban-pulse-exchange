@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { db as supabase } from "@/integrations/supabase/loose";
 import { storePartnerRef } from "@/lib/partner-attribution";
 
 export const Route = createFileRoute("/r/$slug")({

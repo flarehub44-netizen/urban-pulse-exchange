@@ -9,7 +9,7 @@ export const toggleTraderFollowFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(followingIdSchema)
   .handler(async ({ data, context }) => {
-    const { supabase } = context as SupabaseFnContext;
+    const { supabase } = context as unknown as SupabaseFnContext;
     const { data: following, error } = await supabase.rpc("toggle_trader_follow", {
       p_following_id: data.followingId,
     });

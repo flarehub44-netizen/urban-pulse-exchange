@@ -14,7 +14,7 @@ export const placeBetFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(placeBetSchema)
   .handler(async ({ data, context }) => {
-    const { supabase } = context as SupabaseFnContext;
+    const { supabase } = context as unknown as SupabaseFnContext;
     const { data: result, error } = await supabase.rpc("place_bet", {
       p_market_id: data.marketId,
       p_side: data.side,

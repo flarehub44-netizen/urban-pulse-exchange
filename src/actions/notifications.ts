@@ -5,7 +5,7 @@ import type { SupabaseFnContext } from "@/integrations/supabase/loose";
 export const markNotificationsReadFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabase, userId } = context as SupabaseFnContext;
+    const { supabase, userId } = context as unknown as SupabaseFnContext;
     const { error } = await supabase
       .from("notifications")
       .update({ read: true })

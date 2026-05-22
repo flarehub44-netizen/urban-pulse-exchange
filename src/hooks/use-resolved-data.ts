@@ -1,5 +1,5 @@
 import { useViaX } from "@/store/viax-store";
-import type { Market, Trader, Transaction, Notification, FeedPost } from "@/store/viax-store";
+import type { Market, Trader, Transaction, ViaXNotification, FeedPost } from "@/store/viax-store";
 import { pickDbOrEmptyArray, pickDbOrSeed } from "@/lib/data-source";
 import { useProfile } from "@/hooks/use-profile";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
@@ -47,7 +47,7 @@ export function useResolvedTraders() {
 export function useResolvedNotifications() {
   const { data: db, isLoading, isError } = useNotifications();
   const seed = useViaX((s) => s.notifications);
-  const notifications = pickDbOrEmptyArray(db, seed) as Notification[];
+  const notifications = pickDbOrEmptyArray(db, seed) as ViaXNotification[];
   return { notifications, isLoading, isError };
 }
 

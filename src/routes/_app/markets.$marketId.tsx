@@ -108,7 +108,7 @@ function MarketDetail() {
   const { enabled: casinoEnabled } = useCasinoEnabled();
   const { marketId } = Route.useParams();
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/_app/markets/$marketId" });
+  const navigate = useNavigate({ from: "/markets/$marketId" });
   const activeTab = search.tab ?? "book";
   const initialSide = search.side ?? undefined;
   const [showSocialBook, setShowSocialBook] = useState(false);
