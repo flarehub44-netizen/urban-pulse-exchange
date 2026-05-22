@@ -59,9 +59,10 @@ export function useResolvedFeed() {
 }
 
 export function useResolvedFeedForMarket(marketId: string) {
-  const { feed, isLoading, isError } = useResolvedFeed();
-  const filtered = feed.filter((p) => p.marketId === marketId);
-  return { feed: filtered, isLoading, isError };
+  const { data: db, isLoading, isError } = useFeed(marketId);
+  const seed = useViaX((s) => s.feed.filter((p) => p.marketId === marketId));
+  const feed = pickDbOrEmptyArray(db, seed) as FeedPost[];
+  return { feed, isLoading, isError };
 }
 
 export type { Market, Trader, Transaction };

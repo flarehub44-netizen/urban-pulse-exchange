@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useWalletDeposit, useWalletWithdraw } from "@/hooks/use-wallet-rpc";
 import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
@@ -21,8 +21,13 @@ import { formatBRL } from "@/lib/parimutuel";
 import { ArrowDownLeft, ArrowUpRight, Plus, Minus, Trophy } from "lucide-react";
 import { EmptyState } from "@/components/viax/empty-state";
 import { SimulatedMoneyBanner } from "@/components/viax/simulated-money-banner";
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { cn } from "@/lib/utils";
+
+const WalletBalanceChart = lazy(() =>
+  import("@/components/viax/wallet-balance-chart").then((m) => ({
+    default: m.WalletBalanceChart,
+  })),
+);
 import { isOpenBetStatus } from "@/lib/market-status";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -94,35 +99,9 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
       </div>
 
       <div className="rounded-2xl border bg-card/60 p-3 backdrop-blur">
-        <div style={{ width: "100%", height: 160 }}>
-          <ResponsiveContainer>
-            <AreaChart data={balanceCurve}>
-              <defs>
-                <linearGradient id="wg" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0%" stopColor="var(--color-primary)" stopOpacity={0.4} />
-                  <stop offset="100%" stopColor="var(--color-primary)" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <XAxis dataKey="d" hide />
-              <YAxis hide />
-              <Tooltip
-                contentStyle={{
-                  background: "var(--color-popover)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: 12,
-                  fontSize: 12,
-                }}
-              />
-              <Area
-                type="monotone"
-                dataKey="v"
-                stroke="var(--color-primary)"
-                strokeWidth={1.8}
-                fill="url(#wg)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
+        <Suspense fallback={<div className="h-40 animate-pulse rounded-xl bg-surface/60" />}>
+          <WalletBalanceChart data={balanceCurve} />
+        </Suspense>
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">

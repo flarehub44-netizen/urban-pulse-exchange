@@ -1,6 +1,5 @@
 import { useMarketBets } from "@/hooks/use-market-bets";
 import { useFeed } from "@/hooks/use-feed";
-import { useViaX } from "@/store/viax-store";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL, formatPct, probability } from "@/lib/parimutuel";
 import type { Market } from "@/store/viax-store";
@@ -11,8 +10,7 @@ import { ptBR } from "date-fns/locale";
 export function SocialBook({ m }: { m: Market }) {
   const { data: bets, isLoading, isError } = useMarketBets(m.id);
   const { data: dbFeed } = useFeed(m.id);
-  const zustandFeed = useViaX((s) => s.feed.filter((p) => p.marketId === m.id));
-  const feedFallback = (dbFeed ?? zustandFeed).slice(0, 6);
+  const feedFallback = (dbFeed ?? []).slice(0, 6);
   const pY = probability(m.pool, "YES");
   const showFeed = isError || (!isLoading && (!bets || bets.length === 0));
 

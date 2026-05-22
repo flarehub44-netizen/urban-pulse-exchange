@@ -46,6 +46,8 @@ export function MarketCard({ m, compact }: { m: Market; compact?: boolean }) {
   return (
     <>
       <motion.div
+        data-testid="market-card"
+        data-market-id={m.id}
         layout
         whileHover={{ y: -2 }}
         transition={{ type: "spring", stiffness: 260, damping: 22 }}
@@ -106,7 +108,12 @@ export function MarketCard({ m, compact }: { m: Market; compact?: boolean }) {
           </div>
         </div>
 
-        <Link to="/markets/$marketId" params={{ marketId: m.id }} className="mt-3 block">
+        <Link
+          to="/markets/$marketId"
+          params={{ marketId: m.id }}
+          className="mt-3 block"
+          data-testid="market-card-link"
+        >
           <h3
             className={cn(
               "font-medium text-foreground leading-snug",

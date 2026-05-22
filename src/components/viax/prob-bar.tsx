@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { copy } from "@/copy/pt-BR";
 
@@ -25,15 +24,13 @@ export function ProbBar({
             title={copy.casino.hotZoneLabel}
           />
         )}
-        <motion.div
-          className="absolute inset-y-0 left-0 bg-gradient-to-r from-up to-up/70"
-          animate={{ width: `${py * 100}%` }}
-          transition={{ type: "tween", duration: 0.6, ease: "easeOut" }}
+        <div
+          className="absolute inset-y-0 left-0 bg-gradient-to-r from-up to-up/70 transition-[width] duration-500 ease-out"
+          style={{ width: `${py * 100}%` }}
         />
-        <motion.div
-          className="absolute inset-y-0 right-0 bg-gradient-to-l from-down to-down/70"
-          animate={{ width: `${(1 - py) * 100}%` }}
-          transition={{ type: "tween", duration: 0.6, ease: "easeOut" }}
+        <div
+          className="absolute inset-y-0 right-0 bg-gradient-to-l from-down to-down/70 transition-[width] duration-500 ease-out"
+          style={{ width: `${(1 - py) * 100}%` }}
         />
       </div>
       {showHotZone && nearFifty && (

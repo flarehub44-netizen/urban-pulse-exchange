@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { useResolvedMarkets } from "@/hooks/use-resolved-data";
 import { useViaX } from "@/store/viax-store";
 import type { Market, Side } from "@/store/viax-store";
@@ -14,16 +14,11 @@ import { Brain, Clock, Zap } from "lucide-react";
 import { UrbanMindDigestCard } from "@/components/viax/urbanmind-digest-card";
 import { useUrbanMindDigest } from "@/hooks/use-urbanmind-digest";
 import { coachContinuityLine } from "@/lib/urbanmind-coach";
-import {
-  Area,
-  AreaChart,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+const UrbanMindAccuracyChart = lazy(() =>
+  import("@/components/viax/urbanmind-accuracy-chart").then((m) => ({
+    default: m.UrbanMindAccuracyChart,
+  })),
+);
 
 export type UrbanMindSearch = { marketId?: string };
 
@@ -55,6 +50,18 @@ function UrbanMind() {
     markets.find((m) => m.status === "live" || m.status === "closing") ??
     markets[0];
   const [betTarget, setBetTarget] = useState<{ market: Market; side: Side } | null>(null);
+  const accuracyData = useMemo(
+    () =>
+      aiAcc.map((d) => ({
+        t: new Date(d.t).toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+        }),
+        AI: +(d.ai * 100).toFixed(1),
+        H: +(d.human * 100).toFixed(1),
+      })),
+    [aiAcc],
+  );
 
   if (!top) {
     return (
@@ -138,57 +145,13 @@ function UrbanMind() {
               <span className="text-muted-foreground">● Comunidade</span>
             </div>
           </div>
-          <div className="mt-3" style={{ width: "100%", height: 280 }}>
-            <ResponsiveContainer>
-              <LineChart
-                data={aiAcc.map((d) => ({
-                  t: new Date(d.t).toLocaleDateString("pt-BR", {
-                    day: "2-digit",
-                    month: "2-digit",
-                  }),
-                  AI: +(d.ai * 100).toFixed(1),
-                  H: +(d.human * 100).toFixed(1),
-                }))}
-              >
-                <XAxis
-                  dataKey="t"
-                  tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }}
-                  axisLine={false}
-                  tickLine={false}
-                  minTickGap={32}
-                />
-                <YAxis
-                  domain={[50, 90]}
-                  tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }}
-                  axisLine={false}
-                  tickLine={false}
-                  width={30}
-                />
-                <Tooltip
-                  contentStyle={{
-                    background: "var(--color-popover)",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: 12,
-                    fontSize: 12,
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="AI"
-                  stroke="var(--color-primary)"
-                  strokeWidth={2}
-                  dot={false}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="H"
-                  stroke="var(--color-muted-foreground)"
-                  strokeWidth={1.6}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+          <Suspense
+            fallback={<div className="mt-3 h-[280px] animate-pulse rounded-xl bg-surface/60" />}
+          >
+            <div className="mt-3">
+              <UrbanMindAccuracyChart data={accuracyData} />
+            </div>
+          </Suspense>
         </div>
 
         <div className="space-y-4">

@@ -15,9 +15,9 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium",
-    "db:push": "supabase db push --linked --yes",
-    "db:tick": "supabase db query --linked",
-    "db:types": "supabase gen types typescript --linked -o src/integrations/supabase/types.generated.ts",
+    "db:push": "npx supabase db push --linked --yes",
+    "db:tick": "npx supabase db query --linked",
+    "db:types": "node scripts/gen-supabase-types.mjs",
     "db:test-sql": "echo Run: psql $DATABASE_URL -f supabase/tests/resolution_engine_acceptance.sql"
   },
   "dependencies": {

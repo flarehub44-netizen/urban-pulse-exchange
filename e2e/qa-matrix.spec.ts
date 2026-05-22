@@ -1,6 +1,5 @@
 import { test, expect } from "@playwright/test";
-
-const PROD = process.env.PLAYWRIGHT_BASE_URL?.includes("workers.dev");
+import { minLiveMarketsExpected, openFirstLiveMarket, waitForMarketCards } from "./helpers/markets";
 
 test.describe("T01 — Landing e entrada no app", () => {
   test("landing carrega e CTA mercados visível", async ({ page }) => {
@@ -19,30 +18,16 @@ test.describe("T01 — Landing e entrada no app", () => {
 });
 
 test.describe("T02 — Mercados", () => {
-  test("lista de mercados renderiza", async ({ page }) => {
-    await page.goto("/markets?status=live");
-    await expect(page).toHaveTitle(/Mercados/i);
-    await page.waitForTimeout(5000);
-    const link = page.locator('a[href*="/markets/"]').first();
-    const empty = page.getByText(/nenhum mercado|sem mercados|empty/i);
-    const hasLink = await link.isVisible().catch(() => false);
-    const hasEmpty = await empty.isVisible().catch(() => false);
-    expect(hasLink || hasEmpty).toBeTruthy();
+  test.describe.configure({ timeout: 60_000 });
+
+  test("lista com mercados live suficientes", async ({ page }) => {
+    const min = minLiveMarketsExpected();
+    const { count } = await waitForMarketCards(page, min, 30_000);
+    expect(count).toBeGreaterThanOrEqual(min);
   });
 
   test("detalhe de mercado abre order box", async ({ page }) => {
-    await page.goto("/markets?status=live");
-    await page.waitForTimeout(5000);
-    const link = page.locator('a[href*="/markets/"]').first();
-    if (!(await link.isVisible().catch(() => false))) {
-      test.skip(true, "Sem mercados live no ambiente");
-      return;
-    }
-    await link.click();
-    await page.waitForTimeout(2000);
-    await expect(page.getByText(/SIM|NÃO|Operar|Apostar/i).first()).toBeVisible({
-      timeout: 12_000,
-    });
+    await openFirstLiveMarket(page);
   });
 });
 

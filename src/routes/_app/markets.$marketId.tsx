@@ -1,10 +1,15 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { useMemo, useEffect } from "react";
+import { lazy, Suspense, useMemo, useEffect, useState } from "react";
 import { useMarketHistory } from "@/hooks/use-market-history";
 import { useMarketsList } from "@/hooks/use-markets";
 import { useResolvedFeedForMarket } from "@/hooks/use-resolved-data";
-import { ProbChart } from "@/components/viax/prob-chart";
-import { MarketVolumeChart } from "@/components/viax/market-volume-chart";
+
+const ProbChart = lazy(() =>
+  import("@/components/viax/prob-chart").then((m) => ({ default: m.ProbChart })),
+);
+const MarketVolumeChart = lazy(() =>
+  import("@/components/viax/market-volume-chart").then((m) => ({ default: m.MarketVolumeChart })),
+);
 import { MarketCandles } from "@/components/viax/market-candles";
 import { SocialBook } from "@/components/viax/social-book";
 import { OrderBox } from "@/components/viax/order-box";
@@ -58,17 +63,58 @@ const tabs = [
   { key: "audit" as const, label: copy.markets.tabAudit },
 ];
 
+function MarketCommentsPanel({ marketId }: { marketId: string }) {
+  const { feed } = useResolvedFeedForMarket(marketId);
+  return (
+    <div className="rounded-2xl border bg-card/60 p-5 backdrop-blur">
+      <div className="flex items-center justify-between">
+        <div className="text-sm font-medium">Comentários da comunidade</div>
+        <span className="text-xs text-muted-foreground">{feed.length} posts</span>
+      </div>
+      <div className="mt-3 space-y-3">
+        {feed.length === 0 && (
+          <p className="text-sm text-muted-foreground">
+            Seja o primeiro a comentar este mercado.
+          </p>
+        )}
+        {feed.map((p) => (
+          <div
+            key={p.id}
+            className="flex gap-3 border-t border-border/60 pt-3 first:border-0 first:pt-0"
+          >
+            <img
+              src={p.user.avatar}
+              className="size-9 rounded-full bg-surface"
+              alt={p.user.name}
+            />
+            <div className="min-w-0 flex-1">
+              <div className="text-xs text-muted-foreground">
+                <span className="font-medium text-foreground">{p.user.name}</span> @{p.user.handle}{" "}
+                · {formatDistanceToNow(p.time, { locale: ptBR, addSuffix: true })}
+              </div>
+              <p className="mt-1 text-sm">{p.text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <Link to="/feed" className="mt-4 inline-block text-xs text-primary hover:underline">
+        Ver feed completo →
+      </Link>
+    </div>
+  );
+}
+
 function MarketDetail() {
   const { enabled: casinoEnabled } = useCasinoEnabled();
   const { marketId } = Route.useParams();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/_app/markets/$marketId" });
-  const activeTab = search.tab ?? "chart";
+  const activeTab = search.tab ?? "book";
   const initialSide = search.side ?? undefined;
+  const [showSocialBook, setShowSocialBook] = useState(false);
 
-  const { markets } = useMarketsList();
+  const { markets, isLoading: marketsLoading } = useMarketsList();
   const m = markets.find((x) => x.id === marketId);
-  const { feed } = useResolvedFeedForMarket(marketId);
   const { data: dbHistory } = useMarketHistory(marketId);
   const history = useMemo(() => {
     if (dbHistory?.length) return dbHistory;
@@ -80,6 +126,28 @@ function MarketDetail() {
     const short = m.question.length > 42 ? `${m.question.slice(0, 42)}…` : m.question;
     document.title = `${short} · ViaX`;
   }, [m?.question]);
+
+  useEffect(() => {
+    if (activeTab !== "book") {
+      setShowSocialBook(false);
+      return;
+    }
+    const id = requestAnimationFrame(() => setShowSocialBook(true));
+    return () => {
+      cancelAnimationFrame(id);
+      setShowSocialBook(false);
+    };
+  }, [activeTab, marketId]);
+
+  if (marketsLoading) {
+    return (
+      <div className="space-y-4 animate-pulse">
+        <div className="h-8 w-48 rounded-lg bg-surface-2" />
+        <div className="h-40 rounded-2xl bg-surface-2" />
+        <div className="h-64 rounded-2xl bg-surface-2" />
+      </div>
+    );
+  }
 
   if (!m) throw notFound();
 
@@ -175,11 +243,7 @@ function MarketDetail() {
               <div className="rounded-xl border border-up/30 bg-up/5 p-3">
                 <div className="text-xs uppercase tracking-wider text-up">↑ SIM</div>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <AnimatedNumber
-                    value={pY * 100}
-                    decimals={1}
-                    className="text-3xl font-semibold text-up"
-                  />
+                  <span className="text-3xl font-semibold text-up mono">{(pY * 100).toFixed(1)}</span>
                   <span className="text-sm text-up/70">%</span>
                 </div>
                 <div className="mt-1 text-[11px] mono text-muted-foreground">
@@ -189,11 +253,7 @@ function MarketDetail() {
               <div className="rounded-xl border border-down/30 bg-down/5 p-3">
                 <div className="text-xs uppercase tracking-wider text-down">↓ NÃO</div>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <AnimatedNumber
-                    value={(1 - pY) * 100}
-                    decimals={1}
-                    className="text-3xl font-semibold text-down"
-                  />
+                  <span className="text-3xl font-semibold text-down mono">{((1 - pY) * 100).toFixed(1)}</span>
                   <span className="text-sm text-down/70">%</span>
                 </div>
                 <div className="mt-1 text-[11px] mono text-muted-foreground">
@@ -203,12 +263,12 @@ function MarketDetail() {
             </div>
 
             <div className="mt-3">
-              <ProbBar yes={m.pool.YES} no={m.pool.NO} showHotZone={showHotZone} />
+              <ProbBar yes={m.pool.YES} no={m.pool.NO} showHotZone={showHotZone} key={marketId} />
             </div>
 
             {(m.status === "live" || m.status === "closing") && (
               <div className="mt-4">
-                <MarketSocialProof marketId={marketId} />
+                {/* MarketSocialProof disabled: framer-motion ticker caused update loop with realtime pool */}
               </div>
             )}
 
@@ -281,13 +341,17 @@ function MarketDetail() {
                   </div>
                 </div>
                 <div className="mt-3">
-                  <ProbChart m={m} history={history} />
+                  <Suspense fallback={<div className="h-[280px] animate-pulse rounded-xl bg-surface-2" />}>
+                    <ProbChart m={m} history={history} />
+                  </Suspense>
                 </div>
                 <div className="mt-4 border-t border-border/60 pt-4">
                   <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
                     <BarChart2 className="size-3.5" /> Volume · barras
                   </div>
-                  <MarketVolumeChart history={history} />
+                  <Suspense fallback={<div className="h-[120px] animate-pulse rounded-xl bg-surface-2" />}>
+                    <MarketVolumeChart history={history} />
+                  </Suspense>
                 </div>
                 <div className="mt-4 border-t border-border/60 pt-4">
                   <div className="mb-2 text-xs text-muted-foreground">
@@ -326,50 +390,7 @@ function MarketDetail() {
             </>
           )}
 
-          {activeTab === "book" && (
-            <div className="lg:hidden">
-              <SocialBook m={m} />
-            </div>
-          )}
-
-          {activeTab === "comments" && (
-            <div className="rounded-2xl border bg-card/60 p-5 backdrop-blur">
-              <div className="flex items-center justify-between">
-                <div className="text-sm font-medium">Comentários da comunidade</div>
-                <span className="text-xs text-muted-foreground">{feed.length} posts</span>
-              </div>
-              <div className="mt-3 space-y-3">
-                {feed.length === 0 && (
-                  <p className="text-sm text-muted-foreground">
-                    Seja o primeiro a comentar este mercado.
-                  </p>
-                )}
-                {feed.map((p) => (
-                  <div
-                    key={p.id}
-                    className="flex gap-3 border-t border-border/60 pt-3 first:border-0 first:pt-0"
-                  >
-                    <img
-                      src={p.user.avatar}
-                      className="size-9 rounded-full bg-surface"
-                      alt={p.user.name}
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="text-xs text-muted-foreground">
-                        <span className="font-medium text-foreground">{p.user.name}</span> @
-                        {p.user.handle} ·{" "}
-                        {formatDistanceToNow(p.time, { locale: ptBR, addSuffix: true })}
-                      </div>
-                      <p className="mt-1 text-sm">{p.text}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <Link to="/feed" className="mt-4 inline-block text-xs text-primary hover:underline">
-                Ver feed completo →
-              </Link>
-            </div>
-          )}
+          {activeTab === "comments" && <MarketCommentsPanel marketId={marketId} />}
 
           {activeTab === "audit" && (
             <div className="rounded-2xl border bg-card/60 p-5 backdrop-blur">
@@ -384,9 +405,7 @@ function MarketDetail() {
             initialSide={initialSide}
             className="max-lg:sticky max-lg:bottom-[calc(4.5rem+env(safe-area-inset-bottom))] max-lg:z-20 max-lg:shadow-[var(--shadow-elevated)]"
           />
-          <div className="hidden lg:block">
-            <SocialBook m={m} />
-          </div>
+          {showSocialBook && activeTab === "book" && <SocialBook m={m} />}
         </div>
       </div>
     </div>

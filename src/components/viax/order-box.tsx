@@ -27,7 +27,6 @@ import { BetConfirmDialog } from "@/components/viax/bet-confirm-dialog";
 import { AnonFirstBetDialog } from "@/components/viax/anon-first-bet-dialog";
 import { AnonAccountBanner } from "@/components/viax/anon-account-banner";
 import { hasAnonBetAck, setAnonBetAck } from "@/lib/anon-account-storage";
-import { AnimatedNumber } from "./animated-number";
 import { cn } from "@/lib/utils";
 import { ArrowDown, ArrowUp, BookOpen } from "lucide-react";
 import { saveBetNoteFn } from "@/actions/bets";
@@ -266,6 +265,7 @@ export function OrderBox({
 
   return (
     <div
+      data-testid="order-box"
       className={cn(
         "rounded-2xl border bg-card/60 p-5 backdrop-blur shadow-[var(--shadow-elevated)]",
         className,
@@ -333,6 +333,7 @@ export function OrderBox({
           <span className="text-muted-foreground">R$</span>
           <input
             type="number"
+            data-testid="order-box-stake"
             value={stake}
             onChange={(e) => setStake(Number(e.target.value) || 0)}
             className="w-full bg-transparent mono text-lg outline-none"
@@ -419,13 +420,7 @@ export function OrderBox({
       <div className="mt-4 space-y-2 rounded-xl border bg-surface/60 p-3 text-sm">
         <Row
           label={copy.bet.prizeTotal}
-          value={
-            <AnimatedNumber
-              value={prizePool(m.pool)}
-              format={formatBRL}
-              className="text-foreground"
-            />
-          }
+          value={<span className="mono text-foreground">{formatBRL(prizePool(m.pool))}</span>}
         />
         <Row
           label={copy.bet.yourShare}
@@ -434,11 +429,9 @@ export function OrderBox({
         <Row
           label={copy.bet.potentialWin}
           value={
-            <AnimatedNumber
-              value={est.payout}
-              format={formatBRL}
-              className={side === "YES" ? "text-up" : "text-down"}
-            />
+            <span className={cn("mono", side === "YES" ? "text-up" : "text-down")}>
+              {formatBRL(est.payout)}
+            </span>
           }
         />
         <Row
@@ -469,6 +462,7 @@ export function OrderBox({
       />
 
       <motion.button
+        data-testid="order-box-operate"
         whileTap={{ scale: 0.98 }}
         type="button"
         onClick={openConfirm}

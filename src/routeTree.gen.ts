@@ -48,6 +48,7 @@ import { Route as AppLiveRouteImport } from './routes/_app/live'
 import { Route as AppLeaguesRouteImport } from './routes/_app/leagues'
 import { Route as AppFeedRouteImport } from './routes/_app/feed'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
+import { Route as AppMarketsIndexRouteImport } from './routes/_app/markets.index'
 import { Route as AppProfileUserIdRouteImport } from './routes/_app/profile.$userId'
 import { Route as AppMarketsMarketIdRouteImport } from './routes/_app/markets.$marketId'
 import { Route as AppFeedPostIdRouteImport } from './routes/_app/feed.$postId'
@@ -246,6 +247,11 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMarketsIndexRoute = AppMarketsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppMarketsRoute,
+} as any)
 const AppProfileUserIdRoute = AppProfileUserIdRouteImport.update({
   id: '/$userId',
   path: '/$userId',
@@ -304,6 +310,7 @@ export interface FileRoutesByFullPath {
   '/feed/$postId': typeof AppFeedPostIdRoute
   '/markets/$marketId': typeof AppMarketsMarketIdRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
+  '/markets/': typeof AppMarketsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -312,7 +319,6 @@ export interface FileRoutesByTo {
   '/feed': typeof AppFeedRouteWithChildren
   '/leagues': typeof AppLeaguesRoute
   '/live': typeof AppLiveRoute
-  '/markets': typeof AppMarketsRouteWithChildren
   '/notifications': typeof AppNotificationsRoute
   '/positions': typeof AppPositionsRoute
   '/profile': typeof AppProfileRouteWithChildren
@@ -345,6 +351,7 @@ export interface FileRoutesByTo {
   '/feed/$postId': typeof AppFeedPostIdRoute
   '/markets/$marketId': typeof AppMarketsMarketIdRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
+  '/markets': typeof AppMarketsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -390,6 +397,7 @@ export interface FileRoutesById {
   '/_app/feed/$postId': typeof AppFeedPostIdRoute
   '/_app/markets/$marketId': typeof AppMarketsMarketIdRoute
   '/_app/profile/$userId': typeof AppProfileUserIdRoute
+  '/_app/markets/': typeof AppMarketsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -435,6 +443,7 @@ export interface FileRouteTypes {
     | '/feed/$postId'
     | '/markets/$marketId'
     | '/profile/$userId'
+    | '/markets/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -443,7 +452,6 @@ export interface FileRouteTypes {
     | '/feed'
     | '/leagues'
     | '/live'
-    | '/markets'
     | '/notifications'
     | '/positions'
     | '/profile'
@@ -476,6 +484,7 @@ export interface FileRouteTypes {
     | '/feed/$postId'
     | '/markets/$marketId'
     | '/profile/$userId'
+    | '/markets'
   id:
     | '__root__'
     | '/'
@@ -520,6 +529,7 @@ export interface FileRouteTypes {
     | '/_app/feed/$postId'
     | '/_app/markets/$marketId'
     | '/_app/profile/$userId'
+    | '/_app/markets/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -806,6 +816,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/markets/': {
+      id: '/_app/markets/'
+      path: '/'
+      fullPath: '/markets/'
+      preLoaderRoute: typeof AppMarketsIndexRouteImport
+      parentRoute: typeof AppMarketsRoute
+    }
     '/_app/profile/$userId': {
       id: '/_app/profile/$userId'
       path: '/$userId'
@@ -905,10 +922,12 @@ const AppFeedRouteWithChildren =
 
 interface AppMarketsRouteChildren {
   AppMarketsMarketIdRoute: typeof AppMarketsMarketIdRoute
+  AppMarketsIndexRoute: typeof AppMarketsIndexRoute
 }
 
 const AppMarketsRouteChildren: AppMarketsRouteChildren = {
   AppMarketsMarketIdRoute: AppMarketsMarketIdRoute,
+  AppMarketsIndexRoute: AppMarketsIndexRoute,
 }
 
 const AppMarketsRouteWithChildren = AppMarketsRoute._addFileChildren(

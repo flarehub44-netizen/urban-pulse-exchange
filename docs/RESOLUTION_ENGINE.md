@@ -19,6 +19,8 @@ O job `viax-lifecycle` roda a cada minuto e chama `tick_market_lifecycle()`:
 
 Confirme em **Supabase Dashboard → Database → Extensions → pg_cron** e em `cron.job`.
 
+Mercados demo (`*-live`): job `viax-refresh-demo-markets` (6h) — ver [OPS_MARKETS.md](./OPS_MARKETS.md).
+
 Teste manual:
 
 ```bash

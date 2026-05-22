@@ -1,56 +1,55 @@
 import { test, expect } from "@playwright/test";
+import {
+  minLiveMarketsExpected,
+  openFirstLiveMarket,
+  primeAppStorage,
+  waitForMarketCards,
+} from "./helpers/markets";
 
 test.describe("Fluxo core — aposta e carteira", () => {
-  test("mercado live abre order box", async ({ page }) => {
-    await page.goto("/markets?status=live");
-    await page.waitForTimeout(5000);
-    const link = page.locator('a[href*="/markets/"]').first();
-    if (!(await link.isVisible().catch(() => false))) {
-      test.skip(true, "Sem mercados live — aplicar migration refresh");
-      return;
+  test.describe.configure({ timeout: 60_000 });
+  const minLive = minLiveMarketsExpected();
+
+  test.beforeAll(async ({ browser }) => {
+    test.setTimeout(60_000);
+    const page = await browser.newPage();
+    try {
+      await waitForMarketCards(page, minLive, 30_000);
+    } catch {
+      test.skip(true, "Sem mercados live — rodar migration refresh + db:push");
+    } finally {
+      await page.close();
     }
-    await link.click();
-    await page.waitForTimeout(2000);
-    await expect(page.getByRole("button", { name: /Operar|Apostar|SIM|NÃO/i }).first()).toBeVisible(
-      {
-        timeout: 12_000,
-      },
-    );
+  });
+
+  test("mercados live visíveis na lista", async ({ page }) => {
+    const { count } = await waitForMarketCards(page, minLive, 30_000);
+    expect(count).toBeGreaterThanOrEqual(minLive);
+  });
+
+  test("mercado live abre order box", async ({ page }) => {
+    await openFirstLiveMarket(page);
   });
 
   test("double-click no botão de operar não dispara múltiplos diálogos", async ({ page }) => {
-    await page.goto("/markets?status=live");
-    await page.waitForTimeout(5000);
-    const link = page.locator('a[href*="/markets/"]').first();
-    if (!(await link.isVisible().catch(() => false))) {
-      test.skip(true, "Sem mercados live");
-      return;
-    }
-    await link.click();
-    await page.waitForTimeout(2000);
-    const operateBtn = page.getByRole("button", { name: /Operar|Apostar/i }).first();
-    if (!(await operateBtn.isVisible().catch(() => false))) {
-      test.skip(true, "Order box indisponível");
-      return;
-    }
-    await operateBtn.dblclick({ delay: 50 });
-    await page.waitForTimeout(500);
+    await openFirstLiveMarket(page);
+    const operateBtn = page.getByTestId("order-box-operate");
+    await expect(operateBtn).toBeEnabled({ timeout: 10_000 });
+    // Pool realtime re-renderiza o CTA; force evita flake de "element is not stable"
+    await operateBtn.click({ clickCount: 2, delay: 80, force: true });
+    await page.waitForTimeout(800);
     const dialogs = page.getByRole("dialog");
-    await expect(dialogs).toHaveCount(await dialogs.count());
     expect(await dialogs.count()).toBeLessThanOrEqual(2);
   });
 
   test("depósito simulado na carteira", async ({ page }) => {
+    await primeAppStorage(page);
     await page.goto("/profile?tab=carteira");
-    await page.waitForTimeout(3000);
-    const depositTab = page.getByRole("button", { name: /Depositar/i });
-    if (await depositTab.isVisible().catch(() => false)) {
-      await depositTab.click();
-    }
-    const banner = page.getByRole("note");
-    await expect(banner.first())
-      .toBeVisible({ timeout: 8000 })
-      .catch(() => {});
+    await page
+      .getByRole("button", { name: /^Depositar$/i })
+      .first()
+      .click({ timeout: 15_000 });
+    await expect(page.getByRole("note").first()).toBeVisible({ timeout: 10_000 });
     const confirm = page.getByRole("button", { name: /Confirmar depósito/i });
     if (await confirm.isVisible().catch(() => false)) {
       await confirm.click();
@@ -58,25 +57,14 @@ test.describe("Fluxo core — aposta e carteira", () => {
     }
   });
 
-  test("saldo insuficiente bloqueia operar", async ({ page }) => {
-    await page.goto("/markets?status=live");
-    await page.waitForTimeout(5000);
-    const link = page.locator('a[href*="/markets/"]').first();
-    if (!(await link.isVisible().catch(() => false))) {
-      test.skip(true, "Sem mercados live");
-      return;
-    }
-    await link.click();
-    await page.waitForTimeout(2000);
-    const maxBtn = page.getByRole("button", { name: /100%|Máx/i }).first();
-    if (await maxBtn.isVisible().catch(() => false)) {
-      await maxBtn.click();
-    }
-    const operateBtn = page.getByRole("button", { name: /Operar|Apostar/i }).first();
-    const disabled = await operateBtn.isDisabled().catch(() => true);
-    if (!disabled) {
-      await operateBtn.click();
-      await expect(page.getByText(/insuficiente|saldo/i).first()).toBeVisible({ timeout: 8000 });
-    }
+  test("saldo insuficiente bloqueia ou alerta", async ({ page }) => {
+    await openFirstLiveMarket(page);
+    const stakeInput = page.getByTestId("order-box-stake");
+    await stakeInput.fill("999999999", { force: true });
+    const operateBtn = page.getByTestId("order-box-operate");
+    await expect(operateBtn).toBeDisabled({ timeout: 5_000 });
+    await expect(page.getByTestId("order-box").getByText(/Saldo insuficiente/i)).toBeVisible({
+      timeout: 5_000,
+    });
   });
 });
