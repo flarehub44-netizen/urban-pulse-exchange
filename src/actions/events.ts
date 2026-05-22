@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { SupabaseFnContext } from "@/integrations/supabase/loose";
 
 export type PlatformEvent = {
   id: string;
@@ -11,8 +12,11 @@ export type PlatformEvent = {
   ends_at: string;
 };
 
-export const getActiveEventsFn = createServerFn({ method: "GET" }).handler(async () => {
-  const { data, error } = await supabaseAdmin.rpc("get_active_events");
-  if (error) throw new Error(error.message);
-  return (Array.isArray(data) ? data : []) as PlatformEvent[];
-});
+export const getActiveEventsFn = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase } = context as unknown as SupabaseFnContext;
+    const { data, error } = await supabase.rpc("get_active_events");
+    if (error) throw new Error(error.message);
+    return (Array.isArray(data) ? data : []) as PlatformEvent[];
+  });
