@@ -37,6 +37,7 @@ import { suggestMarketForPost } from "@/lib/suggest-feed-market";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { EmptyState } from "@/components/viax/empty-state";
 import { MessageSquare } from "lucide-react";
+import { PageHeader } from "@/components/viax/page-header";
 
 export type FeedSearch = { post?: string };
 
@@ -106,9 +107,9 @@ function Feed() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-4">
-      <h1 className="text-2xl font-semibold tracking-tight">Feed</h1>
+      <PageHeader title={<span className="text-highlight">Feed</span>} />
 
-      <div className="rounded-2xl border bg-card/60 p-4 backdrop-blur">
+      <div className="surface-card p-4">
         <div className="flex gap-3">
           <img src={me.avatar} className="size-9 rounded-full bg-surface" alt={me.name} />
           <div className="flex-1">
@@ -161,7 +162,7 @@ function Feed() {
           return (
             <li
               key={p.id}
-              className="rounded-2xl border bg-card/60 p-4 backdrop-blur transition hover:bg-surface/30"
+              className="surface-card-interactive p-4 transition hover:bg-surface/30"
             >
               <div className="flex gap-3">
                 <img

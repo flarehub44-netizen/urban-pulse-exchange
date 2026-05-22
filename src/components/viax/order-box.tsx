@@ -264,16 +264,12 @@ export function OrderBox({
   }
 
   return (
-    <div
-      data-testid="order-box"
-      className={cn(
-        "rounded-2xl border bg-card/60 p-5 backdrop-blur shadow-[var(--shadow-elevated)]",
-        className,
-      )}
-    >
+    <div data-testid="order-box" className={cn("surface-card-featured", className)}>
       <AnonAccountBanner />
       <div className="flex flex-wrap items-center justify-between gap-2 mt-3">
-        <h4 className="text-sm font-medium">{copy.bet.operateMarket}</h4>
+        <h4 className="heading-section">
+          Apostar neste <span className="text-highlight">mercado</span>
+        </h4>
         <EdgeBadge m={m} />
       </div>
 
@@ -314,11 +310,22 @@ export function OrderBox({
             >
               <div
                 className={cn(
-                  "flex items-center gap-1 text-xs uppercase tracking-wider",
+                  "flex items-center gap-2 text-xs uppercase tracking-wider",
                   isYes ? "text-up" : "text-down",
                 )}
               >
-                {isYes ? <ArrowUp className="size-3" /> : <ArrowDown className="size-3" />}
+                <span
+                  className={cn(
+                    "flex size-6 items-center justify-center rounded-full",
+                    active
+                      ? isYes
+                        ? "bg-up/15"
+                        : "bg-down/15"
+                      : "bg-surface-2",
+                  )}
+                >
+                  {isYes ? <ArrowUp className="size-3" /> : <ArrowDown className="size-3" />}
+                </span>
                 {s === "YES" ? "SIM" : "NÃO"}
               </div>
               <div className="mt-1 text-2xl font-semibold mono">{(p * 100).toFixed(1)}%</div>

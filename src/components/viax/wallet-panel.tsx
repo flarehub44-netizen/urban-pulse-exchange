@@ -65,7 +65,9 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
     <div className="space-y-5">
       {!embedded && (
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Carteira</h1>
+          <h1 className="heading-page text-2xl">
+            <span className="text-highlight">Carteira</span>
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Saldo, movimentações e histórico de apostas.
           </p>
@@ -98,7 +100,7 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
         )}
       </div>
 
-      <div className="rounded-2xl border bg-card/60 p-3 backdrop-blur">
+      <div className="surface-card p-3">
         <Suspense fallback={<div className="h-40 animate-pulse rounded-xl bg-surface/60" />}>
           <WalletBalanceChart data={balanceCurve} />
         </Suspense>
@@ -144,8 +146,10 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
 
       {tab === "Visão geral" && (
         <div className="grid gap-3 md:grid-cols-2">
-          <div className="rounded-2xl border bg-card/60 p-4 backdrop-blur">
-            <h3 className="text-sm font-medium">Atalhos</h3>
+          <div className="surface-card p-4">
+            <h3 className="heading-section">
+              <span className="text-highlight">Atalhos</span>
+            </h3>
             <div className="mt-3 grid grid-cols-2 gap-2">
               <button
                 type="button"
@@ -178,13 +182,22 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
       )}
 
       {(tab === "Depositar" || tab === "Sacar") && (
-        <div className="mx-auto max-w-md rounded-2xl border bg-card/60 p-5 backdrop-blur">
+        <div className="surface-card mx-auto max-w-md">
           {tab === "Depositar" && <SimulatedMoneyBanner className="mb-4" />}
-          <h3 className="text-sm font-medium">
-            {tab === "Depositar" ? "Adicionar saldo" : "Sacar para conta"}
+          <h3 className="heading-section">
+            {tab === "Depositar" ? (
+              <>
+                Adicionar <span className="text-highlight">saldo</span>
+              </>
+            ) : (
+              <>
+                Sacar para <span className="text-highlight">conta</span>
+              </>
+            )}
           </h3>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Saldo virtual de demonstração. Integração de pagamento real virá em breve.
+          <p className="text-lead mt-1 text-xs">
+            <span className="text-emphasis">Saldo virtual</span> de demonstração. Integração de
+            pagamento real virá em breve.
           </p>
           {tab === "Depositar" && casinoEnabled && (
             <div className="mt-4 space-y-2">
@@ -387,8 +400,8 @@ function EnrichedHistory({
 
       {deposits.length > 0 && (
         <div>
-          <h3 className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            Movimentações
+          <h3 className="heading-subsection mb-2">
+            <span className="text-highlight">Movimentações</span>
           </h3>
           <RecentTx tx={deposits} />
         </div>
@@ -399,7 +412,7 @@ function EnrichedHistory({
 
 function RecentTx({ tx }: { tx: ReturnType<typeof useViaX.getState>["transactions"] }) {
   return (
-    <div className="overflow-hidden rounded-2xl border bg-card/60 backdrop-blur">
+    <div className="surface-card overflow-hidden p-0">
       <div className="border-b px-4 py-3 text-sm font-medium">Transações</div>
       <ul>
         {tx.map((t) => {
@@ -458,7 +471,7 @@ function labelTx(t: string) {
 
 function KPI({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border bg-card/60 p-4 backdrop-blur">
+    <div className="surface-card p-4">
       <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="mt-1 text-xl font-semibold">{value}</div>
     </div>

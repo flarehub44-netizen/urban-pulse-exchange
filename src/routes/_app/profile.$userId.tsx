@@ -144,7 +144,9 @@ function PublicProfile() {
           <img src={avatar} className="size-20 rounded-2xl border bg-surface" alt={name} />
           <div className="flex-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-2xl font-semibold">{name}</h1>
+              <h1 className="heading-page text-2xl">
+                <span className="text-highlight">{name}</span>
+              </h1>
               <DivisionBadge division={division} />
               {expert?.partner_verified && (
                 <span className="rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
@@ -215,7 +217,9 @@ function PublicProfile() {
 
       <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
         <div className="rounded-2xl border bg-card/60 p-5 backdrop-blur">
-          <h2 className="text-sm font-medium">{copy.profile.gains60d}</h2>
+          <h2 className="heading-section">
+            Ganhos · <span className="text-highlight">60 dias</span>
+          </h2>
           {hasPnlHistory ? null : (
             <div className="mt-3 flex flex-col items-center justify-center gap-2 py-12 text-center text-muted-foreground">
               <BarChart2 className="size-8 opacity-25" />
@@ -225,7 +229,9 @@ function PublicProfile() {
         </div>
 
         <div className="rounded-2xl border bg-card/60 p-5 backdrop-blur">
-          <h2 className="text-sm font-medium">Atividade · 12 semanas</h2>
+          <h2 className="heading-section">
+            Atividade · <span className="text-highlight">12 semanas</span>
+          </h2>
           {hasActivityHistory ? null : (
             <div className="mt-3 flex flex-col items-center justify-center gap-2 py-10 text-center text-muted-foreground">
               <Activity className="size-8 opacity-25" />
@@ -236,8 +242,8 @@ function PublicProfile() {
       </div>
 
       <div>
-        <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-          Últimas apostas públicas
+        <h2 className="heading-subsection mb-3">
+          Últimas <span className="text-highlight">apostas</span> públicas
         </h2>
         {(publicBets ?? []).length === 0 ? (
           <EmptyState
@@ -303,8 +309,8 @@ function PublicProfile() {
       </div>
 
       <div>
-        <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-          Badges
+        <h2 className="heading-subsection mb-3">
+          <span className="text-highlight">Badges</span>
         </h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {badges.map((b, i) => {

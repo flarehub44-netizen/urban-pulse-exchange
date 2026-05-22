@@ -106,7 +106,9 @@ function LeaguesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Ligas Privadas</h1>
+        <h1 className="heading-page text-2xl">
+          <span className="text-highlight">Ligas</span> Privadas
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Crie um grupo com amigos e compita no ranking da sua liga.
         </p>
@@ -143,7 +145,9 @@ function LeaguesPage() {
           animate={{ opacity: 1, y: 0 }}
           className="rounded-2xl border bg-card/60 p-4 backdrop-blur"
         >
-          <h3 className="text-sm font-semibold">Nova liga</h3>
+          <h3 className="heading-section">
+            <span className="text-highlight">Nova</span> liga
+          </h3>
           <div className="mt-3 flex gap-2">
             <input
               value={createName}
@@ -171,7 +175,9 @@ function LeaguesPage() {
           animate={{ opacity: 1, y: 0 }}
           className="rounded-2xl border bg-card/60 p-4 backdrop-blur"
         >
-          <h3 className="text-sm font-semibold">Entrar em liga</h3>
+          <h3 className="heading-section">
+            Entrar em <span className="text-highlight">liga</span>
+          </h3>
           <p className="mt-1 text-xs text-muted-foreground">
             Peça o código de 8 letras para quem criou a liga.
           </p>
@@ -261,9 +267,9 @@ function LeaguesPage() {
           className="rounded-2xl border bg-card/60 p-4 backdrop-blur"
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold flex items-center gap-2">
+            <h2 className="heading-section flex items-center gap-2">
               <Trophy className="size-4 text-warn" />
-              {selectedLeague.name} — Ranking
+              {selectedLeague.name} — <span className="text-highlight">Ranking</span>
             </h2>
             {!selectedLeague.is_creator && (
               <button

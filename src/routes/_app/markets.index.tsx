@@ -23,6 +23,7 @@ import {
 } from "@/lib/markets-catalog";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
 import { useProfile } from "@/hooks/use-profile";
+import { PageHeader } from "@/components/viax/page-header";
 
 export const Route = createFileRoute("/_app/markets/")({
   head: () => ({
@@ -195,13 +196,17 @@ function MarketsList() {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Mercados</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {list.length} mercados · pools atualizando ao vivo
-          </p>
-        </div>
+      <div className="page-section flex flex-wrap items-end justify-between gap-4">
+        <PageHeader
+          title={<span className="text-highlight">Mercados</span>}
+          description={
+            <>
+              <span className="text-emphasis">{list.length} mercados</span> · pools atualizando ao
+              vivo
+            </>
+          }
+          className="flex-1 min-w-[200px]"
+        />
         <div className="relative w-full max-w-xs">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <input

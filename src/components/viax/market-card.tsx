@@ -51,10 +51,7 @@ export function MarketCard({ m, compact }: { m: Market; compact?: boolean }) {
         layout
         whileHover={{ y: -2 }}
         transition={{ type: "spring", stiffness: 260, damping: 22 }}
-        className={cn(
-          "group relative overflow-hidden rounded-2xl border bg-card/60 p-5 shadow-[var(--shadow-card)] backdrop-blur",
-          isUrgent && "border-warn/40",
-        )}
+        className={cn("surface-card-interactive group", isUrgent && "border-warn/40")}
       >
         {isUrgent && (
           <div className="absolute inset-x-0 top-0 flex items-center justify-center gap-1.5 bg-warn/10 py-1.5 text-[11px] font-medium text-warn">

@@ -15,7 +15,9 @@ export function DailyMissions() {
   return (
     <div className="rounded-2xl border border-border/60 bg-card/60 p-4 backdrop-blur">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-semibold">Missões do Dia</h3>
+        <h3 className="heading-section">
+          Missões do <span className="text-highlight">Dia</span>
+        </h3>
         <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
           {completed}/{missions.length}
         </span>

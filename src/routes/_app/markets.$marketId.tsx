@@ -219,8 +219,18 @@ function MarketDetail() {
 
       <div className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
         <div className="space-y-5 min-w-0">
-          <div className="rounded-2xl border bg-card/60 p-5 backdrop-blur">
-            <h1 className="text-xl font-medium leading-snug md:text-2xl">{m.question}</h1>
+          <div className="surface-card">
+            <h1 className="heading-page text-xl leading-snug md:text-2xl">
+              {m.question.includes(m.region) ? (
+                <>
+                  {m.question.slice(0, m.question.indexOf(m.region))}
+                  <span className="text-highlight">{m.region}</span>
+                  {m.question.slice(m.question.indexOf(m.region) + m.region.length)}
+                </>
+              ) : (
+                m.question
+              )}
+            </h1>
             <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
               <span>
                 Encerra em <Countdown to={m.endsAt} className="text-foreground" />
@@ -240,7 +250,7 @@ function MarketDetail() {
             </div>
 
             <div className="mt-5 grid grid-cols-2 gap-3">
-              <div className="rounded-xl border border-up/30 bg-up/5 p-3">
+              <div className="glass-strong rounded-xl border border-up/30 bg-up/5 p-3 shadow-[var(--shadow-glow-up)]">
                 <div className="text-xs uppercase tracking-wider text-up">↑ SIM</div>
                 <div className="mt-1 flex items-baseline gap-2">
                   <span className="text-3xl font-semibold text-up mono">{(pY * 100).toFixed(1)}</span>
@@ -250,7 +260,7 @@ function MarketDetail() {
                   {formatBRL(m.pool.YES)}
                 </div>
               </div>
-              <div className="rounded-xl border border-down/30 bg-down/5 p-3">
+              <div className="glass-strong rounded-xl border border-down/30 bg-down/5 p-3 shadow-[var(--shadow-glow-down)]">
                 <div className="text-xs uppercase tracking-wider text-down">↓ NÃO</div>
                 <div className="mt-1 flex items-baseline gap-2">
                   <span className="text-3xl font-semibold text-down mono">{((1 - pY) * 100).toFixed(1)}</span>

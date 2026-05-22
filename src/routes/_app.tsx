@@ -39,8 +39,10 @@ function AppLayout() {
         <AppSidebar />
         <div className="flex min-h-screen flex-1 flex-col">
           <Topbar />
-          <main className="flex-1 px-4 pb-24 pt-6 lg:px-6 lg:pb-10">
-            <Outlet />
+          <main className="app-canvas relative flex-1 px-4 pb-24 pt-6 lg:px-6 lg:pb-10">
+            <div className="relative z-10">
+              <Outlet />
+            </div>
           </main>
         </div>
       </div>

@@ -168,7 +168,9 @@ function Profile() {
           <img src={me.avatar} className="size-20 rounded-2xl border bg-surface" alt={me.name} />
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-semibold">{me.name}</h1>
+              <h1 className="heading-page text-2xl">
+                <span className="text-highlight">{me.name}</span>
+              </h1>
               <DivisionBadge division={me.division} />
             </div>
             <div className="text-sm text-muted-foreground">
@@ -241,8 +243,10 @@ function Profile() {
 
       {(tab === "visao" || tab === "atividade") && (
         <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
-          <div className="rounded-2xl border bg-card/60 p-5 backdrop-blur">
-            <h2 className="text-sm font-medium">{copy.profile.gains60d}</h2>
+          <div className="surface-card">
+            <h2 className="heading-section">
+              Ganhos · <span className="text-highlight">60 dias</span>
+            </h2>
             <div className="mt-3" style={{ width: "100%", height: 260 }}>
               <ResponsiveContainer>
                 <AreaChart data={chartData}>
@@ -284,8 +288,10 @@ function Profile() {
             </div>
           </div>
 
-          <div className="rounded-2xl border bg-card/60 p-5 backdrop-blur">
-            <h2 className="text-sm font-medium">Atividade · 12 semanas</h2>
+          <div className="surface-card">
+            <h2 className="heading-section">
+              Atividade · <span className="text-highlight">12 semanas</span>
+            </h2>
             <div className="mt-4 grid grid-cols-12 gap-1">
               {calendar.map((v, i) => (
                 <div
@@ -324,8 +330,9 @@ function Profile() {
 
       {(tab === "visao" || tab === "favoritos") && (
         <div>
-          <h2 className="mb-3 flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-            <Star className="size-3.5 fill-warn text-warn" /> Mercados favoritos
+          <h2 className="heading-subsection mb-3 flex items-center gap-2">
+            <Star className="size-3.5 fill-warn text-warn" /> Mercados{" "}
+            <span className="text-highlight">favoritos</span>
           </h2>
           {favMarkets.length === 0 ? (
             <EmptyState
@@ -347,8 +354,8 @@ function Profile() {
 
       {(tab === "visao" || tab === "badges") && (
         <div>
-          <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-            Badges
+          <h2 className="heading-subsection mb-3">
+            <span className="text-highlight">Badges</span>
           </h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {achievements.map((b) => (

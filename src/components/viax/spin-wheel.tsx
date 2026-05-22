@@ -134,7 +134,9 @@ export function SpinWheel({ onNearMissSpin, onDepositBonusCta }: SpinWheelProps)
           })}
         </div>
         <div className="min-w-0 flex-1">
-          <h2 className="text-sm font-semibold">{copy.casino.wheelTitle}</h2>
+          <h2 className="heading-section">
+            Roleta <span className="text-highlight">diária</span>
+          </h2>
           <p className="mt-1 text-xs text-muted-foreground">{copy.casino.wheelDesc}</p>
           {lastResult?.is_near_miss && (
             <p className="mt-2 text-xs font-medium text-warn">{copy.casino.nearMissJackpot}</p>

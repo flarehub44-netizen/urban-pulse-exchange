@@ -43,7 +43,9 @@ export function PositionsPanel({ embedded }: { embedded?: boolean }) {
     <div className="space-y-6">
       {!embedded && (
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{copy.positions.title}</h1>
+          <h1 className="heading-page text-2xl">
+            Minhas <span className="text-highlight">apostas</span>
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">{copy.positions.subtitle}</p>
         </div>
       )}
@@ -69,8 +71,8 @@ export function PositionsPanel({ embedded }: { embedded?: boolean }) {
 
       <section>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-            Abertas
+          <h2 className="heading-subsection">
+            <span className="text-highlight">Abertas</span>
           </h2>
           <span className="text-xs text-muted-foreground">{open.length} posições</span>
         </div>
@@ -170,8 +172,8 @@ export function PositionsPanel({ embedded }: { embedded?: boolean }) {
 
       {resolved.length > 0 && (
         <section>
-          <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-            Resolvidas
+          <h2 className="heading-subsection mb-3">
+            <span className="text-highlight">Resolvidas</span>
           </h2>
           <div className="space-y-2">
             {resolved.slice(0, 10).map((bet) => (

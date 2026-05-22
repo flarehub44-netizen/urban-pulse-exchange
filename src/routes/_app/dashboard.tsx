@@ -50,6 +50,9 @@ function ChartFallback() {
 }
 import { AnonAccountBanner } from "@/components/viax/anon-account-banner";
 import { TrendingUp, Users } from "lucide-react";
+import { PageHeader } from "@/components/viax/page-header";
+import { KpiTile } from "@/components/viax/kpi-tile";
+import { SurfaceCard } from "@/components/viax/surface-card";
 import { useFollowedTraders } from "@/hooks/use-followed-traders";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -199,47 +202,54 @@ function Dashboard() {
       <EventsBanner />
       <StreakRiskBanner />
 
-      <div>
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              {copy.dashboard.greeting(me.name.split(" ")[0])}
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {liveCount} mercados ao vivo
+      <div className="page-section">
+        <PageHeader
+          title={
+            <>
+              Olá,{" "}
+              <span className="text-highlight">{me.name.split(" ")[0]}</span>.
+            </>
+          }
+          description={
+            <>
+              <span className="text-emphasis">{liveCount} mercados</span> ao vivo
               {urbanMindMarket ? (
                 <>
                   {" "}
-                  · UrbanMind confiança {(urbanMindMarket.aiPrediction.confidence * 100).toFixed(0)}
-                  %
+                  · UrbanMind confiança{" "}
+                  <span className="text-emphasis">
+                    {(urbanMindMarket.aiPrediction.confidence * 100).toFixed(0)}%
+                  </span>
                 </>
               ) : null}
-            </p>
-          </div>
-        </div>
+            </>
+          }
+        />
 
         <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
           <Link to="/profile" search={{ tab: "carteira" }}>
-            <KPI
+            <KpiTile
               label="Saldo"
+              icon={TrendingUp}
               value={<AnimatedNumber value={me.balance} format={formatBRL} />}
-              clickable
+              interactive
             />
           </Link>
           <Link to="/profile" search={{ tab: "carteira" }}>
-            <KPI
+            <KpiTile
               label={copy.dashboard.profit24h}
+              icon={TrendingUp}
               value={
                 <span className={cn(("pnl" in me ? me.pnl : 0) >= 0 ? "text-up" : "text-down")}>
                   <AnimatedNumber value={"pnl" in me ? me.pnl : 0} format={formatBRL} />
                 </span>
               }
               sub={dbProfile ? "Atualizado em tempo real" : undefined}
-              clickable
+              interactive
             />
           </Link>
           <Link to="/profile">
-            <KPI
+            <KpiTile
               label={copy.dashboard.precision}
               value={
                 <AnimatedNumber
@@ -249,15 +259,15 @@ function Dashboard() {
                 />
               }
               sub={copy.dashboard.precisionSub}
-              clickable
+              interactive
             />
           </Link>
           <Link to="/ranking">
-            <KPI
+            <KpiTile
               label="Ranking"
               value={
                 myRank ? (
-                  <span className="mono">#{myRank}</span>
+                  <span>#{myRank}</span>
                 ) : (
                   <span className="text-sm text-muted-foreground">—</span>
                 )
@@ -267,7 +277,7 @@ function Dashboard() {
                   ? `Top ${((myRank / traders.length) * 100).toFixed(1)}%`
                   : "Explore o ranking"
               }
-              clickable
+              interactive
             />
           </Link>
         </div>
@@ -275,8 +285,8 @@ function Dashboard() {
 
       {actionNow.length > 0 && (
         <div className="rounded-2xl border border-primary/25 bg-primary/5 p-4">
-          <h2 className="text-xs font-medium uppercase tracking-wider text-primary">
-            {copy.dashboard.actionNow}
+          <h2 className="heading-subsection">
+            <span className="text-highlight">Ação</span> agora
           </h2>
           <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             {actionNow.slice(0, 3).map((item) => {
@@ -377,8 +387,8 @@ function Dashboard() {
       {/* Core — mercados em alta */}
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-            Mercados em alta
+          <h2 className="heading-subsection">
+            Mercados em <span className="text-highlight">alta</span>
           </h2>
           <Link
             to="/markets"
@@ -401,10 +411,10 @@ function Dashboard() {
       {/* Fold 3 — performance + posições abertas */}
       <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
         <div>
-          <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-            {copy.dashboard.performance}
+          <h2 className="heading-subsection mb-3">
+            Seus <span className="text-highlight">ganhos</span>
           </h2>
-          <div className="rounded-2xl border bg-card/60 p-4 backdrop-blur">
+          <SurfaceCard className="p-4">
             <div className="flex items-baseline gap-2">
               <span
                 className={cn(
@@ -428,13 +438,13 @@ function Dashboard() {
                 showHint={!pnlSeries.length ? copy.dashboard.gainsChartHint : ""}
               />
             </Suspense>
-          </div>
+          </SurfaceCard>
         </div>
 
         <div id="open-positions">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              Suas posições abertas
+            <h2 className="heading-subsection">
+              Suas <span className="text-highlight">posições</span> abertas
             </h2>
             <Link
               to="/profile"
@@ -538,8 +548,8 @@ function Dashboard() {
       {deferredReady && (
         <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
           <div>
-            <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              Mapa da cidade
+            <h2 className="heading-subsection mb-3">
+              Mapa da <span className="text-highlight">cidade</span>
             </h2>
             <Suspense
               fallback={<div className="h-[360px] animate-pulse rounded-2xl bg-surface/60" />}
@@ -560,8 +570,8 @@ function Dashboard() {
             </Suspense>
           </div>
           <div>
-            <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              Feed
+            <h2 className="heading-subsection mb-3">
+              <span className="text-highlight">Feed</span>
             </h2>
             <div className="space-y-2">
               {feed.slice(0, 4).map((p) => (
@@ -605,29 +615,3 @@ function Dashboard() {
   );
 }
 
-function KPI({
-  label,
-  value,
-  sub,
-  clickable,
-}: {
-  label: string;
-  value: React.ReactNode;
-  sub?: string;
-  clickable?: boolean;
-}) {
-  return (
-    <div
-      className={cn(
-        "rounded-2xl border bg-card/60 p-4 backdrop-blur transition",
-        clickable && "hover:bg-surface/60 hover:border-primary/30 cursor-pointer",
-      )}
-    >
-      <div className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted-foreground">
-        <TrendingUp className="size-3" /> {label}
-      </div>
-      <div className="mt-2 text-xl font-semibold">{value}</div>
-      {sub && <div className="mt-1 text-[11px] text-muted-foreground">{sub}</div>}
-    </div>
-  );
-}

@@ -33,7 +33,9 @@ function Live() {
     <div className="space-y-5">
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Mapa ao vivo · São Paulo</h1>
+          <h1 className="heading-page text-2xl">
+            Mapa <span className="text-highlight">ao vivo</span> · São Paulo
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Heatmap de congestionamento e mercados ativos atualizando em tempo real.
           </p>
@@ -66,8 +68,8 @@ function Live() {
 
         <div className="space-y-5">
           <div className="rounded-2xl border bg-card/60 p-4 backdrop-blur">
-            <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              Regiões
+            <h2 className="heading-subsection mb-3">
+              <span className="text-highlight">Regiões</span>
             </h2>
             <ul className="space-y-2">
               {regions.length === 0 && (
@@ -115,8 +117,9 @@ function Live() {
           </div>
 
           <div className="rounded-2xl border bg-card/60 p-4 backdrop-blur">
-            <h2 className="mb-3 flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              <AlertTriangle className="size-4 text-warn" /> Eventos detectados
+            <h2 className="heading-subsection mb-3 flex items-center gap-2">
+              <AlertTriangle className="size-4 text-warn" />{" "}
+              <span className="text-highlight">Eventos</span> detectados
             </h2>
             <ul className="space-y-2 text-sm">
               {events.map((e, i) => (
@@ -145,8 +148,9 @@ function Live() {
           </div>
 
           <div className="rounded-2xl border bg-card/60 p-4 backdrop-blur">
-            <h2 className="mb-3 flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              <Radio className="size-4 text-primary" /> Mercados ativos perto de você
+            <h2 className="heading-subsection mb-3 flex items-center gap-2">
+              <Radio className="size-4 text-primary" /> Mercados{" "}
+              <span className="text-highlight">ativos</span> perto de você
             </h2>
             <ul className="space-y-2">
               {markets.length === 0 && (

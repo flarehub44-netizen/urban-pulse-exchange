@@ -47,7 +47,7 @@ function SidebarNav({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate
                 "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition",
                 collapsed && "justify-center px-2",
                 active
-                  ? "bg-primary/10 text-foreground shadow-[inset_0_0_0_1px_oklch(0.70_0.20_250/0.25)]"
+                  ? "bg-primary/10 text-foreground ring-1 ring-inset ring-primary/25"
                   : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
               )}
             >

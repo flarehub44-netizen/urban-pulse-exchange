@@ -14,6 +14,8 @@ import { Brain, Clock, Zap } from "lucide-react";
 import { UrbanMindDigestCard } from "@/components/viax/urbanmind-digest-card";
 import { useUrbanMindDigest } from "@/hooks/use-urbanmind-digest";
 import { coachContinuityLine } from "@/lib/urbanmind-coach";
+import { SurfaceCard } from "@/components/viax/surface-card";
+import { KpiTile } from "@/components/viax/kpi-tile";
 const UrbanMindAccuracyChart = lazy(() =>
   import("@/components/viax/urbanmind-accuracy-chart").then((m) => ({
     default: m.UrbanMindAccuracyChart,
@@ -77,7 +79,7 @@ function UrbanMind() {
   return (
     <div className="space-y-6">
       <UrbanMindDigestCard />
-      <div className="rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/10 via-card/60 to-card/30 p-6 backdrop-blur">
+      <SurfaceCard variant="featured" className="bg-gradient-to-br from-primary/10 via-card/60 to-card/30 p-6">
         <div className="flex items-center gap-2 text-primary">
           <Brain className="size-5" />
           <span className="text-xs uppercase tracking-wider">UrbanMind AI</span>
@@ -94,37 +96,41 @@ function UrbanMind() {
             </Link>
           )}
         </div>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
-          Previsão ativa:{" "}
+        <h1 className="heading-page mt-2 text-3xl md:text-4xl">
+          <span className="text-highlight">Previsão ativa</span>:{" "}
           <span className="text-gradient">{top.aiPrediction.value.toLocaleString("pt-BR")}</span>{" "}
-          carros na {top.region}
+          carros na <span className="text-highlight">{top.region}</span>
         </h1>
         {coachLine && (
           <p className="mt-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-primary">
             {coachLine}
           </p>
         )}
-        <p className="mt-2 max-w-2xl text-muted-foreground">
+        <p className="text-lead mt-2 max-w-2xl">
           A UrbanMind sinaliza{" "}
           <span
-            className={`mono font-medium ${top.aiPrediction.side === "YES" ? "text-up" : "text-down"}`}
+            className={`mono text-emphasis ${top.aiPrediction.side === "YES" ? "text-up" : "text-down"}`}
           >
             {top.aiPrediction.side === "YES" ? "SIM" : "NÃO"}
           </span>{" "}
-          para o mercado entre 18h–19h com base em 14 dias de dados de fluxo, clima e padrões
+          para o mercado entre{" "}
+          <span className="text-emphasis">18h–19h</span> com base em{" "}
+          <span className="text-emphasis">14 dias</span> de dados de fluxo, clima e padrões
           históricos.
         </p>
         <div className="mt-6 grid max-w-2xl grid-cols-3 gap-3">
-          <KPI
+          <KpiTile
+            embedded
             label="Confiança"
+            tone="primary"
             value={
               <>
                 <AnimatedNumber value={top.aiPrediction.confidence * 100} decimals={1} />%
               </>
             }
-            tone="primary"
           />
-          <KPI
+          <KpiTile
+            embedded
             label="Probabilidade SIM agora"
             value={
               <>
@@ -132,14 +138,16 @@ function UrbanMind() {
               </>
             }
           />
-          <KPI label={copy.ia.edgeLabel} value={<>{getMarketEdge(top).label}</>} />
+          <KpiTile embedded label={copy.ia.edgeLabel} value={<>{getMarketEdge(top).label}</>} />
         </div>
-      </div>
+      </SurfaceCard>
 
       <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
-        <div className="rounded-2xl border bg-card/60 p-5 backdrop-blur">
+        <SurfaceCard>
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-medium">{copy.urbanmind.iaPrecisionChart}</h2>
+            <h2 className="heading-section">
+              Precisão da <span className="text-highlight">IA</span> e da comunidade · 30 dias
+            </h2>
             <div className="flex items-center gap-3 text-xs uppercase tracking-wider">
               <span className="text-primary">● UrbanMind</span>
               <span className="text-muted-foreground">● Comunidade</span>
@@ -152,11 +160,13 @@ function UrbanMind() {
               <UrbanMindAccuracyChart data={accuracyData} />
             </div>
           </Suspense>
-        </div>
+        </SurfaceCard>
 
         <div className="space-y-4">
-          <div className="rounded-2xl border bg-card/60 p-4 backdrop-blur">
-            <h2 className="mb-3 text-sm font-medium">Previsões ativas</h2>
+          <SurfaceCard className="p-4">
+            <h2 className="heading-section mb-3">
+              Previsões <span className="text-highlight">ativas</span>
+            </h2>
             <ul className="space-y-2">
               {markets.slice(0, 5).map((m) => (
                 <li
@@ -193,10 +203,12 @@ function UrbanMind() {
                 </li>
               ))}
             </ul>
-          </div>
+          </SurfaceCard>
 
-          <div className="rounded-2xl border bg-card/60 p-4 backdrop-blur">
-            <h2 className="mb-3 text-sm font-medium">Histórico recente</h2>
+          <SurfaceCard className="p-4">
+            <h2 className="heading-section mb-3">
+              Histórico <span className="text-highlight">recente</span>
+            </h2>
             <div className="flex flex-col items-center gap-2 py-6 text-center text-muted-foreground">
               <Clock className="size-7 opacity-30" />
               <p className="text-sm">Histórico sendo coletado</p>
@@ -204,7 +216,7 @@ function UrbanMind() {
                 Os acertos e erros aparecerão aqui conforme os mercados forem resolvidos.
               </p>
             </div>
-          </div>
+          </SurfaceCard>
         </div>
       </div>
 
@@ -239,17 +251,3 @@ function UrbanMind() {
   );
 }
 
-function KPI({ label, value, tone }: { label: string; value: React.ReactNode; tone?: "primary" }) {
-  return (
-    <div
-      className={`rounded-xl border p-3 ${tone === "primary" ? "border-primary/40 bg-primary/15" : "bg-card/40"}`}
-    >
-      <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div
-        className={`mt-1 text-xl font-semibold mono ${tone === "primary" ? "text-primary" : ""}`}
-      >
-        {value}
-      </div>
-    </div>
-  );
-}

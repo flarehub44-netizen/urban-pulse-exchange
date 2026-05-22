@@ -64,7 +64,9 @@ function NotificationsPage() {
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Bell className="size-5 text-primary" />
-          <h1 className="text-2xl font-semibold tracking-tight">Notificações</h1>
+          <h1 className="heading-page text-2xl">
+            <span className="text-highlight">Notificações</span>
+          </h1>
           {unreadCount > 0 && (
             <span className="rounded-full bg-primary/20 px-2 py-0.5 text-xs font-medium text-primary">
               {unreadCount} nova{unreadCount !== 1 ? "s" : ""}

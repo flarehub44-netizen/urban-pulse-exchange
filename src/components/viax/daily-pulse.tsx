@@ -81,7 +81,9 @@ export function DailyPulse() {
             </div>
           </div>
           <div>
-            <h2 className="text-sm font-semibold">{copy.retention.dailyPulseTitle}</h2>
+            <h2 className="heading-section">
+              Pulso diário da <span className="text-highlight">cidade</span>
+            </h2>
             <p className="mt-0.5 max-w-md text-xs text-muted-foreground">
               {done
                 ? String(today?.insight ?? copy.retention.dailyPulseDone)

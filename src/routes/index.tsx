@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   ArrowRight,
@@ -24,6 +24,7 @@ import { AnimatedNumber } from "@/components/viax/animated-number";
 import { Sparkline } from "@/components/viax/sparkline";
 import { CityHeatmap } from "@/components/viax/city-heatmap";
 import { Logo } from "@/components/viax/sidebar";
+import { KpiTile } from "@/components/viax/kpi-tile";
 import { DivisionBadge } from "@/components/viax/division-badge";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL, formatCompact, probability, prizePool } from "@/lib/parimutuel";
@@ -82,17 +83,22 @@ function Landing() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.05 }}
-                className="mt-6 text-5xl font-semibold leading-[1.04] tracking-tight md:text-6xl lg:text-7xl"
+                className="heading-page mt-6 text-5xl leading-[1.04] md:text-6xl lg:text-7xl"
               >
-                {copy.landing.heroTitle}
+                Transforme o movimento da cidade em{" "}
+                <span className="text-highlight">palpites que valem prêmio</span>.
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="mt-5 max-w-xl text-lg text-muted-foreground"
+                className="text-lead mt-5 max-w-xl text-base"
               >
-                {copy.landing.heroBody}
+                Preveja trânsito, fluxo e velocidade em{" "}
+                <span className="text-emphasis">tempo real</span>. Você aposta{" "}
+                <span className="text-emphasis">SIM ou NÃO</span> junto com a comunidade e com a{" "}
+                <span className="text-emphasis">UrbanMind AI</span>. Quase todo o prêmio (
+                <span className="text-emphasis">90%</span>) vai para quem acertar.
               </motion.p>
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
@@ -124,12 +130,15 @@ function Landing() {
               </motion.div>
 
               <div className="mt-10 grid max-w-xl grid-cols-3 gap-4">
-                <Stat
+                <KpiTile
                   label="Volume 24h"
                   value={<AnimatedNumber value={totalVol} format={formatBRL} />}
                 />
-                <Stat label="Mercados ativos" value={<AnimatedNumber value={markets.length} />} />
-                <Stat
+                <KpiTile
+                  label="Mercados ativos"
+                  value={<AnimatedNumber value={markets.length} />}
+                />
+                <KpiTile
                   label="Traders online"
                   value={<AnimatedNumber value={totalPart} format={formatCompact} />}
                 />
@@ -151,7 +160,14 @@ function Landing() {
 
       {/* HOW IT WORKS */}
       <section className="mx-auto max-w-7xl px-6 py-24">
-        <SectionHeader eyebrow={copy.landing.howEyebrow} title={copy.landing.howTitle} />
+        <SectionHeader
+          eyebrow={copy.landing.howEyebrow}
+          title={
+            <>
+              Da rua para a <span className="text-highlight">aposta</span>, em poucos passos.
+            </>
+          }
+        />
         <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
           {[
             {
@@ -181,7 +197,7 @@ function Landing() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: k * 0.06 }}
-              className="rounded-2xl border bg-card/60 p-5 backdrop-blur"
+              className="surface-card"
             >
               <div className="inline-flex size-10 items-center justify-center rounded-xl border border-primary/30 bg-primary/10 text-primary">
                 <Icon className="size-5" />
@@ -196,8 +212,19 @@ function Landing() {
       {/* MERCADOS */}
       <section className="border-y border-border/60 bg-card/30">
         <div className="mx-auto max-w-7xl px-6 py-20">
-          <SectionHeader eyebrow="Mercados ViaX" title={copy.landing.marketsTitle} />
-          <p className="mt-3 max-w-2xl text-muted-foreground">{copy.landing.marketsBody}</p>
+          <SectionHeader
+            eyebrow="Mercados ViaX"
+            title={
+              <>
+                <span className="text-highlight">Mercados reais</span> da cidade, não casa de
+                apostas.
+              </>
+            }
+          />
+          <p className="text-lead mt-3 max-w-2xl">
+            Mercados sobre <span className="text-emphasis">trânsito e mobilidade</span> em São Paulo.
+            Pools atualizam em tempo real — entre antes do fechamento.
+          </p>
           <MobileMarketsCarousel markets={markets.slice(0, 6)} className="mt-10 md:hidden" />
           <div className="mt-10 hidden gap-4 md:grid md:grid-cols-2 lg:grid-cols-3">
             {markets.slice(0, 6).map((m) => (
@@ -221,7 +248,12 @@ function Landing() {
           <div>
             <SectionHeader
               eyebrow="UrbanMind AI"
-              title="Sua leitura vs. a melhor IA urbana do país."
+              title={
+                <>
+                  Sua leitura vs. a melhor <span className="text-highlight">IA urbana</span> do
+                  país.
+                </>
+              }
               align="left"
             />
             <p className="mt-4 max-w-xl text-muted-foreground">
@@ -229,13 +261,13 @@ function Landing() {
               contexto e velocidade. Quem decidiu melhor essa semana?
             </p>
             <div className="mt-6 grid grid-cols-2 gap-3">
-              <KPI label={copy.landing.kpiAiPrecision} value="78.4%" tone="primary" />
-              <KPI label={copy.landing.kpiHumanPrecision} value="64.1%" />
-              <KPI label="Mercados resolvidos" value="12.482" />
-              <KPI label="Volume movimentado" value="R$ 18.4M" />
+              <KpiTile label={copy.landing.kpiAiPrecision} value="78.4%" tone="primary" />
+              <KpiTile label={copy.landing.kpiHumanPrecision} value="64.1%" />
+              <KpiTile label="Mercados resolvidos" value="12.482" />
+              <KpiTile label="Volume movimentado" value="R$ 18.4M" />
             </div>
           </div>
-          <div className="rounded-2xl border bg-card/60 p-5 backdrop-blur shadow-[var(--shadow-elevated)]">
+          <div className="surface-card-featured">
             <div className="mb-3 flex items-center justify-between">
               <div className="text-sm font-medium">{copy.landing.chartTitle}</div>
               <div className="flex items-center gap-3 text-[10px] uppercase tracking-wider">
@@ -305,7 +337,14 @@ function Landing() {
       {/* LIVE MAP */}
       <section className="border-y border-border/60 bg-card/30">
         <div className="mx-auto max-w-7xl px-6 py-20">
-          <SectionHeader eyebrow="Mercados em tempo real" title={copy.landing.mapTitle} />
+          <SectionHeader
+            eyebrow="Mercados em tempo real"
+            title={
+              <>
+                A cidade respira. Os <span className="text-highlight">mercados</span> também.
+              </>
+            }
+          />
           <div className="mt-10 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
             <CityHeatmap height={460} />
             <div className="space-y-3">
@@ -343,8 +382,15 @@ function Landing() {
 
       {/* RANKINGS */}
       <section className="mx-auto max-w-7xl px-6 py-24">
-        <SectionHeader eyebrow="Rankings" title="Top traders urbanos · esta semana" />
-        <div className="mt-10 overflow-hidden rounded-2xl border bg-card/60 backdrop-blur">
+        <SectionHeader
+          eyebrow="Rankings"
+          title={
+            <>
+              Top <span className="text-highlight">traders urbanos</span> · esta semana
+            </>
+          }
+        />
+        <div className="surface-card mt-10 overflow-hidden p-0">
           <table className="w-full text-sm">
             <thead className="bg-surface/60 text-[10px] uppercase tracking-wider text-muted-foreground">
               <tr>
@@ -414,7 +460,7 @@ function Landing() {
           ].map((s, i) => {
             const Icon = s.i;
             return (
-              <div key={i} className="rounded-2xl border bg-card/60 p-5 backdrop-blur">
+              <div key={i} className="surface-card">
                 <Icon className="size-4 text-primary" />
                 <div className="mt-3 text-2xl font-semibold">{s.v}</div>
                 <div className="text-xs text-muted-foreground">{s.l}</div>
@@ -428,7 +474,15 @@ function Landing() {
       <section className="mx-auto max-w-7xl px-6 py-24">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div>
-            <SectionHeader eyebrow="No celular" title={copy.landing.mobileTitle} align="left" />
+            <SectionHeader
+              eyebrow="No celular"
+              title={
+                <>
+                  Tudo no <span className="text-highlight">celular</span>.
+                </>
+              }
+              align="left"
+            />
             <p className="mt-4 max-w-xl text-muted-foreground">{copy.landing.mobileBody}</p>
             <ul className="mt-6 space-y-2 text-sm">
               {[
@@ -505,41 +559,19 @@ function Nav() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="rounded-xl border bg-card/60 p-3 backdrop-blur">
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className="mt-1 text-xl font-semibold">{value}</div>
-    </div>
-  );
-}
-function KPI({ label, value, tone }: { label: string; value: string; tone?: "primary" }) {
-  return (
-    <div
-      className={`rounded-xl border p-3 ${tone === "primary" ? "border-primary/40 bg-primary/10" : "bg-card/60"}`}
-    >
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div
-        className={`mt-1 text-xl font-semibold mono ${tone === "primary" ? "text-primary" : ""}`}
-      >
-        {value}
-      </div>
-    </div>
-  );
-}
 function SectionHeader({
   eyebrow,
   title,
   align = "center",
 }: {
   eyebrow: string;
-  title: string;
+  title: ReactNode;
   align?: "center" | "left";
 }) {
   return (
     <div className={align === "center" ? "text-center" : ""}>
       <div className="text-xs uppercase tracking-[0.18em] text-primary">{eyebrow}</div>
-      <h2 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">{title}</h2>
+      <h2 className="heading-page mt-2 text-3xl md:text-4xl">{title}</h2>
     </div>
   );
 }

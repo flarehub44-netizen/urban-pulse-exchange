@@ -9,6 +9,7 @@ import { formatBRL } from "@/lib/parimutuel";
 import { Crown, Medal, Trophy, Users } from "lucide-react";
 import { EmptyState } from "@/components/viax/empty-state";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/viax/page-header";
 
 export type RankingSearch = {
   tab?: "global" | "cidade" | "bairro" | "amigos";
@@ -76,12 +77,12 @@ function Ranking() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Ranking</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {tab === "amigos" ? copy.ranking.followingSort : copy.ranking.defaultSort}
-        </p>
-      </div>
+      <PageHeader
+        title={<span className="text-highlight">Ranking</span>}
+        description={
+          tab === "amigos" ? copy.ranking.followingSort : copy.ranking.defaultSort
+        }
+      />
 
       <div className="flex flex-wrap gap-2">
         {tabs.map((t) => (
@@ -127,7 +128,7 @@ function Ranking() {
                   to="/profile/$userId"
                   params={{ userId: t.id }}
                   className={cn(
-                    "relative block overflow-hidden rounded-2xl border bg-card/60 p-5 backdrop-blur transition hover:bg-surface/40",
+                    "surface-card-interactive relative block overflow-hidden transition hover:bg-surface/40",
                     i === 0 &&
                       "border-yellow-400/40 shadow-[0_0_50px_-12px_oklch(0.84_0.17_85/0.45)]",
                     userId === t.id && "ring-2 ring-primary/50",
@@ -168,7 +169,7 @@ function Ranking() {
             })}
           </div>
 
-          <div className="overflow-hidden rounded-2xl border bg-card/60 backdrop-blur">
+          <div className="surface-card overflow-hidden p-0">
             <table className="w-full text-sm">
               <thead className="bg-surface/60 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
