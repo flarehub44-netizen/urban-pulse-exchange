@@ -7,12 +7,31 @@ import { useNotificationPrefs } from "@/hooks/use-notification-prefs";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { AdminClaimPanel } from "@/components/viax/admin-claim-panel";
+import { useCasinoSpinStatus } from "@/hooks/use-casino-spin";
+import { setCasinoOptOutFn } from "@/actions/casino";
+import { toast } from "sonner";
 
 export function SettingsPanel() {
   const { prefs, update } = useNotificationPrefs();
   const { userId } = useAnonAuth();
   const { data: profile } = useProfile(userId);
   const { theme, setTheme, isDark } = useTheme();
+  const { data: casinoStatus, refetch: refetchCasino } = useCasinoSpinStatus();
+  const showCasinoSettings =
+    !!userId &&
+    (typeof import.meta.env.VITE_CASINO_ENABLED !== "string" ||
+      import.meta.env.VITE_CASINO_ENABLED !== "false");
+  const intenseOn = !casinoStatus?.opt_out;
+
+  const onCasinoIntenseToggle = async (on: boolean) => {
+    try {
+      await setCasinoOptOutFn({ optOut: !on });
+      await refetchCasino();
+      toast.success(copy.responsiblePlay.optOutSaved);
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : copy.errors.generic);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -58,6 +77,17 @@ export function SettingsPanel() {
           description="Eventos de trânsito e congestionamento detectados pela UrbanMind."
           checked={prefs.alerts}
           onChange={(v) => update({ alerts: v })}
+        />
+        <Toggle
+          label={copy.retention.pushDigestLabel}
+          description={copy.retention.pushDigestDesc}
+          checked={prefs.pushDigest}
+          onChange={(v) => {
+            update({ pushDigest: v });
+            if (v && typeof Notification !== "undefined" && Notification.permission === "default") {
+              Notification.requestPermission().catch(() => undefined);
+            }
+          }}
         />
       </Section>
 
@@ -117,6 +147,19 @@ export function SettingsPanel() {
           </button>
         </div>
       </Section>
+
+      {showCasinoSettings && (
+        <Section icon={<Shield className="size-4" />} title={copy.responsiblePlay.settingsTitle}>
+          <p className="text-xs text-muted-foreground">{copy.responsiblePlay.disclaimerShort}</p>
+          <p className="text-xs text-muted-foreground">{copy.responsiblePlay.settingsDesc}</p>
+          <Toggle
+            label={intenseOn ? copy.responsiblePlay.intenseOn : copy.responsiblePlay.intenseOff}
+            description={copy.responsiblePlay.settingsDesc}
+            checked={intenseOn}
+            onChange={(v) => void onCasinoIntenseToggle(v)}
+          />
+        </Section>
+      )}
 
       <Section icon={<Info className="size-4" />} title="Sobre">
         <div className="space-y-1">

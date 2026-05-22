@@ -29,7 +29,15 @@ import { cn } from "@/lib/utils";
 import { copy } from "@/copy/pt-BR";
 import { EmptyState } from "@/components/viax/empty-state";
 import { buildActionNowItems } from "@/lib/action-now";
+import { buildDailyMission } from "@/lib/urbanmind-coach";
 import { DEFAULT_FEATURED_MARKET_ID } from "@/config/markets";
+import { DailyPulse } from "@/components/viax/daily-pulse";
+import { StreakRiskBanner } from "@/components/viax/streak-risk-banner";
+import { UrbanMindDigestCard } from "@/components/viax/urbanmind-digest-card";
+import { WeeklyChallengeCard } from "@/components/viax/weekly-challenge-card";
+import { PrecisionReportCard } from "@/components/viax/precision-report-card";
+import { SpinWheel } from "@/components/viax/spin-wheel";
+import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
 
 export type DashboardSearch = { from?: string; highlight?: "position" };
 
@@ -49,9 +57,10 @@ export const Route = createFileRoute("/_app/dashboard")({
 
 function Dashboard() {
   const navigate = useNavigate();
+  const { enabled: casinoEnabled } = useCasinoEnabled();
   const { from, highlight } = Route.useSearch();
   const { userId } = useAnonAuth();
-  const { me } = useResolvedProfile();
+  const { me, profile: dbProfile } = useResolvedProfile();
   const { markets } = useResolvedMarkets();
   const { regions } = useResolvedRegions();
   const feed = useViaX((s) => s.feed);
@@ -91,7 +100,19 @@ function Dashboard() {
   const liveCount = markets.filter((m) => m.status === "live" || m.status === "closing").length;
   const top = [...markets].sort((a, b) => Math.abs(b.trend) - Math.abs(a.trend)).slice(0, 4);
   const urbanMindMarket = markets.find((m) => m.id === DEFAULT_FEATURED_MARKET_ID) ?? markets[0];
-  const actionNow = buildActionNowItems(openBets, markets, urbanMindMarket, followedIds, traders);
+  const dailyMission = buildDailyMission(
+    markets,
+    dbProfile?.neighborhood ?? null,
+    dbProfile?.city ?? "São Paulo",
+  );
+  const actionNow = buildActionNowItems(
+    openBets,
+    markets,
+    urbanMindMarket,
+    followedIds,
+    traders,
+    dailyMission,
+  );
 
   const pnlTotal = pnlSeries.length ? pnlSeries[pnlSeries.length - 1].v : "pnl" in me ? me.pnl : 0;
   const pnlStart = pnlSeries.length > 1 ? pnlSeries[0].v : 0;
@@ -105,6 +126,21 @@ function Dashboard() {
   return (
     <div className="space-y-6">
       <AnonAccountBanner />
+      <StreakRiskBanner />
+      <DailyPulse />
+      {casinoEnabled && (
+        <SpinWheel
+          onDepositBonusCta={() =>
+            navigate({ to: "/profile", search: { tab: "carteira" } })
+          }
+        />
+      )}
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <UrbanMindDigestCard />
+        <WeeklyChallengeCard accuracy={"accuracy" in me ? me.accuracy : 0.5} />
+      </div>
+      <PrecisionReportCard />
 
       <div>
         <div className="flex items-center justify-between">
@@ -221,6 +257,20 @@ function Dashboard() {
                   </Link>
                 );
               }
+              if (item.type === "daily_mission") {
+                return (
+                  <Link
+                    key={`mission-${item.market.id}`}
+                    to="/markets/$marketId"
+                    params={{ marketId: item.market.id }}
+                    className="flex-1 rounded-xl border border-primary/30 bg-primary/10 px-3 py-2 text-sm hover:border-primary/50"
+                  >
+                    <span className="text-xs uppercase text-primary">{copy.retention.dailyMission}</span>
+                    <div className="line-clamp-1 font-medium">{item.market.question}</div>
+                    <div className="text-[10px] text-muted-foreground">{item.market.region}</div>
+                  </Link>
+                );
+              }
               if (item.type === "followed") {
                 return (
                   <Link
@@ -242,17 +292,20 @@ function Dashboard() {
                   </Link>
                 );
               }
-              return (
-                <Link
-                  key="um"
-                  to="/urbanmind"
-                  search={{ marketId: item.market.id }}
-                  className="flex-1 rounded-xl border bg-card/80 px-3 py-2 text-sm hover:border-primary/40"
-                >
-                  <span className="text-[10px] uppercase text-muted-foreground">UrbanMind</span>
-                  <div className="font-medium">Previsão · {item.market.region}</div>
-                </Link>
-              );
+              if (item.type === "urbanmind") {
+                return (
+                  <Link
+                    key="um"
+                    to="/urbanmind"
+                    search={{ marketId: item.market.id }}
+                    className="flex-1 rounded-xl border bg-card/80 px-3 py-2 text-sm hover:border-primary/40"
+                  >
+                    <span className="text-[10px] uppercase text-muted-foreground">UrbanMind</span>
+                    <div className="font-medium">Previsão · {item.market.region}</div>
+                  </Link>
+                );
+              }
+              return null;
             })}
           </div>
         </div>

@@ -7,7 +7,8 @@ export type ActionNowItem =
   | { type: "position"; priority: number; bet: OpenBet; estPnL: number; minutesLeft: number }
   | { type: "closing"; priority: number; market: Market }
   | { type: "urbanmind"; priority: number; market: Market }
-  | { type: "followed"; priority: number; trader: Trader };
+  | { type: "followed"; priority: number; trader: Trader }
+  | { type: "daily_mission"; priority: number; market: Market };
 
 const MS_15MIN = 15 * 60 * 1000;
 
@@ -17,6 +18,7 @@ export function buildActionNowItems(
   urbanMindMarket: Market | undefined,
   followedIds?: string[],
   traders?: Trader[],
+  dailyMission?: Market,
 ): ActionNowItem[] {
   const now = Date.now();
   const items: ActionNowItem[] = [];
@@ -59,6 +61,10 @@ export function buildActionNowItems(
     if (followedTrader) {
       items.push({ type: "followed", priority: 50, trader: followedTrader });
     }
+  }
+
+  if (dailyMission && (dailyMission.status === "live" || dailyMission.status === "closing")) {
+    items.push({ type: "daily_mission", priority: 120, market: dailyMission });
   }
 
   return items.sort((a, b) => b.priority - a.priority);

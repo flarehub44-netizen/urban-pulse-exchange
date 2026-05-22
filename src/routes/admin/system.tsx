@@ -18,11 +18,17 @@ function AdminSystemPage() {
   const { mutateAsync: update, isPending } = useAdminUpdateSetting();
   const [fee, setFee] = useState("0.10");
   const [maxStake, setMaxStake] = useState("100000");
+  const [casinoEnabled, setCasinoEnabled] = useState(true);
+  const [impulseMax, setImpulseMax] = useState("3");
 
   useEffect(() => {
     if (!settings) return;
     if (settings.house_fee_rate != null) setFee(String(settings.house_fee_rate));
     if (settings.max_stake != null) setMaxStake(String(settings.max_stake));
+    if (settings.casino_enabled != null) setCasinoEnabled(Boolean(settings.casino_enabled));
+    if (settings.casino_impulse_max_per_hour != null) {
+      setImpulseMax(String(settings.casino_impulse_max_per_hour));
+    }
   }, [settings]);
 
   if (isError) return <InlineError onRetry={() => refetch()} />;
@@ -31,6 +37,8 @@ function AdminSystemPage() {
     try {
       await update({ key: "house_fee_rate", value: Number(fee) });
       await update({ key: "max_stake", value: Number(maxStake) });
+      await update({ key: "casino_enabled", value: casinoEnabled });
+      await update({ key: "casino_impulse_max_per_hour", value: Number(impulseMax) });
       toast.success("Configurações salvas.");
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Erro");
@@ -61,6 +69,26 @@ function AdminSystemPage() {
             type="number"
             value={maxStake}
             onChange={(e) => setMaxStake(e.target.value)}
+            className="mt-1 w-full rounded-lg border bg-surface px-3 py-2 mono"
+          />
+        </label>
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={casinoEnabled}
+            onChange={(e) => setCasinoEnabled(e.target.checked)}
+          />
+          <span className="text-xs">{copy.admin.system.casinoEnabled}</span>
+        </label>
+        <p className="text-[11px] text-muted-foreground">{copy.admin.system.casinoEnabledHint}</p>
+        <label className="block">
+          <span className="text-xs text-muted-foreground">{copy.admin.system.impulseMaxHour}</span>
+          <input
+            type="number"
+            min={1}
+            max={10}
+            value={impulseMax}
+            onChange={(e) => setImpulseMax(e.target.value)}
             className="mt-1 w-full rounded-lg border bg-surface px-3 py-2 mono"
           />
         </label>

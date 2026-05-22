@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useFollowedTraders } from "@/hooks/use-followed-traders";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
 import { RankBar } from "@/components/viax/rank-bar";
-import { useResolvedTraders } from "@/hooks/use-resolved-data";
+import { useResolvedTraders, useResolvedProfile } from "@/hooks/use-resolved-data";
 import { DivisionBadge } from "@/components/viax/division-badge";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
@@ -42,6 +42,9 @@ function Ranking() {
   const { userId } = useAnonAuth();
   const { ids: followedIds } = useFollowedTraders();
   const { traders: traderList } = useResolvedTraders();
+  const { profile } = useResolvedProfile();
+  const myCity = profile?.city ?? "São Paulo";
+  const myHood = profile?.neighborhood?.trim() || "Pinheiros";
   const myIndex = userId ? traderList.findIndex((t) => t.id === userId) : -1;
   const me = myIndex >= 0 ? traderList[myIndex] : null;
 
@@ -58,9 +61,9 @@ function Ranking() {
 
   const list =
     tab === "cidade"
-      ? [...traderList].filter((t) => t.city === "São Paulo")
+      ? [...traderList].filter((t) => t.city === myCity)
       : tab === "bairro"
-        ? [...traderList].filter((t) => t.neighborhood === "Pinheiros")
+        ? [...traderList].filter((t) => t.neighborhood === myHood)
         : tab === "amigos"
           ? highlights.length > 0
             ? highlights

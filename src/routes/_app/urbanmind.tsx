@@ -11,6 +11,9 @@ import { formatBRL, formatPct, probability } from "@/lib/parimutuel";
 import { EdgeBadge } from "@/components/viax/edge-badge";
 import { getMarketEdge } from "@/lib/market-edge";
 import { Brain, Clock, Zap } from "lucide-react";
+import { UrbanMindDigestCard } from "@/components/viax/urbanmind-digest-card";
+import { useUrbanMindDigest } from "@/hooks/use-urbanmind-digest";
+import { coachContinuityLine } from "@/lib/urbanmind-coach";
 import {
   Area,
   AreaChart,
@@ -45,6 +48,8 @@ function UrbanMind() {
   const { marketId: marketIdFromUrl } = Route.useSearch();
   const { markets } = useResolvedMarkets();
   const aiAcc = useViaX((s) => s.aiAccuracy);
+  const { data: digest } = useUrbanMindDigest();
+  const coachLine = coachContinuityLine(digest);
   const top =
     (marketIdFromUrl ? markets.find((m) => m.id === marketIdFromUrl) : undefined) ??
     markets.find((m) => m.status === "live" || m.status === "closing") ??
@@ -64,6 +69,7 @@ function UrbanMind() {
 
   return (
     <div className="space-y-6">
+      <UrbanMindDigestCard />
       <div className="rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/10 via-card/60 to-card/30 p-6 backdrop-blur">
         <div className="flex items-center gap-2 text-primary">
           <Brain className="size-5" />
@@ -86,6 +92,11 @@ function UrbanMind() {
           <span className="text-gradient">{top.aiPrediction.value.toLocaleString("pt-BR")}</span>{" "}
           carros na {top.region}
         </h1>
+        {coachLine && (
+          <p className="mt-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-primary">
+            {coachLine}
+          </p>
+        )}
         <p className="mt-2 max-w-2xl text-muted-foreground">
           A UrbanMind sinaliza{" "}
           <span

@@ -10,6 +10,7 @@ import { useViaX } from "@/store/viax-store";
 import { usePlaceBet } from "@/hooks/use-place-bet";
 import { supabase } from "@/integrations/supabase/client";
 import { copy, toastBetSuccess } from "@/copy/pt-BR";
+import type { AchievementUnlock } from "@/actions/retention";
 import {
   estimatePayout,
   probability,
@@ -20,6 +21,8 @@ import {
 } from "@/lib/parimutuel";
 import { canPlaceBets, isSettledDisplay } from "@/lib/market-status";
 import { EdgeBadge } from "@/components/viax/edge-badge";
+import { ImpulseDepositBar } from "@/components/viax/impulse-deposit-bar";
+import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
 import { BetConfirmDialog } from "@/components/viax/bet-confirm-dialog";
 import { AnimatedNumber } from "./animated-number";
 import { cn } from "@/lib/utils";
@@ -43,6 +46,7 @@ export function OrderBox({
   const balance = profile?.balance ?? zustandBalance;
 
   const { mutateAsync: placeBet, isPending } = usePlaceBet();
+  const { enabled: casinoEnabled } = useCasinoEnabled();
   const [side, setSide] = useState<Side>(initialSide);
   const [stake, setStake] = useState(100);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -104,7 +108,14 @@ export function OrderBox({
       return;
     }
     try {
-      await placeBet({ marketId: m.id, side, stake });
+      const result = await placeBet({ marketId: m.id, side, stake });
+      const unlocked = (result as { progress?: { achievements_unlocked?: AchievementUnlock[] } })
+        ?.progress?.achievements_unlocked;
+      if (unlocked?.length) {
+        for (const a of unlocked) {
+          toast.success(copy.retention.achievementUnlocked(a.name), { description: a.description });
+        }
+      }
       confetti({
         particleCount: 60,
         spread: 70,
@@ -231,6 +242,15 @@ export function OrderBox({
         <h4 className="text-sm font-medium">{copy.bet.operateMarket}</h4>
         <EdgeBadge m={m} />
       </div>
+
+      {casinoEnabled && (insufficient || balance < 80) && (
+        <ImpulseDepositBar
+          balance={balance}
+          className="mt-3"
+          context={insufficient ? "after_loss" : "low_balance"}
+          suggestedAmount={insufficient ? Math.ceil(stake * 1.2) : undefined}
+        />
+      )}
 
       {imbalanceWarn && (
         <p className="mt-3 rounded-lg border border-warn/30 bg-warn/5 px-3 py-2 text-xs text-warn">

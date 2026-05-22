@@ -7,10 +7,17 @@ export type NotificationPrefs = {
   markets: boolean;
   ranking: boolean;
   alerts: boolean;
+  pushDigest: boolean;
 };
 
 const STORAGE_KEY = "viax_notification_prefs";
-const defaults: NotificationPrefs = { wins: true, markets: true, ranking: false, alerts: true };
+const defaults: NotificationPrefs = {
+  wins: true,
+  markets: true,
+  ranking: false,
+  alerts: true,
+  pushDigest: false,
+};
 
 function loadLocal(): NotificationPrefs {
   try {

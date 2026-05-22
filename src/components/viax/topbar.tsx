@@ -2,6 +2,8 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Bell, Flame, TrendingUp, Wallet as WalletIcon, Briefcase, Search, Shield } from "lucide-react";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
 import { useResolvedProfile, useResolvedNotifications } from "@/hooks/use-resolved-data";
+import { useProfile } from "@/hooks/use-profile";
+import { cn } from "@/lib/utils";
 import { useBets } from "@/hooks/use-bets";
 import { isOpenBetStatus } from "@/lib/market-status";
 import { markNotificationsReadFn } from "@/actions/notifications";
@@ -21,6 +23,7 @@ export function Topbar() {
   const navigate = useNavigate();
   const { userId } = useAnonAuth();
   const { me } = useResolvedProfile();
+  const { data: profile } = useProfile(userId);
   const { notifications } = useResolvedNotifications();
 
   const { data: bets } = useBets();
@@ -119,8 +122,18 @@ export function Topbar() {
           <span className="mono text-xs text-foreground">{me.xp}</span>
         </div>
         <DivisionBadge division={me.division} className="hidden sm:inline-flex" />
-        <div className="hidden md:flex items-center gap-1 rounded-full border bg-card px-2.5 py-1 text-xs">
-          <Flame className="size-3.5 text-warn" />
+        <div
+          className={cn(
+            "hidden md:flex items-center gap-1 rounded-full border bg-card px-2.5 py-1 text-xs",
+            me.streak >= 3 && "border-warn/40 shadow-[var(--shadow-glow-up)]",
+          )}
+        >
+          <Flame
+            className={cn(
+              "size-3.5 text-warn",
+              me.streak >= 3 && "animate-[pulse-glow_2s_ease-in-out_infinite]",
+            )}
+          />
           <span className="mono">{me.streak}</span>
         </div>
 

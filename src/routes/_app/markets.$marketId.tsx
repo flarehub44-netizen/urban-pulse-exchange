@@ -11,6 +11,8 @@ import { OrderBox } from "@/components/viax/order-box";
 import { OpenPositionStrip } from "@/components/viax/open-position-strip";
 import { EdgeBadge } from "@/components/viax/edge-badge";
 import { ProbBar } from "@/components/viax/prob-bar";
+import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
+import { getMarketEdge } from "@/lib/market-edge";
 import { AnimatedNumber } from "@/components/viax/animated-number";
 import { Countdown } from "@/components/viax/countdown";
 import { copy } from "@/copy/pt-BR";
@@ -55,6 +57,7 @@ const tabs = [
 ];
 
 function MarketDetail() {
+  const { enabled: casinoEnabled } = useCasinoEnabled();
   const { marketId } = Route.useParams();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/_app/markets/$marketId" });
@@ -79,6 +82,8 @@ function MarketDetail() {
   if (!m) throw notFound();
 
   const pY = probability(m.pool, "YES");
+  const marketEdge = getMarketEdge(m);
+  const showHotZone = casinoEnabled && Math.abs(marketEdge.edgePp) >= 8;
   const total = poolTotal(m.pool);
   const questionShort = m.question.length > 48 ? `${m.question.slice(0, 48)}…` : m.question;
 
@@ -194,7 +199,7 @@ function MarketDetail() {
             </div>
 
             <div className="mt-3">
-              <ProbBar yes={m.pool.YES} no={m.pool.NO} />
+              <ProbBar yes={m.pool.YES} no={m.pool.NO} showHotZone={showHotZone} />
             </div>
 
             {m.status === "resolving" && (

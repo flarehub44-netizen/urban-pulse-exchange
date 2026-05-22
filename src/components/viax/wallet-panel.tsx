@@ -2,6 +2,11 @@ import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useWalletDeposit, useWalletWithdraw } from "@/hooks/use-wallet-rpc";
+import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
+import { useCasinoQuickDeposit } from "@/hooks/use-casino-spin";
+import { ImpulseDepositChips } from "@/components/viax/impulse-deposit-bar";
+import { setLastImpulseAmount } from "@/lib/impulse-deposit";
+import { copy } from "@/copy/pt-BR";
 import { useBalanceSeries } from "@/hooks/use-balance-series";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
 import { useBets } from "@/hooks/use-bets";
@@ -12,7 +17,6 @@ import {
 } from "@/hooks/use-resolved-data";
 import type { Market } from "@/store/viax-store";
 import { AnimatedNumber } from "@/components/viax/animated-number";
-import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
 import { ArrowDownLeft, ArrowUpRight, Plus, Minus, Trophy } from "lucide-react";
 import { EmptyState } from "@/components/viax/empty-state";
@@ -36,6 +40,8 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
   const [walletAmount, setWalletAmount] = useState("200");
   const depositMut = useWalletDeposit();
   const withdrawMut = useWalletWithdraw();
+  const { enabled: casinoEnabled } = useCasinoEnabled();
+  const quickDeposit = useCasinoQuickDeposit();
 
   const balanceSeries = useBalanceSeries(tx);
   const balanceCurve = balanceSeries.length
@@ -199,6 +205,19 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
           <p className="mt-1 text-xs text-muted-foreground">
             Saldo virtual de demonstração. Integração de pagamento real virá em breve.
           </p>
+          {tab === "Depositar" && casinoEnabled && (
+            <div className="mt-4 space-y-2">
+              <p className="text-xs font-medium">{copy.casino.impulseDepositTitle}</p>
+              <p className="text-[11px] text-muted-foreground">{copy.casino.impulseDepositHint}</p>
+              <ImpulseDepositChips
+                disabled={quickDeposit.isPending || depositMut.isPending}
+                onSelect={(amt) => {
+                  setWalletAmount(String(amt));
+                  setLastImpulseAmount(amt);
+                }}
+              />
+            </div>
+          )}
           <label className="mt-4 block text-xs uppercase tracking-wider text-muted-foreground">
             Valor
           </label>
@@ -223,8 +242,19 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
               }
               try {
                 if (tab === "Depositar") {
-                  await depositMut.mutateAsync(amount);
-                  toast.success(copy.wallet.deposit);
+                  if (casinoEnabled) {
+                    const res = await quickDeposit.mutateAsync({
+                      amount,
+                      context: "low_balance",
+                    });
+                    setLastImpulseAmount(amount);
+                    toast.success(copy.wallet.deposit, {
+                      description: copy.casino.depositSuccess(formatBRL(res.balance)),
+                    });
+                  } else {
+                    await depositMut.mutateAsync(amount);
+                    toast.success(copy.wallet.deposit);
+                  }
                 } else {
                   await withdrawMut.mutateAsync(amount);
                   toast.success(copy.wallet.withdraw);

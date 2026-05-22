@@ -6,6 +6,8 @@ import { WalletPanel } from "@/components/viax/wallet-panel";
 import { useViaX } from "@/store/viax-store";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
 import { useProfile } from "@/hooks/use-profile";
+import { useAchievements } from "@/hooks/use-achievements";
+import { grantEmailLinkBonusFn } from "@/actions/retention";
 import { useResolvedMarkets, useResolvedTransactions } from "@/hooks/use-resolved-data";
 import { useWatchlist } from "@/hooks/use-watchlist";
 import { usePnlSeries } from "@/hooks/use-pnl-series";
@@ -21,6 +23,7 @@ import { EmptyState } from "@/components/viax/empty-state";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export type ProfileSearch = {
   tab?: "visao" | "posicoes" | "carteira" | "favoritos" | "badges" | "atividade" | "config";
@@ -59,23 +62,13 @@ const profileTabs = [
   { key: "config" as const, label: "Configurações" },
 ];
 
-const badges = [
-  { name: "Mestre da Paulista", unlocked: true, desc: "10 wins na Av. Paulista" },
-  { name: "Rei do Rush", unlocked: true, desc: "5 wins entre 18h–19h" },
-  { name: "Alpha Predictor", unlocked: true, desc: "Acertou contra IA 3x seguidas" },
-  { name: "Traffic Sniper", unlocked: true, desc: copy.profile.badgeRoi },
-  { name: "Urban Oracle", unlocked: false, desc: "Top 100 global" },
-  { name: "Maratonista", unlocked: false, desc: "30 mercados em 1 dia" },
-  { name: "Marginal Master", unlocked: false, desc: "10 wins na Marginal" },
-  { name: "Volume Beast", unlocked: false, desc: "R$ 50k movimentados" },
-];
-
 function Profile() {
   const navigate = useNavigate({ from: "/_app/profile" });
   const { tab = "visao" } = Route.useSearch();
   const zustandMe = useViaX((s) => s.me);
   const { userId } = useAnonAuth();
   const { data: dbProfile } = useProfile(userId);
+  const { data: achievements = [] } = useAchievements(userId);
   const me = dbProfile
     ? {
         name: dbProfile.name,
@@ -117,6 +110,16 @@ function Profile() {
     if (!emailInput) return;
     setLinkState("loading");
     const { error } = await supabase.auth.updateUser({ email: emailInput });
+    if (!error) {
+      try {
+        const bonus = await grantEmailLinkBonusFn({});
+        if (!bonus.already_claimed) {
+          toast.success(copy.retention.emailBonusToast);
+        }
+      } catch {
+        /* migration pendente */
+      }
+    }
     if (error) {
       setLinkState("error");
       return;
@@ -345,9 +348,9 @@ function Profile() {
             Badges
           </h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {badges.map((b) => (
+            {achievements.map((b) => (
               <div
-                key={b.name}
+                key={b.id}
                 className={cn(
                   "rounded-2xl border p-4",
                   b.unlocked
@@ -365,7 +368,7 @@ function Profile() {
                   {!b.unlocked && <Lock className="size-3.5 text-muted-foreground" />}
                 </div>
                 <div className="mt-3 text-sm font-medium">{b.name}</div>
-                <div className="text-[11px] text-muted-foreground">{b.desc}</div>
+                <div className="text-[11px] text-muted-foreground">{b.description}</div>
               </div>
             ))}
           </div>

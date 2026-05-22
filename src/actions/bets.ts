@@ -26,5 +26,10 @@ export const placeBetFn = createServerFn({ method: "POST" })
       pool_yes: number;
       pool_no: number;
       balance: number;
+      progress?: {
+        xp?: number;
+        xp_delta?: number;
+        achievements_unlocked?: { id: string; name: string; description: string }[];
+      };
     };
   });
