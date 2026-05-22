@@ -19,6 +19,7 @@ import { MarketCard } from "@/components/viax/market-card";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
 import { Lock, Mail, ShieldCheck, AlertTriangle, Star } from "lucide-react";
+import { TraderArchetypeCard } from "@/components/viax/trader-archetype-card";
 import { EmptyState } from "@/components/viax/empty-state";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -235,6 +236,8 @@ function Profile() {
       {tab === "config" && <SettingsPanel />}
       {tab === "posicoes" && <PositionsPanel embedded />}
       {tab === "carteira" && <WalletPanel embedded />}
+
+      {tab === "visao" && <TraderArchetypeCard />}
 
       {(tab === "visao" || tab === "atividade") && (
         <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">

@@ -45,6 +45,7 @@ import { Route as AppPositionsRouteImport } from './routes/_app/positions'
 import { Route as AppNotificationsRouteImport } from './routes/_app/notifications'
 import { Route as AppMarketsRouteImport } from './routes/_app/markets'
 import { Route as AppLiveRouteImport } from './routes/_app/live'
+import { Route as AppLeaguesRouteImport } from './routes/_app/leagues'
 import { Route as AppFeedRouteImport } from './routes/_app/feed'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppProfileUserIdRouteImport } from './routes/_app/profile.$userId'
@@ -230,6 +231,11 @@ const AppLiveRoute = AppLiveRouteImport.update({
   path: '/live',
   getParentRoute: () => AppRoute,
 } as any)
+const AppLeaguesRoute = AppLeaguesRouteImport.update({
+  id: '/leagues',
+  path: '/leagues',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppFeedRoute = AppFeedRouteImport.update({
   id: '/feed',
   path: '/feed',
@@ -263,6 +269,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRouteWithChildren
+  '/leagues': typeof AppLeaguesRoute
   '/live': typeof AppLiveRoute
   '/markets': typeof AppMarketsRouteWithChildren
   '/notifications': typeof AppNotificationsRoute
@@ -303,6 +310,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRouteWithChildren
+  '/leagues': typeof AppLeaguesRoute
   '/live': typeof AppLiveRoute
   '/markets': typeof AppMarketsRouteWithChildren
   '/notifications': typeof AppNotificationsRoute
@@ -347,6 +355,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/feed': typeof AppFeedRouteWithChildren
+  '/_app/leagues': typeof AppLeaguesRoute
   '/_app/live': typeof AppLiveRoute
   '/_app/markets': typeof AppMarketsRouteWithChildren
   '/_app/notifications': typeof AppNotificationsRoute
@@ -391,6 +400,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/dashboard'
     | '/feed'
+    | '/leagues'
     | '/live'
     | '/markets'
     | '/notifications'
@@ -431,6 +441,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/dashboard'
     | '/feed'
+    | '/leagues'
     | '/live'
     | '/markets'
     | '/notifications'
@@ -474,6 +485,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/_app/dashboard'
     | '/_app/feed'
+    | '/_app/leagues'
     | '/_app/live'
     | '/_app/markets'
     | '/_app/notifications'
@@ -773,6 +785,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLiveRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/leagues': {
+      id: '/_app/leagues'
+      path: '/leagues'
+      fullPath: '/leagues'
+      preLoaderRoute: typeof AppLeaguesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/feed': {
       id: '/_app/feed'
       path: '/feed'
@@ -911,6 +930,7 @@ const AppProfileRouteWithChildren = AppProfileRoute._addFileChildren(
 interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppFeedRoute: typeof AppFeedRouteWithChildren
+  AppLeaguesRoute: typeof AppLeaguesRoute
   AppLiveRoute: typeof AppLiveRoute
   AppMarketsRoute: typeof AppMarketsRouteWithChildren
   AppNotificationsRoute: typeof AppNotificationsRoute
@@ -925,6 +945,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppFeedRoute: AppFeedRouteWithChildren,
+  AppLeaguesRoute: AppLeaguesRoute,
   AppLiveRoute: AppLiveRoute,
   AppMarketsRoute: AppMarketsRouteWithChildren,
   AppNotificationsRoute: AppNotificationsRoute,

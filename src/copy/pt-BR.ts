@@ -413,12 +413,41 @@ export const copy = {
     allTimeAccuracy: "Precisão geral",
     weekAccuracy: "Últimos 7 dias",
     precisionReportHint: "Foco em melhorar 2 pontos percentuais — sem pressão de ranking.",
-    achievementUnlocked: (name: string) => `Conquista: ${name}`,
+    achievementUnlocked: (name: string) => `Conquista desbloqueada: ${name}`,
     dailyMission: "Missão do dia",
     dailyMissionDesc: "Mercado sugerido na sua região",
     emailBonusToast: "+500 XP por proteger sua conta com e-mail.",
     pushDigestLabel: "Resumo matinal (navegador)",
     pushDigestDesc: "Lembrete opcional para check-in e pulso urbano — sem spam.",
+    streakMultiplierLabel: (x: number) => `Multiplicador ${x}x ativo`,
+    recoveryModeActive: "Modo Recuperação: XP em dobro",
+    buyFreezeLabel: "Comprar freeze (200 XP)",
+    weeklyReportTitle: "Sua Semana em SP",
+    missionComplete: (label: string, xp: number) => `✅ ${label} — +${xp} XP`,
+  },
+
+  leagues: {
+    title: "Ligas Privadas",
+    subtitle: "Crie grupos com amigos e compita em ranking privado.",
+    create: "Criar liga",
+    join: "Entrar com código",
+    inviteCode: "Código de convite",
+    memberCount: (n: number) => `${n} membro${n !== 1 ? "s" : ""}`,
+    leaveLeague: "Sair da liga",
+    noLeagues: "Você ainda não está em nenhuma liga.",
+    createFirst: "Crie a sua ou entre com o código de um amigo.",
+  },
+
+  poll: {
+    title: "Poll do Dia",
+    xpReward: "+10 XP por votar",
+    voted: (choice: string) => `Você votou: ${choice}`,
+    totalVotes: (n: number) => `${n} voto${n !== 1 ? "s" : ""}`,
+  },
+
+  events: {
+    xpBoost: (n: number) => `+${n} XP bônus`,
+    endsIn: "Encerra",
   },
 
   casino: {

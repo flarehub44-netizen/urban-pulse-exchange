@@ -23,6 +23,7 @@ import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { isSettledDisplay, statusLabel } from "@/lib/market-status";
 import { MarketAuditPanel } from "@/components/viax/market-audit-panel";
+import { MarketSocialProof } from "@/components/viax/market-social-proof";
 
 export type MarketDetailSearch = {
   tab?: "chart" | "book" | "comments" | "audit";
@@ -201,6 +202,12 @@ function MarketDetail() {
             <div className="mt-3">
               <ProbBar yes={m.pool.YES} no={m.pool.NO} showHotZone={showHotZone} />
             </div>
+
+            {(m.status === "live" || m.status === "closing") && (
+              <div className="mt-4">
+                <MarketSocialProof marketId={marketId} />
+              </div>
+            )}
 
             {m.status === "resolving" && (
               <div className="mt-3 rounded-xl border border-primary/30 bg-primary/5 px-4 py-3 text-xs">

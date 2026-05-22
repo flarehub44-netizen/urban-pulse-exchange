@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState, useRef } from "react";
 import { useRegions } from "@/hooks/use-regions";
 import { findTopMarketForRegion } from "@/lib/region-market";
 import { toast } from "sonner";
@@ -38,6 +38,15 @@ import { WeeklyChallengeCard } from "@/components/viax/weekly-challenge-card";
 import { PrecisionReportCard } from "@/components/viax/precision-report-card";
 import { SpinWheel } from "@/components/viax/spin-wheel";
 import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
+import { DailyMissions } from "@/components/viax/daily-missions";
+import { WeeklyReportModal } from "@/components/viax/weekly-report-modal";
+import { useWeeklyReport } from "@/hooks/use-weekly-report";
+import { scheduleDailyPush } from "@/lib/push-scheduler";
+import { EventsBanner } from "@/components/viax/events-banner";
+import { TomorrowPreview } from "@/components/viax/tomorrow-preview";
+import { NeighborhoodWidget } from "@/components/viax/neighborhood-widget";
+import { DailyPoll } from "@/components/viax/daily-poll";
+import { DivisionUpModal } from "@/components/viax/division-up-modal";
 
 export type DashboardSearch = { from?: string; highlight?: "position" };
 
@@ -61,6 +70,10 @@ function Dashboard() {
   const { from, highlight } = Route.useSearch();
   const { userId } = useAnonAuth();
   const { me, profile: dbProfile } = useResolvedProfile();
+  const { data: weeklyReport, shouldShow: showWeeklyReport } = useWeeklyReport();
+  const [weeklyReportDismissed, setWeeklyReportDismissed] = useState(false);
+  const [divisionUp, setDivisionUp] = useState<string | null>(null);
+  const prevDivisionRef = useRef<string | null>(null);
   const { markets } = useResolvedMarkets();
   const { regions } = useResolvedRegions();
   const feed = useViaX((s) => s.feed);
@@ -73,6 +86,30 @@ function Dashboard() {
       navigate({ search: {}, replace: true });
     }
   }, [from, navigate]);
+
+  // Detectar subida de divisão e mostrar modal comemorativo
+  useEffect(() => {
+    if (!dbProfile?.division) return;
+    const prev = prevDivisionRef.current;
+    if (prev && prev !== dbProfile.division) {
+      setDivisionUp(dbProfile.division);
+    }
+    prevDivisionRef.current = dbProfile.division;
+  }, [dbProfile?.division]);
+
+  // Agendar push notifications diárias
+  useEffect(() => {
+    if (!dbProfile) return;
+    const liveCount = markets.filter((m) => m.status === "live" || m.status === "closing").length;
+    scheduleDailyPush({
+      name: dbProfile.name?.split(" ")[0] ?? "Analista",
+      neighborhood: dbProfile.neighborhood ?? "",
+      city: dbProfile.city ?? "São Paulo",
+      streak: dbProfile.streak ?? 0,
+      openMarkets: liveCount,
+      multiplier: dbProfile.streakMultiplier ?? 1,
+    });
+  }, [dbProfile, markets]);
 
   useEffect(() => {
     if (highlight !== "position") return;
@@ -125,9 +162,22 @@ function Dashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Weekly Pulse Report — segunda-feira */}
+      {showWeeklyReport && !weeklyReportDismissed && weeklyReport && (
+        <WeeklyReportModal
+          report={weeklyReport}
+          onClose={() => setWeeklyReportDismissed(true)}
+        />
+      )}
+
+      {/* Division-up celebration */}
+      <DivisionUpModal newDivision={divisionUp} onClose={() => setDivisionUp(null)} />
+
       <AnonAccountBanner />
+      <EventsBanner />
       <StreakRiskBanner />
       <DailyPulse />
+      <DailyMissions />
       {casinoEnabled && (
         <SpinWheel
           onDepositBonusCta={() =>
@@ -177,7 +227,7 @@ function Dashboard() {
                   <AnimatedNumber value={"pnl" in me ? me.pnl : 0} format={formatBRL} />
                 </span>
               }
-              sub={profile ? "Atualizado em tempo real" : undefined}
+              sub={dbProfile ? "Atualizado em tempo real" : undefined}
               clickable
             />
           </Link>
@@ -310,6 +360,16 @@ function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Daily poll + Tomorrow preview + Neighborhood */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <DailyPoll />
+        <TomorrowPreview markets={markets} />
+        <NeighborhoodWidget
+          neighborhood={dbProfile?.neighborhood ?? null}
+          city={dbProfile?.city ?? "São Paulo"}
+        />
+      </div>
 
       {/* Fold 2 — mercados em alta */}
       <div>

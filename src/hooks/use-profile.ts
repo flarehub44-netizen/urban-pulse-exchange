@@ -12,6 +12,10 @@ export interface Profile {
   xp: number;
   xpToNext: number;
   streak: number;
+  streakMultiplier: number;
+  streakFreezesLeft: number;
+  recoveryMode: boolean;
+  recoveryDaysLeft: number;
   accuracy: number;
   roi: number;
   pnl: number;
@@ -32,6 +36,10 @@ function mapProfile(row: Record<string, unknown>): Profile {
     xp: Number(row.xp),
     xpToNext: Number(row.xp_to_next),
     streak: Number(row.streak),
+    streakMultiplier: Number(row.streak_multiplier ?? 1),
+    streakFreezesLeft: Number(row.streak_freezes_left ?? 0),
+    recoveryMode: Boolean(row.recovery_mode),
+    recoveryDaysLeft: Number(row.recovery_days_left ?? 0),
     accuracy: Number(row.accuracy),
     roi: Number(row.roi),
     pnl: Number(row.pnl),

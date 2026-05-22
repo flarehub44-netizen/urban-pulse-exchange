@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
-import { Flame, Sparkles } from "lucide-react";
+import { Flame, Sparkles, Zap, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { copy } from "@/copy/pt-BR";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
@@ -12,7 +12,7 @@ import type { AchievementUnlock } from "@/actions/retention";
 function showAchievementToasts(items: AchievementUnlock[] | undefined) {
   if (!items?.length) return;
   for (const a of items) {
-    toast.success(copy.retention.achievementUnlocked(a.name), {
+    toast.success(`${a.icon ?? "🏅"} ${copy.retention.achievementUnlocked(a.name)}`, {
       description: a.description,
     });
   }
@@ -26,11 +26,14 @@ export function DailyPulse() {
 
   const done = !!today;
   const streak = profile?.streak ?? 0;
+  const multiplier = profile?.streakMultiplier ?? 1;
+  const recoveryMode = profile?.recoveryMode ?? false;
   const ringPct = done ? 100 : 0;
 
   const streakTone = useMemo(() => {
-    if (streak >= 7) return "text-warn";
-    if (streak >= 3) return "text-primary";
+    if (streak >= 14) return "text-warn";
+    if (streak >= 7) return "text-primary";
+    if (streak >= 3) return "text-primary/70";
     return "text-muted-foreground";
   }, [streak]);
 
@@ -41,9 +44,10 @@ export function DailyPulse() {
         toast.message(copy.retention.alreadyCheckedIn);
         return;
       }
-      toast.success(copy.retention.checkInSuccess(res.xp_awarded ?? 100), {
-        description: res.insight,
-      });
+      const xpMsg = multiplier > 1
+        ? `+${res.xp_awarded} XP (${multiplier}x streak)`
+        : `+${res.xp_awarded} XP`;
+      toast.success(xpMsg, { description: res.insight });
       showAchievementToasts(res.progress?.achievements_unlocked);
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : copy.errors.generic);
@@ -51,7 +55,18 @@ export function DailyPulse() {
   };
 
   return (
-    <div className="rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 to-card/80 p-4 backdrop-blur">
+    <div className={cn(
+      "rounded-2xl border p-4 backdrop-blur",
+      recoveryMode
+        ? "border-warn/30 bg-gradient-to-br from-warn/10 to-card/80"
+        : "border-primary/25 bg-gradient-to-br from-primary/10 to-card/80",
+    )}>
+      {recoveryMode && (
+        <div className="mb-3 flex items-center gap-2 rounded-lg bg-warn/10 px-3 py-1.5 text-xs text-warn">
+          <ShieldCheck className="size-3.5" />
+          Modo Recuperação ativo — XP em dobro por {profile?.recoveryDaysLeft ?? 0} dia(s)
+        </div>
+      )}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-3">
           <div
@@ -67,12 +82,21 @@ export function DailyPulse() {
           <div>
             <h2 className="text-sm font-semibold">{copy.retention.dailyPulseTitle}</h2>
             <p className="mt-0.5 max-w-md text-xs text-muted-foreground">
-              {done ? today?.insight ?? copy.retention.dailyPulseDone : copy.retention.dailyPulseCta}
+              {done
+                ? String(today?.insight ?? copy.retention.dailyPulseDone)
+                : copy.retention.dailyPulseCta}
             </p>
-            <p className={cn("mt-1 flex items-center gap-1 text-xs font-medium", streakTone)}>
-              <Flame className="size-3.5" />
-              {copy.retention.streakDays(streak)}
-            </p>
+            <div className="mt-1 flex items-center gap-2">
+              <p className={cn("flex items-center gap-1 text-xs font-medium", streakTone)}>
+                <Flame className="size-3.5" />
+                {copy.retention.streakDays(streak)}
+              </p>
+              {multiplier > 1 && (
+                <span className="flex items-center gap-0.5 rounded-full bg-warn/15 px-2 py-0.5 text-[10px] font-semibold text-warn">
+                  <Zap className="size-2.5" />{multiplier}x XP
+                </span>
+              )}
+            </div>
           </div>
         </div>
         {!done ? (

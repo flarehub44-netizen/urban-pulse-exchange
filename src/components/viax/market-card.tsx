@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, Users, Clock, Star, ArrowUp, ArrowDown } from "lucide-react";
+import { TrendingUp, TrendingDown, Users, Clock, Star, ArrowUp, ArrowDown, Zap } from "lucide-react";
 import { copy } from "@/copy/pt-BR";
 import { EdgeBadge } from "@/components/viax/edge-badge";
 import type { Market, Side } from "@/store/viax-store";
@@ -31,6 +31,8 @@ export function MarketCard({ m, compact }: { m: Market; compact?: boolean }) {
   const [quickBet, setQuickBet] = useState<Side | null>(null);
   const { ids: watchlist, toggle } = useWatchlist();
   const watched = watchlist.includes(m.id);
+  const minsLeft = m.endsAt > 0 ? (m.endsAt - Date.now()) / 60_000 : Infinity;
+  const isUrgent = minsLeft > 0 && minsLeft < 30;
 
   return (
     <>
@@ -38,9 +40,21 @@ export function MarketCard({ m, compact }: { m: Market; compact?: boolean }) {
         layout
         whileHover={{ y: -2 }}
         transition={{ type: "spring", stiffness: 260, damping: 22 }}
-        className="group relative overflow-hidden rounded-2xl border bg-card/60 p-5 shadow-[var(--shadow-card)] backdrop-blur"
+        className={cn(
+          "group relative overflow-hidden rounded-2xl border bg-card/60 p-5 shadow-[var(--shadow-card)] backdrop-blur",
+          isUrgent && "border-warn/40",
+        )}
       >
-        <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+        {isUrgent && (
+          <div className="absolute inset-x-0 top-0 flex items-center justify-center gap-1.5 bg-warn/10 py-1.5 text-[11px] font-medium text-warn">
+            <Zap className="size-3 animate-pulse" />
+            Últimos {Math.ceil(minsLeft)} min — apostas encerram em breve!
+          </div>
+        )}
+        <div className={cn(
+          "pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100",
+          isUrgent ? "via-warn/40" : "via-primary/40",
+        )} />
         <div className="flex items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-primary">

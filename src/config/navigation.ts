@@ -12,6 +12,7 @@ import {
   Settings,
   Briefcase,
   Bell,
+  Shield,
 } from "lucide-react";
 
 export type NavSearch = Record<string, string>;
@@ -34,6 +35,7 @@ export const sidebarNav: NavItem[] = [
   { to: "/ranking", label: copy.nav.ranking, icon: Trophy },
   { to: "/feed", label: copy.nav.feed, icon: MessageSquare },
   { to: "/urbanmind", label: copy.nav.urbanmind, icon: Brain },
+  { to: "/leagues", label: "Ligas", icon: Shield },
   { to: "/profile", label: copy.nav.account, icon: User, matchPrefix: true },
 ];
 

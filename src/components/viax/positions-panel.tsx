@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useBets } from "@/hooks/use-bets";
 import { useViaX } from "@/store/viax-store";
@@ -5,7 +6,7 @@ import { AnimatedNumber } from "@/components/viax/animated-number";
 import { Countdown } from "@/components/viax/countdown";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL, PRIZE_RATIO } from "@/lib/parimutuel";
-import { Activity, TrendingUp } from "lucide-react";
+import { Activity, TrendingUp, BookOpen, ChevronDown, ChevronUp, HelpCircle, ArrowUpRight } from "lucide-react";
 import { EmptyState } from "@/components/viax/empty-state";
 import { cn } from "@/lib/utils";
 import { isOpenBetStatus, statusLabel, type MarketStatus } from "@/lib/market-status";
@@ -165,48 +166,9 @@ export function PositionsPanel({ embedded }: { embedded?: boolean }) {
             Resolvidas
           </h2>
           <div className="space-y-2">
-            {resolved.slice(0, 10).map((bet) => {
-              const isWin = bet.payout != null && bet.payout > 0;
-              return (
-                <div key={bet.id} className="rounded-xl border bg-card/60 p-4 backdrop-blur">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <div className="text-xs uppercase tracking-wider text-muted-foreground">
-                        {bet.marketRegion}
-                      </div>
-                      <div className="mt-0.5 line-clamp-1 text-sm">{bet.marketQuestion}</div>
-                    </div>
-                    <div
-                      className={cn(
-                        "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium",
-                        isWin ? "bg-up/15 text-up" : "bg-down/15 text-down",
-                      )}
-                    >
-                      {isWin ? "GANHOU" : "PERDEU"}
-                    </div>
-                  </div>
-                  <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
-                    <span>
-                      Apostado: <span className="mono text-foreground">{formatBRL(bet.stake)}</span>
-                    </span>
-                    <span>
-                      Lado:{" "}
-                      <span className={cn("mono", bet.side === "YES" ? "text-up" : "text-down")}>
-                        {bet.side === "YES" ? "SIM" : "NÃO"}
-                      </span>
-                    </span>
-                    {bet.payout != null && (
-                      <span>
-                        {copy.positions.payout}{" "}
-                        <span className={cn("mono", isWin ? "text-up" : "text-down")}>
-                          {formatBRL(bet.payout)}
-                        </span>
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+            {resolved.slice(0, 10).map((bet) => (
+              <ResolvedBetRow key={bet.id} bet={bet} />
+            ))}
           </div>
           <Link
             to="/profile"
@@ -237,6 +199,103 @@ function Stat({ label, value }: { label: string; value: React.ReactNode }) {
     <div className="rounded-lg border bg-surface/60 p-2">
       <div className="text-[9px] uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="mono mt-0.5 text-sm">{value}</div>
+    </div>
+  );
+}
+
+function ResolvedBetRow({ bet }: { bet: import("@/hooks/use-bets").OpenBet }) {
+  const [showAnalysis, setShowAnalysis] = useState(false);
+  const isWin = bet.payout != null && bet.payout > 0;
+
+  return (
+    <div className="rounded-xl border bg-card/60 p-4 backdrop-blur">
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground">
+            {bet.marketRegion}
+          </div>
+          <div className="mt-0.5 line-clamp-1 text-sm">{bet.marketQuestion}</div>
+        </div>
+        <div
+          className={cn(
+            "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium",
+            isWin ? "bg-up/15 text-up" : "bg-down/15 text-down",
+          )}
+        >
+          {isWin ? "GANHOU" : "PERDEU"}
+        </div>
+      </div>
+      <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
+        <span>
+          Apostado: <span className="mono text-foreground">{formatBRL(bet.stake)}</span>
+        </span>
+        <span>
+          Lado:{" "}
+          <span className={cn("mono", bet.side === "YES" ? "text-up" : "text-down")}>
+            {bet.side === "YES" ? "SIM" : "NÃO"}
+          </span>
+        </span>
+        {bet.payout != null && (
+          <span>
+            {copy.positions.payout}{" "}
+            <span className={cn("mono", isWin ? "text-up" : "text-down")}>
+              {formatBRL(bet.payout)}
+            </span>
+          </span>
+        )}
+      </div>
+
+      {/* Prediction Journal note */}
+      {bet.note && (
+        <div className="mt-2 flex items-start gap-1.5 rounded-lg bg-surface/60 px-2.5 py-2 text-xs text-muted-foreground">
+          <BookOpen className="size-3 mt-0.5 shrink-0 text-primary/60" />
+          <span className="italic">"{bet.note}"</span>
+        </div>
+      )}
+
+      {/* A6: Error analysis (only for lost bets) */}
+      {!isWin && (
+        <div className="mt-2">
+          <button
+            type="button"
+            onClick={() => setShowAnalysis((v) => !v)}
+            className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground"
+          >
+            <HelpCircle className="size-3" />
+            O que aconteceu?
+            {showAnalysis ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
+          </button>
+          {showAnalysis && (
+            <div className="mt-2 rounded-lg border border-down/20 bg-down/5 p-3 text-xs space-y-1.5 text-muted-foreground">
+              <p className="font-medium text-foreground">Análise da aposta perdida</p>
+              <p>
+                Você apostou{" "}
+                <span className={cn("font-medium", bet.side === "YES" ? "text-up" : "text-down")}>
+                  {bet.side === "YES" ? "SIM" : "NÃO"}
+                </span>{" "}
+                com <span className="mono text-foreground">{formatBRL(bet.stake)}</span>.
+              </p>
+              {bet.note && (
+                <p>
+                  Seu raciocínio: <span className="italic text-foreground">"{bet.note}"</span>
+                </p>
+              )}
+              <p className="pt-1 border-t border-border/40">
+                <span className="font-medium text-down">Resultado:</span> O mercado resolveu no lado
+                oposto ao seu. Avalie se havia informação adicional disponível que poderia ter mudado
+                sua análise.
+              </p>
+              <Link
+                to="/markets/$marketId"
+                params={{ marketId: bet.marketId }}
+                className="inline-flex items-center gap-1 text-primary hover:underline"
+              >
+                Ver mercado <ArrowUpRight className="size-3" />
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

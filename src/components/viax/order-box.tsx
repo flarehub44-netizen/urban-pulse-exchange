@@ -26,7 +26,8 @@ import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
 import { BetConfirmDialog } from "@/components/viax/bet-confirm-dialog";
 import { AnimatedNumber } from "./animated-number";
 import { cn } from "@/lib/utils";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowUp, BookOpen } from "lucide-react";
+import { saveBetNoteFn } from "@/actions/bets";
 
 export function OrderBox({
   m,
@@ -49,6 +50,8 @@ export function OrderBox({
   const { enabled: casinoEnabled } = useCasinoEnabled();
   const [side, setSide] = useState<Side>(initialSide);
   const [stake, setStake] = useState(100);
+  const [note, setNote] = useState("");
+  const [showNote, setShowNote] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   useEffect(() => {
@@ -109,6 +112,10 @@ export function OrderBox({
     }
     try {
       const result = await placeBet({ marketId: m.id, side, stake });
+      const betId = (result as { bet_id?: string }).bet_id;
+      if (betId && note.trim()) {
+        saveBetNoteFn({ data: { bet_id: betId, note: note.trim() } }).catch(() => {});
+      }
       const unlocked = (result as { progress?: { achievements_unlocked?: AchievementUnlock[] } })
         ?.progress?.achievements_unlocked;
       if (unlocked?.length) {
@@ -353,6 +360,29 @@ export function OrderBox({
             >
               Carteira →
             </Link>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-3">
+        <button
+          type="button"
+          onClick={() => setShowNote((v) => !v)}
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+        >
+          <BookOpen className="size-3.5" />
+          {showNote ? "Ocultar diário" : "Anotar raciocínio (opcional)"}
+        </button>
+        {showNote && (
+          <div className="mt-2">
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value.slice(0, 140))}
+              placeholder="Por que você está apostando nisso? (máx 140 caracteres)"
+              rows={2}
+              className="w-full resize-none rounded-lg border bg-surface px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary/50"
+            />
+            <div className="mt-1 text-right text-[10px] text-muted-foreground">{note.length}/140</div>
           </div>
         )}
       </div>

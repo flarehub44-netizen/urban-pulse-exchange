@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { SupabaseFnContext } from "@/integrations/supabase/loose";
+import { db } from "@/integrations/supabase/loose";
 
 const placeBetSchema = z.object({
   marketId: z.string(),
@@ -32,4 +33,16 @@ export const placeBetFn = createServerFn({ method: "POST" })
         achievements_unlocked?: { id: string; name: string; description: string }[];
       };
     };
+  });
+
+export const saveBetNoteFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { bet_id: string; note: string }) => d)
+  .handler(async ({ data }) => {
+    const { error } = await db
+      .from("bets")
+      .update({ note: data.note.trim().slice(0, 280) })
+      .eq("id", data.bet_id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
