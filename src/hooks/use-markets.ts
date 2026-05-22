@@ -32,12 +32,9 @@ function mapMarket(row: Record<string, unknown>): Market {
   };
 }
 
-const isBrowser = typeof window !== "undefined";
-
 export function useMarkets() {
   return useQuery({
     queryKey: ["markets"],
-    enabled: isBrowser,
     refetchOnMount: true,
     queryFn: async () => {
       const { data, error } = (await db
