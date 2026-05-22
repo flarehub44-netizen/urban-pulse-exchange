@@ -194,6 +194,9 @@ export type AdminCamera = {
   fps: number | null;
   detection_ok: boolean;
   count_line: unknown;
+  last_vehicle_count?: number | null;
+  last_flow_estimate?: number | null;
+  last_metric_at?: string | null;
 };
 
 export function useAdminForceClose() {

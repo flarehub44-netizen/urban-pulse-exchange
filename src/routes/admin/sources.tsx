@@ -15,6 +15,7 @@ import { CameraLineEditor } from "@/components/admin/camera-line-editor";
 import { CameraStreamPreview } from "@/components/admin/camera-stream-preview";
 import { EmptyState } from "@/components/viax/empty-state";
 import { Video } from "lucide-react";
+import { isAllowedStreamUrl } from "@/lib/camera-stream-url";
 
 export const Route = createFileRoute("/admin/sources")({
   component: AdminSourcesPage,
@@ -39,6 +40,10 @@ function AdminSourcesPage() {
   const onAddCamera = async () => {
     if (!name.trim() || !regionId) {
       toast.error("Nome e região obrigatórios");
+      return;
+    }
+    if (streamUrl.trim() && !isAllowedStreamUrl(streamUrl.trim())) {
+      toast.error(copy.cameras.invalidUrl);
       return;
     }
     try {
@@ -136,6 +141,13 @@ function AdminSourcesPage() {
                 </span>
               </div>
               <p className="mt-1 text-muted-foreground">{c.location ?? c.region_id}</p>
+              <p className="mt-1 text-[10px] text-muted-foreground">
+                {c.detection_ok
+                  ? copy.admin.sources.detectionOk
+                  : copy.admin.sources.detectionPending}
+                {c.last_vehicle_count != null &&
+                  ` · ${copy.admin.sources.lastCount}: ${c.last_vehicle_count}`}
+              </p>
               {c.stream_url && (
                 <div className="mt-2 space-y-2">
                   <CameraStreamPreview url={c.stream_url} />
@@ -188,7 +200,11 @@ function AdminSourcesPage() {
           )}
         </ul>
         <div className="mt-4">
-          <CameraLineEditor value={countLine} onChange={setCountLine} />
+          <CameraLineEditor
+            value={countLine}
+            onChange={setCountLine}
+            previewUrl={streamUrl.trim() || null}
+          />
         </div>
       </div>
     </div>

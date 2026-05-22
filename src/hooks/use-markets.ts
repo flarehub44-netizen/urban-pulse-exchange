@@ -11,6 +11,7 @@ function mapMarket(row: Record<string, unknown>): Market {
     id: row.id as string,
     question: row.question as string,
     region: row.region as string,
+    regionId: (row.region_id as string | null) ?? null,
     target: Number(row.target),
     category: row.category as Market["category"],
     endsAt: new Date(row.ends_at as string).getTime(),

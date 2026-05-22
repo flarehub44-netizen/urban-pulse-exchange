@@ -49,6 +49,7 @@ import { Route as AppLeaguesRouteImport } from './routes/_app/leagues'
 import { Route as AppFeedRouteImport } from './routes/_app/feed'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppMarketsIndexRouteImport } from './routes/_app/markets.index'
+import { Route as ApiWebhooksSyncpayRouteImport } from './routes/api/webhooks/syncpay'
 import { Route as AppProfileUserIdRouteImport } from './routes/_app/profile.$userId'
 import { Route as AppMarketsMarketIdRouteImport } from './routes/_app/markets.$marketId'
 import { Route as AppFeedPostIdRouteImport } from './routes/_app/feed.$postId'
@@ -252,6 +253,11 @@ const AppMarketsIndexRoute = AppMarketsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppMarketsRoute,
 } as any)
+const ApiWebhooksSyncpayRoute = ApiWebhooksSyncpayRouteImport.update({
+  id: '/api/webhooks/syncpay',
+  path: '/api/webhooks/syncpay',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppProfileUserIdRoute = AppProfileUserIdRouteImport.update({
   id: '/$userId',
   path: '/$userId',
@@ -310,6 +316,7 @@ export interface FileRoutesByFullPath {
   '/feed/$postId': typeof AppFeedPostIdRoute
   '/markets/$marketId': typeof AppMarketsMarketIdRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
+  '/api/webhooks/syncpay': typeof ApiWebhooksSyncpayRoute
   '/markets/': typeof AppMarketsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -351,6 +358,7 @@ export interface FileRoutesByTo {
   '/feed/$postId': typeof AppFeedPostIdRoute
   '/markets/$marketId': typeof AppMarketsMarketIdRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
+  '/api/webhooks/syncpay': typeof ApiWebhooksSyncpayRoute
   '/markets': typeof AppMarketsIndexRoute
 }
 export interface FileRoutesById {
@@ -397,6 +405,7 @@ export interface FileRoutesById {
   '/_app/feed/$postId': typeof AppFeedPostIdRoute
   '/_app/markets/$marketId': typeof AppMarketsMarketIdRoute
   '/_app/profile/$userId': typeof AppProfileUserIdRoute
+  '/api/webhooks/syncpay': typeof ApiWebhooksSyncpayRoute
   '/_app/markets/': typeof AppMarketsIndexRoute
 }
 export interface FileRouteTypes {
@@ -443,6 +452,7 @@ export interface FileRouteTypes {
     | '/feed/$postId'
     | '/markets/$marketId'
     | '/profile/$userId'
+    | '/api/webhooks/syncpay'
     | '/markets/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -484,6 +494,7 @@ export interface FileRouteTypes {
     | '/feed/$postId'
     | '/markets/$marketId'
     | '/profile/$userId'
+    | '/api/webhooks/syncpay'
     | '/markets'
   id:
     | '__root__'
@@ -529,6 +540,7 @@ export interface FileRouteTypes {
     | '/_app/feed/$postId'
     | '/_app/markets/$marketId'
     | '/_app/profile/$userId'
+    | '/api/webhooks/syncpay'
     | '/_app/markets/'
   fileRoutesById: FileRoutesById
 }
@@ -539,6 +551,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   RSlugRoute: typeof RSlugRoute
+  ApiWebhooksSyncpayRoute: typeof ApiWebhooksSyncpayRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -823,6 +836,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMarketsIndexRouteImport
       parentRoute: typeof AppMarketsRoute
     }
+    '/api/webhooks/syncpay': {
+      id: '/api/webhooks/syncpay'
+      path: '/api/webhooks/syncpay'
+      fullPath: '/api/webhooks/syncpay'
+      preLoaderRoute: typeof ApiWebhooksSyncpayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app/profile/$userId': {
       id: '/_app/profile/$userId'
       path: '/$userId'
@@ -985,6 +1005,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   RSlugRoute: RSlugRoute,
+  ApiWebhooksSyncpayRoute: ApiWebhooksSyncpayRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

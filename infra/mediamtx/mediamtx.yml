@@ -1,0 +1,28 @@
+# ViaX — MediaMTX paths (RTSP ingest → HLS playback)
+# Docs: docs/CAMERA_STREAMING.md
+
+logLevel: info
+
+api: yes
+apiAddress: :9997
+
+# HLS (browser playback)
+hls: yes
+hlsAddress: :8888
+hlsAllowOrigin: "*"
+hlsVariant: lowLatency
+hlsSegmentCount: 7
+hlsSegmentDuration: 1s
+hlsPartDuration: 200ms
+
+# RTSP server (optional publish)
+rtsp: yes
+rtspAddress: :8554
+
+# Edit paths below with your RTSP URLs, or publish to path "demo" via ffmpeg (see docs/CAMERA_STREAMING.md)
+paths:
+  paulista: {}
+  marginal: {}
+  pinheiros: {}
+  demo:
+    source: publisher

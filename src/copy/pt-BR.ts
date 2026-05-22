@@ -601,6 +601,9 @@ export const copy = {
       synthetic: "Regiões (simulador)",
       cameras: "Câmeras",
       addCamera: "Adicionar câmera",
+      detectionOk: "Detecção ativa",
+      detectionPending: "Aguardando worker",
+      lastCount: "Última contagem",
     },
     intelligence: {
       yoloDemo: "Rodar inferência demo (YOLO)",
@@ -623,6 +626,20 @@ export const copy = {
       casinoEnabledHint: "Roleta, near-miss e depósito impulsivo no app.",
       impulseMaxHour: "Máx. recargas rápidas / hora",
     },
+  },
+
+  cameras: {
+    liveTitle: "Ao vivo",
+    liveSubtitle: "Stream da região · UrbanMind",
+    offline: "Câmera offline",
+    noSignal: "Sem sinal ao vivo nesta região",
+    privacyNote: "Imagem de tráfego público. Evite identificar pessoas.",
+    previewAlt: "Preview da câmera",
+    openExternal: "Abrir stream externo",
+    rtspHint: "RTSP/RTMP exige gateway HLS — use URL .m3u8 HTTPS no cadastro.",
+    hlsUnsupported: "HLS não suportado neste navegador.",
+    streamError: "Não foi possível carregar o stream.",
+    invalidUrl: "URL inválida. Use HTTPS com .m3u8, snapshot ou YouTube.",
   },
 } as const;
 

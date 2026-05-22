@@ -12,6 +12,7 @@ import { EdgeBadge } from "@/components/viax/edge-badge";
 import { getMarketEdge } from "@/lib/market-edge";
 import { Brain, Clock, Zap } from "lucide-react";
 import { UrbanMindDigestCard } from "@/components/viax/urbanmind-digest-card";
+import { LiveCameraStrip } from "@/components/viax/live-camera-strip";
 import { useUrbanMindDigest } from "@/hooks/use-urbanmind-digest";
 import { coachContinuityLine } from "@/lib/urbanmind-coach";
 import { SurfaceCard } from "@/components/viax/surface-card";
@@ -79,6 +80,7 @@ function UrbanMind() {
   return (
     <div className="space-y-6">
       <UrbanMindDigestCard />
+      <LiveCameraStrip regionId={top.regionId} />
       <SurfaceCard variant="featured" className="bg-gradient-to-br from-primary/10 via-card/60 to-card/30 p-6">
         <div className="flex items-center gap-2 text-primary">
           <Brain className="size-5" />

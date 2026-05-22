@@ -216,6 +216,54 @@ export type Database = {
           },
         ]
       }
+      camera_metrics: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "camera_metrics_camera_id_fkey"
+            columns: ["camera_id"]
+            isOneToOne: false
+            referencedRelation: "cameras"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "camera_metrics_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cameras: {
         Row: {
           count_line: Json | null
@@ -1421,6 +1469,57 @@ export type Database = {
           },
         ]
       }
+      payment_intents: {
+        Row: {
+          amount: number
+          created_at: string
+          expires_at: string | null
+          id: string
+          meta: Json
+          pix_key: string | null
+          provider_id: string | null
+          qr_code: string | null
+          qr_code_img: string | null
+          settled_at: string | null
+          status: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          meta?: Json
+          pix_key?: string | null
+          provider_id?: string | null
+          qr_code?: string | null
+          qr_code_img?: string | null
+          settled_at?: string | null
+          status?: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          meta?: Json
+          pix_key?: string | null
+          provider_id?: string | null
+          qr_code?: string | null
+          qr_code_img?: string | null
+          settled_at?: string | null
+          status?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       platform_events: {
         Row: {
           badge_icon: string | null
@@ -1585,11 +1684,13 @@ export type Database = {
           id: string
           is_admin: boolean
           is_ai: boolean
+          kyc_status: string
           last_active_at: string | null
           last_check_in_date: string | null
           name: string
           neighborhood: string
           notification_prefs: Json
+          pix_key: string | null
           pnl: number
           recovery_days_left: number
           recovery_mode: boolean
@@ -1614,11 +1715,13 @@ export type Database = {
           id: string
           is_admin?: boolean
           is_ai?: boolean
+          kyc_status?: string
           last_active_at?: string | null
           last_check_in_date?: string | null
           name?: string
           neighborhood?: string
           notification_prefs?: Json
+          pix_key?: string | null
           pnl?: number
           recovery_days_left?: number
           recovery_mode?: boolean
@@ -1643,11 +1746,13 @@ export type Database = {
           id?: string
           is_admin?: boolean
           is_ai?: boolean
+          kyc_status?: string
           last_active_at?: string | null
           last_check_in_date?: string | null
           name?: string
           neighborhood?: string
           notification_prefs?: Json
+          pix_key?: string | null
           pnl?: number
           recovery_days_left?: number
           recovery_mode?: boolean
@@ -1805,7 +1910,9 @@ export type Database = {
       }
       transactions: {
         Row: {
+          after_balance: number | null
           amount: number
+          before_balance: number | null
           created_at: string
           id: string
           market_id: string | null
@@ -1814,7 +1921,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          after_balance?: number | null
           amount: number
+          before_balance?: number | null
           created_at?: string
           id?: string
           market_id?: string | null
@@ -1823,7 +1932,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          after_balance?: number | null
           amount?: number
+          before_balance?: number | null
           created_at?: string
           id?: string
           market_id?: string | null
@@ -2401,6 +2512,10 @@ export type Database = {
       get_admin_users_list: { Args: never; Returns: Json }
       get_admin_volume_by_hour: { Args: never; Returns: Json }
       get_admin_volume_by_region: { Args: never; Returns: Json }
+      get_camera_region_raw: {
+        Args: { p_metric: string; p_region_id: string }
+        Returns: number
+      }
       get_daily_missions: { Args: never; Returns: Json }
       get_following_trader_ids: { Args: never; Returns: string[] }
       get_league_leaderboard: { Args: { p_league_id: string }; Returns: Json }
@@ -2447,12 +2562,22 @@ export type Database = {
         }[]
       }
       get_recent_near_miss: { Args: never; Returns: Json }
+      get_region_camera_status: { Args: { p_region_id: string }; Returns: Json }
       get_today_poll: { Args: never; Returns: Json }
       get_trader_archetype: { Args: { p_user_id?: string }; Returns: Json }
       get_urbanmind_digest: { Args: never; Returns: Json }
       get_user_achievements: { Args: { p_user_id?: string }; Returns: Json }
       get_weekly_pulse_report: { Args: never; Returns: Json }
       grant_email_link_bonus: { Args: never; Returns: Json }
+      ingest_camera_metrics: {
+        Args: {
+          p_avg_speed_estimate?: number
+          p_camera_id: string
+          p_confidence?: number
+          p_vehicle_count: number
+        }
+        Returns: Json
+      }
       ingest_oracle_snapshots: { Args: never; Returns: number }
       insert_user_notification: {
         Args: {
@@ -2463,11 +2588,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      is_allowed_stream_url: { Args: { p_url: string }; Returns: boolean }
       is_casino_enabled: { Args: never; Returns: boolean }
       is_partner_program_enabled: { Args: never; Returns: boolean }
       join_league: { Args: { p_invite_code: string }; Returns: Json }
       leave_league: { Args: { p_league_id: string }; Returns: Json }
       like_feed_post: { Args: { p_post_id: string }; Returns: number }
+      list_cameras_for_ingest: { Args: never; Returns: Json }
+      list_live_cameras: { Args: { p_region_id?: string }; Returns: Json }
       min_minority_ratio: { Args: never; Returns: number }
       min_oracle_confidence: { Args: never; Returns: number }
       open_market: {
@@ -2524,6 +2652,10 @@ export type Database = {
         Returns: Json
       }
       repost_feed_post: { Args: { p_post_id: string }; Returns: number }
+      request_withdrawal: {
+        Args: { p_amount: number; p_pix_key: string }
+        Returns: Json
+      }
       resolve_expired_markets: { Args: never; Returns: number }
       resolve_market: {
         Args: {
@@ -2536,6 +2668,14 @@ export type Database = {
       seed_oracle_snapshots_for_market: {
         Args: { p_count?: number; p_market_id: string }
         Returns: number
+      }
+      service_credit_balance: {
+        Args: { p_amount: number; p_intent_id: string; p_user_id: string }
+        Returns: undefined
+      }
+      service_refund_withdrawal: {
+        Args: { p_amount: number; p_intent_id: string; p_user_id: string }
+        Returns: undefined
       }
       set_casino_opt_out: { Args: { p_opt_out: boolean }; Returns: Json }
       settle_market: {
@@ -2614,6 +2754,8 @@ export type Database = {
         | "payout"
         | "refund"
         | "house_fee"
+        | "loss"
+        | "bonus"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2776,6 +2918,8 @@ export const Constants = {
         "payout",
         "refund",
         "house_fee",
+        "loss",
+        "bonus",
       ],
     },
   },

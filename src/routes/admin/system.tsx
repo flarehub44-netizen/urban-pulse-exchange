@@ -19,6 +19,8 @@ function AdminSystemPage() {
   const [impulseMax, setImpulseMax] = useState("3");
   const [partnerEnabled, setPartnerEnabled] = useState(true);
   const [partnerShare, setPartnerShare] = useState("0.20");
+  const [cameraOracleEnabled, setCameraOracleEnabled] = useState(false);
+  const [regionsSimulatorEnabled, setRegionsSimulatorEnabled] = useState(true);
 
   useEffect(() => {
     if (!settings) return;
@@ -34,6 +36,12 @@ function AdminSystemPage() {
     if (settings.default_revenue_share_pct != null) {
       setPartnerShare(String(settings.default_revenue_share_pct));
     }
+    if (settings.camera_oracle_enabled != null) {
+      setCameraOracleEnabled(Boolean(settings.camera_oracle_enabled));
+    }
+    if (settings.regions_simulator_enabled != null) {
+      setRegionsSimulatorEnabled(Boolean(settings.regions_simulator_enabled));
+    }
   }, [settings]);
 
   if (isError) return <InlineError onRetry={() => refetch()} />;
@@ -46,6 +54,8 @@ function AdminSystemPage() {
       await update({ key: "casino_impulse_max_per_hour", value: Number(impulseMax) });
       await update({ key: "partner_program_enabled", value: partnerEnabled });
       await update({ key: "default_revenue_share_pct", value: Number(partnerShare) });
+      await update({ key: "camera_oracle_enabled", value: cameraOracleEnabled });
+      await update({ key: "regions_simulator_enabled", value: regionsSimulatorEnabled });
       toast.success("Configurações salvas.");
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Erro");
@@ -107,6 +117,22 @@ function AdminSystemPage() {
             onChange={(e) => setPartnerShare(e.target.value)}
             className="mt-1 w-full rounded-lg border bg-surface px-3 py-2 mono"
           />
+        </label>
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={cameraOracleEnabled}
+            onChange={(e) => setCameraOracleEnabled(e.target.checked)}
+          />
+          <span className="text-xs">Oráculo por câmera (data_source=camera)</span>
+        </label>
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={regionsSimulatorEnabled}
+            onChange={(e) => setRegionsSimulatorEnabled(e.target.checked)}
+          />
+          <span className="text-xs">Simulador de regiões (pg_cron)</span>
         </label>
         <label className="block">
           <span className="text-xs text-muted-foreground">{copy.admin.system.impulseMaxHour}</span>

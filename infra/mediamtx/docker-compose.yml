@@ -1,0 +1,17 @@
+services:
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    container_name: viax-mediamtx
+    restart: unless-stopped
+    ports:
+      - "8554:8554"   # RTSP
+      - "8888:8888"   # HLS
+      - "9997:9997"   # API
+    volumes:
+      - ./mediamtx.yml:/mediamtx.yml:ro
+    environment:
+      # Set real RTSP URLs on the host (.env) — leave empty to skip path
+      RTSP_PAULISTA: ${RTSP_PAULISTA:-}
+      RTSP_MARGINAL: ${RTSP_MARGINAL:-}
+      RTSP_PINHEIROS: ${RTSP_PINHEIROS:-}
+    command: /mediamtx.yml

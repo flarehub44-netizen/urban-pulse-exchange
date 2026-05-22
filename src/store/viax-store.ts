@@ -8,6 +8,7 @@ export interface Market {
   id: string;
   question: string;
   region: string;
+  regionId?: string | null;
   target: number;
   category: "Fluxo" | "Velocidade" | "Congestionamento" | "Evento";
   endsAt: number; // epoch ms

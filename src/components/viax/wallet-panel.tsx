@@ -1,12 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import { lazy, Suspense, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useViaX } from "@/store/viax-store";
 import { toast } from "sonner";
-import { useWalletDeposit, useWalletWithdraw } from "@/hooks/use-wallet-rpc";
 import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
 import { useCasinoQuickDeposit } from "@/hooks/use-casino-spin";
 import { ImpulseDepositChips } from "@/components/viax/impulse-deposit-bar";
 import { setLastImpulseAmount } from "@/lib/impulse-deposit";
+import { initiateDepositFn, initiateWithdrawFn, getDepositStatusFn } from "@/actions/payments";
+import { Copy, QrCode, Clock } from "lucide-react";
 import { copy } from "@/copy/pt-BR";
 import { useBalanceSeries } from "@/hooks/use-balance-series";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
@@ -21,7 +23,6 @@ import { AnimatedNumber } from "@/components/viax/animated-number";
 import { formatBRL } from "@/lib/parimutuel";
 import { ArrowDownLeft, ArrowUpRight, Plus, Minus, Trophy } from "lucide-react";
 import { EmptyState } from "@/components/viax/empty-state";
-import { SimulatedMoneyBanner } from "@/components/viax/simulated-money-banner";
 import { cn } from "@/lib/utils";
 
 const WalletBalanceChart = lazy(() =>
@@ -45,9 +46,68 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
   const [tab, setTab] = useState<WalletTab>("Visão geral");
   const [betFilter, setBetFilter] = useState<"todos" | "wins" | "losses">("todos");
   const [walletAmount, setWalletAmount] = useState("200");
-  const depositMut = useWalletDeposit();
-  const withdrawMut = useWalletWithdraw();
+  const [pixKey, setPixKey] = useState("");
+  const [depositQr, setDepositQr] = useState<{
+    qrCode: string;
+    qrCodeImg: string;
+    intentId: string;
+    expiresAt: string;
+  } | null>(null);
+  const [depositDone, setDepositDone] = useState(false);
   const { enabled: casinoEnabled } = useCasinoEnabled();
+  const queryClient = useQueryClient();
+
+  const depositMut = useMutation({
+    mutationFn: (amount: number) => initiateDepositFn({ data: { amount } }),
+    onSuccess: (res) => {
+      setDepositQr({
+        qrCode: res.qrCode,
+        qrCodeImg: res.qrCodeImg,
+        intentId: res.intentId,
+        expiresAt: res.expiresAt,
+      });
+    },
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Depósito falhou."),
+  });
+
+  const withdrawMut = useMutation({
+    mutationFn: ({ amount, pixKey: pk }: { amount: number; pixKey: string }) =>
+      initiateWithdrawFn({ data: { amount, pixKey: pk } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["me"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      toast.success("Saque solicitado! O valor será transferido em instantes.");
+    },
+    onError: (err) => {
+      const msg = err instanceof Error ? err.message : "Saque falhou.";
+      if (msg.includes("kyc_required")) {
+        toast.error("Verificação necessária", { description: "Complete o KYC para sacar acima de R$ 100." });
+      } else {
+        toast.error(msg);
+      }
+    },
+  });
+
+  // Polling: verifica se o depósito foi confirmado (a cada 5s enquanto QR exibido)
+  useEffect(() => {
+    if (!depositQr || depositDone) return;
+    const interval = setInterval(async () => {
+      try {
+        const status = await getDepositStatusFn({ data: { intentId: depositQr.intentId } });
+        if (status.status === "paid") {
+          setDepositDone(true);
+          setDepositQr(null);
+          queryClient.invalidateQueries({ queryKey: ["me"] });
+          queryClient.invalidateQueries({ queryKey: ["transactions"] });
+          toast.success("Depósito confirmado!", { description: `R$ ${status.amount.toFixed(2)} adicionado ao seu saldo.` });
+        } else if (status.status === "failed" || status.status === "expired") {
+          setDepositQr(null);
+          toast.error("QR Code expirado ou pagamento falhou. Tente novamente.");
+        }
+      } catch { /* silencioso */ }
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [depositQr, depositDone, queryClient]);
   const quickDeposit = useCasinoQuickDeposit();
 
   const balanceSeries = useBalanceSeries(tx);
@@ -183,88 +243,137 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
       )}
 
       {(tab === "Depositar" || tab === "Sacar") && (
-        <div className="surface-card mx-auto max-w-md">
-          {tab === "Depositar" && <SimulatedMoneyBanner className="mb-4" />}
+        <div className="surface-card mx-auto max-w-md space-y-4">
           <h3 className="heading-section">
             {tab === "Depositar" ? (
-              <>
-                Adicionar <span className="text-highlight">saldo</span>
-              </>
+              <>Adicionar <span className="text-highlight">saldo</span></>
             ) : (
-              <>
-                Sacar para <span className="text-highlight">conta</span>
-              </>
+              <>Sacar para <span className="text-highlight">conta Pix</span></>
             )}
           </h3>
-          <p className="text-lead mt-1 text-xs">
-            <span className="text-emphasis">Saldo virtual</span> de demonstração. Integração de
-            pagamento real virá em breve.
-          </p>
-          {tab === "Depositar" && casinoEnabled && (
-            <div className="mt-4 space-y-2">
-              <p className="text-xs font-medium">{copy.casino.impulseDepositTitle}</p>
-              <p className="text-[11px] text-muted-foreground">{copy.casino.impulseDepositHint}</p>
-              <ImpulseDepositChips
-                disabled={quickDeposit.isPending || depositMut.isPending}
-                onSelect={(amt) => {
-                  setWalletAmount(String(amt));
-                  setLastImpulseAmount(amt);
+
+          {/* QR Code exibido após gerar o depósito */}
+          {depositQr && tab === "Depositar" ? (
+            <div className="space-y-4 text-center">
+              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                <Clock className="size-3" />
+                <span>Escaneie o QR Code no app do seu banco</span>
+              </div>
+              {depositQr.qrCodeImg ? (
+                <img
+                  src={`data:image/png;base64,${depositQr.qrCodeImg}`}
+                  alt="QR Code Pix"
+                  className="mx-auto size-48 rounded-xl border"
+                />
+              ) : (
+                <div className="mx-auto flex size-48 items-center justify-center rounded-xl border bg-surface-2">
+                  <QrCode className="size-16 text-muted-foreground" />
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(depositQr.qrCode);
+                  toast.success("Código Pix copiado!");
                 }}
-              />
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border bg-surface px-3 py-2 text-xs hover:bg-surface-2"
+              >
+                <Copy className="size-3" /> Pix Copia e Cola
+              </button>
+              <p className="text-[11px] text-muted-foreground">
+                Aguardando confirmação do banco… O saldo será atualizado automaticamente.
+              </p>
+              <button
+                type="button"
+                onClick={() => setDepositQr(null)}
+                className="text-xs text-muted-foreground underline"
+              >
+                Cancelar e gerar novo código
+              </button>
             </div>
-          )}
-          <label className="mt-4 block text-xs uppercase tracking-wider text-muted-foreground">
-            Valor
-          </label>
-          <div className="mt-1 flex items-center gap-2 rounded-xl border bg-surface px-3 py-2">
-            <span className="text-muted-foreground">R$</span>
-            <input
-              type="number"
-              min={1}
-              value={walletAmount}
-              onChange={(e) => setWalletAmount(e.target.value)}
-              className="w-full bg-transparent mono text-lg outline-none"
-            />
-          </div>
-          <button
-            type="button"
-            disabled={depositMut.isPending || withdrawMut.isPending}
-            onClick={async () => {
-              const amount = Number(walletAmount);
-              if (!amount || amount <= 0) {
-                toast.error("Informe um valor válido.");
-                return;
-              }
-              try {
-                if (tab === "Depositar") {
-                  if (casinoEnabled) {
-                    const res = await quickDeposit.mutateAsync({
-                      amount,
-                      context: "low_balance",
-                    });
-                    setLastImpulseAmount(amount);
-                    toast.success(copy.wallet.deposit, {
-                      description: copy.casino.depositSuccess(formatBRL(res.balance)),
-                    });
-                  } else {
-                    await depositMut.mutateAsync(amount);
-                    toast.success(copy.wallet.deposit);
+          ) : (
+            <>
+              {tab === "Depositar" && casinoEnabled && (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium">{copy.casino.impulseDepositTitle}</p>
+                  <ImpulseDepositChips
+                    disabled={quickDeposit.isPending || depositMut.isPending}
+                    onSelect={(amt) => {
+                      setWalletAmount(String(amt));
+                      setLastImpulseAmount(amt);
+                    }}
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-muted-foreground">
+                  Valor
+                </label>
+                <div className="mt-1 flex items-center gap-2 rounded-xl border bg-surface px-3 py-2">
+                  <span className="text-muted-foreground">R$</span>
+                  <input
+                    type="number"
+                    min={1}
+                    value={walletAmount}
+                    onChange={(e) => setWalletAmount(e.target.value)}
+                    className="w-full bg-transparent mono text-lg outline-none"
+                  />
+                </div>
+              </div>
+
+              {tab === "Sacar" && (
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-muted-foreground">
+                    Chave Pix (CPF, e-mail, celular ou chave aleatória)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="sua@chave.pix"
+                    value={pixKey}
+                    onChange={(e) => setPixKey(e.target.value)}
+                    className="mt-1 w-full rounded-xl border bg-surface px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
+                  />
+                  {Number(walletAmount) > 100 && (
+                    <p className="mt-1 text-[11px] text-warn">
+                      Saques acima de R$ 100 exigem verificação de identidade (KYC).
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <button
+                type="button"
+                disabled={depositMut.isPending || withdrawMut.isPending}
+                onClick={async () => {
+                  const amount = Number(walletAmount);
+                  if (!amount || amount <= 0) {
+                    toast.error("Informe um valor válido.");
+                    return;
                   }
-                } else {
-                  await withdrawMut.mutateAsync(amount);
-                  toast.success(copy.wallet.withdraw);
-                }
-              } catch (err: unknown) {
-                toast.error(err instanceof Error ? err.message : "Operação falhou.");
-              }
-            }}
-            className={cn(
-              "mt-4 w-full rounded-xl px-4 py-3 font-medium disabled:opacity-50",
-              tab === "Depositar" ? "bg-up text-up-foreground" : "bg-down text-down-foreground",
-            )}
-          >
-            {tab === "Depositar" ? "Confirmar depósito" : "Confirmar saque"}
-          </button>
+                  if (tab === "Depositar") {
+                    depositMut.mutate(amount);
+                  } else {
+                    if (!pixKey.trim()) {
+                      toast.error("Informe sua chave Pix.");
+                      return;
+                    }
+                    withdrawMut.mutate({ amount, pixKey: pixKey.trim() });
+                  }
+                }}
+                className={cn(
+                  "w-full rounded-xl px-4 py-3 font-medium disabled:opacity-50",
+                  tab === "Depositar" ? "bg-up text-up-foreground" : "bg-down text-down-foreground",
+                )}
+              >
+                {depositMut.isPending || withdrawMut.isPending
+                  ? "Processando…"
+                  : tab === "Depositar"
+                    ? "Gerar QR Code Pix"
+                    : "Solicitar Saque"}
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>
@@ -417,7 +526,7 @@ function RecentTx({ tx }: { tx: ReturnType<typeof useViaX.getState>["transaction
       <div className="border-b px-4 py-3 text-sm font-medium">Transações</div>
       <ul>
         {tx.map((t) => {
-          const positive = t.type === "deposit" || t.type === "payout" || t.type === "refund";
+          const positive = ["deposit", "payout", "refund", "bonus"].includes(t.type);
           return (
             <li
               key={t.id}
@@ -466,6 +575,8 @@ function labelTx(t: string) {
       entry: copy.wallet.entry,
       payout: copy.wallet.payout,
       refund: copy.wallet.refund,
+      loss: "Derrota",
+      bonus: "Bônus",
     }[t] ?? t
   );
 }

@@ -29,6 +29,7 @@ import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { isSettledDisplay, statusLabel } from "@/lib/market-status";
 import { MarketAuditPanel } from "@/components/viax/market-audit-panel";
+import { LiveCameraStrip } from "@/components/viax/live-camera-strip";
 import { MarketSocialProof } from "@/components/viax/market-social-proof";
 
 export type MarketDetailSearch = {
@@ -216,6 +217,10 @@ function MarketDetail() {
       </div>
 
       <OpenPositionStrip marketId={marketId} />
+
+      {(m.status === "live" || m.status === "closing") && (
+        <LiveCameraStrip regionId={m.regionId} />
+      )}
 
       <div className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
         <div className="space-y-5 min-w-0">
