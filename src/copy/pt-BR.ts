@@ -640,6 +640,10 @@ export const copy = {
     hlsUnsupported: "HLS não suportado neste navegador.",
     streamError: "Não foi possível carregar o stream.",
     invalidUrl: "URL inválida. Use HTTPS com .m3u8, snapshot ou YouTube.",
+    mixedContent: "Stream HTTP não reproduz no app HTTPS. Use URL HTTPS ou abra externamente.",
+    corsHint: "Se o vídeo não carregar, pode ser CORS do provedor do stream.",
+    lastReading: "Última leitura",
+    staleDetection: "Detecção sem atualização há mais de 10 min",
   },
 } as const;
 

@@ -12,7 +12,15 @@ export POLL_INTERVAL_SEC=45
 python main.py
 ```
 
-Requires OpenCV/ffmpeg support for your stream URLs (HLS may need `opencv` built with ffmpeg).
+Requires **ffmpeg** on PATH for HLS streams (`frame_grab.py`). Docker image includes ffmpeg.
+
+## Docker (recomendado)
+
+```bash
+cd infra/stream-stack
+cp .env.example .env
+docker compose up -d --build
+```
 
 ## Deploy
 

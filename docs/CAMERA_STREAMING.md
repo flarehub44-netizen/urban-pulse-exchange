@@ -1,60 +1,89 @@
 # Stream de câmeras ViaX
 
-## Arquitetura
+## Status: HLS público (fase 1)
 
-1. **Câmera IP** → RTSP
-2. **MediaMTX** (VPS) → HLS `.m3u8` em `http://<host>:8888/<path>/index.m3u8`
-3. **ViaX admin** → cadastra URL HLS em `cameras.stream_url` (nunca RTSP no banco)
-4. **vision-worker** → lê frames, conta veículos na `count_line`, RPC `ingest_camera_metrics`
-5. **Oráculo** → mercados com `data_source = 'camera'` usam métricas recentes
+Câmeras demo seedadas com stream HTTPS Mux — playback sem VPS.
 
-## Subir MediaMTX
+| Região | Camera ID | Stream |
+|--------|-----------|--------|
+| paulista | `demo-cam-paulista` | Mux test HLS |
+| marginal | `demo-cam-marginal` | Mux test HLS |
+| pinheiros | `demo-cam-pinheiros` | Mux test HLS |
+
+## Checklist pós-deploy
+
+1. `npm run db:push` (migrations `20260605*`)
+2. `npm run deploy`
+3. Admin → **Fontes** — 3 câmeras `online`
+4. Mercado **live** (ex. paulista) → faixa **Ao vivo** com `<video>`
+5. `/urbanmind` — mesmo strip
+6. Subir vision-worker (métricas + `detection_ok`)
 
 ```bash
-cd infra/mediamtx
-cp .env.example .env
-# edit .env with RTSP URLs
-docker compose up -d
+# RPC smoke (SQL Editor)
+select public.list_live_cameras('paulista');
 ```
-
-HLS de teste (sem câmera):
-
-```bash
-ffmpeg -re -f lavfi -i testsrc=size=1280x720:rate=30 -f lavfi -i sine -pix_fmt yuv420p -c:v libx264 -tune zerolatency -f rtsp rtsp://127.0.0.1:8554/demo
-```
-
-URL para o admin: `http://<vps-ip>:8888/demo/index.m3u8` (use HTTPS via Caddy em produção).
-
-## Cadastro no ViaX
-
-1. Admin → **Fontes** (`/admin/sources`)
-2. Nome, região, URL HLS (`https://.../index.m3u8`)
-3. Desenhar linha de contagem no preview
-4. Status **online**
 
 ## Vision worker
 
 ```bash
+cd infra/stream-stack
+cp .env.example .env
+# preencher SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY
+docker compose up -d --build
+```
+
+Ou local:
+
+```bash
 cd services/vision-worker
 pip install -r requirements.txt
+# ffmpeg no PATH (choco install ffmpeg / apt install ffmpeg)
 export SUPABASE_URL=...
 export SUPABASE_SERVICE_ROLE_KEY=...
 python main.py
 ```
 
-## Variáveis Supabase
+## Oráculo por câmera
 
-| Setting | Descrição |
-|---------|-----------|
-| `camera_oracle_enabled` | `true` para resolver mercados `data_source=camera` via métricas |
-| `regions_simulator_enabled` | `false` quando região usa só câmeras |
+1. Aguarde métricas estáveis (worker rodando ~10+ min)
+2. Admin → **Sistema** → **Oráculo por câmera** = ON
+3. Opcional: desligar **Simulador de regiões**
+4. Mercados `*-live` usam `data_source = camera` (migration `20260605000001`)
+
+## Arquitetura
+
+1. **HLS HTTPS** → `cameras.stream_url`
+2. **ViaX** → `list_live_cameras` + `CameraPlayer` (hls.js)
+3. **vision-worker** → ffmpeg frame → `ingest_camera_metrics`
+4. **Oráculo** → `camera_metrics` + `regions`
+
+## MediaMTX (fase 2 — VPS)
+
+```bash
+cd infra/mediamtx
+cp .env.example .env
+docker compose up -d
+```
+
+Substitua URLs no admin por `https://stream.seudominio.com/paulista/index.m3u8`.
+
+## Regras de URL
+
+- Só **HTTPS** + `.m3u8` (ou snapshot) no app de produção
+- Nunca `rtsp://` no banco
+- HTTP quebra mixed content no `workers.dev`
 
 ## LGPD
 
-- Preferir ROI sem rostos/placas legíveis
-- Retenção curta de frames no worker (processar in-memory)
-- Aviso na UI: stream pode conter tráfego público
+- Tráfego público; aviso na UI
+- Frames só in-memory no worker
 
-## CORS
+## Troubleshooting
 
-Se o player falhar no browser, configure `hlsAllowOrigin` no `mediamtx.yml` ou proxy HLS no mesmo domínio do app.
+| Sintoma | Ação |
+|---------|------|
+| "Sem sinal ao vivo" | `db:push` + câmeras `online` |
+| Vídeo não carrega | Abrir URL em nova aba; verificar CORS do host |
+| Detecção parada | Worker down ou ffmpeg ausente — badge amarelo no admin |
+| Oráculo falha | `camera_oracle_enabled` + câmera `detection_ok` |

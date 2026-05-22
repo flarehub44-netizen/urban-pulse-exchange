@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ExternalLink, Loader2, Video, VideoOff } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { classifyStreamUrl } from "@/lib/camera-stream-url";
+import { classifyStreamUrl, isInsecureStreamInProd } from "@/lib/camera-stream-url";
 import { copy } from "@/copy/pt-BR";
 
 type CameraPlayerProps = {
@@ -20,19 +20,57 @@ export function CameraPlayer({
   offline = false,
 }: CameraPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const hlsRef = useRef<{ destroy: () => void; loadSource: (s: string) => void } | null>(null);
+  const retriedRef = useRef(false);
   const [hlsError, setHlsError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const insecureProd = useMemo(() => isInsecureStreamInProd(url), [url]);
   const kind = useMemo(() => classifyStreamUrl(url), [url]);
 
   useEffect(() => {
-    if (offline || kind !== "hls") return;
+    if (offline || insecureProd || kind !== "hls") return;
 
     const video = videoRef.current;
     if (!video) return;
 
-    let hls: { destroy: () => void } | null = null;
     let cancelled = false;
+    retriedRef.current = false;
+
+    const attachHls = async (HlsMod: typeof import("hls.js").default) => {
+      if (cancelled) return;
+      if (!HlsMod.isSupported()) {
+        setHlsError(copy.cameras.hlsUnsupported);
+        setLoading(false);
+        return;
+      }
+
+      hlsRef.current?.destroy();
+      const instance = new HlsMod({ enableWorker: true, lowLatencyMode: true });
+      hlsRef.current = instance;
+
+      instance.loadSource(url);
+      instance.attachMedia(video);
+
+      instance.on(HlsMod.Events.MANIFEST_PARSED, () => {
+        setLoading(false);
+        setHlsError(null);
+        if (autoPlay) void video.play().catch(() => undefined);
+      });
+
+      instance.on(HlsMod.Events.ERROR, (_e, data) => {
+        if (!data.fatal) return;
+
+        if (data.type === HlsMod.ErrorTypes.NETWORK_ERROR && !retriedRef.current) {
+          retriedRef.current = true;
+          instance.startLoad();
+          return;
+        }
+
+        setHlsError(copy.cameras.streamError);
+        setLoading(false);
+      });
+    };
 
     const setup = async () => {
       setLoading(true);
@@ -40,32 +78,25 @@ export function CameraPlayer({
 
       if (video.canPlayType("application/vnd.apple.mpegurl")) {
         video.src = url;
-        setLoading(false);
+        const onLoaded = () => {
+          setLoading(false);
+          if (autoPlay) void video.play().catch(() => undefined);
+        };
+        video.addEventListener("loadeddata", onLoaded, { once: true });
+        video.addEventListener(
+          "error",
+          () => {
+            setHlsError(copy.cameras.streamError);
+            setLoading(false);
+          },
+          { once: true },
+        );
         return;
       }
 
       try {
         const Hls = (await import("hls.js")).default;
-        if (cancelled) return;
-        if (!Hls.isSupported()) {
-          setHlsError(copy.cameras.hlsUnsupported);
-          setLoading(false);
-          return;
-        }
-        const instance = new Hls({ enableWorker: true, lowLatencyMode: true });
-        instance.loadSource(url);
-        instance.attachMedia(video);
-        instance.on(Hls.Events.ERROR, (_e, data) => {
-          if (data.fatal) {
-            setHlsError(copy.cameras.streamError);
-            setLoading(false);
-          }
-        });
-        instance.on(Hls.Events.MANIFEST_PARSED, () => {
-          setLoading(false);
-          if (autoPlay) void video.play().catch(() => undefined);
-        });
-        hls = instance;
+        await attachHls(Hls);
       } catch {
         setHlsError(copy.cameras.streamError);
         setLoading(false);
@@ -76,9 +107,10 @@ export function CameraPlayer({
 
     return () => {
       cancelled = true;
-      hls?.destroy();
+      hlsRef.current?.destroy();
+      hlsRef.current = null;
     };
-  }, [url, kind, autoPlay, offline]);
+  }, [url, kind, autoPlay, offline, insecureProd]);
 
   if (offline) {
     return (
@@ -91,6 +123,23 @@ export function CameraPlayer({
       >
         <VideoOff className="size-4" />
         {copy.cameras.offline}
+      </div>
+    );
+  }
+
+  if (insecureProd) {
+    return (
+      <div
+        className={cn(
+          "rounded-lg border border-warn/30 bg-warn/5 px-3 py-2 text-xs text-muted-foreground",
+          className,
+        )}
+      >
+        <p>{copy.cameras.mixedContent}</p>
+        <a href={url} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-primary hover:underline">
+          <ExternalLink className="size-3" />
+          {copy.cameras.openExternal}
+        </a>
       </div>
     );
   }
@@ -124,7 +173,21 @@ export function CameraPlayer({
           muted
           className={cn("aspect-video w-full object-contain", maxHeightClass)}
         />
-        {hlsError && <p className="px-2 py-1 text-[10px] text-warn">{hlsError}</p>}
+        {hlsError && (
+          <div className="space-y-1 px-2 py-1">
+            <p className="text-[10px] text-warn">{hlsError}</p>
+            <p className="text-[10px] text-muted-foreground">{copy.cameras.corsHint}</p>
+            <a
+              href={url}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline"
+            >
+              <ExternalLink className="size-3" />
+              {copy.cameras.openExternal}
+            </a>
+          </div>
+        )}
       </div>
     );
   }

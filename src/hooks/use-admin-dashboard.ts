@@ -184,6 +184,31 @@ export function useAdminCameras(enabled = true) {
   });
 }
 
+export type CameraHealthRow = {
+  id: string;
+  name: string;
+  region_id: string | null;
+  status: string;
+  detection_ok: boolean;
+  stream_host: string | null;
+  last_metric_at: string | null;
+  minutes_stale: number | null;
+  is_stale: boolean;
+};
+
+export function useAdminCameraHealth(enabled = true) {
+  return useQuery({
+    queryKey: ["admin", "camera-health"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_camera_health");
+      if (error) throw error;
+      return (data ?? []) as CameraHealthRow[];
+    },
+    enabled,
+    refetchInterval: 60_000,
+  });
+}
+
 export type AdminCamera = {
   id: string;
   region_id: string | null;

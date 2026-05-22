@@ -1,0 +1,40 @@
+name: Vision Worker
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-once:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: pip install -r services/vision-worker/requirements.txt
+
+      - name: Poll cameras once
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          POLL_INTERVAL_SEC: "1"
+        run: |
+          cd services/vision-worker
+          timeout 120 python -c "
+          import os, time
+          os.environ['POLL_INTERVAL_SEC'] = '1'
+          from main import process_camera
+          from supabase_client import SupabaseWorkerClient
+          c = SupabaseWorkerClient()
+          cams = c.list_cameras()
+          print('cameras', len(cams))
+          for cam in cams:
+              process_camera(c, cam)
+          "

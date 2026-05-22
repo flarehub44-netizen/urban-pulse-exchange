@@ -3,6 +3,8 @@ import { useLiveCameras, useRegionCameraStatus } from "@/hooks/use-live-cameras"
 import { copy } from "@/copy/pt-BR";
 import { Video } from "lucide-react";
 import { InlineError } from "@/components/viax/inline-error";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export function LiveCameraStrip({ regionId }: { regionId: string | null | undefined }) {
   const { data: cameras, isLoading, isError, refetch } = useLiveCameras(regionId);
@@ -38,11 +40,22 @@ export function LiveCameraStrip({ regionId }: { regionId: string | null | undefi
           <h3 className="text-sm font-medium">{copy.cameras.liveTitle}</h3>
           <p className="text-[10px] text-muted-foreground">{copy.cameras.liveSubtitle}</p>
         </div>
-        {status && status.detecting_count > 0 && (
-          <span className="rounded-md border border-up/30 bg-up/10 px-2 py-0.5 text-[10px] text-up">
-            UrbanMind · {status.detecting_count} detecção ativa
-          </span>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          {status && status.detecting_count > 0 && (
+            <span className="rounded-md border border-up/30 bg-up/10 px-2 py-0.5 text-[10px] text-up">
+              UrbanMind · {status.detecting_count} detecção ativa
+            </span>
+          )}
+          {status?.last_reading_at && (
+            <span className="text-[10px] text-muted-foreground">
+              {copy.cameras.lastReading}:{" "}
+              {formatDistanceToNow(new Date(status.last_reading_at), {
+                addSuffix: true,
+                locale: ptBR,
+              })}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">

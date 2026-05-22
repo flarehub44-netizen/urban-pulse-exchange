@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   useAdminCameras,
+  useAdminCameraHealth,
   useAdminUpsertCamera,
   useAdminSetCameraStatus,
 } from "@/hooks/use-admin-dashboard";
@@ -15,7 +16,7 @@ import { CameraLineEditor } from "@/components/admin/camera-line-editor";
 import { CameraStreamPreview } from "@/components/admin/camera-stream-preview";
 import { EmptyState } from "@/components/viax/empty-state";
 import { Video } from "lucide-react";
-import { isAllowedStreamUrl } from "@/lib/camera-stream-url";
+import { isAllowedStreamUrl, isInsecureStreamInProd } from "@/lib/camera-stream-url";
 
 export const Route = createFileRoute("/admin/sources")({
   component: AdminSourcesPage,
@@ -23,6 +24,11 @@ export const Route = createFileRoute("/admin/sources")({
 
 function AdminSourcesPage() {
   const { data: cameras, isError: camErr, refetch: refetchCam } = useAdminCameras();
+  const { data: healthRows } = useAdminCameraHealth();
+  const staleById = useMemo(
+    () => new Map((healthRows ?? []).map((h) => [h.id, h.is_stale])),
+    [healthRows],
+  );
   const { data: oracle } = useAdminOracleHealth();
   const { data: regions } = useRegions();
   const { mutateAsync: upsertCamera } = useAdminUpsertCamera();
@@ -44,6 +50,10 @@ function AdminSourcesPage() {
     }
     if (streamUrl.trim() && !isAllowedStreamUrl(streamUrl.trim())) {
       toast.error(copy.cameras.invalidUrl);
+      return;
+    }
+    if (streamUrl.trim() && isInsecureStreamInProd(streamUrl.trim())) {
+      toast.error(copy.cameras.mixedContent);
       return;
     }
     try {
@@ -148,6 +158,9 @@ function AdminSourcesPage() {
                 {c.last_vehicle_count != null &&
                   ` · ${copy.admin.sources.lastCount}: ${c.last_vehicle_count}`}
               </p>
+              {staleById.get(c.id) && (
+                <p className="mt-1 text-[10px] text-warn">{copy.cameras.staleDetection}</p>
+              )}
               {c.stream_url && (
                 <div className="mt-2 space-y-2">
                   <CameraStreamPreview url={c.stream_url} />

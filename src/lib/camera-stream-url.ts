@@ -29,6 +29,12 @@ export function isAllowedStreamUrl(url: string | null | undefined): boolean {
   return false;
 }
 
+/** Mixed content: HTTPS app cannot play HTTP streams in production. */
+export function isInsecureStreamInProd(url: string, isProd = import.meta.env.PROD): boolean {
+  if (!isProd) return false;
+  return url.trim().toLowerCase().startsWith("http://");
+}
+
 export function classifyStreamUrl(url: string): StreamKind | { type: "embed"; src: string } {
   const lower = url.toLowerCase();
   if (lower.startsWith("rtsp://") || lower.startsWith("rtmp://")) return "unsupported";

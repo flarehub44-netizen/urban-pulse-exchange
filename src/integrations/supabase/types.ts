@@ -156,6 +156,7 @@ export type Database = {
       admin_set_camera_status: { Args: { p_camera_id: string; p_status: string }; Returns: Json };
       list_live_cameras: { Args: { p_region_id?: string | null }; Returns: Json };
       get_region_camera_status: { Args: { p_region_id: string }; Returns: Json };
+      get_camera_health: { Args: Record<string, never>; Returns: Json };
       ingest_camera_metrics: {
         Args: {
           p_camera_id: string;

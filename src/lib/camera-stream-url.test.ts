@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { classifyStreamUrl, isAllowedStreamUrl, youtubeEmbed } from "./camera-stream-url";
+import {
+  classifyStreamUrl,
+  isAllowedStreamUrl,
+  isInsecureStreamInProd,
+  youtubeEmbed,
+} from "./camera-stream-url";
 
 describe("isAllowedStreamUrl", () => {
   it("allows HLS and snapshots", () => {
@@ -25,6 +30,14 @@ describe("classifyStreamUrl", () => {
 
   it("classifies unsupported protocols", () => {
     expect(classifyStreamUrl("rtsp://x")).toBe("unsupported");
+  });
+});
+
+describe("isInsecureStreamInProd", () => {
+  it("flags http only in prod mode", () => {
+    expect(isInsecureStreamInProd("http://192.168.0.1/live.m3u8", true)).toBe(true);
+    expect(isInsecureStreamInProd("http://192.168.0.1/live.m3u8", false)).toBe(false);
+    expect(isInsecureStreamInProd("https://cdn.test/index.m3u8", true)).toBe(false);
   });
 });
 

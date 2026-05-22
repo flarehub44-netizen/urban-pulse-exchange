@@ -1,0 +1,13 @@
+services:
+  vision-worker:
+    build:
+      context: ../../services/vision-worker
+      dockerfile: Dockerfile
+    container_name: viax-vision-worker
+    restart: unless-stopped
+    environment:
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      POLL_INTERVAL_SEC: ${POLL_INTERVAL_SEC:-45}
+    env_file:
+      - .env
