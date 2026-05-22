@@ -18,16 +18,9 @@ async function initDemoAuth(): Promise<DemoAuthState> {
       return { authReady: true, userId: session.user.id };
     }
 
-    const { data, error } = await supabase.auth.signInAnonymously();
-    if (error) {
-      console.warn("[anon-auth] Anonymous auth unavailable; continuing in local demo mode.");
-      return { authReady: true, userId: null };
-    }
-
-    void tryBindPartnerRef();
-    return { authReady: true, userId: data.user?.id ?? null };
+    return { authReady: true, userId: null };
   } catch {
-    console.warn("[anon-auth] Anonymous auth failed; continuing in local demo mode.");
+    console.warn("[anon-auth] Session lookup failed; continuing in local demo mode.");
     return { authReady: true, userId: null };
   }
 }
@@ -54,7 +47,7 @@ export function useAnonAuth() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_, session) => {
       setUserId(session?.user?.id ?? null);
-      if (session) setAuthReady(true);
+      setAuthReady(true);
     });
 
     return () => subscription.unsubscribe();
