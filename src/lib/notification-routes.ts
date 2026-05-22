@@ -4,7 +4,7 @@ export type NotificationLink =
   | { to: "/profile"; search: { tab: "carteira" } }
   | { to: "/profile"; search: { tab: "posicoes" } }
   | { to: "/ranking" }
-  | { to: "/markets"; search?: { status?: string } }
+  | { to: "/markets"; search?: { status?: "all" | "live" | "closing" | "dispute" | "resolved" | "draft" } }
   | { to: "/markets/$marketId"; params: { marketId: string } }
   | { to: "/live" }
   | null;

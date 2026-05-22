@@ -18,12 +18,14 @@ import { AnimatedNumber } from "@/components/viax/animated-number";
 import { formatBRL, PRIZE_RATIO } from "@/lib/parimutuel";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { AnonAccountBanner } from "@/components/viax/anon-account-banner";
-import { ArrowUpRight, Brain, TrendingUp } from "lucide-react";
+import { TrendingUp, Users } from "lucide-react";
+import { useFollowedTraders } from "@/hooks/use-followed-traders";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { copy } from "@/copy/pt-BR";
 import { buildActionNowItems } from "@/lib/action-now";
+import { DEFAULT_FEATURED_MARKET_ID } from "@/config/markets";
 
 export type DashboardSearch = { from?: string; highlight?: "position" };
 
@@ -91,10 +93,12 @@ function Dashboard() {
     return idx >= 0 ? idx + 1 : null;
   }, [traders, userId]);
 
+  const { ids: followedIds } = useFollowedTraders();
+
   const liveCount = markets.filter((m) => m.status === "live" || m.status === "closing").length;
   const top = [...markets].sort((a, b) => Math.abs(b.trend) - Math.abs(a.trend)).slice(0, 4);
-  const urbanMindMarket = markets.find((m) => m.id === "paulista-rush") ?? markets[0];
-  const actionNow = buildActionNowItems(openBets, markets, urbanMindMarket);
+  const urbanMindMarket = markets.find((m) => m.id === DEFAULT_FEATURED_MARKET_ID) ?? markets[0];
+  const actionNow = buildActionNowItems(openBets, markets, urbanMindMarket, followedIds, traders);
 
   const pnlTotal = pnlSeries.length ? pnlSeries[pnlSeries.length - 1].v : "pnl" in me ? me.pnl : 0;
   const pnlStart = pnlSeries.length > 1 ? pnlSeries[0].v : 0;
@@ -198,7 +202,7 @@ function Dashboard() {
                     params={{ marketId: item.bet.marketId }}
                     className="flex-1 rounded-xl border bg-card/80 px-3 py-2 text-sm hover:border-primary/40"
                   >
-                    <span className="text-[10px] uppercase text-muted-foreground">
+                    <span className="text-xs uppercase text-muted-foreground">
                       {copy.dashboard.positionLine} ·{" "}
                       {copy.dashboard.positionEst(
                         `${item.estPnL >= 0 ? "+" : ""}${formatBRL(item.estPnL)}`,
@@ -217,10 +221,31 @@ function Dashboard() {
                     params={{ marketId: item.market.id }}
                     className="flex-1 rounded-xl border bg-card/80 px-3 py-2 text-sm hover:border-primary/40"
                   >
-                    <span className="text-[10px] uppercase text-muted-foreground">
+                    <span className="text-xs uppercase text-muted-foreground">
                       {copy.ia.closingWithIa}
                     </span>
                     <div className="line-clamp-1 font-medium">{item.market.question}</div>
+                  </Link>
+                );
+              }
+              if (item.type === "followed") {
+                return (
+                  <Link
+                    key={`followed-${item.trader.id}`}
+                    to="/profile/$userId"
+                    params={{ userId: item.trader.id }}
+                    className="flex-1 rounded-xl border bg-card/80 px-3 py-2 text-sm hover:border-primary/40"
+                  >
+                    <span className="inline-flex items-center gap-1 text-[10px] uppercase text-muted-foreground">
+                      <Users className="size-3" /> Trader seguido
+                    </span>
+                    <div className="mt-0.5 flex items-center gap-1.5">
+                      <img src={item.trader.avatar} className="size-5 rounded-full bg-surface" alt={item.trader.name} />
+                      <span className="font-medium truncate">{item.trader.name}</span>
+                    </div>
+                    <div className="text-[10px] text-muted-foreground">
+                      Precisão {(item.trader.accuracy * 100).toFixed(0)}% · {item.trader.division}
+                    </div>
                   </Link>
                 );
               }
@@ -240,169 +265,88 @@ function Dashboard() {
         </div>
       )}
 
-      <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              Mercados em alta
-            </h2>
-            <Link
-              to="/markets"
-              search={{ status: "live" }}
-              className="text-xs text-primary hover:underline"
-            >
-              Ver todos →
-            </Link>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            {top.map((m) => (
-              <MarketCard key={m.id} m={m} />
-            ))}
-          </div>
+      {/* Fold 2 — mercados em alta */}
+      <div>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+            Mercados em alta
+          </h2>
+          <Link
+            to="/markets"
+            search={{ status: "live" }}
+            className="text-xs text-primary hover:underline"
+          >
+            Ver todos →
+          </Link>
         </div>
-
-        <div className="space-y-5">
-          <div>
-            <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              {copy.dashboard.performance}
-            </h2>
-            <div className="rounded-2xl border bg-card/60 p-4 backdrop-blur">
-              <div className="flex items-baseline gap-2">
-                <span
-                  className={cn(
-                    "text-2xl font-semibold mono",
-                    pnlTotal >= 0 ? "text-up" : "text-down",
-                  )}
-                >
-                  {pnlTotal >= 0 ? "+" : ""}
-                  {formatBRL(pnlTotal)}
-                </span>
-                {pnlPct && (
-                  <span className={cn("text-xs", pnlDelta >= 0 ? "text-up" : "text-down")}>
-                    {pnlDelta >= 0 ? "+" : ""}
-                    {pnlPct}%
-                  </span>
-                )}
-              </div>
-              <div style={{ width: "100%", height: 140 }}>
-                <ResponsiveContainer>
-                  <AreaChart data={chartData}>
-                    <defs>
-                      <linearGradient id="pn" x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0%" stopColor="var(--color-up)" stopOpacity={0.4} />
-                        <stop offset="100%" stopColor="var(--color-up)" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <XAxis dataKey="d" hide={chartData.length > 8} tick={{ fontSize: 10 }} />
-                    <YAxis hide />
-                    <Tooltip
-                      contentStyle={{
-                        background: "var(--color-popover)",
-                        border: "1px solid var(--color-border)",
-                        borderRadius: 12,
-                        fontSize: 12,
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="pnl"
-                      stroke="var(--color-up)"
-                      strokeWidth={1.6}
-                      fill="url(#pn)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-              {!pnlSeries.length && (
-                <p className="mt-2 text-center text-[11px] text-muted-foreground">
-                  {copy.dashboard.gainsChartHint}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {urbanMindMarket && (
-            <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4">
-              <div className="flex items-center gap-2 text-primary">
-                <Brain className="size-4" />
-                <span className="text-xs uppercase tracking-wider">UrbanMind AI</span>
-              </div>
-              <p className="mt-2 text-sm">
-                UrbanMind prevê{" "}
-                <span className="mono text-foreground">
-                  {urbanMindMarket.aiPrediction.value.toLocaleString("pt-BR")}
-                </span>{" "}
-                em {urbanMindMarket.region}, sinal{" "}
-                <span
-                  className={cn(
-                    "mono font-medium",
-                    urbanMindMarket.aiPrediction.side === "YES" ? "text-up" : "text-down",
-                  )}
-                >
-                  {urbanMindMarket.aiPrediction.side === "YES" ? "SIM" : "NÃO"}
-                </span>{" "}
-                · {(urbanMindMarket.aiPrediction.confidence * 100).toFixed(0)}% confiança.
-              </p>
-              <Link
-                to="/markets/$marketId"
-                params={{ marketId: urbanMindMarket.id }}
-                className="mt-3 inline-flex items-center gap-1 text-xs text-primary hover:underline"
-              >
-                {copy.dashboard.operateMarket} <ArrowUpRight className="size-3" />
-              </Link>
-            </div>
-          )}
-
-          <div>
-            <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              Feed
-            </h2>
-            <div className="space-y-2">
-              {feed.slice(0, 4).map((p) => (
-                <Link
-                  to="/feed"
-                  key={p.id}
-                  className="block rounded-xl border bg-card/60 p-3 backdrop-blur hover:bg-surface/60"
-                >
-                  <div className="flex items-center gap-2">
-                    <img src={p.user.avatar} className="size-7 rounded-full bg-surface" alt="" />
-                    <div className="min-w-0 flex-1">
-                      <div className="text-xs font-medium">
-                        {p.user.name}{" "}
-                        <span className="text-muted-foreground">@{p.user.handle}</span>
-                      </div>
-                      <div className="line-clamp-2 text-xs text-muted-foreground">{p.text}</div>
-                    </div>
-                    <span className="text-[10px] text-muted-foreground">
-                      {formatDistanceToNow(p.time, { locale: ptBR, addSuffix: false })}
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {top.map((m) => (
+            <MarketCard key={m.id} m={m} compact />
+          ))}
         </div>
       </div>
 
+      {/* Fold 3 — performance + posições abertas */}
       <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
         <div>
           <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-            Mapa da cidade
+            {copy.dashboard.performance}
           </h2>
-          <CityHeatmap
-            height={360}
-            regions={regions}
-            showLiveLink
-            onRegionClick={(r) => {
-              const top = findTopMarketForRegion(markets, r);
-              if (top) navigate({ to: "/markets/$marketId", params: { marketId: top.id } });
-              else {
-                navigate({ to: "/markets", search: { region: r.name } });
-                toast.message("Lista filtrada por região");
-              }
-            }}
-          />
+          <div className="rounded-2xl border bg-card/60 p-4 backdrop-blur">
+            <div className="flex items-baseline gap-2">
+              <span
+                className={cn(
+                  "text-2xl font-semibold mono",
+                  pnlTotal >= 0 ? "text-up" : "text-down",
+                )}
+              >
+                {pnlTotal >= 0 ? "+" : ""}
+                {formatBRL(pnlTotal)}
+              </span>
+              {pnlPct && (
+                <span className={cn("text-xs", pnlDelta >= 0 ? "text-up" : "text-down")}>
+                  {pnlDelta >= 0 ? "+" : ""}
+                  {pnlPct}%
+                </span>
+              )}
+            </div>
+            <div style={{ width: "100%", height: 140 }}>
+              <ResponsiveContainer>
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="pn" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stopColor="var(--color-up)" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="var(--color-up)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="d" hide={chartData.length > 8} tick={{ fontSize: 10 }} />
+                  <YAxis hide />
+                  <Tooltip
+                    contentStyle={{
+                      background: "var(--color-popover)",
+                      border: "1px solid var(--color-border)",
+                      borderRadius: 12,
+                      fontSize: 12,
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="pnl"
+                    stroke="var(--color-up)"
+                    strokeWidth={1.6}
+                    fill="url(#pn)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+            {!pnlSeries.length && (
+              <p className="mt-2 text-center text-[11px] text-muted-foreground">
+                {copy.dashboard.gainsChartHint}
+              </p>
+            )}
+          </div>
         </div>
+
         <div id="open-positions">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
@@ -472,6 +416,64 @@ function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Fold 4 — mapa + feed (menor prioridade) */}
+      <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
+        <div>
+          <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+            Mapa da cidade
+          </h2>
+          <CityHeatmap
+            height={360}
+            regions={regions}
+            showLiveLink
+            onRegionClick={(r) => {
+              const top = findTopMarketForRegion(markets, r);
+              if (top) navigate({ to: "/markets/$marketId", params: { marketId: top.id } });
+              else {
+                navigate({ to: "/markets", search: { region: r.name } });
+                toast.message("Lista filtrada por região");
+              }
+            }}
+          />
+        </div>
+        <div>
+          <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+            Feed
+          </h2>
+          <div className="space-y-2">
+            {feed.slice(0, 4).map((p) => (
+              <Link
+                to="/feed"
+                key={p.id}
+                className="block rounded-xl border bg-card/60 p-3 backdrop-blur hover:bg-surface/60"
+              >
+                <div className="flex items-center gap-2">
+                  <img src={p.user.avatar} className="size-7 rounded-full bg-surface" alt={p.user.name} />
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs font-medium">
+                      {p.user.name}{" "}
+                      <span className="text-muted-foreground">@{p.user.handle}</span>
+                    </div>
+                    <div className="line-clamp-2 text-xs text-muted-foreground">{p.text}</div>
+                  </div>
+                  <span className="text-xs text-muted-foreground shrink-0">
+                    {formatDistanceToNow(p.time, { locale: ptBR, addSuffix: false })}
+                  </span>
+                </div>
+              </Link>
+            ))}
+            {feed.length === 0 && (
+              <div className="rounded-xl border bg-card/60 p-4 text-center text-sm text-muted-foreground">
+                Nenhum post ainda.{" "}
+                <Link to="/feed" className="text-primary hover:underline">
+                  Abrir feed →
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -494,7 +496,7 @@ function KPI({
         clickable && "hover:bg-surface/60 hover:border-primary/30 cursor-pointer",
       )}
     >
-      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+      <div className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted-foreground">
         <TrendingUp className="size-3" /> {label}
       </div>
       <div className="mt-2 text-xl font-semibold">{value}</div>

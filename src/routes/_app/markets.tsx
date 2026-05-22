@@ -1,13 +1,16 @@
 import { copy } from "@/copy/pt-BR";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useEffect, useState } from "react";
-import { useCatalogMarkets } from "@/hooks/use-markets";
+import { useCatalogMarkets, useMarkets } from "@/hooks/use-markets";
 import { useBets } from "@/hooks/use-bets";
+import { useQueryClient } from "@tanstack/react-query";
+import { MarketCardSkeleton } from "@/components/viax/market-card-skeleton";
+import { InlineError } from "@/components/viax/inline-error";
 import { getMarketEdge } from "@/lib/market-edge";
 import { useWatchlist } from "@/hooks/use-watchlist";
 import { MarketCard } from "@/components/viax/market-card";
 import { MobileMarketsCarousel } from "@/components/viax/mobile-markets-carousel";
-import { Search, Star, X } from "lucide-react";
+import { Search, Star, X, TrendingUp, Clock, Bot, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { loadMarketsFilters, saveMarketsFilters } from "@/lib/markets-filter-persist";
 import { isOpenBetStatus, isSettledDisplay } from "@/lib/market-status";
@@ -27,6 +30,7 @@ export type MarketsSearch = {
   hasPosition?: "1";
   sort?: "edge" | "closing" | "trend";
   q?: string;
+  aiPicks?: "1";
 };
 
 export const Route = createFileRoute("/_app/markets")({
@@ -61,6 +65,7 @@ export const Route = createFileRoute("/_app/markets")({
         search.sort === "edge" || search.sort === "closing" || search.sort === "trend"
           ? search.sort
           : undefined,
+      aiPicks: search.aiPicks === "1" ? "1" : undefined,
     };
   },
   component: Markets,
@@ -81,6 +86,8 @@ function Markets() {
   const { userId } = useAnonAuth();
   const { data: profile } = useProfile(userId);
   const markets = useCatalogMarkets();
+  const { isLoading: marketsLoading, error: marketsError, refetch } = useMarkets();
+  const queryClient = useQueryClient();
   const statusFilters = profile?.isAdmin
     ? [...baseStatusFilters, draftFilter]
     : baseStatusFilters;
@@ -98,6 +105,9 @@ function Markets() {
   const regionFilter = search.region;
   const hasPosition = search.hasPosition === "1";
   const sortKey = search.sort;
+  const aiPicks = search.aiPicks === "1";
+
+  const userRegion = profile?.neighborhood || profile?.city || null;
 
   const [qInput, setQInput] = useState(q);
   const [hydrated, setHydrated] = useState(false);
@@ -163,6 +173,7 @@ function Markets() {
       )
         return false;
       if (category && m.category !== category) return false;
+      if (aiPicks && getMarketEdge(m).edgePp < 12) return false;
       return matchesStatusFilter(m.status, statusKey, m.endsAt);
     });
     const now = Date.now();
@@ -189,6 +200,7 @@ function Markets() {
     hasPosition,
     openMarketIds,
     sortKey,
+    aiPicks,
   ]);
 
   return (
@@ -226,6 +238,60 @@ function Markets() {
       )}
 
       <div className="flex flex-wrap gap-2">
+        {(() => {
+          const isHot = statusKey === "live" && sortKey === "trend" && !category && !showFavorites && !hasPosition && !aiPicks && !regionFilter;
+          const isClosing = statusKey === "closing" && sortKey === "closing" && !category && !showFavorites && !hasPosition && !aiPicks;
+          const isAi = aiPicks;
+          const isMyRegion = !!userRegion && regionFilter === userRegion;
+          const presets = [
+            {
+              key: "hot",
+              label: "Em Alta",
+              icon: <TrendingUp className="size-3" />,
+              active: isHot,
+              onClick: () => patchSearch({ status: "live", sort: "trend", category: undefined, aiPicks: undefined, favorites: undefined, hasPosition: undefined, region: undefined }),
+            },
+            {
+              key: "closing",
+              label: "Encerrando",
+              icon: <Clock className="size-3" />,
+              active: isClosing,
+              onClick: () => patchSearch({ status: "closing", sort: "closing", category: undefined, aiPicks: undefined, favorites: undefined, hasPosition: undefined }),
+            },
+            {
+              key: "ai",
+              label: "IA Indica",
+              icon: <Bot className="size-3" />,
+              active: isAi,
+              onClick: () => patchSearch({ aiPicks: aiPicks ? undefined : "1", status: "live", sort: "edge", category: undefined, favorites: undefined, hasPosition: undefined }),
+            },
+            ...(userRegion ? [{
+              key: "region",
+              label: userRegion,
+              icon: <MapPin className="size-3" />,
+              active: isMyRegion,
+              onClick: () => patchSearch({ region: isMyRegion ? undefined : userRegion, aiPicks: undefined }),
+            }] : []),
+          ];
+          return presets.map((p) => (
+            <button
+              key={p.key}
+              type="button"
+              onClick={p.onClick}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition",
+                p.active
+                  ? "border-primary bg-primary text-primary-foreground shadow-[var(--shadow-glow-primary)]"
+                  : "border-border bg-card text-muted-foreground hover:bg-surface-2 hover:text-foreground",
+              )}
+            >
+              {p.icon} {p.label}
+            </button>
+          ));
+        })()}
+      </div>
+
+      <div className="flex flex-wrap gap-2">
         <button
           type="button"
           onClick={() =>
@@ -233,6 +299,7 @@ function Markets() {
               favorites: showFavorites ? undefined : "1",
               status: undefined,
               category: undefined,
+              aiPicks: undefined,
             })
           }
           className={cn(
@@ -335,13 +402,65 @@ function Markets() {
         </div>
       )}
 
-      <MobileMarketsCarousel markets={list} className="md:hidden" />
+      {!showFavorites && list.length === 0 && (
+        <div className="rounded-2xl border bg-card/60 p-10 text-center backdrop-blur">
+          <Search className="mx-auto mb-3 size-8 text-muted-foreground/30" />
+          <p className="text-sm font-medium">Nenhum mercado encontrado</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Tente ajustar os filtros ou limpar a busca.
+          </p>
+          <button
+            type="button"
+            onClick={() =>
+              patchSearch({
+                status: undefined,
+                category: undefined,
+                hasPosition: undefined,
+                sort: undefined,
+                q: undefined,
+                region: undefined,
+                aiPicks: undefined,
+              })
+            }
+            className="mt-4 rounded-lg border bg-card px-4 py-2 text-xs text-muted-foreground transition hover:bg-surface-2 hover:text-foreground"
+          >
+            Limpar filtros
+          </button>
+        </div>
+      )}
 
-      <div className="hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-3">
-        {list.map((m) => (
-          <MarketCard key={m.id} m={m} />
-        ))}
-      </div>
+      {marketsError && (
+        <InlineError
+          message="Não foi possível carregar os mercados."
+          onRetry={() => refetch()}
+        />
+      )}
+
+      {marketsLoading && !marketsError && (
+        <>
+          <div className="md:hidden space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <MarketCardSkeleton key={i} />
+            ))}
+          </div>
+          <div className="hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <MarketCardSkeleton key={i} />
+            ))}
+          </div>
+        </>
+      )}
+
+      {!marketsLoading && !marketsError && (
+        <>
+          <MobileMarketsCarousel markets={list} className="md:hidden" />
+          <div className="hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-3">
+            {list.map((m) => (
+              <MarketCard key={m.id} m={m} />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

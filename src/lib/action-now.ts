@@ -1,4 +1,4 @@
-import type { Market } from "@/store/viax-store";
+import type { Market, Trader } from "@/store/viax-store";
 import type { OpenBet } from "@/hooks/use-bets";
 import { getMarketEdge } from "@/lib/market-edge";
 import { PRIZE_RATIO } from "@/lib/parimutuel";
@@ -6,7 +6,8 @@ import { PRIZE_RATIO } from "@/lib/parimutuel";
 export type ActionNowItem =
   | { type: "position"; priority: number; bet: OpenBet; estPnL: number; minutesLeft: number }
   | { type: "closing"; priority: number; market: Market }
-  | { type: "urbanmind"; priority: number; market: Market };
+  | { type: "urbanmind"; priority: number; market: Market }
+  | { type: "followed"; priority: number; trader: Trader };
 
 const MS_15MIN = 15 * 60 * 1000;
 
@@ -14,6 +15,8 @@ export function buildActionNowItems(
   openBets: OpenBet[],
   markets: Market[],
   urbanMindMarket: Market | undefined,
+  followedIds?: string[],
+  traders?: Trader[],
 ): ActionNowItem[] {
   const now = Date.now();
   const items: ActionNowItem[] = [];
@@ -47,6 +50,15 @@ export function buildActionNowItems(
 
   if (urbanMindMarket && (urbanMindMarket.status === "live" || urbanMindMarket.status === "closing")) {
     items.push({ type: "urbanmind", priority: 100, market: urbanMindMarket });
+  }
+
+  if (followedIds?.length && traders?.length) {
+    const followedTrader = traders
+      .filter((t) => followedIds.includes(t.id))
+      .sort((a, b) => b.accuracy - a.accuracy)[0];
+    if (followedTrader) {
+      items.push({ type: "followed", priority: 50, trader: followedTrader });
+    }
   }
 
   return items.sort((a, b) => b.priority - a.priority);
