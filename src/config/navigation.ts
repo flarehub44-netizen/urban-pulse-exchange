@@ -49,18 +49,18 @@ export const notificationsNav: NavItem = {
   icon: Bell,
 };
 
-/** Mobile bottom bar — Início · Mercados · Ao vivo · Ranking · Conta */
+/** Mobile bottom bar — Início · Mercados · Ao vivo · Apostas · Conta */
 export const bottomNavPrimary: NavItem[] = [
   { to: "/dashboard", label: copy.nav.home, icon: LayoutDashboard },
   { to: "/markets", label: copy.nav.markets, icon: Radio, matchPrefix: true },
   { to: "/live", label: copy.nav.live, icon: Map },
-  { to: "/ranking", label: copy.nav.ranking, icon: Trophy },
+  { to: "/profile", label: copy.nav.positions, icon: Briefcase, search: { tab: "posicoes" } },
   { to: "/profile", label: copy.nav.account, icon: User, matchPrefix: true },
 ];
 
 /** Secondary routes in mobile "Mais" sheet */
 export const bottomNavMore: NavItem[] = [
-  { to: "/profile", label: copy.nav.positions, icon: Briefcase, search: { tab: "posicoes" } },
+  { to: "/ranking", label: copy.nav.ranking, icon: Trophy },
   { to: "/feed", label: copy.nav.feed, icon: MessageSquare },
   { to: "/notifications", label: copy.nav.notifications, icon: Bell },
   { to: "/profile", label: copy.nav.wallet, icon: Wallet, search: { tab: "carteira" } },

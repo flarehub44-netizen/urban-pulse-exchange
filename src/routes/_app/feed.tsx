@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useFeed } from "@/hooks/use-feed";
 import { useFeedComments } from "@/hooks/use-feed-comments";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
-import { useProfile } from "@/hooks/use-profile";
 import {
   createFeedPostFn,
   likeFeedPostFn,
@@ -12,7 +11,7 @@ import {
 } from "@/actions/feed";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useViaX } from "@/store/viax-store";
+import { useResolvedFeed, useResolvedProfile, useResolvedMarkets } from "@/hooks/use-resolved-data";
 import { DivisionBadge } from "@/components/viax/division-badge";
 import {
   Heart,
@@ -36,6 +35,8 @@ import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { suggestMarketForPost } from "@/lib/suggest-feed-market";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { EmptyState } from "@/components/viax/empty-state";
+import { MessageSquare } from "lucide-react";
 
 export type FeedSearch = { post?: string };
 
@@ -65,14 +66,11 @@ const tagTone: Record<string, string> = {
 function Feed() {
   const navigate = useNavigate({ from: "/_app/feed" });
   const { post: postFromUrl } = Route.useSearch();
-  const { data: dbFeed } = useFeed();
-  const zustandFeed = useViaX((s) => s.feed);
-  const feed = dbFeed ?? zustandFeed;
-  const markets = useViaX((s) => s.markets);
+  useFeed();
+  const { feed } = useResolvedFeed();
+  const { markets } = useResolvedMarkets();
   const { userId } = useAnonAuth();
-  const { data: profile } = useProfile(userId);
-  const zustandMe = useViaX((s) => s.me);
-  const me = profile ?? zustandMe;
+  const { me } = useResolvedProfile();
   const queryClient = useQueryClient();
   const [text, setText] = useState("");
   const [commentPostId, setCommentPostId] = useState<string | null>(null);
@@ -145,6 +143,15 @@ function Feed() {
           </div>
         </div>
       </div>
+
+      {feed.length === 0 && (
+        <EmptyState
+          icon={MessageSquare}
+          title={copy.empty.feed.title}
+          description={copy.empty.feed.description}
+          action={{ label: copy.empty.feed.cta, to: "/markets", search: { status: "live" } }}
+        />
+      )}
 
       <ul className="space-y-3">
         {feed.map((p) => {

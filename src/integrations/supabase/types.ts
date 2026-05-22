@@ -112,6 +112,45 @@ export type Database = {
         };
         Returns: Json;
       };
+      get_admin_dashboard_metrics: { Args: Record<string, never>; Returns: Json };
+      get_admin_volume_by_hour: { Args: Record<string, never>; Returns: Json };
+      get_admin_settlement_queue: { Args: Record<string, never>; Returns: Json };
+      get_admin_finance_breakdown: { Args: Record<string, never>; Returns: Json };
+      get_admin_oracle_health: { Args: Record<string, never>; Returns: Json };
+      get_admin_users_list: { Args: Record<string, never>; Returns: Json };
+      get_admin_risk_alerts: { Args: Record<string, never>; Returns: Json };
+      get_admin_live_feed: { Args: { p_limit?: number }; Returns: Json };
+      admin_force_close: { Args: { p_market_id: string; p_note?: string | null }; Returns: Json };
+      admin_reprocess_market: { Args: { p_market_id: string }; Returns: Json };
+      admin_update_setting: { Args: { p_key: string; p_value: Json }; Returns: Json };
+      admin_freeze_account: { Args: { p_user_id: string; p_frozen: boolean }; Returns: Json };
+      admin_set_bet_limit: { Args: { p_user_id: string; p_limit: number }; Returns: Json };
+      admin_list_cameras: { Args: Record<string, never>; Returns: Json };
+      admin_upsert_camera: {
+        Args: {
+          p_id: string | null;
+          p_region_id: string;
+          p_name: string;
+          p_location?: string | null;
+          p_status?: string | null;
+          p_stream_url?: string | null;
+          p_count_line?: Json | null;
+        };
+        Returns: Json;
+      };
+      get_platform_settings_admin: { Args: Record<string, never>; Returns: Json };
+      admin_extend_market: { Args: { p_market_id: string; p_extra_hours?: number }; Returns: Json };
+      admin_pause_bets: { Args: { p_market_id: string; p_paused?: boolean }; Returns: Json };
+      admin_trigger_lifecycle: { Args: Record<string, never>; Returns: Json };
+      admin_apply_simulator_scenario: { Args: { p_rush?: boolean; p_rain?: boolean }; Returns: Json };
+      get_admin_volume_by_region: { Args: Record<string, never>; Returns: Json };
+      get_admin_open_exposure: { Args: Record<string, never>; Returns: Json };
+      get_admin_actions_log: { Args: { p_limit?: number }; Returns: Json };
+      admin_update_kyc_status: {
+        Args: { p_user_id: string; p_status: string; p_notes?: string | null };
+        Returns: Json;
+      };
+      admin_set_camera_status: { Args: { p_camera_id: string; p_status: string }; Returns: Json };
     };
     Enums: {
       market_status: MarketStatus;

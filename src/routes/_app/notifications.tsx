@@ -1,13 +1,13 @@
 import { copy } from "@/copy/pt-BR";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useNotifications } from "@/hooks/use-notifications";
-import { useViaX } from "@/store/viax-store";
+import { useResolvedNotifications } from "@/hooks/use-resolved-data";
 import { getNotificationLink } from "@/lib/notification-routes";
 import { markNotificationsReadFn } from "@/actions/notifications";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Bell, CheckCheck } from "lucide-react";
+import { EmptyState } from "@/components/viax/empty-state";
 import { useState } from "react";
 
 export const Route = createFileRoute("/_app/notifications")({
@@ -23,9 +23,7 @@ export const Route = createFileRoute("/_app/notifications")({
 function NotificationsPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { data: dbNotifications } = useNotifications();
-  const zustandNotifications = useViaX((s) => s.notifications);
-  const notifications = dbNotifications ?? zustandNotifications;
+  const { notifications } = useResolvedNotifications();
   const [markingAll, setMarkingAll] = useState(false);
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ["notifications"] });
@@ -91,8 +89,18 @@ function NotificationsPage() {
 
       <ul className="space-y-2">
         {notifications.length === 0 && (
-          <li className="rounded-xl border bg-card/60 p-6 text-center text-sm text-muted-foreground">
-            Nenhuma notificação ainda.
+          <li>
+            <EmptyState
+              icon={Bell}
+              title={copy.empty.notifications.title}
+              description={copy.empty.notifications.description}
+              action={{
+                label: copy.empty.notifications.cta,
+                to: "/markets",
+                search: { status: "live" },
+              }}
+              compact
+            />
           </li>
         )}
         {notifications.map((n) => (

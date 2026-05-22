@@ -112,6 +112,15 @@ export const copy = {
     sideNo: "NÃO",
     draftTitle: "Mercado em rascunho",
     draftDesc: "Aguardando abertura oficial pelo admin.",
+    confirmTitle: "Confirmar aposta",
+    confirmSide: "Seu palpite",
+    confirmStake: "Valor da aposta",
+    confirmCancel: "Voltar",
+    confirmSubmit: (side: Side, amount: string) =>
+      `Confirmar ${side === "YES" ? "SIM" : "NÃO"} · ${amount}`,
+    confirmFeeNote: (housePct: number, prizePct: number) =>
+      `A plataforma retém ${housePct.toFixed(0)}% do prêmio; ${prizePct.toFixed(0)}% é dividido entre quem acertar.`,
+    confirmReturn: "Retorno estimado se ganhar",
   },
 
   ia: {
@@ -230,6 +239,11 @@ export const copy = {
     adminClaimError: "Não foi possível ativar. Verifique o código.",
     adminClaimNeedCode: "Informe o código de convite.",
     adminClaimNoAllowlist: "E-mail ainda não está na lista de operadores.",
+    themeTitle: "Aparência",
+    themeDark: "Tema escuro",
+    themeLight: "Tema claro",
+    themeDarkDesc: "Interface otimizada para ambientes com pouca luz.",
+    themeLightDesc: "Alto contraste para uso diurno e telas externas.",
   },
 
   markets: {
@@ -313,6 +327,143 @@ export const copy = {
 
   empty: {
     noFavorites: "Nenhum favorito ainda.",
+    markets: {
+      title: "Nenhum mercado encontrado",
+      description: "Ajuste os filtros ou explore todos os mercados abertos.",
+      cta: "Ver todos os mercados",
+    },
+    favorites: {
+      title: "Nenhum favorito ainda",
+      description: "Toque na ★ em qualquer card de mercado para salvar aqui.",
+      cta: "Explorar mercados",
+    },
+    notifications: {
+      title: "Nenhuma notificação",
+      description: "Quando um mercado fechar ou você ganhar, o alerta aparece aqui.",
+      cta: "Ver mercados",
+    },
+    feed: {
+      title: "Feed vazio",
+      description: "Seja o primeiro a publicar ou acompanhe os mercados em alta.",
+      cta: "Ver mercados",
+    },
+    ranking: {
+      title: "Ranking ainda sem dados",
+      description: "Participe de mercados para aparecer no placar da comunidade.",
+      cta: "Fazer uma aposta",
+    },
+    live: {
+      regions: {
+        title: "Sem regiões no mapa",
+        description: "Aguarde a sincronização ou abra o painel de operações.",
+        cta: "Ver mercados",
+      },
+      markets: {
+        title: "Nenhum mercado ativo",
+        description: "Novos mercados urbanos aparecem aqui quando abrirem.",
+        cta: "Lista de mercados",
+      },
+    },
+    positions: {
+      title: "Nenhuma aposta aberta",
+      description: "Escolha SIM ou NÃO em um mercado ao vivo para começar.",
+      cta: "Explorar mercados",
+    },
+    wallet: {
+      title: "Sem movimentações",
+      description: "Depósitos simulados e ganhos de mercados resolvidos aparecem aqui.",
+      cta: "Ver mercados",
+    },
+    dashboardFeed: {
+      title: "Nenhum post no feed",
+      description: "A comunidade ainda não publicou — confira os mercados ao vivo.",
+      cta: "Abrir feed",
+    },
+    profileFavorites: {
+      title: "Sem favoritos",
+      description: "Marque mercados com ★ para acompanhar de perto.",
+      cta: "Ir aos mercados",
+    },
+    traders: {
+      title: "Sem histórico público",
+      description: "Este trader ainda não tem resultados resolvidos visíveis.",
+      cta: "Ver ranking",
+    },
+  },
+
+  admin: {
+    title: "Control Center",
+    subtitle: "Trading & Urban Intelligence",
+    backToApp: "Voltar ao app",
+    accessDenied: "Acesso restrito a operadores.",
+    nav: {
+      overview: "Overview",
+      markets: "Mercados",
+      settlement: "Liquidação",
+      intelligence: "IA & Dados",
+      sources: "Fontes",
+      finance: "Financeiro",
+      users: "Usuários",
+      risk: "Risco",
+      system: "Sistema",
+      simulator: "Simulador",
+    },
+    metrics: {
+      volumeToday: "Volume hoje",
+      revenueToday: "Receita (10%)",
+      activeMarkets: "Mercados ativos",
+      dau: "Usuários ativos (24h)",
+      openPools: "Pools abertos",
+      disputes: "Em disputa",
+      cronStatus: "Motor cron",
+      liveFeed: "Feed ao vivo",
+    },
+    markets: {
+      title: "Prediction Engine",
+      create: "Criar mercado",
+      forceClose: "Forçar fechamento",
+      tableStatus: "Status",
+      tableVolume: "Volume",
+    },
+    settlement: {
+      title: "Settlement Engine",
+      poolTotal: "Pool total",
+      houseFee: "Taxa plataforma",
+      prize: "Prêmio líquido",
+      reprocess: "Reprocessar oráculo",
+      execute: "Liquidar",
+    },
+    simulator: {
+      title: "Simulador urbano",
+      rush: "Horário de pico",
+      rain: "Chuva forte",
+      preview: "Preview regiões",
+      applyNote: "Cenários afetam apenas simulação local até integração completa.",
+    },
+    sources: {
+      title: "Fontes de dados",
+      synthetic: "Regiões (simulador)",
+      cameras: "Câmeras",
+      addCamera: "Adicionar câmera",
+    },
+    intelligence: {
+      yoloDemo: "Rodar inferência demo (YOLO)",
+      yoloDemoDone: "Demo: 42 veículos · 18 pedestres (simulado)",
+      yoloNote: "Modelo real exige worker GPU; este botão só valida o fluxo ops.",
+    },
+    users: {
+      freeze: "Congelar",
+      unfreeze: "Descongelar",
+      betLimit: "Limite aposta",
+    },
+    risk: {
+      title: "Risco & fraude",
+      empty: "Nenhum alerta no momento.",
+    },
+    system: {
+      title: "DNA do produto",
+      save: "Salvar",
+    },
   },
 } as const;
 

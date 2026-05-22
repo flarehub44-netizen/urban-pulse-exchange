@@ -11,7 +11,18 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AppRouteImport } from './routes/_app'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AdminSystemRouteImport } from './routes/admin/system'
+import { Route as AdminSourcesRouteImport } from './routes/admin/sources'
+import { Route as AdminSimulatorRouteImport } from './routes/admin/simulator'
+import { Route as AdminSettlementRouteImport } from './routes/admin/settlement'
+import { Route as AdminRiskRouteImport } from './routes/admin/risk'
+import { Route as AdminMarketsRouteImport } from './routes/admin/markets'
+import { Route as AdminIntelligenceRouteImport } from './routes/admin/intelligence'
+import { Route as AdminFinanceRouteImport } from './routes/admin/finance'
 import { Route as AppWalletRouteImport } from './routes/_app/wallet'
 import { Route as AppUrbanmindRouteImport } from './routes/_app/urbanmind'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
@@ -36,10 +47,65 @@ const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminSystemRoute = AdminSystemRouteImport.update({
+  id: '/system',
+  path: '/system',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminSourcesRoute = AdminSourcesRouteImport.update({
+  id: '/sources',
+  path: '/sources',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminSimulatorRoute = AdminSimulatorRouteImport.update({
+  id: '/simulator',
+  path: '/simulator',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminSettlementRoute = AdminSettlementRouteImport.update({
+  id: '/settlement',
+  path: '/settlement',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminRiskRoute = AdminRiskRouteImport.update({
+  id: '/risk',
+  path: '/risk',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminMarketsRoute = AdminMarketsRouteImport.update({
+  id: '/markets',
+  path: '/markets',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminIntelligenceRoute = AdminIntelligenceRouteImport.update({
+  id: '/intelligence',
+  path: '/intelligence',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminFinanceRoute = AdminFinanceRouteImport.update({
+  id: '/finance',
+  path: '/finance',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const AppWalletRoute = AppWalletRouteImport.update({
   id: '/wallet',
@@ -114,6 +180,7 @@ const AppFeedPostIdRoute = AppFeedPostIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRouteWithChildren
@@ -126,6 +193,16 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AppSettingsRoute
   '/urbanmind': typeof AppUrbanmindRoute
   '/wallet': typeof AppWalletRoute
+  '/admin/finance': typeof AdminFinanceRoute
+  '/admin/intelligence': typeof AdminIntelligenceRoute
+  '/admin/markets': typeof AdminMarketsRoute
+  '/admin/risk': typeof AdminRiskRoute
+  '/admin/settlement': typeof AdminSettlementRoute
+  '/admin/simulator': typeof AdminSimulatorRoute
+  '/admin/sources': typeof AdminSourcesRoute
+  '/admin/system': typeof AdminSystemRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin/': typeof AdminIndexRoute
   '/feed/$postId': typeof AppFeedPostIdRoute
   '/markets/$marketId': typeof AppMarketsMarketIdRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
@@ -144,6 +221,16 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRoute
   '/urbanmind': typeof AppUrbanmindRoute
   '/wallet': typeof AppWalletRoute
+  '/admin/finance': typeof AdminFinanceRoute
+  '/admin/intelligence': typeof AdminIntelligenceRoute
+  '/admin/markets': typeof AdminMarketsRoute
+  '/admin/risk': typeof AdminRiskRoute
+  '/admin/settlement': typeof AdminSettlementRoute
+  '/admin/simulator': typeof AdminSimulatorRoute
+  '/admin/sources': typeof AdminSourcesRoute
+  '/admin/system': typeof AdminSystemRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin': typeof AdminIndexRoute
   '/feed/$postId': typeof AppFeedPostIdRoute
   '/markets/$marketId': typeof AppMarketsMarketIdRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
@@ -151,6 +238,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/_app': typeof AppRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_app/dashboard': typeof AppDashboardRoute
@@ -164,6 +252,16 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRoute
   '/_app/urbanmind': typeof AppUrbanmindRoute
   '/_app/wallet': typeof AppWalletRoute
+  '/admin/finance': typeof AdminFinanceRoute
+  '/admin/intelligence': typeof AdminIntelligenceRoute
+  '/admin/markets': typeof AdminMarketsRoute
+  '/admin/risk': typeof AdminRiskRoute
+  '/admin/settlement': typeof AdminSettlementRoute
+  '/admin/simulator': typeof AdminSimulatorRoute
+  '/admin/sources': typeof AdminSourcesRoute
+  '/admin/system': typeof AdminSystemRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin/': typeof AdminIndexRoute
   '/_app/feed/$postId': typeof AppFeedPostIdRoute
   '/_app/markets/$marketId': typeof AppMarketsMarketIdRoute
   '/_app/profile/$userId': typeof AppProfileUserIdRoute
@@ -172,6 +270,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/sitemap.xml'
     | '/dashboard'
     | '/feed'
@@ -184,6 +283,16 @@ export interface FileRouteTypes {
     | '/settings'
     | '/urbanmind'
     | '/wallet'
+    | '/admin/finance'
+    | '/admin/intelligence'
+    | '/admin/markets'
+    | '/admin/risk'
+    | '/admin/settlement'
+    | '/admin/simulator'
+    | '/admin/sources'
+    | '/admin/system'
+    | '/admin/users'
+    | '/admin/'
     | '/feed/$postId'
     | '/markets/$marketId'
     | '/profile/$userId'
@@ -202,12 +311,23 @@ export interface FileRouteTypes {
     | '/settings'
     | '/urbanmind'
     | '/wallet'
+    | '/admin/finance'
+    | '/admin/intelligence'
+    | '/admin/markets'
+    | '/admin/risk'
+    | '/admin/settlement'
+    | '/admin/simulator'
+    | '/admin/sources'
+    | '/admin/system'
+    | '/admin/users'
+    | '/admin'
     | '/feed/$postId'
     | '/markets/$marketId'
     | '/profile/$userId'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/_app'
     | '/sitemap.xml'
     | '/_app/dashboard'
@@ -221,6 +341,16 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/_app/urbanmind'
     | '/_app/wallet'
+    | '/admin/finance'
+    | '/admin/intelligence'
+    | '/admin/markets'
+    | '/admin/risk'
+    | '/admin/settlement'
+    | '/admin/simulator'
+    | '/admin/sources'
+    | '/admin/system'
+    | '/admin/users'
+    | '/admin/'
     | '/_app/feed/$postId'
     | '/_app/markets/$marketId'
     | '/_app/profile/$userId'
@@ -228,6 +358,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
@@ -248,12 +379,89 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/system': {
+      id: '/admin/system'
+      path: '/system'
+      fullPath: '/admin/system'
+      preLoaderRoute: typeof AdminSystemRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/sources': {
+      id: '/admin/sources'
+      path: '/sources'
+      fullPath: '/admin/sources'
+      preLoaderRoute: typeof AdminSourcesRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/simulator': {
+      id: '/admin/simulator'
+      path: '/simulator'
+      fullPath: '/admin/simulator'
+      preLoaderRoute: typeof AdminSimulatorRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/settlement': {
+      id: '/admin/settlement'
+      path: '/settlement'
+      fullPath: '/admin/settlement'
+      preLoaderRoute: typeof AdminSettlementRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/risk': {
+      id: '/admin/risk'
+      path: '/risk'
+      fullPath: '/admin/risk'
+      preLoaderRoute: typeof AdminRiskRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/markets': {
+      id: '/admin/markets'
+      path: '/markets'
+      fullPath: '/admin/markets'
+      preLoaderRoute: typeof AdminMarketsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/intelligence': {
+      id: '/admin/intelligence'
+      path: '/intelligence'
+      fullPath: '/admin/intelligence'
+      preLoaderRoute: typeof AdminIntelligenceRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/finance': {
+      id: '/admin/finance'
+      path: '/finance'
+      fullPath: '/admin/finance'
+      preLoaderRoute: typeof AdminFinanceRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/_app/wallet': {
       id: '/_app/wallet'
@@ -356,6 +564,36 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteRouteChildren {
+  AdminFinanceRoute: typeof AdminFinanceRoute
+  AdminIntelligenceRoute: typeof AdminIntelligenceRoute
+  AdminMarketsRoute: typeof AdminMarketsRoute
+  AdminRiskRoute: typeof AdminRiskRoute
+  AdminSettlementRoute: typeof AdminSettlementRoute
+  AdminSimulatorRoute: typeof AdminSimulatorRoute
+  AdminSourcesRoute: typeof AdminSourcesRoute
+  AdminSystemRoute: typeof AdminSystemRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminFinanceRoute: AdminFinanceRoute,
+  AdminIntelligenceRoute: AdminIntelligenceRoute,
+  AdminMarketsRoute: AdminMarketsRoute,
+  AdminRiskRoute: AdminRiskRoute,
+  AdminSettlementRoute: AdminSettlementRoute,
+  AdminSimulatorRoute: AdminSimulatorRoute,
+  AdminSourcesRoute: AdminSourcesRoute,
+  AdminSystemRoute: AdminSystemRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
 interface AppFeedRouteChildren {
   AppFeedPostIdRoute: typeof AppFeedPostIdRoute
 }
@@ -423,6 +661,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   AppRoute: AppRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
 }

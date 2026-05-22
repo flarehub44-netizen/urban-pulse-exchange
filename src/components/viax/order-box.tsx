@@ -20,6 +20,7 @@ import {
 } from "@/lib/parimutuel";
 import { canPlaceBets, isSettledDisplay } from "@/lib/market-status";
 import { EdgeBadge } from "@/components/viax/edge-badge";
+import { BetConfirmDialog } from "@/components/viax/bet-confirm-dialog";
 import { AnimatedNumber } from "./animated-number";
 import { cn } from "@/lib/utils";
 import { ArrowDown, ArrowUp } from "lucide-react";
@@ -44,6 +45,7 @@ export function OrderBox({
   const { mutateAsync: placeBet, isPending } = usePlaceBet();
   const [side, setSide] = useState<Side>(initialSide);
   const [stake, setStake] = useState(100);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   useEffect(() => {
     setSide(initialSide);
@@ -65,6 +67,25 @@ export function OrderBox({
   const insufficient = stake > balance;
   const maxAffordable = Math.max(10, Math.floor(balance));
   const imbalanceWarn = poolImbalanceWarning(m.pool.YES, m.pool.NO);
+
+  const openConfirm = () => {
+    if (!canBet) return;
+    if (stake <= 0) {
+      toast.error("Informe um valor válido");
+      return;
+    }
+    if (stake > balance) {
+      toast.error("Saldo insuficiente", {
+        description: `Disponível: ${formatBRL(balance)}`,
+        action: {
+          label: "Carteira",
+          onClick: () => navigate({ to: "/profile", search: { tab: "carteira" } }),
+        },
+      });
+      return;
+    }
+    setConfirmOpen(true);
+  };
 
   const submit = async () => {
     if (!canBet) return;
@@ -109,6 +130,7 @@ export function OrderBox({
           action: { label: "Perfil", onClick: () => navigate({ to: "/profile" }) },
         });
       }
+      setConfirmOpen(false);
       onSuccess?.();
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Erro ao colocar aposta");
@@ -350,10 +372,22 @@ export function OrderBox({
         />
       </div>
 
+      <BetConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        side={side}
+        stake={stake}
+        estimatedPayout={est.payout}
+        prizePool={prizePool(m.pool)}
+        question={m.question}
+        onConfirm={submit}
+        isPending={isPending}
+      />
+
       <motion.button
         whileTap={{ scale: 0.98 }}
         type="button"
-        onClick={submit}
+        onClick={openConfirm}
         disabled={isPending || insufficient || stake <= 0}
         className={cn(
           "mt-4 w-full rounded-xl px-4 py-3 font-medium transition disabled:opacity-60",

@@ -1,19 +1,18 @@
 import { Link } from "@tanstack/react-router";
-import { Bell, Moon, Shield, Info, Scale } from "lucide-react";
+import { Bell, Moon, Sun, Shield, Info, Scale } from "lucide-react";
+import { useTheme } from "@/hooks/use-theme";
 import { cn } from "@/lib/utils";
 import { copy } from "@/copy/pt-BR";
 import { useNotificationPrefs } from "@/hooks/use-notification-prefs";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
 import { useProfile } from "@/hooks/use-profile";
-import { AdminDisputePanel } from "@/components/viax/admin-dispute-panel";
-import { AdminCreateMarketForm } from "@/components/viax/admin-create-market-form";
-import { AdminOpsPanel } from "@/components/viax/admin-ops-panel";
 import { AdminClaimPanel } from "@/components/viax/admin-claim-panel";
 
 export function SettingsPanel() {
   const { prefs, update } = useNotificationPrefs();
   const { userId } = useAnonAuth();
   const { data: profile } = useProfile(userId);
+  const { theme, setTheme, isDark } = useTheme();
 
   return (
     <div className="space-y-6">
@@ -23,11 +22,16 @@ export function SettingsPanel() {
         </Section>
       )}
       {profile?.isAdmin && (
-        <Section icon={<Scale className="size-4" />} title={copy.settings.adminTitle}>
-          <p className="text-xs text-muted-foreground">{copy.settings.adminDesc}</p>
-          <AdminOpsPanel />
-          <AdminCreateMarketForm />
-          <AdminDisputePanel />
+        <Section icon={<Scale className="size-4" />} title={copy.admin.title}>
+          <p className="text-xs text-muted-foreground">
+            Operações, liquidação e métricas no Control Center.
+          </p>
+          <Link
+            to="/admin"
+            className="inline-flex rounded-lg border border-primary/40 bg-primary/15 px-4 py-2 text-sm text-primary hover:bg-primary/20"
+          >
+            Abrir {copy.admin.title}
+          </Link>
         </Section>
       )}
       <Section icon={<Bell className="size-4" />} title="Notificações">
@@ -73,19 +77,44 @@ export function SettingsPanel() {
         </div>
       </Section>
 
-      <Section icon={<Moon className="size-4" />} title="Aparência">
-        <div className="rounded-xl border bg-card/40 p-4">
-          <div className="flex items-center justify-between">
+      <Section icon={isDark ? <Moon className="size-4" /> : <Sun className="size-4" />} title={copy.settings.themeTitle}>
+        <div className="rounded-xl border bg-card/40 p-4 space-y-3">
+          <button
+            type="button"
+            onClick={() => setTheme("dark")}
+            className={cn(
+              "flex w-full items-center justify-between rounded-lg border px-3 py-2.5 text-left transition",
+              theme === "dark"
+                ? "border-primary/50 bg-primary/10"
+                : "border-transparent hover:bg-surface/60",
+            )}
+          >
             <div>
-              <div className="text-sm font-medium">Tema escuro</div>
-              <div className="mt-0.5 text-xs text-muted-foreground">
-                Interface otimizada para ambientes com pouca luz.
-              </div>
+              <div className="text-sm font-medium">{copy.settings.themeDark}</div>
+              <div className="mt-0.5 text-xs text-muted-foreground">{copy.settings.themeDarkDesc}</div>
             </div>
-            <div className="rounded-full border border-primary/40 bg-primary/15 px-2.5 py-1 text-[10px] text-primary uppercase tracking-wider">
-              Ativo
+            {theme === "dark" && (
+              <span className="text-[10px] uppercase tracking-wider text-primary">Ativo</span>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => setTheme("light")}
+            className={cn(
+              "flex w-full items-center justify-between rounded-lg border px-3 py-2.5 text-left transition",
+              theme === "light"
+                ? "border-primary/50 bg-primary/10"
+                : "border-transparent hover:bg-surface/60",
+            )}
+          >
+            <div>
+              <div className="text-sm font-medium">{copy.settings.themeLight}</div>
+              <div className="mt-0.5 text-xs text-muted-foreground">{copy.settings.themeLightDesc}</div>
             </div>
-          </div>
+            {theme === "light" && (
+              <span className="text-[10px] uppercase tracking-wider text-primary">Ativo</span>
+            )}
+          </button>
         </div>
       </Section>
 

@@ -11,6 +11,7 @@ import { useWatchlist } from "@/hooks/use-watchlist";
 import { MarketCard } from "@/components/viax/market-card";
 import { MobileMarketsCarousel } from "@/components/viax/mobile-markets-carousel";
 import { Search, Star, X, TrendingUp, Clock, Bot, MapPin } from "lucide-react";
+import { EmptyState } from "@/components/viax/empty-state";
 import { cn } from "@/lib/utils";
 import { loadMarketsFilters, saveMarketsFilters } from "@/lib/markets-filter-persist";
 import { isOpenBetStatus, isSettledDisplay } from "@/lib/market-status";
@@ -393,39 +394,45 @@ function Markets() {
       </div>
 
       {showFavorites && watchlist.length === 0 && (
-        <div className="rounded-2xl border bg-card/60 p-8 text-center backdrop-blur">
-          <Star className="mx-auto mb-3 size-8 text-muted-foreground/30" />
-          <p className="text-sm text-muted-foreground">Nenhum favorito ainda.</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Clique na ★ em qualquer card para salvar um mercado.
-          </p>
-        </div>
+        <EmptyState
+          icon={Star}
+          title={copy.empty.favorites.title}
+          description={copy.empty.favorites.description}
+          action={{ label: copy.empty.favorites.cta, to: "/markets", search: { status: "live" } }}
+        />
       )}
 
       {!showFavorites && list.length === 0 && (
-        <div className="rounded-2xl border bg-card/60 p-10 text-center backdrop-blur">
-          <Search className="mx-auto mb-3 size-8 text-muted-foreground/30" />
-          <p className="text-sm font-medium">Nenhum mercado encontrado</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Tente ajustar os filtros ou limpar a busca.
+        <div className="space-y-3">
+          <EmptyState
+            icon={Search}
+            title={copy.empty.markets.title}
+            description={copy.empty.markets.description}
+            action={{
+              label: copy.empty.markets.cta,
+              to: "/markets",
+              search: { status: "live" },
+            }}
+          />
+          <p className="text-center">
+            <button
+              type="button"
+              onClick={() =>
+                patchSearch({
+                  status: undefined,
+                  category: undefined,
+                  hasPosition: undefined,
+                  sort: undefined,
+                  q: undefined,
+                  region: undefined,
+                  aiPicks: undefined,
+                })
+              }
+              className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+            >
+              Limpar filtros
+            </button>
           </p>
-          <button
-            type="button"
-            onClick={() =>
-              patchSearch({
-                status: undefined,
-                category: undefined,
-                hasPosition: undefined,
-                sort: undefined,
-                q: undefined,
-                region: undefined,
-                aiPicks: undefined,
-              })
-            }
-            className="mt-4 rounded-lg border bg-card px-4 py-2 text-xs text-muted-foreground transition hover:bg-surface-2 hover:text-foreground"
-          >
-            Limpar filtros
-          </button>
         </div>
       )}
 

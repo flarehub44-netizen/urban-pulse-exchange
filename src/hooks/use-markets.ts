@@ -4,6 +4,7 @@ import { useViaX } from "@/store/viax-store";
 import type { Market } from "@/store/viax-store";
 import { normalizeMarketStatus } from "@/lib/market-status";
 import { filterCatalogMarkets } from "@/lib/markets-catalog";
+import { pickDbOrEmptyArray } from "@/lib/data-source";
 
 function mapMarket(row: Record<string, unknown>): Market {
   return {
@@ -54,11 +55,24 @@ export function useMarket(id: string) {
   return markets?.find((m) => m.id === id);
 }
 
-/** DB markets when loaded, else filtered Zustand fallback (landing + app). */
+/** DB markets; seed só em dev. */
 export function useCatalogMarkets(): Market[] {
   const { data: dbMarkets } = useMarkets();
   const zustandMarkets = useViaX((s) => s.markets);
-  return dbMarkets ?? filterCatalogMarkets(zustandMarkets);
+  return pickDbOrEmptyArray(
+    dbMarkets,
+    filterCatalogMarkets(zustandMarkets),
+  );
+}
+
+export function useMarketsList() {
+  const query = useMarkets();
+  const zustandMarkets = useViaX((s) => s.markets);
+  const markets = pickDbOrEmptyArray(
+    query.data,
+    filterCatalogMarkets(zustandMarkets),
+  );
+  return { ...query, markets };
 }
 
 export { mapMarket };

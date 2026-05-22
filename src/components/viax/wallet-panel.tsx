@@ -2,18 +2,20 @@ import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useWalletDeposit, useWalletWithdraw } from "@/hooks/use-wallet-rpc";
-import { useTransactions } from "@/hooks/use-transactions";
 import { useBalanceSeries } from "@/hooks/use-balance-series";
-import { useProfile } from "@/hooks/use-profile";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
-import { useViaX } from "@/store/viax-store";
 import { useBets } from "@/hooks/use-bets";
-import { useMarkets } from "@/hooks/use-markets";
+import {
+  useResolvedProfile,
+  useResolvedTransactions,
+  useResolvedMarkets,
+} from "@/hooks/use-resolved-data";
 import type { Market } from "@/store/viax-store";
 import { AnimatedNumber } from "@/components/viax/animated-number";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
 import { ArrowDownLeft, ArrowUpRight, Plus, Minus, Trophy } from "lucide-react";
+import { EmptyState } from "@/components/viax/empty-state";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { cn } from "@/lib/utils";
 import { isOpenBetStatus } from "@/lib/market-status";
@@ -24,17 +26,11 @@ const tabs = ["Visão geral", "Histórico", "Depositar", "Sacar"] as const;
 type WalletTab = (typeof tabs)[number];
 
 export function WalletPanel({ embedded }: { embedded?: boolean }) {
-  const { userId } = useAnonAuth();
-  const { data: profile } = useProfile(userId);
-  const zustandMe = useViaX((s) => s.me);
-  const me = profile ?? zustandMe;
-  const { data: dbTx } = useTransactions();
-  const zustandTx = useViaX((s) => s.transactions);
-  const tx = dbTx ?? zustandTx;
+  useAnonAuth();
+  const { me } = useResolvedProfile();
+  const { transactions: tx } = useResolvedTransactions();
   const { data: bets } = useBets();
-  const { data: dbMarkets } = useMarkets();
-  const zustandMarkets = useViaX((s) => s.markets);
-  const allMarkets = dbMarkets ?? zustandMarkets;
+  const { markets: allMarkets } = useResolvedMarkets();
   const [tab, setTab] = useState<WalletTab>("Visão geral");
   const [betFilter, setBetFilter] = useState<"todos" | "wins" | "losses">("todos");
   const [walletAmount, setWalletAmount] = useState("200");
@@ -305,10 +301,12 @@ function EnrichedHistory({
       </div>
 
       {shown.length === 0 && (
-        <div className="rounded-2xl border bg-card/60 p-8 text-center text-sm text-muted-foreground backdrop-blur">
-          <Trophy className="mx-auto mb-3 size-7 opacity-30" />
-          Nenhum resultado aqui ainda.
-        </div>
+        <EmptyState
+          icon={Trophy}
+          title={copy.empty.wallet.title}
+          description={copy.empty.wallet.description}
+          action={{ label: copy.empty.wallet.cta, to: "/markets", search: { status: "live" } }}
+        />
       )}
 
       <div className="space-y-2">

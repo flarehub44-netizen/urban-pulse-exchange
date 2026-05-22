@@ -1,14 +1,13 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Bell, Flame, TrendingUp, Wallet as WalletIcon, Briefcase, Search } from "lucide-react";
-import { useViaX } from "@/store/viax-store";
+import { Bell, Flame, TrendingUp, Wallet as WalletIcon, Briefcase, Search, Shield } from "lucide-react";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
-import { useProfile } from "@/hooks/use-profile";
-import { useNotifications } from "@/hooks/use-notifications";
+import { useResolvedProfile, useResolvedNotifications } from "@/hooks/use-resolved-data";
 import { useBets } from "@/hooks/use-bets";
 import { isOpenBetStatus } from "@/lib/market-status";
 import { markNotificationsReadFn } from "@/actions/notifications";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatBRL } from "@/lib/parimutuel";
+import { copy } from "@/copy/pt-BR";
 import { getNotificationLink } from "@/lib/notification-routes";
 import { AnimatedNumber } from "./animated-number";
 import { DivisionBadge } from "./division-badge";
@@ -21,13 +20,8 @@ import { ptBR } from "date-fns/locale";
 export function Topbar() {
   const navigate = useNavigate();
   const { userId } = useAnonAuth();
-  const { data: profile } = useProfile(userId);
-  const zustandMe = useViaX((s) => s.me);
-  const me = profile ?? zustandMe;
-
-  const { data: dbNotifications } = useNotifications();
-  const zustandNotifications = useViaX((s) => s.notifications);
-  const notifications = dbNotifications ?? zustandNotifications;
+  const { me } = useResolvedProfile();
+  const { notifications } = useResolvedNotifications();
 
   const { data: bets } = useBets();
   const openPositions = (bets ?? []).filter((b) => isOpenBetStatus(b.marketStatus)).length;
@@ -68,6 +62,16 @@ export function Topbar() {
       </div>
 
       <div className="ml-auto flex items-center gap-2 md:gap-4">
+        {profile?.isAdmin && (
+          <Link
+            to="/admin"
+            className="hidden sm:flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[10px] text-primary hover:bg-primary/20"
+            title={copy.admin.title}
+          >
+            <Shield className="size-3.5" />
+            Ops
+          </Link>
+        )}
         <button
           type="button"
           onClick={() => openCommandPalette()}

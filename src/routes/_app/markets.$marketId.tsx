@@ -1,9 +1,8 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useMemo, useEffect } from "react";
-import { useMarkets } from "@/hooks/use-markets";
-import { useFeed } from "@/hooks/use-feed";
 import { useMarketHistory } from "@/hooks/use-market-history";
-import { useViaX } from "@/store/viax-store";
+import { useMarketsList } from "@/hooks/use-markets";
+import { useResolvedFeedForMarket } from "@/hooks/use-resolved-data";
 import { ProbChart } from "@/components/viax/prob-chart";
 import { MarketVolumeChart } from "@/components/viax/market-volume-chart";
 import { MarketCandles } from "@/components/viax/market-candles";
@@ -62,13 +61,9 @@ function MarketDetail() {
   const activeTab = search.tab ?? "chart";
   const initialSide = search.side ?? undefined;
 
-  const { data: dbMarkets } = useMarkets();
-  const zustandMarkets = useViaX((s) => s.markets);
-  const markets = dbMarkets ?? zustandMarkets;
+  const { markets } = useMarketsList();
   const m = markets.find((x) => x.id === marketId);
-  const { data: dbFeed } = useFeed(marketId);
-  const zustandFeed = useViaX((s) => s.feed.filter((p) => p.marketId === marketId));
-  const feed = dbFeed ?? zustandFeed;
+  const { feed } = useResolvedFeedForMarket(marketId);
   const { data: dbHistory } = useMarketHistory(marketId);
   const history = useMemo(() => {
     if (dbHistory?.length) return dbHistory;

@@ -5,7 +5,8 @@ import { AnimatedNumber } from "@/components/viax/animated-number";
 import { Countdown } from "@/components/viax/countdown";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL, PRIZE_RATIO } from "@/lib/parimutuel";
-import { Activity, ArrowUpRight, TrendingUp } from "lucide-react";
+import { Activity, TrendingUp } from "lucide-react";
+import { EmptyState } from "@/components/viax/empty-state";
 import { cn } from "@/lib/utils";
 import { isOpenBetStatus, statusLabel, type MarketStatus } from "@/lib/market-status";
 
@@ -74,17 +75,16 @@ export function PositionsPanel({ embedded }: { embedded?: boolean }) {
         )}
 
         {!isLoading && open.length === 0 && (
-          <div className="rounded-2xl border bg-card/60 p-8 text-center backdrop-blur">
-            <Activity className="mx-auto mb-3 size-8 text-muted-foreground/40" />
-            <p className="text-sm text-muted-foreground">{copy.positions.emptyOpen}</p>
-            <Link
-              to="/markets"
-              search={{ status: "live" }}
-              className="mt-3 inline-flex items-center gap-1 text-xs text-primary hover:underline"
-            >
-              {copy.positions.explore} <ArrowUpRight className="size-3" />
-            </Link>
-          </div>
+          <EmptyState
+            icon={Activity}
+            title={copy.empty.positions.title}
+            description={copy.empty.positions.description}
+            action={{
+              label: copy.empty.positions.cta,
+              to: "/markets",
+              search: { status: "live" },
+            }}
+          />
         )}
 
         <div className="space-y-2">

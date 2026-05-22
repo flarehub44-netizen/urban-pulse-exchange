@@ -1,12 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMarkets } from "@/hooks/use-markets";
-import { useRegions } from "@/hooks/use-regions";
-import { useViaX, LIVE_EVENTS } from "@/store/viax-store";
+import { useResolvedMarkets, useResolvedRegions } from "@/hooks/use-resolved-data";
+import { LIVE_EVENTS } from "@/store/viax-store";
 import { CityHeatmap } from "@/components/viax/city-heatmap";
 import { AnimatedNumber } from "@/components/viax/animated-number";
 import { findTopMarketForRegion } from "@/lib/region-market";
 import { toast } from "sonner";
-import { Radio, AlertTriangle, ExternalLink } from "lucide-react";
+import { Radio, AlertTriangle, ExternalLink, MapPin } from "lucide-react";
+import { EmptyState } from "@/components/viax/empty-state";
+import { copy } from "@/copy/pt-BR";
 
 export const Route = createFileRoute("/_app/live")({
   head: () => ({
@@ -22,12 +23,8 @@ export const Route = createFileRoute("/_app/live")({
 });
 
 function Live() {
-  const { data: dbMarkets } = useMarkets();
-  const zustandMarkets = useViaX((s) => s.markets);
-  const markets = dbMarkets ?? zustandMarkets;
-  const { data: dbRegions } = useRegions();
-  const zustandRegions = useViaX((s) => s.regions);
-  const regions = dbRegions ?? zustandRegions;
+  const { markets } = useResolvedMarkets();
+  const { regions } = useResolvedRegions();
   const navigate = useNavigate();
 
   const events = LIVE_EVENTS;
@@ -73,6 +70,19 @@ function Live() {
               Regiões
             </h2>
             <ul className="space-y-2">
+              {regions.length === 0 && (
+                <EmptyState
+                  icon={MapPin}
+                  title={copy.empty.live.regions.title}
+                  description={copy.empty.live.regions.description}
+                  action={{
+                    label: copy.empty.live.regions.cta,
+                    to: "/markets",
+                    search: { status: "live" },
+                  }}
+                  compact
+                />
+              )}
               {regions.map((r) => {
                 const tone =
                   r.congestion > 0.75 ? "text-down" : r.congestion > 0.5 ? "text-warn" : "text-up";
@@ -139,6 +149,19 @@ function Live() {
               <Radio className="size-4 text-primary" /> Mercados ativos perto de você
             </h2>
             <ul className="space-y-2">
+              {markets.length === 0 && (
+                <EmptyState
+                  icon={Radio}
+                  title={copy.empty.live.markets.title}
+                  description={copy.empty.live.markets.description}
+                  action={{
+                    label: copy.empty.live.markets.cta,
+                    to: "/markets",
+                    search: { status: "live" },
+                  }}
+                  compact
+                />
+              )}
               {markets.slice(0, 5).map((m) => (
                 <li key={m.id}>
                   <Link

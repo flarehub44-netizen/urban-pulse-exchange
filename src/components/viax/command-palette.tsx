@@ -4,9 +4,10 @@ export function openCommandPalette() {
   window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }));
 }
 import { useNavigate } from "@tanstack/react-router";
-import { useMarkets } from "@/hooks/use-markets";
-import { useTraders } from "@/hooks/use-traders";
-import { useViaX } from "@/store/viax-store";
+import { useMarketsList } from "@/hooks/use-markets";
+import { useResolvedTraders } from "@/hooks/use-resolved-data";
+import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useProfile } from "@/hooks/use-profile";
 import {
   CommandDialog,
   CommandEmpty,
@@ -28,6 +29,7 @@ import {
   Brain,
   Wallet,
   User,
+  Shield,
 } from "lucide-react";
 
 const navIcons: Record<string, typeof LayoutDashboard> = {
@@ -45,12 +47,10 @@ const navIcons: Record<string, typeof LayoutDashboard> = {
 export function CommandPalette() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const { data: dbMarkets } = useMarkets();
-  const zustandMarkets = useViaX((s) => s.markets);
-  const markets = dbMarkets ?? zustandMarkets;
-  const { data: dbTraders } = useTraders();
-  const zustandTraders = useViaX((s) => s.traders);
-  const traders = dbTraders ?? zustandTraders;
+  const { userId } = useAnonAuth();
+  const { data: profile } = useProfile(userId);
+  const { markets } = useMarketsList();
+  const { traders } = useResolvedTraders();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -89,6 +89,17 @@ export function CommandPalette() {
               </CommandItem>
             );
           })}
+          {profile?.isAdmin && (
+            <CommandItem
+              value={`${copy.admin.title} admin ops`}
+              onSelect={() => {
+                setOpen(false);
+                navigate({ to: "/admin" });
+              }}
+            >
+              <Shield className="mr-2 size-4 text-primary" /> {copy.admin.title}
+            </CommandItem>
+          )}
           <CommandItem
             value={copy.nav.settings}
             onSelect={() => {

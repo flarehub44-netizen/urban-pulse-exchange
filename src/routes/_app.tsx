@@ -10,6 +10,7 @@ import { useAnonAuth } from "@/hooks/use-anon-auth";
 import { useSupabaseRealtime } from "@/hooks/use-supabase-realtime";
 import { useResolveExpired } from "@/hooks/use-resolve-expired";
 import { useClosingMarketAlerts } from "@/hooks/use-closing-market-alerts";
+import { AppLoadingShell } from "@/components/viax/app-loading-shell";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,

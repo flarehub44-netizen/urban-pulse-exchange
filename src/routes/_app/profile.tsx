@@ -6,8 +6,7 @@ import { WalletPanel } from "@/components/viax/wallet-panel";
 import { useViaX } from "@/store/viax-store";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
 import { useProfile } from "@/hooks/use-profile";
-import { useTransactions } from "@/hooks/use-transactions";
-import { useMarkets } from "@/hooks/use-markets";
+import { useResolvedMarkets, useResolvedTransactions } from "@/hooks/use-resolved-data";
 import { useWatchlist } from "@/hooks/use-watchlist";
 import { usePnlSeries } from "@/hooks/use-pnl-series";
 import { useActivityCalendar } from "@/hooks/use-activity-calendar";
@@ -18,6 +17,7 @@ import { MarketCard } from "@/components/viax/market-card";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
 import { Lock, Mail, ShieldCheck, AlertTriangle, Star } from "lucide-react";
+import { EmptyState } from "@/components/viax/empty-state";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { cn } from "@/lib/utils";
@@ -92,14 +92,10 @@ function Profile() {
         pnl: dbProfile.pnl,
       }
     : zustandMe;
-  const { data: dbTx } = useTransactions();
-  const zustandTx = useViaX((s) => s.transactions);
-  const transactions = dbTx ?? zustandTx;
+  const { transactions } = useResolvedTransactions();
   const pnl = usePnlSeries(transactions);
   const calendar = useActivityCalendar(transactions);
-  const { data: dbMarkets } = useMarkets();
-  const zustandMarkets = useViaX((s) => s.markets);
-  const markets = dbMarkets ?? zustandMarkets;
+  const { markets } = useResolvedMarkets();
   const { ids: watchlist } = useWatchlist();
   const favMarkets = markets.filter((m) => watchlist.includes(m.id));
   const [isAnon, setIsAnon] = useState(true);
@@ -326,9 +322,13 @@ function Profile() {
             <Star className="size-3.5 fill-warn text-warn" /> Mercados favoritos
           </h2>
           {favMarkets.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Nenhum favorito. Marque ★ nos cards de mercado.
-            </p>
+            <EmptyState
+              icon={Star}
+              title={copy.empty.profileFavorites.title}
+              description={copy.empty.profileFavorites.description}
+              action={{ label: copy.empty.profileFavorites.cta, to: "/markets" }}
+              compact
+            />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {favMarkets.map((m) => (

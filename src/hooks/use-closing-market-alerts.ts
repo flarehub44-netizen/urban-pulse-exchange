@@ -2,8 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useBets } from "@/hooks/use-bets";
-import { useMarkets } from "@/hooks/use-markets";
-import { useViaX } from "@/store/viax-store";
+import { useResolvedMarkets } from "@/hooks/use-resolved-data";
 import { isOpenBetStatus, isSettledDisplay } from "@/lib/market-status";
 
 const ALERT_KEY = "viax_closing_alerted";
@@ -28,9 +27,7 @@ function markAlerted(id: string) {
 export function useClosingMarketAlerts() {
   const navigate = useNavigate();
   const { data: bets } = useBets();
-  const { data: dbMarkets } = useMarkets();
-  const zustandMarkets = useViaX((s) => s.markets);
-  const markets = dbMarkets ?? zustandMarkets;
+  const { markets } = useResolvedMarkets();
   useEffect(() => {
     const open = (bets ?? []).filter((b) => isOpenBetStatus(b.marketStatus));
     if (!open.length || !markets.length) return;

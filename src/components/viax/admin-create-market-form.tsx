@@ -22,6 +22,7 @@ export function AdminCreateMarketForm() {
   const [target, setTarget] = useState("5000");
   const [category, setCategory] = useState<Market["category"]>("Fluxo");
   const [hours, setHours] = useState("24");
+  const [dataSource, setDataSource] = useState<"regions" | "manual" | "camera">("regions");
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +41,7 @@ export function AdminCreateMarketForm() {
         category,
         endsAt,
         regionId,
+        dataSource,
       });
       toast.success(copy.settings.adminCreateSuccess);
       setQuestion("");
@@ -95,6 +97,20 @@ export function AdminCreateMarketForm() {
             ))}
           </select>
         </div>
+      </div>
+      <div>
+        <label className="block text-xs uppercase tracking-wider text-muted-foreground">
+          Fonte de resolução
+        </label>
+        <select
+          value={dataSource}
+          onChange={(e) => setDataSource(e.target.value as typeof dataSource)}
+          className="mt-1 w-full rounded-lg border bg-surface px-3 py-2 text-sm"
+        >
+          <option value="regions">Regiões (simulador / UrbanMind)</option>
+          <option value="manual">Manual (disputa admin)</option>
+          <option value="camera">Câmera (futuro)</option>
+        </select>
       </div>
       <div className="grid gap-2 sm:grid-cols-2">
         <div>

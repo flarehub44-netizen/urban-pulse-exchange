@@ -8,7 +8,8 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { copy } from "@/copy/pt-BR";
-import { Toaster } from "@/components/ui/sonner";
+import { ThemeToaster } from "@/components/viax/theme-toaster";
+import { themeInitScript } from "@/lib/theme";
 
 import appCss from "../styles.css?url";
 
@@ -98,8 +99,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" className="dark" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <HeadContent />
       </head>
       <body>
@@ -115,7 +117,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
-      <Toaster theme="dark" position="top-right" richColors closeButton />
+      <ThemeToaster />
     </QueryClientProvider>
   );
 }

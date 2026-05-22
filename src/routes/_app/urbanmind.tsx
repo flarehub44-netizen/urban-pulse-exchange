@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { useMarkets } from "@/hooks/use-markets";
+import { useResolvedMarkets } from "@/hooks/use-resolved-data";
 import { useViaX } from "@/store/viax-store";
 import type { Market, Side } from "@/store/viax-store";
 import { AnimatedNumber } from "@/components/viax/animated-number";
@@ -43,9 +43,7 @@ export const Route = createFileRoute("/_app/urbanmind")({
 function UrbanMind() {
   const navigate = useNavigate();
   const { marketId: marketIdFromUrl } = Route.useSearch();
-  const { data: dbMarkets } = useMarkets();
-  const zustandMarkets = useViaX((s) => s.markets);
-  const markets = dbMarkets ?? zustandMarkets;
+  const { markets } = useResolvedMarkets();
   const aiAcc = useViaX((s) => s.aiAccuracy);
   const top =
     (marketIdFromUrl ? markets.find((m) => m.id === marketIdFromUrl) : undefined) ??

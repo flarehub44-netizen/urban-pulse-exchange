@@ -10,6 +10,7 @@ export type CreateMarketInput = {
   category: Market["category"];
   endsAt: Date;
   regionId: string;
+  dataSource?: "regions" | "manual" | "camera";
 };
 
 export function useCreateMarket() {
@@ -24,6 +25,7 @@ export function useCreateMarket() {
         p_category: input.category,
         p_ends_at: input.endsAt.toISOString(),
         p_region_id: input.regionId,
+        p_data_source: input.dataSource ?? "regions",
       });
       if (error) throw error;
       return data as { market_id: string; status: string };

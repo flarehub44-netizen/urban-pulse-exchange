@@ -68,6 +68,81 @@
 :root {
   --radius: 0.75rem;
 
+  /* Light fintech */
+  --background: oklch(0.985 0.004 250);
+  --foreground: oklch(0.22 0.02 250);
+
+  --surface: oklch(0.97 0.006 250);
+  --surface-2: oklch(0.94 0.008 250);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.02 250);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.02 250);
+
+  --primary: oklch(0.52 0.2 250);
+  --primary-foreground: oklch(0.99 0.005 250);
+  --primary-glow: oklch(0.58 0.18 250);
+
+  --secondary: oklch(0.94 0.01 250);
+  --secondary-foreground: oklch(0.28 0.02 250);
+
+  --muted: oklch(0.94 0.008 250);
+  --muted-foreground: oklch(0.48 0.025 250);
+
+  --accent: oklch(0.93 0.02 250);
+  --accent-foreground: oklch(0.22 0.02 250);
+
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.99 0.005 250);
+
+  --up: oklch(0.48 0.16 152);
+  --up-foreground: oklch(0.99 0.005 250);
+  --down: oklch(0.52 0.2 22);
+  --down-foreground: oklch(0.99 0.005 250);
+  --warn: oklch(0.62 0.16 85);
+  --warn-foreground: oklch(0.2 0.02 80);
+
+  --border: oklch(0.88 0.015 250 / 0.9);
+  --input: oklch(0.88 0.015 250 / 0.9);
+  --ring: oklch(0.52 0.2 250);
+
+  --chart-1: oklch(0.52 0.2 250);
+  --chart-2: oklch(0.48 0.16 152);
+  --chart-3: oklch(0.52 0.2 22);
+  --chart-4: oklch(0.62 0.16 85);
+  --chart-5: oklch(0.55 0.18 295);
+
+  --sidebar: oklch(0.97 0.006 250);
+  --sidebar-foreground: oklch(0.28 0.02 250);
+  --sidebar-primary: oklch(0.52 0.2 250);
+  --sidebar-primary-foreground: oklch(0.99 0.005 250);
+  --sidebar-accent: oklch(0.94 0.01 250);
+  --sidebar-accent-foreground: oklch(0.22 0.02 250);
+  --sidebar-border: oklch(0.88 0.015 250 / 0.8);
+  --sidebar-ring: oklch(0.52 0.2 250);
+
+  --gradient-primary: linear-gradient(135deg, oklch(0.52 0.2 250), oklch(0.58 0.18 290));
+  --gradient-up: linear-gradient(135deg, oklch(0.48 0.16 152), oklch(0.55 0.14 170));
+  --gradient-down: linear-gradient(135deg, oklch(0.52 0.2 22), oklch(0.58 0.18 10));
+  --gradient-surface: linear-gradient(
+    180deg,
+    oklch(1 0 0 / 0.95),
+    oklch(0.97 0.006 250 / 0.85)
+  );
+  --gradient-glow: radial-gradient(circle at 50% 0%, oklch(0.52 0.2 250 / 0.12), transparent 60%);
+
+  --shadow-glow-primary: 0 0 32px -8px oklch(0.52 0.2 250 / 0.25);
+  --shadow-glow-up: 0 0 24px -6px oklch(0.48 0.16 152 / 0.25);
+  --shadow-glow-down: 0 0 24px -6px oklch(0.52 0.2 22 / 0.2);
+  --shadow-elevated: 0 12px 40px -10px oklch(0.2 0.02 250 / 0.12), 0 1px 0 0 oklch(1 0 0 / 0.8) inset;
+  --shadow-card: 0 1px 0 0 oklch(1 0 0 / 0.9) inset, 0 8px 24px -12px oklch(0.2 0.02 250 / 0.08);
+}
+
+.dark {
+  --radius: 0.75rem;
+
   /* Dark fintech grafite */
   --background: oklch(0.16 0.015 250);
   --foreground: oklch(0.97 0.005 250);
@@ -224,9 +299,14 @@
   }
   body {
     background-image:
+      radial-gradient(1200px 600px at 80% -10%, oklch(0.52 0.2 250 / 0.06), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, oklch(0.58 0.18 295 / 0.05), transparent 60%);
+    min-height: 100vh;
+  }
+  .dark body {
+    background-image:
       radial-gradient(1200px 600px at 80% -10%, oklch(0.7 0.2 250 / 0.1), transparent 60%),
       radial-gradient(900px 500px at -10% 10%, oklch(0.78 0.18 295 / 0.08), transparent 60%);
-    min-height: 100vh;
   }
   .font-mono,
   .mono {

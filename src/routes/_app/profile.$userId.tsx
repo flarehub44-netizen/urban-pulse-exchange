@@ -10,7 +10,8 @@ import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
 import { useFollowedTraders } from "@/hooks/use-followed-traders";
 import { toast } from "sonner";
-import { ArrowLeft, Lock, UserPlus, UserMinus, Zap, Link2, BarChart2, Activity } from "lucide-react";
+import { ArrowLeft, Lock, UserPlus, UserMinus, Zap, Link2, BarChart2, Activity, History } from "lucide-react";
+import { EmptyState } from "@/components/viax/empty-state";
 import { usePublicTraderBets } from "@/hooks/use-public-trader-bets";
 import { copyShareUrl } from "@/lib/share-url";
 import { cn } from "@/lib/utils";
@@ -205,7 +206,13 @@ function PublicProfile() {
           Últimas apostas públicas
         </h2>
         {(publicBets ?? []).length === 0 ? (
-          <p className="text-sm text-muted-foreground">Nenhum resultado resolvido público ainda.</p>
+          <EmptyState
+            icon={History}
+            title={copy.empty.traders.title}
+            description={copy.empty.traders.description}
+            action={{ label: copy.empty.traders.cta, to: "/ranking" }}
+            compact
+          />
         ) : (
           <div className="space-y-2">
             {(publicBets ?? []).map((b) => {

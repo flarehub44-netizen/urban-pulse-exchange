@@ -1,13 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useTraders } from "@/hooks/use-traders";
 import { useFollowedTraders } from "@/hooks/use-followed-traders";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
 import { RankBar } from "@/components/viax/rank-bar";
-import { useViaX } from "@/store/viax-store";
+import { useResolvedTraders } from "@/hooks/use-resolved-data";
 import { DivisionBadge } from "@/components/viax/division-badge";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
-import { Crown, Medal, Trophy } from "lucide-react";
+import { Crown, Medal, Trophy, Users } from "lucide-react";
+import { EmptyState } from "@/components/viax/empty-state";
 import { cn } from "@/lib/utils";
 
 export type RankingSearch = {
@@ -41,9 +41,7 @@ function Ranking() {
   const { tab = "global" } = Route.useSearch();
   const { userId } = useAnonAuth();
   const { ids: followedIds } = useFollowedTraders();
-  const { data: dbTraders } = useTraders();
-  const zustandTraders = useViaX((s) => s.traders);
-  const traderList = dbTraders ?? zustandTraders;
+  const { traders: traderList } = useResolvedTraders();
   const myIndex = userId ? traderList.findIndex((t) => t.id === userId) : -1;
   const me = myIndex >= 0 ? traderList[myIndex] : null;
 
@@ -71,6 +69,7 @@ function Ranking() {
 
   const podium = list.slice(0, 3);
   const rest = list.slice(3);
+  const isEmpty = traderList.length === 0;
 
   return (
     <div className="space-y-5">
@@ -103,6 +102,17 @@ function Ranking() {
 
       {me && myIndex >= 0 && <RankBar trader={me} rank={myIndex + 1} />}
 
+      {isEmpty && (
+        <EmptyState
+          icon={Users}
+          title={copy.empty.ranking.title}
+          description={copy.empty.ranking.description}
+          action={{ label: copy.empty.ranking.cta, to: "/markets", search: { status: "live" } }}
+        />
+      )}
+
+      {!isEmpty && (
+      <>
       <div className="grid gap-3 md:grid-cols-3">
         {podium.map((t, i) => {
           const Icon = i === 0 ? Crown : i === 1 ? Trophy : Medal;
@@ -200,6 +210,8 @@ function Ranking() {
           </tbody>
         </table>
       </div>
+      </>
+      )}
     </div>
   );
 }

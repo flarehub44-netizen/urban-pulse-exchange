@@ -5,12 +5,15 @@ import { findTopMarketForRegion } from "@/lib/region-market";
 import { toast } from "sonner";
 import { useViaX } from "@/store/viax-store";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
-import { useProfile } from "@/hooks/use-profile";
 import { useBets } from "@/hooks/use-bets";
 import { isOpenBetStatus } from "@/lib/market-status";
-import { useMarkets } from "@/hooks/use-markets";
-import { useTransactions } from "@/hooks/use-transactions";
-import { useTraders } from "@/hooks/use-traders";
+import {
+  useResolvedProfile,
+  useResolvedMarkets,
+  useResolvedRegions,
+  useResolvedTransactions,
+  useResolvedTraders,
+} from "@/hooks/use-resolved-data";
 import { usePnlSeries } from "@/hooks/use-pnl-series";
 import { MarketCard } from "@/components/viax/market-card";
 import { CityHeatmap } from "@/components/viax/city-heatmap";
@@ -24,6 +27,7 @@ import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { copy } from "@/copy/pt-BR";
+import { EmptyState } from "@/components/viax/empty-state";
 import { buildActionNowItems } from "@/lib/action-now";
 import { DEFAULT_FEATURED_MARKET_ID } from "@/config/markets";
 
@@ -47,16 +51,9 @@ function Dashboard() {
   const navigate = useNavigate();
   const { from, highlight } = Route.useSearch();
   const { userId } = useAnonAuth();
-  const { data: profile } = useProfile(userId);
-  const zustandMe = useViaX((s) => s.me);
-  const me = profile ?? zustandMe;
-
-  const { data: dbMarkets } = useMarkets();
-  const zustandMarkets = useViaX((s) => s.markets);
-  const markets = dbMarkets ?? zustandMarkets;
-  const { data: dbRegions } = useRegions();
-  const zustandRegions = useViaX((s) => s.regions);
-  const regions = dbRegions ?? zustandRegions;
+  const { me } = useResolvedProfile();
+  const { markets } = useResolvedMarkets();
+  const { regions } = useResolvedRegions();
   const feed = useViaX((s) => s.feed);
 
   useEffect(() => {
@@ -79,14 +76,10 @@ function Dashboard() {
   const openBets = (bets ?? []).filter((b) => isOpenBetStatus(b.marketStatus));
   const topOpen = openBets.slice(0, 3);
 
-  const { data: dbTx } = useTransactions();
-  const zustandTx = useViaX((s) => s.transactions);
-  const transactions = dbTx ?? zustandTx;
+  const { transactions } = useResolvedTransactions();
   const pnlSeries = usePnlSeries(transactions);
 
-  const { data: dbTraders } = useTraders();
-  const zustandTraders = useViaX((s) => s.traders);
-  const traders = dbTraders ?? zustandTraders;
+  const { traders } = useResolvedTraders();
   const myRank = useMemo(() => {
     if (!userId || !traders.length) return null;
     const idx = traders.findIndex((t) => t.id === userId);
@@ -362,16 +355,16 @@ function Dashboard() {
           </div>
           <div className="space-y-2">
             {topOpen.length === 0 && (
-              <div className="rounded-xl border bg-card/60 p-4 text-center text-sm text-muted-foreground backdrop-blur">
-                {copy.positions.emptyOpen}{" "}
-                <Link
-                  to="/markets"
-                  search={{ status: "live" }}
-                  className="text-primary hover:underline"
-                >
-                  {copy.positions.explore} →
-                </Link>
-              </div>
+              <EmptyState
+                compact
+                title={copy.empty.positions.title}
+                description={copy.empty.positions.description}
+                action={{
+                  label: copy.empty.positions.cta,
+                  to: "/markets",
+                  search: { status: "live" },
+                }}
+              />
             )}
             {topOpen.map((bet) => {
               const live = markets.find((m) => m.id === bet.marketId);
@@ -464,12 +457,12 @@ function Dashboard() {
               </Link>
             ))}
             {feed.length === 0 && (
-              <div className="rounded-xl border bg-card/60 p-4 text-center text-sm text-muted-foreground">
-                Nenhum post ainda.{" "}
-                <Link to="/feed" className="text-primary hover:underline">
-                  Abrir feed →
-                </Link>
-              </div>
+              <EmptyState
+                compact
+                title={copy.empty.dashboardFeed.title}
+                description={copy.empty.dashboardFeed.description}
+                action={{ label: copy.empty.dashboardFeed.cta, to: "/feed" }}
+              />
             )}
           </div>
         </div>
