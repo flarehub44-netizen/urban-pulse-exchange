@@ -2,39 +2,12 @@
 import { createMiddleware } from "@tanstack/react-start";
 import { supabase } from "./client";
 
-let anonSignInPromise: Promise<string | null> | null = null;
-
 async function ensureSessionToken(): Promise<string | null> {
   // Server-side / SSR: no browser session available.
   if (typeof window === "undefined") return null;
 
   const { data } = await supabase.auth.getSession();
-  if (data.session?.access_token) return data.session.access_token;
-
-  // No session yet — sign in anonymously once and cache the promise so
-  // concurrent serverFn calls share the same in-flight request.
-  if (!anonSignInPromise) {
-    anonSignInPromise = supabase.auth
-      .signInAnonymously()
-      .then(({ data, error }) => {
-        if (error) {
-          console.error("[auth-attacher] anon sign-in failed:", error.message);
-          return null;
-        }
-        return data.session?.access_token ?? null;
-      })
-      .catch((err) => {
-        console.error("[auth-attacher] anon sign-in threw:", err);
-        return null;
-      })
-      .finally(() => {
-        // Allow retry on next call if it failed; success path keeps session in storage.
-        setTimeout(() => {
-          anonSignInPromise = null;
-        }, 0);
-      });
-  }
-  return anonSignInPromise;
+  return data.session?.access_token ?? null;
 }
 
 // Must be registered as a global `functionMiddleware` in `src/start.ts`; otherwise
