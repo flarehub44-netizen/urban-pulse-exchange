@@ -21,7 +21,7 @@ export function useLifecycleHealth(enabled: boolean) {
     queryFn: async () => {
       const { data, error } = await supabase.rpc("get_lifecycle_health");
       if (error) throw error;
-      return data as LifecycleHealth;
+      return data as unknown as LifecycleHealth;
     },
     enabled,
     staleTime: 30_000,
@@ -34,7 +34,7 @@ export function usePlatformLedgerSummary(enabled: boolean) {
     queryFn: async () => {
       const { data, error } = await supabase.rpc("get_platform_ledger_summary");
       if (error) throw error;
-      return data as LedgerSummary;
+      return data as unknown as LedgerSummary;
     },
     enabled,
     staleTime: 60_000,

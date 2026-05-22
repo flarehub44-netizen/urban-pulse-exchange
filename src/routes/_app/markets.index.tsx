@@ -131,7 +131,7 @@ function MarketsList() {
 
   const patchSearch = (patch: Partial<MarketsSearch>) => {
     navigate({
-      search: (prev) => {
+      search: (prev: MarketsSearch) => {
         const next = {
           ...prev,
           ...patch,

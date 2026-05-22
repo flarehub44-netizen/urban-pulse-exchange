@@ -153,7 +153,7 @@ function MarketDetail() {
   const questionShort = m.question.length > 48 ? `${m.question.slice(0, 48)}…` : m.question;
 
   const setTab = (tab: MarketDetailSearch["tab"]) => {
-    navigate({ search: (prev) => ({ ...prev, tab }), replace: true });
+    navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, tab }), replace: true });
   };
 
   return (
