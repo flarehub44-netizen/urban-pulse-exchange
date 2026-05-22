@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { SupabaseFnContext } from "@/integrations/supabase/loose";
+import { db } from "@/integrations/supabase/loose";
 
 export type DailyPoll = {
   id: string;
@@ -12,12 +13,28 @@ export type DailyPoll = {
 };
 
 export const getTodayPollFn = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { supabase } = context as unknown as SupabaseFnContext;
-    const { data, error } = await supabase.rpc("get_today_poll");
-    if (error) throw new Error(error.message);
-    return data as DailyPoll | null;
+  .handler(async () => {
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const { data, error } = (await db
+        .from("daily_polls")
+        .select("id, question, yes_count, no_count")
+        .eq("poll_date", today)
+        .maybeSingle()) as {
+        data: Omit<DailyPoll, "voted" | "my_vote"> | null;
+        error: Error | null;
+      };
+
+      if (error) {
+        console.warn("[polls] Failed to load today's poll:", error.message);
+        return null;
+      }
+
+      return data ? { ...data, voted: false, my_vote: null } : null;
+    } catch (error) {
+      console.warn("[polls] Today's poll unavailable:", error);
+      return null;
+    }
   });
 
 export const voteDailyPollFn = createServerFn({ method: "POST" })
