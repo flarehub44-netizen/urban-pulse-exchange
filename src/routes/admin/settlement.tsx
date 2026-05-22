@@ -1,9 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
-import {
-  useAdminSettlementQueue,
-  useAdminReprocess,
-} from "@/hooks/use-admin-dashboard";
+import { useAdminSettlementQueue, useAdminReprocess } from "@/hooks/use-admin-dashboard";
 import { useAdminResolveMarket } from "@/hooks/use-admin-resolve";
 import { PoolBreakdown } from "@/components/admin/pool-breakdown";
 import { copy } from "@/copy/pt-BR";
@@ -71,7 +68,9 @@ function AdminSettlementPage() {
               <span
                 className={cn(
                   "rounded-full px-2 py-0.5 text-[10px] uppercase",
-                  m.status === "dispute" ? "bg-warn/15 text-warn" : "bg-muted text-muted-foreground",
+                  m.status === "dispute"
+                    ? "bg-warn/15 text-warn"
+                    : "bg-muted text-muted-foreground",
                 )}
               >
                 {m.status}

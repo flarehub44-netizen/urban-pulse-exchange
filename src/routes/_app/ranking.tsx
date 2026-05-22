@@ -115,105 +115,123 @@ function Ranking() {
       )}
 
       {!isEmpty && (
-      <>
-      <div className="grid gap-3 md:grid-cols-3">
-        {podium.map((t, i) => {
-          const Icon = i === 0 ? Crown : i === 1 ? Trophy : Medal;
-          const tone = i === 0 ? "text-yellow-300" : i === 1 ? "text-slate-200" : "text-amber-400";
-          return (
-            <Link
-              key={t.id}
-              to="/profile/$userId"
-              params={{ userId: t.id }}
-              className={cn(
-                "relative block overflow-hidden rounded-2xl border bg-card/60 p-5 backdrop-blur transition hover:bg-surface/40",
-                i === 0 && "border-yellow-400/40 shadow-[0_0_50px_-12px_oklch(0.84_0.17_85/0.45)]",
-                userId === t.id && "ring-2 ring-primary/50",
-              )}
-            >
-              <div className="absolute right-4 top-4">
-                <Icon className={cn("size-6", tone)} />
-              </div>
-              <div className="text-xs uppercase tracking-wider text-muted-foreground">
-                #{i + 1}
-              </div>
-              <div className="mt-3 flex items-center gap-3">
-                <img src={t.avatar} className="size-14 rounded-full border bg-surface" alt={t.name} />
-                <div>
-                  <div className="font-medium">{t.name}</div>
-                  <div className="text-xs text-muted-foreground">@{t.handle}</div>
-                  <DivisionBadge division={t.division} className="mt-1" />
-                </div>
-              </div>
-              <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
-                <Box label={copy.ranking.precision} value={`${(t.accuracy * 100).toFixed(1)}%`} />
-                <Box
-                  label={copy.ranking.return}
-                  value={`+${(t.roi * 100).toFixed(0)}%`}
-                  tone="up"
-                />
-                <Box label="Streak" value={`🔥 ${t.streak}`} />
-              </div>
-            </Link>
-          );
-        })}
-      </div>
-
-      <div className="overflow-hidden rounded-2xl border bg-card/60 backdrop-blur">
-        <table className="w-full text-sm">
-          <thead className="bg-surface/60 text-xs uppercase tracking-wider text-muted-foreground">
-            <tr>
-              <th className="px-4 py-3 text-left">#</th>
-              <th className="px-4 py-3 text-left">Trader</th>
-              <th className="px-4 py-3 text-left">Divisão</th>
-              <th className="px-4 py-3 text-right">{copy.ranking.precision}</th>
-              <th className="hidden sm:table-cell px-4 py-3 text-right">{copy.ranking.return}</th>
-              <th className="hidden md:table-cell px-4 py-3 text-right">Streak</th>
-              <th className="hidden md:table-cell px-4 py-3 text-right">Volume</th>
-              <th className="hidden lg:table-cell px-4 py-3 text-right">7d</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rest.map((t, i) => (
-              <tr
-                key={t.id}
-                className="cursor-pointer border-t border-border/60 hover:bg-surface/40"
-                onClick={() => navigate({ to: "/profile/$userId", params: { userId: t.id } })}
-              >
-                <td className="px-4 py-3 mono text-muted-foreground">{i + 4}</td>
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-3">
-                    <img src={t.avatar} className="size-8 rounded-full bg-surface" alt={t.name} />
+        <>
+          <div className="grid gap-3 md:grid-cols-3">
+            {podium.map((t, i) => {
+              const Icon = i === 0 ? Crown : i === 1 ? Trophy : Medal;
+              const tone =
+                i === 0 ? "text-yellow-300" : i === 1 ? "text-slate-200" : "text-amber-400";
+              return (
+                <Link
+                  key={t.id}
+                  to="/profile/$userId"
+                  params={{ userId: t.id }}
+                  className={cn(
+                    "relative block overflow-hidden rounded-2xl border bg-card/60 p-5 backdrop-blur transition hover:bg-surface/40",
+                    i === 0 &&
+                      "border-yellow-400/40 shadow-[0_0_50px_-12px_oklch(0.84_0.17_85/0.45)]",
+                    userId === t.id && "ring-2 ring-primary/50",
+                  )}
+                >
+                  <div className="absolute right-4 top-4">
+                    <Icon className={cn("size-6", tone)} />
+                  </div>
+                  <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                    #{i + 1}
+                  </div>
+                  <div className="mt-3 flex items-center gap-3">
+                    <img
+                      src={t.avatar}
+                      className="size-14 rounded-full border bg-surface"
+                      alt={t.name}
+                    />
                     <div>
                       <div className="font-medium">{t.name}</div>
-                      <div className="text-[11px] text-muted-foreground">
-                        @{t.handle} · {t.neighborhood}
-                      </div>
+                      <div className="text-xs text-muted-foreground">@{t.handle}</div>
+                      <DivisionBadge division={t.division} className="mt-1" />
                     </div>
                   </div>
-                </td>
-                <td className="px-4 py-3">
-                  <DivisionBadge division={t.division} />
-                </td>
-                <td className="px-4 py-3 text-right mono">{(t.accuracy * 100).toFixed(1)}%</td>
-                <td className="hidden sm:table-cell px-4 py-3 text-right mono text-up">
-                  +{(t.roi * 100).toFixed(0)}%
-                </td>
-                <td className="hidden md:table-cell px-4 py-3 text-right mono">🔥 {t.streak}</td>
-                <td className="hidden md:table-cell px-4 py-3 text-right mono">
-                  {formatBRL(t.volume)}
-                </td>
-                <td className="hidden lg:table-cell px-4 py-3 text-right mono">
-                  <span className={t.weeklyGrowth >= 0 ? "text-up" : "text-down"}>
-                    {t.weeklyGrowth >= 0 ? "▲" : "▼"} {(Math.abs(t.weeklyGrowth) * 100).toFixed(1)}%
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      </>
+                  <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
+                    <Box
+                      label={copy.ranking.precision}
+                      value={`${(t.accuracy * 100).toFixed(1)}%`}
+                    />
+                    <Box
+                      label={copy.ranking.return}
+                      value={`+${(t.roi * 100).toFixed(0)}%`}
+                      tone="up"
+                    />
+                    <Box label="Streak" value={`🔥 ${t.streak}`} />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border bg-card/60 backdrop-blur">
+            <table className="w-full text-sm">
+              <thead className="bg-surface/60 text-xs uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3 text-left">#</th>
+                  <th className="px-4 py-3 text-left">Trader</th>
+                  <th className="px-4 py-3 text-left">Divisão</th>
+                  <th className="px-4 py-3 text-right">{copy.ranking.precision}</th>
+                  <th className="hidden sm:table-cell px-4 py-3 text-right">
+                    {copy.ranking.return}
+                  </th>
+                  <th className="hidden md:table-cell px-4 py-3 text-right">Streak</th>
+                  <th className="hidden md:table-cell px-4 py-3 text-right">Volume</th>
+                  <th className="hidden lg:table-cell px-4 py-3 text-right">7d</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rest.map((t, i) => (
+                  <tr
+                    key={t.id}
+                    className="cursor-pointer border-t border-border/60 hover:bg-surface/40"
+                    onClick={() => navigate({ to: "/profile/$userId", params: { userId: t.id } })}
+                  >
+                    <td className="px-4 py-3 mono text-muted-foreground">{i + 4}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={t.avatar}
+                          className="size-8 rounded-full bg-surface"
+                          alt={t.name}
+                        />
+                        <div>
+                          <div className="font-medium">{t.name}</div>
+                          <div className="text-[11px] text-muted-foreground">
+                            @{t.handle} · {t.neighborhood}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <DivisionBadge division={t.division} />
+                    </td>
+                    <td className="px-4 py-3 text-right mono">{(t.accuracy * 100).toFixed(1)}%</td>
+                    <td className="hidden sm:table-cell px-4 py-3 text-right mono text-up">
+                      +{(t.roi * 100).toFixed(0)}%
+                    </td>
+                    <td className="hidden md:table-cell px-4 py-3 text-right mono">
+                      🔥 {t.streak}
+                    </td>
+                    <td className="hidden md:table-cell px-4 py-3 text-right mono">
+                      {formatBRL(t.volume)}
+                    </td>
+                    <td className="hidden lg:table-cell px-4 py-3 text-right mono">
+                      <span className={t.weeklyGrowth >= 0 ? "text-up" : "text-down"}>
+                        {t.weeklyGrowth >= 0 ? "▲" : "▼"}{" "}
+                        {(Math.abs(t.weeklyGrowth) * 100).toFixed(1)}%
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );

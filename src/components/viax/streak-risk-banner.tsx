@@ -5,7 +5,7 @@ import { copy } from "@/copy/pt-BR";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { useTodayCheckIn } from "@/hooks/use-daily-check-in";
-import { useStreakFreezeFn, buyStreakFreezeFn } from "@/actions/retention";
+import { useStreakFreezeFn as streakFreezeFn, buyStreakFreezeFn } from "@/actions/retention";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function StreakRiskBanner() {
@@ -20,7 +20,7 @@ export function StreakRiskBanner() {
   };
 
   const { mutateAsync: freeze, isPending: freezePending } = useMutation({
-    mutationFn: () => useStreakFreezeFn({}),
+    mutationFn: () => streakFreezeFn({}),
     onSuccess: invalidate,
   });
 
@@ -48,7 +48,9 @@ export function StreakRiskBanner() {
           <Flame className="size-4 text-warn" />
           <span>{copy.retention.streakAtRisk(profile?.streak ?? 0)}</span>
           {freezesLeft > 0 && (
-            <span className="text-xs text-muted-foreground">({freezesLeft} freeze{freezesLeft > 1 ? "s" : ""} disponível)</span>
+            <span className="text-xs text-muted-foreground">
+              ({freezesLeft} freeze{freezesLeft > 1 ? "s" : ""} disponível)
+            </span>
           )}
         </div>
         <div className="flex items-center gap-2">

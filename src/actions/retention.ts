@@ -50,7 +50,13 @@ export const buyStreakFreezeFn = createServerFn({ method: "POST" })
     const { supabase } = context as SupabaseFnContext;
     const { data, error } = await supabase.rpc("buy_streak_freeze");
     if (error) throw new Error(error.message);
-    return data as { ok: boolean; freezes_left?: number; reason?: string; cost?: number; xp?: number };
+    return data as {
+      ok: boolean;
+      freezes_left?: number;
+      reason?: string;
+      cost?: number;
+      xp?: number;
+    };
   });
 
 export const getDailyMissionsFn = createServerFn({ method: "GET" })
@@ -67,7 +73,9 @@ export const completeMissionFn = createServerFn({ method: "POST" })
   .inputValidator((d: { mission_id: string }) => d)
   .handler(async ({ context, data }) => {
     const { supabase } = context as SupabaseFnContext;
-    const { data: res, error } = await supabase.rpc("complete_mission", { p_mission_id: data.mission_id });
+    const { data: res, error } = await supabase.rpc("complete_mission", {
+      p_mission_id: data.mission_id,
+    });
     if (error) throw new Error(error.message);
     return res as { xp?: number; already_done?: boolean };
   });

@@ -11,6 +11,7 @@ import {
   setLastImpulseAmount,
 } from "@/lib/impulse-deposit";
 import { cn } from "@/lib/utils";
+import { SimulatedMoneyBanner } from "@/components/viax/simulated-money-banner";
 
 type ImpulseDepositBarProps = {
   balance: number;
@@ -46,24 +47,26 @@ export function ImpulseDepositBar({
   };
 
   return (
-    <div
-      className={cn(
-        "flex flex-wrap items-center justify-between gap-3 rounded-xl border border-warn/35 bg-warn/10 px-4 py-3 animate-pulse",
-        className,
-      )}
-    >
-      <div className="flex items-center gap-2 text-sm">
-        <Zap className="size-4 text-warn shrink-0" />
-        <span>{copy.casino.lowBalanceBanner(formatBRL(balance))}</span>
-      </div>
-      <button
-        type="button"
-        disabled={isPending}
-        onClick={() => onQuick(amount)}
-        className="shrink-0 rounded-lg bg-warn px-4 py-2 text-sm font-semibold text-warn-foreground disabled:opacity-50"
+    <div className={cn("space-y-2", className)}>
+      <SimulatedMoneyBanner />
+      <div
+        className={cn(
+          "flex flex-wrap items-center justify-between gap-3 rounded-xl border border-warn/35 bg-warn/10 px-4 py-3 animate-pulse",
+        )}
       >
-        {copy.casino.oneTapReload(formatBRL(amount))}
-      </button>
+        <div className="flex items-center gap-2 text-sm">
+          <Zap className="size-4 text-warn shrink-0" />
+          <span>{copy.casino.lowBalanceBanner(formatBRL(balance))}</span>
+        </div>
+        <button
+          type="button"
+          disabled={isPending}
+          onClick={() => onQuick(amount)}
+          className="shrink-0 rounded-lg bg-warn px-4 py-2 text-sm font-semibold text-warn-foreground disabled:opacity-50"
+        >
+          {copy.casino.oneTapReload(formatBRL(amount))}
+        </button>
+      </div>
     </div>
   );
 }
@@ -86,9 +89,7 @@ export function ImpulseDepositChips({
           onClick={() => onSelect(amt)}
           className={cn(
             "rounded-lg border px-3 py-2 text-sm font-medium mono transition-colors",
-            amt === last
-              ? "border-primary bg-primary/15 text-primary"
-              : "hover:bg-muted/60",
+            amt === last ? "border-primary bg-primary/15 text-primary" : "hover:bg-muted/60",
           )}
         >
           {formatBRL(amt)}

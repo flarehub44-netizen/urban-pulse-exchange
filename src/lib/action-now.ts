@@ -50,7 +50,10 @@ export function buildActionNowItems(
     items.push({ type: "closing", priority: 800 + edge + (MS_15MIN - msLeft) / 1000, market: m });
   }
 
-  if (urbanMindMarket && (urbanMindMarket.status === "live" || urbanMindMarket.status === "closing")) {
+  if (
+    urbanMindMarket &&
+    (urbanMindMarket.status === "live" || urbanMindMarket.status === "closing")
+  ) {
     items.push({ type: "urbanmind", priority: 100, market: urbanMindMarket });
   }
 

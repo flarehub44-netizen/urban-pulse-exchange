@@ -31,8 +31,7 @@ function AdminIntelligencePage() {
       <div>
         <h1 className="text-lg font-semibold">{copy.admin.nav.intelligence}</h1>
         <p className="text-xs text-muted-foreground">
-          Oráculo UrbanMind · taxa disputa:{" "}
-          {((Number(data?.dispute_rate ?? 0)) * 100).toFixed(1)}%
+          Oráculo UrbanMind · taxa disputa: {(Number(data?.dispute_rate ?? 0) * 100).toFixed(1)}%
         </p>
       </div>
 
@@ -104,7 +103,9 @@ function AdminIntelligencePage() {
                   <td className="py-2">{r.name}</td>
                   <td className="py-2 text-right mono">{r.flow}</td>
                   <td className="py-2 text-right mono">{Number(r.avg_speed).toFixed(0)}</td>
-                  <td className="py-2 text-right mono">{(Number(r.congestion) * 100).toFixed(0)}%</td>
+                  <td className="py-2 text-right mono">
+                    {(Number(r.congestion) * 100).toFixed(0)}%
+                  </td>
                   <td className="py-2 text-right text-muted-foreground">
                     {formatDistanceToNow(new Date(r.updated_at), { addSuffix: true, locale: ptBR })}
                   </td>

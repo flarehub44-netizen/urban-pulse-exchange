@@ -60,7 +60,9 @@ function PartnerPayoutsPage() {
       <ul className="space-y-2">
         {(history ?? []).map((p) => (
           <li key={p.id} className="rounded-lg border px-3 py-2 text-sm flex justify-between">
-            <span>{formatBRL(p.amount)} · {p.method}</span>
+            <span>
+              {formatBRL(p.amount)} · {p.method}
+            </span>
             <span className="text-xs text-muted-foreground">
               {formatDistanceToNow(new Date(p.at), { locale: ptBR, addSuffix: true })}
             </span>

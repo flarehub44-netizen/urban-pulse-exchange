@@ -1,7 +1,16 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, Users, Clock, Star, ArrowUp, ArrowDown, Zap } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  Users,
+  Clock,
+  Star,
+  ArrowUp,
+  ArrowDown,
+  Zap,
+} from "lucide-react";
 import { copy } from "@/copy/pt-BR";
 import { EdgeBadge } from "@/components/viax/edge-badge";
 import type { Market, Side } from "@/store/viax-store";
@@ -51,10 +60,12 @@ export function MarketCard({ m, compact }: { m: Market; compact?: boolean }) {
             Últimos {Math.ceil(minsLeft)} min — apostas encerram em breve!
           </div>
         )}
-        <div className={cn(
-          "pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100",
-          isUrgent ? "via-warn/40" : "via-primary/40",
-        )} />
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100",
+            isUrgent ? "via-warn/40" : "via-primary/40",
+          )}
+        />
         <div className="flex items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-primary">
@@ -66,7 +77,8 @@ export function MarketCard({ m, compact }: { m: Market; compact?: boolean }) {
                 className={cn(
                   "rounded-md px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider",
                   m.status === "dispute" && "border border-warn/40 bg-warn/10 text-warn",
-                  m.status === "draft" && "border border-muted-foreground/30 bg-surface text-muted-foreground",
+                  m.status === "draft" &&
+                    "border border-muted-foreground/30 bg-surface text-muted-foreground",
                   m.status === "void" && "border border-down/30 bg-down/10 text-down",
                 )}
               >

@@ -35,7 +35,10 @@ export function DivisionUpModal({ newDivision, onClose }: Props) {
     if (!open) return;
     const colors = ["#ffd700", "#fff", color];
     confetti({ particleCount: 120, spread: 80, origin: { y: 0.4 }, colors });
-    const t = setTimeout(() => confetti({ particleCount: 60, spread: 60, origin: { y: 0.5 }, colors }), 400);
+    const t = setTimeout(
+      () => confetti({ particleCount: 60, spread: 60, origin: { y: 0.5 }, colors }),
+      400,
+    );
     return () => clearTimeout(t);
   }, [open, color]);
 

@@ -49,7 +49,13 @@ export const joinLeagueFn = createServerFn({ method: "POST" })
       p_invite_code: data.invite_code,
     });
     if (error) throw new Error(error.message);
-    return res as { ok: boolean; league_id?: string; name?: string; already_member?: boolean; reason?: string };
+    return res as {
+      ok: boolean;
+      league_id?: string;
+      name?: string;
+      already_member?: boolean;
+      reason?: string;
+    };
   });
 
 export const leaveLeagueFn = createServerFn({ method: "POST" })

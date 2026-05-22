@@ -36,11 +36,7 @@ export function validateMarketPools(
 }
 
 /** True when settlement would proceed for this side (not void). */
-export function isValidForSettlement(
-  poolYes: number,
-  poolNo: number,
-  winningSide: Side,
-): boolean {
+export function isValidForSettlement(poolYes: number, poolNo: number, winningSide: Side): boolean {
   return validateMarketPools(poolYes, poolNo, winningSide) === "settle";
 }
 

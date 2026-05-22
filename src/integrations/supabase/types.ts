@@ -142,7 +142,10 @@ export type Database = {
       admin_extend_market: { Args: { p_market_id: string; p_extra_hours?: number }; Returns: Json };
       admin_pause_bets: { Args: { p_market_id: string; p_paused?: boolean }; Returns: Json };
       admin_trigger_lifecycle: { Args: Record<string, never>; Returns: Json };
-      admin_apply_simulator_scenario: { Args: { p_rush?: boolean; p_rain?: boolean }; Returns: Json };
+      admin_apply_simulator_scenario: {
+        Args: { p_rush?: boolean; p_rain?: boolean };
+        Returns: Json;
+      };
       get_admin_volume_by_region: { Args: Record<string, never>; Returns: Json };
       get_admin_open_exposure: { Args: Record<string, never>; Returns: Json };
       get_admin_actions_log: { Args: { p_limit?: number }; Returns: Json };

@@ -148,7 +148,13 @@ export function useAdminRiskAlerts(enabled = true) {
     queryFn: async () => {
       const { data, error } = await supabase.rpc("get_admin_risk_alerts");
       if (error) throw error;
-      return (data ?? []) as { type: string; user_id: string; username: string; detail: string; severity: string }[];
+      return (data ?? []) as {
+        type: string;
+        user_id: string;
+        username: string;
+        detail: string;
+        severity: string;
+      }[];
     },
     enabled,
   });

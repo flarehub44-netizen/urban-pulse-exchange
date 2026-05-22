@@ -4,14 +4,7 @@ import { AdminStatCard } from "@/components/admin/admin-stat-card";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
 import { InlineError } from "@/components/viax/inline-error";
-import {
-  Bar,
-  BarChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 export const Route = createFileRoute("/admin/finance")({
   component: AdminFinancePage,

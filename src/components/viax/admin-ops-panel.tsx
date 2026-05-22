@@ -47,9 +47,7 @@ export function AdminOpsPanel() {
             <li>
               {copy.settings.adminOpsDisputes}: {health.dispute_count}
             </li>
-            {health.last_error && (
-              <li className="text-down">{health.last_error}</li>
-            )}
+            {health.last_error && <li className="text-down">{health.last_error}</li>}
           </ul>
         ) : null}
       </div>

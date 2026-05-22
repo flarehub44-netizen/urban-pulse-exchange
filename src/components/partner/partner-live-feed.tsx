@@ -27,7 +27,9 @@ export function PartnerLiveFeed({
             key={`${e.at}-${i}`}
             className="flex gap-2 rounded-lg border bg-surface/40 px-3 py-2 text-xs"
           >
-            <Icon className={cn("size-3.5 shrink-0 mt-0.5", e.kind === "commission" && "text-up")} />
+            <Icon
+              className={cn("size-3.5 shrink-0 mt-0.5", e.kind === "commission" && "text-up")}
+            />
             <div className="min-w-0 flex-1">
               <p>{e.message}</p>
               <p className="text-[10px] text-muted-foreground mt-0.5">

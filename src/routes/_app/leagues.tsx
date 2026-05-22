@@ -3,16 +3,30 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Trophy, Users, Plus, Link2, LogIn, LogOut, Crown } from "lucide-react";
-import { useMyLeagues, useLeagueLeaderboard, useCreateLeague, useJoinLeague, useLeaveLeague } from "@/hooks/use-leagues";
+import {
+  useMyLeagues,
+  useLeagueLeaderboard,
+  useCreateLeague,
+  useJoinLeague,
+  useLeaveLeague,
+} from "@/hooks/use-leagues";
 import { cn } from "@/lib/utils";
 import type { Division } from "@/store/viax-store";
 
 function divisionFromDb(d: string): Division {
   const map: Record<string, Division> = {
-    bronze: "Bronze", silver: "Prata", gold: "Ouro",
-    platinum: "Platina", diamond: "Diamante", elite: "Elite",
-    Bronze: "Bronze", Prata: "Prata", Ouro: "Ouro",
-    Platina: "Platina", Diamante: "Diamante", Elite: "Elite",
+    bronze: "Bronze",
+    silver: "Prata",
+    gold: "Ouro",
+    platinum: "Platina",
+    diamond: "Diamante",
+    elite: "Elite",
+    Bronze: "Bronze",
+    Prata: "Prata",
+    Ouro: "Ouro",
+    Platina: "Platina",
+    Diamante: "Diamante",
+    Elite: "Elite",
   };
   return map[d] ?? "Bronze";
 }
@@ -102,14 +116,20 @@ function LeaguesPage() {
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
-          onClick={() => { setShowCreate(true); setShowJoin(false); }}
+          onClick={() => {
+            setShowCreate(true);
+            setShowJoin(false);
+          }}
           className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
         >
           <Plus className="size-4" /> Criar liga
         </button>
         <button
           type="button"
-          onClick={() => { setShowJoin(true); setShowCreate(false); }}
+          onClick={() => {
+            setShowJoin(true);
+            setShowCreate(false);
+          }}
           className="inline-flex items-center gap-1.5 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-surface"
         >
           <LogIn className="size-4" /> Entrar com código
@@ -152,7 +172,9 @@ function LeaguesPage() {
           className="rounded-2xl border bg-card/60 p-4 backdrop-blur"
         >
           <h3 className="text-sm font-semibold">Entrar em liga</h3>
-          <p className="mt-1 text-xs text-muted-foreground">Peça o código de 8 letras para quem criou a liga.</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Peça o código de 8 letras para quem criou a liga.
+          </p>
           <div className="mt-3 flex gap-2">
             <input
               value={joinCode}
@@ -216,7 +238,10 @@ function LeaguesPage() {
                 </span>
                 <button
                   type="button"
-                  onClick={(e) => { e.stopPropagation(); copyInvite(league.invite_code); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    copyInvite(league.invite_code);
+                  }}
                   className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] text-primary hover:bg-primary/10"
                 >
                   <Link2 className="size-3" /> Copiar
@@ -260,13 +285,23 @@ function LeaguesPage() {
                   key={member.user_id}
                   className={cn(
                     "flex items-center gap-3 rounded-xl px-3 py-2",
-                    member.is_me ? "bg-primary/10 border border-primary/20" : "border border-border/50",
+                    member.is_me
+                      ? "bg-primary/10 border border-primary/20"
+                      : "border border-border/50",
                   )}
                 >
-                  <span className={cn(
-                    "mono text-sm font-bold w-6 text-center shrink-0",
-                    idx === 0 ? "text-warn" : idx === 1 ? "text-muted-foreground" : idx === 2 ? "text-warn/70" : "text-muted-foreground/60",
-                  )}>
+                  <span
+                    className={cn(
+                      "mono text-sm font-bold w-6 text-center shrink-0",
+                      idx === 0
+                        ? "text-warn"
+                        : idx === 1
+                          ? "text-muted-foreground"
+                          : idx === 2
+                            ? "text-warn/70"
+                            : "text-muted-foreground/60",
+                    )}
+                  >
                     #{idx + 1}
                   </span>
                   <img
@@ -283,7 +318,9 @@ function LeaguesPage() {
                       {member.xp.toLocaleString("pt-BR")} XP · {(member.accuracy * 100).toFixed(0)}%
                     </div>
                   </div>
-                  <span className="text-xs text-muted-foreground mono">{divisionFromDb(member.division)}</span>
+                  <span className="text-xs text-muted-foreground mono">
+                    {divisionFromDb(member.division)}
+                  </span>
                 </div>
               ))}
             </div>

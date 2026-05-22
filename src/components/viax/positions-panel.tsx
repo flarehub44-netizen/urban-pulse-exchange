@@ -6,7 +6,15 @@ import { AnimatedNumber } from "@/components/viax/animated-number";
 import { Countdown } from "@/components/viax/countdown";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL, PRIZE_RATIO } from "@/lib/parimutuel";
-import { Activity, TrendingUp, BookOpen, ChevronDown, ChevronUp, HelpCircle, ArrowUpRight } from "lucide-react";
+import {
+  Activity,
+  TrendingUp,
+  BookOpen,
+  ChevronDown,
+  ChevronUp,
+  HelpCircle,
+  ArrowUpRight,
+} from "lucide-react";
 import { EmptyState } from "@/components/viax/empty-state";
 import { cn } from "@/lib/utils";
 import { isOpenBetStatus, statusLabel, type MarketStatus } from "@/lib/market-status";
@@ -261,8 +269,7 @@ function ResolvedBetRow({ bet }: { bet: import("@/hooks/use-bets").OpenBet }) {
             onClick={() => setShowAnalysis((v) => !v)}
             className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground"
           >
-            <HelpCircle className="size-3" />
-            O que aconteceu?
+            <HelpCircle className="size-3" />O que aconteceu?
             {showAnalysis ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
           </button>
           {showAnalysis && (
@@ -282,8 +289,8 @@ function ResolvedBetRow({ bet }: { bet: import("@/hooks/use-bets").OpenBet }) {
               )}
               <p className="pt-1 border-t border-border/40">
                 <span className="font-medium text-down">Resultado:</span> O mercado resolveu no lado
-                oposto ao seu. Avalie se havia informação adicional disponível que poderia ter mudado
-                sua análise.
+                oposto ao seu. Avalie se havia informação adicional disponível que poderia ter
+                mudado sua análise.
               </p>
               <Link
                 to="/markets/$marketId"

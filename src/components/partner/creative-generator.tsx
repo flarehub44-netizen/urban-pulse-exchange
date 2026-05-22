@@ -82,9 +82,7 @@ export function CreativeGenerator() {
       <div className="rounded-xl border bg-gradient-to-br from-slate-900 to-slate-800 p-6 text-white max-w-md">
         <p className="text-xs text-emerald-400">ViaX</p>
         <p className="mt-2 font-semibold">{live?.question?.slice(0, 60) ?? "Mercado"}</p>
-        <p className="mt-4 text-2xl font-bold text-amber-400">
-          {formatPct(pYes)} SIM
-        </p>
+        <p className="mt-4 text-2xl font-bold text-amber-400">{formatPct(pYes)} SIM</p>
       </div>
       <button
         type="button"

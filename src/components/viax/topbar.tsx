@@ -1,5 +1,13 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Bell, Flame, TrendingUp, Wallet as WalletIcon, Briefcase, Search, Shield } from "lucide-react";
+import {
+  Bell,
+  Flame,
+  TrendingUp,
+  Wallet as WalletIcon,
+  Briefcase,
+  Search,
+  Shield,
+} from "lucide-react";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
 import { useResolvedProfile, useResolvedNotifications } from "@/hooks/use-resolved-data";
 import { useProfile } from "@/hooks/use-profile";

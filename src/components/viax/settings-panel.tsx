@@ -150,7 +150,10 @@ export function SettingsPanel() {
         </div>
       </Section>
 
-      <Section icon={isDark ? <Moon className="size-4" /> : <Sun className="size-4" />} title={copy.settings.themeTitle}>
+      <Section
+        icon={isDark ? <Moon className="size-4" /> : <Sun className="size-4" />}
+        title={copy.settings.themeTitle}
+      >
         <div className="rounded-xl border bg-card/40 p-4 space-y-3">
           <button
             type="button"
@@ -164,7 +167,9 @@ export function SettingsPanel() {
           >
             <div>
               <div className="text-sm font-medium">{copy.settings.themeDark}</div>
-              <div className="mt-0.5 text-xs text-muted-foreground">{copy.settings.themeDarkDesc}</div>
+              <div className="mt-0.5 text-xs text-muted-foreground">
+                {copy.settings.themeDarkDesc}
+              </div>
             </div>
             {theme === "dark" && (
               <span className="text-[10px] uppercase tracking-wider text-primary">Ativo</span>
@@ -182,7 +187,9 @@ export function SettingsPanel() {
           >
             <div>
               <div className="text-sm font-medium">{copy.settings.themeLight}</div>
-              <div className="mt-0.5 text-xs text-muted-foreground">{copy.settings.themeLightDesc}</div>
+              <div className="mt-0.5 text-xs text-muted-foreground">
+                {copy.settings.themeLightDesc}
+              </div>
             </div>
             {theme === "light" && (
               <span className="text-[10px] uppercase tracking-wider text-primary">Ativo</span>

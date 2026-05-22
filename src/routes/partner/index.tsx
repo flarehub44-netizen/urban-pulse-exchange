@@ -29,7 +29,8 @@ function PartnerOverviewPage() {
       <div>
         <h1 className="text-lg font-semibold">{copy.partner.nav.overview}</h1>
         <p className="text-xs text-muted-foreground">
-          {o.tier} · @{o.slug} · {(o.revenue_share_pct * 100).toFixed(0)}% {copy.partner.stats.commissionHint}
+          {o.tier} · @{o.slug} · {(o.revenue_share_pct * 100).toFixed(0)}%{" "}
+          {copy.partner.stats.commissionHint}
         </p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -51,7 +52,13 @@ function PartnerOverviewPage() {
                 <XAxis dataKey="d" tick={{ fontSize: 10 }} />
                 <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip />
-                <Area type="monotone" dataKey="v" stroke="var(--color-primary)" fill="var(--color-primary)" fillOpacity={0.2} />
+                <Area
+                  type="monotone"
+                  dataKey="v"
+                  stroke="var(--color-primary)"
+                  fill="var(--color-primary)"
+                  fillOpacity={0.2}
+                />
               </AreaChart>
             </ResponsiveContainer>
           </div>

@@ -1,13 +1,7 @@
 import { copy } from "@/copy/pt-BR";
 import { formatBRL, PRIZE_RATIO, probability } from "@/lib/parimutuel";
 
-export function PoolBreakdown({
-  poolYes,
-  poolNo,
-}: {
-  poolYes: number;
-  poolNo: number;
-}) {
+export function PoolBreakdown({ poolYes, poolNo }: { poolYes: number; poolNo: number }) {
   const total = poolYes + poolNo;
   const fee = total * (1 - PRIZE_RATIO);
   const prize = total * PRIZE_RATIO;

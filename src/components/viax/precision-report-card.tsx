@@ -32,7 +32,9 @@ export function PrecisionReportCard() {
       <dl className="mt-3 grid grid-cols-2 gap-3 text-xs">
         <div>
           <dt className="text-muted-foreground">{copy.retention.allTimeAccuracy}</dt>
-          <dd className="mono mt-0.5 text-lg font-semibold">{(stats.accuracy * 100).toFixed(1)}%</dd>
+          <dd className="mono mt-0.5 text-lg font-semibold">
+            {(stats.accuracy * 100).toFixed(1)}%
+          </dd>
         </div>
         <div>
           <dt className="text-muted-foreground">{copy.retention.weekAccuracy}</dt>

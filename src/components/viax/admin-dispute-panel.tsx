@@ -19,9 +19,7 @@ export function AdminDisputePanel() {
   const drafts = (markets ?? []).filter((m) => m.status === "draft");
   const frozen = (markets ?? []).filter((m) => m.frozen === true);
   const open = (markets ?? []).filter(
-    (m) =>
-      !m.frozen &&
-      (m.status === "live" || m.status === "closing" || m.status === "closed"),
+    (m) => !m.frozen && (m.status === "live" || m.status === "closing" || m.status === "closed"),
   );
 
   const onFreeze = async (marketId: string, frozen: boolean) => {
@@ -52,21 +50,19 @@ export function AdminDisputePanel() {
   };
 
   if (!disputes.length && !open.length && !drafts.length && !frozen.length) {
-    return (
-      <p className="text-xs text-muted-foreground">{copy.settings.adminNoDisputes}</p>
-    );
+    return <p className="text-xs text-muted-foreground">{copy.settings.adminNoDisputes}</p>;
   }
 
   return (
     <div className="space-y-6">
       {disputes.length > 0 && (
-        <p className="text-[10px] text-muted-foreground">
-          {disputes.length} em disputa
-        </p>
+        <p className="text-[10px] text-muted-foreground">{disputes.length} em disputa</p>
       )}
       {drafts.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs font-medium text-muted-foreground">{copy.settings.adminDraftTitle}</p>
+          <p className="text-xs font-medium text-muted-foreground">
+            {copy.settings.adminDraftTitle}
+          </p>
           {drafts.map((m) => (
             <div
               key={m.id}
@@ -112,7 +108,9 @@ export function AdminDisputePanel() {
 
       {open.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs font-medium text-muted-foreground">{copy.settings.adminFreezeTitle}</p>
+          <p className="text-xs font-medium text-muted-foreground">
+            {copy.settings.adminFreezeTitle}
+          </p>
           {open.slice(0, 5).map((m) => (
             <div
               key={m.id}

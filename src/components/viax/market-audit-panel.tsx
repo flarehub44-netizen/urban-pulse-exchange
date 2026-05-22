@@ -8,17 +8,17 @@ import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 
 const VALIDATION_LABELS: Record<string, string> = {
-  consistency:       "Consistência",
-  tie:               "Empate detectado",
-  window_data:       "Janela de dados",
-  snapshot_count:    "Snapshots suficientes",
-  sanity_ratio:      "Índice de sanidade",
-  confidence_value:  "Confiança IA",
-  crowd_conflict:    "Conflito de consenso",
+  consistency: "Consistência",
+  tie: "Empate detectado",
+  window_data: "Janela de dados",
+  snapshot_count: "Snapshots suficientes",
+  sanity_ratio: "Índice de sanidade",
+  confidence_value: "Confiança IA",
+  crowd_conflict: "Conflito de consenso",
 };
 
 // Keys where true = passed (green), false = failed (red)
-const GOOD_WHEN_TRUE  = new Set(["consistency", "window_data", "snapshot_count"]);
+const GOOD_WHEN_TRUE = new Set(["consistency", "window_data", "snapshot_count"]);
 // Keys where false = passed (green), true = failed (red)
 const GOOD_WHEN_FALSE = new Set(["tie", "crowd_conflict"]);
 
@@ -29,15 +29,11 @@ export function MarketAuditPanel({ marketId }: { marketId: string }) {
   const showLedger = profile?.isAdmin === true || data?.is_admin === true;
 
   if (isLoading) {
-    return (
-      <p className="text-sm text-muted-foreground">{copy.markets.auditLoading}</p>
-    );
+    return <p className="text-sm text-muted-foreground">{copy.markets.auditLoading}</p>;
   }
 
   if (error || !data) {
-    return (
-      <p className="text-sm text-muted-foreground">{copy.markets.auditEmpty}</p>
-    );
+    return <p className="text-sm text-muted-foreground">{copy.markets.auditEmpty}</p>;
   }
 
   const { resolutions, ledger, snapshots } = data;
@@ -55,9 +51,7 @@ export function MarketAuditPanel({ marketId }: { marketId: string }) {
                 <div className="flex flex-wrap gap-2 text-xs">
                   <span className="rounded bg-surface px-2 py-0.5 uppercase">{r.status}</span>
                   <span className="text-muted-foreground">{r.source}</span>
-                  {r.derived_side && (
-                    <span className="mono text-primary">→ {r.derived_side}</span>
-                  )}
+                  {r.derived_side && <span className="mono text-primary">→ {r.derived_side}</span>}
                 </div>
                 {r.raw_value != null && (
                   <p className="mt-1 mono text-xs">
@@ -75,9 +69,13 @@ export function MarketAuditPanel({ marketId }: { marketId: string }) {
                       const isBool = typeof v === "boolean";
                       const passed = isBool
                         ? GOOD_WHEN_TRUE.has(k)
-                          ? (v === true ? true : false)
+                          ? v === true
+                            ? true
+                            : false
                           : GOOD_WHEN_FALSE.has(k)
-                            ? (v === false ? true : false)
+                            ? v === false
+                              ? true
+                              : false
                             : null
                         : null;
                       return (
@@ -92,7 +90,11 @@ export function MarketAuditPanel({ marketId }: { marketId: string }) {
                             )}
                           >
                             {isBool
-                              ? passed === true ? "✓" : passed === false ? "✗" : String(v)
+                              ? passed === true
+                                ? "✓"
+                                : passed === false
+                                  ? "✗"
+                                  : String(v)
                               : typeof v === "number"
                                 ? v.toFixed(2)
                                 : String(v)}

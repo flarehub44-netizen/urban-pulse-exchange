@@ -1,15 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import {
-  ArrowUpCircle,
-  ArrowDownCircle,
-  Trophy,
-  ChevronRight,
-  X,
-  Zap,
-  Brain,
-} from "lucide-react";
+import { ArrowUpCircle, ArrowDownCircle, Trophy, ChevronRight, X, Zap, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "viax_onboarded";
@@ -99,7 +91,8 @@ const stepData = [
                 <div className="h-full w-[76%] rounded-full bg-primary" />
               </div>
               <div className="flex justify-between text-[10px] text-muted-foreground">
-                <span>Confiança IA</span><span className="text-primary font-medium">76%</span>
+                <span>Confiança IA</span>
+                <span className="text-primary font-medium">76%</span>
               </div>
             </div>
           </div>

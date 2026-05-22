@@ -27,8 +27,7 @@ export function CameraStreamPreview({ url, className }: { url: string; className
       return "image" as const;
     const yt = youtubeEmbed(url);
     if (yt) return { type: "embed" as const, src: yt };
-    if (lower.startsWith("rtsp://") || lower.startsWith("rtmp://"))
-      return "unsupported" as const;
+    if (lower.startsWith("rtsp://") || lower.startsWith("rtmp://")) return "unsupported" as const;
     return "link" as const;
   }, [url]);
 

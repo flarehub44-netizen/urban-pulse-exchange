@@ -1,13 +1,6 @@
 import { useAdminVolumeByRegion } from "@/hooks/use-admin-dashboard";
 import { formatBRL } from "@/lib/parimutuel";
-import {
-  Bar,
-  BarChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 export function AdminRegionVolumeChart() {
   const { data } = useAdminVolumeByRegion();
@@ -19,9 +12,7 @@ export function AdminRegionVolumeChart() {
   }));
 
   if (!chartData.length) {
-    return (
-      <p className="text-xs text-muted-foreground">Sem volume por região hoje.</p>
-    );
+    return <p className="text-xs text-muted-foreground">Sem volume por região hoje.</p>;
   }
 
   return (

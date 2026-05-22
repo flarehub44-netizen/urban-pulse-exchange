@@ -59,9 +59,7 @@ export function NearMissModal({
             <X className="size-5" />
           </button>
         </div>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {copy.casino.nearMissBody(gap)}
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">{copy.casino.nearMissBody(gap)}</p>
         {payload.question && (
           <p className="mt-2 text-xs font-medium line-clamp-2">{payload.question}</p>
         )}

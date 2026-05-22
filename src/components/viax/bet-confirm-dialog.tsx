@@ -47,12 +47,7 @@ export function BetConfirmDialog({
 
         <div className="space-y-3 rounded-xl border bg-surface/60 p-4 text-sm">
           <Row label={copy.bet.confirmSide}>
-            <span
-              className={cn(
-                "font-semibold mono",
-                side === "YES" ? "text-up" : "text-down",
-              )}
-            >
+            <span className={cn("font-semibold mono", side === "YES" ? "text-up" : "text-down")}>
               {side === "YES" ? "SIM" : "NÃO"}
             </span>
           </Row>

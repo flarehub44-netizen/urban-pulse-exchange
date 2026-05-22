@@ -89,13 +89,12 @@ function Markets() {
   const markets = useCatalogMarkets();
   const { isLoading: marketsLoading, error: marketsError, refetch } = useMarkets();
   const queryClient = useQueryClient();
-  const statusFilters = profile?.isAdmin
-    ? [...baseStatusFilters, draftFilter]
-    : baseStatusFilters;
+  const statusFilters = profile?.isAdmin ? [...baseStatusFilters, draftFilter] : baseStatusFilters;
   const { ids: watchlist } = useWatchlist();
   const { data: bets } = useBets();
   const openMarketIds = useMemo(
-    () => new Set((bets ?? []).filter((b) => isOpenBetStatus(b.marketStatus)).map((b) => b.marketId)),
+    () =>
+      new Set((bets ?? []).filter((b) => isOpenBetStatus(b.marketStatus)).map((b) => b.marketId)),
     [bets],
   );
 
@@ -240,8 +239,21 @@ function Markets() {
 
       <div className="flex flex-wrap gap-2">
         {(() => {
-          const isHot = statusKey === "live" && sortKey === "trend" && !category && !showFavorites && !hasPosition && !aiPicks && !regionFilter;
-          const isClosing = statusKey === "closing" && sortKey === "closing" && !category && !showFavorites && !hasPosition && !aiPicks;
+          const isHot =
+            statusKey === "live" &&
+            sortKey === "trend" &&
+            !category &&
+            !showFavorites &&
+            !hasPosition &&
+            !aiPicks &&
+            !regionFilter;
+          const isClosing =
+            statusKey === "closing" &&
+            sortKey === "closing" &&
+            !category &&
+            !showFavorites &&
+            !hasPosition &&
+            !aiPicks;
           const isAi = aiPicks;
           const isMyRegion = !!userRegion && regionFilter === userRegion;
           const presets = [
@@ -250,29 +262,62 @@ function Markets() {
               label: "Em Alta",
               icon: <TrendingUp className="size-3" />,
               active: isHot,
-              onClick: () => patchSearch({ status: "live", sort: "trend", category: undefined, aiPicks: undefined, favorites: undefined, hasPosition: undefined, region: undefined }),
+              onClick: () =>
+                patchSearch({
+                  status: "live",
+                  sort: "trend",
+                  category: undefined,
+                  aiPicks: undefined,
+                  favorites: undefined,
+                  hasPosition: undefined,
+                  region: undefined,
+                }),
             },
             {
               key: "closing",
               label: "Encerrando",
               icon: <Clock className="size-3" />,
               active: isClosing,
-              onClick: () => patchSearch({ status: "closing", sort: "closing", category: undefined, aiPicks: undefined, favorites: undefined, hasPosition: undefined }),
+              onClick: () =>
+                patchSearch({
+                  status: "closing",
+                  sort: "closing",
+                  category: undefined,
+                  aiPicks: undefined,
+                  favorites: undefined,
+                  hasPosition: undefined,
+                }),
             },
             {
               key: "ai",
               label: "IA Indica",
               icon: <Bot className="size-3" />,
               active: isAi,
-              onClick: () => patchSearch({ aiPicks: aiPicks ? undefined : "1", status: "live", sort: "edge", category: undefined, favorites: undefined, hasPosition: undefined }),
+              onClick: () =>
+                patchSearch({
+                  aiPicks: aiPicks ? undefined : "1",
+                  status: "live",
+                  sort: "edge",
+                  category: undefined,
+                  favorites: undefined,
+                  hasPosition: undefined,
+                }),
             },
-            ...(userRegion ? [{
-              key: "region",
-              label: userRegion,
-              icon: <MapPin className="size-3" />,
-              active: isMyRegion,
-              onClick: () => patchSearch({ region: isMyRegion ? undefined : userRegion, aiPicks: undefined }),
-            }] : []),
+            ...(userRegion
+              ? [
+                  {
+                    key: "region",
+                    label: userRegion,
+                    icon: <MapPin className="size-3" />,
+                    active: isMyRegion,
+                    onClick: () =>
+                      patchSearch({
+                        region: isMyRegion ? undefined : userRegion,
+                        aiPicks: undefined,
+                      }),
+                  },
+                ]
+              : []),
           ];
           return presets.map((p) => (
             <button
@@ -437,10 +482,7 @@ function Markets() {
       )}
 
       {marketsError && (
-        <InlineError
-          message="Não foi possível carregar os mercados."
-          onRetry={() => refetch()}
-        />
+        <InlineError message="Não foi possível carregar os mercados." onRetry={() => refetch()} />
       )}
 
       {marketsLoading && !marketsError && (

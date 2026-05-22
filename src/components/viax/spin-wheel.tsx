@@ -61,8 +61,7 @@ export function SpinWheel({ onNearMissSpin, onDepositBonusCta }: SpinWheelProps)
       setLastResult(res);
       const idx = sectorIndex(res.outcome_key ?? "balance_25");
       const overshoot = res.is_near_miss ? SECTOR_DEG * 0.35 : 0;
-      const target =
-        360 * 5 + (360 - idx * SECTOR_DEG - SECTOR_DEG / 2) + overshoot;
+      const target = 360 * 5 + (360 - idx * SECTOR_DEG - SECTOR_DEG / 2) + overshoot;
       setRotation((r) => r + target);
       setTimeout(() => {
         setSpinning(false);
@@ -86,11 +85,7 @@ export function SpinWheel({ onNearMissSpin, onDepositBonusCta }: SpinWheelProps)
       {showDisclaimer && (
         <p className="mb-3 rounded-lg border border-warn/20 bg-warn/5 px-3 py-2 text-xs text-muted-foreground">
           {copy.responsiblePlay.disclaimerShort}{" "}
-          <button
-            type="button"
-            className="text-primary underline"
-            onClick={dismissDisclaimer}
-          >
+          <button type="button" className="text-primary underline" onClick={dismissDisclaimer}>
             {copy.responsiblePlay.understood}
           </button>
         </p>
@@ -115,8 +110,7 @@ export function SpinWheel({ onNearMissSpin, onDepositBonusCta }: SpinWheelProps)
             style={{
               transform: `rotate(${rotation}deg)`,
               background: `conic-gradient(${SECTORS.map(
-                (s, i) =>
-                  `${s.color} ${i * SECTOR_DEG}deg ${(i + 1) * SECTOR_DEG}deg`,
+                (s, i) => `${s.color} ${i * SECTOR_DEG}deg ${(i + 1) * SECTOR_DEG}deg`,
               ).join(", ")})`,
             }}
           >

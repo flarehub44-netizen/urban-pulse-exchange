@@ -16,11 +16,7 @@ export function wouldNearMissBetLoss(
   const total = market.pool.YES + market.pool.NO;
   if (total <= 0) return stake >= 50;
   const yesRatio = market.pool.YES / total;
-  return (
-    (share ?? 0) >= 0.35 ||
-    Math.abs(yesRatio - 0.5) <= 0.08 ||
-    stake / total >= 0.08
-  );
+  return (share ?? 0) >= 0.35 || Math.abs(yesRatio - 0.5) <= 0.08 || stake / total >= 0.08;
 }
 
 export function nearMissGapPercent(market: Pick<Market, "pool">): number {

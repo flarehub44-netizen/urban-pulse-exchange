@@ -10,7 +10,17 @@ import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
 import { useFollowedTraders } from "@/hooks/use-followed-traders";
 import { toast } from "sonner";
-import { ArrowLeft, Lock, UserPlus, UserMinus, Zap, Link2, BarChart2, Activity, History } from "lucide-react";
+import {
+  ArrowLeft,
+  Lock,
+  UserPlus,
+  UserMinus,
+  Zap,
+  Link2,
+  BarChart2,
+  Activity,
+  History,
+} from "lucide-react";
 import { EmptyState } from "@/components/viax/empty-state";
 import { usePublicTraderBets } from "@/hooks/use-public-trader-bets";
 import { usePublicExpertProfile } from "@/hooks/use-partner";

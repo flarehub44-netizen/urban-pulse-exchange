@@ -27,7 +27,11 @@ export function SocialBook({ m }: { m: Market }) {
           feedFallback.map((p) => (
             <div key={p.id} className="flex items-center justify-between gap-2">
               <div className="flex min-w-0 items-center gap-2">
-                <img src={p.user.avatar} alt={p.user.handle} className="size-6 rounded-full bg-surface" />
+                <img
+                  src={p.user.avatar}
+                  alt={p.user.handle}
+                  className="size-6 rounded-full bg-surface"
+                />
                 <span className="truncate text-muted-foreground">@{p.user.handle}</span>
               </div>
               <span className="truncate text-foreground/80 max-w-[120px]">

@@ -17,22 +17,18 @@ export function TraderArchetypeCard() {
           {data.icon}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-primary">Seu Arquétipo</p>
+          <p className="text-[10px] font-medium uppercase tracking-widest text-primary">
+            Seu Arquétipo
+          </p>
           <h3 className="mt-0.5 text-base font-bold text-foreground">{data.archetype}</h3>
           <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{data.description}</p>
         </div>
       </div>
       {data.total_bets > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
-          {data.accuracy > 0 && (
-            <Chip label={`${data.accuracy}% de acerto`} />
-          )}
-          {data.top_region && (
-            <Chip label={`📍 ${data.top_region}`} />
-          )}
-          {data.total_bets > 0 && (
-            <Chip label={`${data.total_bets} apostas`} />
-          )}
+          {data.accuracy > 0 && <Chip label={`${data.accuracy}% de acerto`} />}
+          {data.top_region && <Chip label={`📍 ${data.top_region}`} />}
+          {data.total_bets > 0 && <Chip label={`${data.total_bets} apostas`} />}
         </div>
       )}
     </motion.div>

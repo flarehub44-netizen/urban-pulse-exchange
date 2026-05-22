@@ -164,7 +164,11 @@ function Feed() {
               className="rounded-2xl border bg-card/60 p-4 backdrop-blur transition hover:bg-surface/30"
             >
               <div className="flex gap-3">
-                <img src={p.user.avatar} className="size-10 rounded-full bg-surface" alt={p.user.name} />
+                <img
+                  src={p.user.avatar}
+                  className="size-10 rounded-full bg-surface"
+                  alt={p.user.name}
+                />
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2 text-sm">
                     <span className="font-medium">{p.user.name}</span>
@@ -362,7 +366,11 @@ function Feed() {
             {!commentsLoading &&
               threadComments?.map((c) => (
                 <li key={c.id} className="flex gap-2 text-sm">
-                  <img src={c.user.avatar} className="size-8 rounded-full bg-surface" alt={c.user.name} />
+                  <img
+                    src={c.user.avatar}
+                    className="size-8 rounded-full bg-surface"
+                    alt={c.user.name}
+                  />
                   <div>
                     <span className="font-medium">{c.user.name}</span>{" "}
                     <span className="text-muted-foreground">@{c.user.handle}</span>

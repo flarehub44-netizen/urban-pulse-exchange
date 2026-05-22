@@ -8,7 +8,9 @@ export function buildDailyMission(
 ): Market | undefined {
   const region = (neighborhood?.trim() || city || "").toLowerCase();
   const live = markets.filter((m) => m.status === "live" || m.status === "closing");
-  const regional = live.filter((m) => m.region.toLowerCase().includes(region) || region.includes(m.region.toLowerCase()));
+  const regional = live.filter(
+    (m) => m.region.toLowerCase().includes(region) || region.includes(m.region.toLowerCase()),
+  );
   const pool = regional.length > 0 ? regional : live;
   return [...pool].sort((a, b) => Math.abs(b.trend) - Math.abs(a.trend))[0];
 }

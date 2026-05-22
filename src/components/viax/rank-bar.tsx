@@ -23,7 +23,11 @@ export function RankBar({
     >
       <div className="flex items-center gap-3">
         <span className="mono text-lg font-semibold text-primary">#{rank}</span>
-        <img src={trader.avatar} className="size-10 rounded-full border bg-surface" alt={trader.name} />
+        <img
+          src={trader.avatar}
+          className="size-10 rounded-full border bg-surface"
+          alt={trader.name}
+        />
         <div>
           <div className="text-xs uppercase tracking-wider text-primary">Sua posição</div>
           <div className="font-medium">{trader.name}</div>

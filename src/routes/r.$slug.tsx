@@ -41,7 +41,11 @@ function PartnerRedirectPage() {
       storePartnerRef(res.slug, res.campaign_id);
       const target = res.target ?? { path: "/dashboard" };
       if (target.market_id) {
-        navigate({ to: "/markets/$marketId", params: { marketId: target.market_id }, replace: true });
+        navigate({
+          to: "/markets/$marketId",
+          params: { marketId: target.market_id },
+          replace: true,
+        });
       } else if (target.city) {
         navigate({ to: "/live", search: { city: target.city }, replace: true });
       } else {

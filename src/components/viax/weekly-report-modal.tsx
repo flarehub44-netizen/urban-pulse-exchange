@@ -10,12 +10,7 @@ interface WeeklyReportModalProps {
   onClose: () => void;
 }
 
-const slides = [
-  "summary",
-  "region",
-  "streak",
-  "ranking",
-] as const;
+const slides = ["summary", "region", "streak", "ranking"] as const;
 
 type Slide = (typeof slides)[number];
 
@@ -40,9 +35,8 @@ export function WeeklyReportModal({ report, onClose }: WeeklyReportModalProps) {
 
   const accuracyPct = report.accuracy;
   const isPositivePnl = report.pnl_week >= 0;
-  const winRate = report.bets_week > 0
-    ? Math.round((report.wins_week / report.bets_week) * 100)
-    : 0;
+  const winRate =
+    report.bets_week > 0 ? Math.round((report.wins_week / report.bets_week) * 100) : 0;
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
@@ -61,7 +55,9 @@ export function WeeklyReportModal({ report, onClose }: WeeklyReportModalProps) {
         </button>
 
         <div className="px-6 pt-6 pb-2">
-          <p className="text-xs font-medium uppercase tracking-widest text-primary">Sua Semana em SP</p>
+          <p className="text-xs font-medium uppercase tracking-widest text-primary">
+            Sua Semana em SP
+          </p>
           <p className="text-xs text-muted-foreground">{report.report_week}</p>
         </div>
 
@@ -87,9 +83,13 @@ export function WeeklyReportModal({ report, onClose }: WeeklyReportModalProps) {
                     value={`${report.wins_week}/${report.bets_week}`}
                   />
                   <StatCard
-                    icon={isPositivePnl
-                      ? <TrendingUp className="size-4 text-up" />
-                      : <TrendingDown className="size-4 text-down" />}
+                    icon={
+                      isPositivePnl ? (
+                        <TrendingUp className="size-4 text-up" />
+                      ) : (
+                        <TrendingDown className="size-4 text-down" />
+                      )
+                    }
                     label="P&L"
                     value={formatBRL(Math.abs(report.pnl_week))}
                     color={isPositivePnl ? "text-up" : "text-down"}
@@ -106,7 +106,9 @@ export function WeeklyReportModal({ report, onClose }: WeeklyReportModalProps) {
                   <>
                     <div>
                       <p className="text-2xl font-bold">{report.best_region}</p>
-                      <p className="text-sm text-muted-foreground mt-1">foi sua melhor região esta semana</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        foi sua melhor região esta semana
+                      </p>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Continue apostando aí — você conhece o terreno.
@@ -151,8 +153,8 @@ export function WeeklyReportModal({ report, onClose }: WeeklyReportModalProps) {
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Divisão atual:{" "}
-                  <span className="font-semibold text-foreground">{report.division}</span>
-                  {" "}· Precisão: {accuracyPct}%
+                  <span className="font-semibold text-foreground">{report.division}</span> ·
+                  Precisão: {accuracyPct}%
                 </p>
               </div>
             )}
@@ -199,9 +201,13 @@ function StatCard({
 }) {
   return (
     <div className="rounded-xl border border-border/50 bg-surface/60 p-3">
-      <div className="mb-1 flex items-center gap-1.5">{icon}<span className="text-xs text-muted-foreground">{label}</span></div>
+      <div className="mb-1 flex items-center gap-1.5">
+        {icon}
+        <span className="text-xs text-muted-foreground">{label}</span>
+      </div>
       <p className={`text-lg font-semibold ${color}`}>
-        {prefix}{value}
+        {prefix}
+        {value}
       </p>
     </div>
   );

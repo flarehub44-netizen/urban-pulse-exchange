@@ -27,11 +27,7 @@ export function isSettledDisplay(status: MarketStatus): boolean {
   return status === "settled" || status === "void" || status === "resolved";
 }
 
-export function canPlaceBets(
-  status: MarketStatus,
-  acceptBets = true,
-  endsAtMs?: number,
-): boolean {
+export function canPlaceBets(status: MarketStatus, acceptBets = true, endsAtMs?: number): boolean {
   if (!acceptBets) return false;
   if (!["live", "closing"].includes(status)) return false;
   if (endsAtMs != null && Date.now() >= endsAtMs) return false;

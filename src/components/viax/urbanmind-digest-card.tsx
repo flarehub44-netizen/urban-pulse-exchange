@@ -15,7 +15,9 @@ export function UrbanMindDigestCard() {
           <Brain className="size-5 text-primary" />
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-sm font-medium">{data.headline ?? copy.retention.urbanmindDigestTitle}</h3>
+          <h3 className="text-sm font-medium">
+            {data.headline ?? copy.retention.urbanmindDigestTitle}
+          </h3>
           <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{data.body}</p>
           {data.bets_vs_ai > 0 && (
             <p className="mt-2 text-[11px] text-primary">

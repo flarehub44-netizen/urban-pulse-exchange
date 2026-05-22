@@ -24,6 +24,9 @@ import { EdgeBadge } from "@/components/viax/edge-badge";
 import { ImpulseDepositBar } from "@/components/viax/impulse-deposit-bar";
 import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
 import { BetConfirmDialog } from "@/components/viax/bet-confirm-dialog";
+import { AnonFirstBetDialog } from "@/components/viax/anon-first-bet-dialog";
+import { AnonAccountBanner } from "@/components/viax/anon-account-banner";
+import { hasAnonBetAck, setAnonBetAck } from "@/lib/anon-account-storage";
 import { AnimatedNumber } from "./animated-number";
 import { cn } from "@/lib/utils";
 import { ArrowDown, ArrowUp, BookOpen } from "lucide-react";
@@ -53,10 +56,17 @@ export function OrderBox({
   const [note, setNote] = useState("");
   const [showNote, setShowNote] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [anonAckOpen, setAnonAckOpen] = useState(false);
+  const [isAnonUser, setIsAnonUser] = useState(false);
 
   useEffect(() => {
     setSide(initialSide);
   }, [initialSide, m.id]);
+
+  useEffect(() => {
+    if (!userId) return;
+    supabase.auth.getUser().then(({ data }) => setIsAnonUser(!data.user?.email));
+  }, [userId]);
 
   const settled = isSettledDisplay(m.status);
   const canBet = canPlaceBets(m.status, m.acceptBets ?? true, m.endsAt);
@@ -91,6 +101,15 @@ export function OrderBox({
       });
       return;
     }
+    if (isAnonUser && !hasAnonBetAck()) {
+      setAnonAckOpen(true);
+      return;
+    }
+    setConfirmOpen(true);
+  };
+
+  const proceedAfterAnonAck = () => {
+    setAnonBetAck();
     setConfirmOpen(true);
   };
 
@@ -175,7 +194,12 @@ export function OrderBox({
 
   if (m.status === "resolving") {
     return (
-      <div className={cn("rounded-2xl border border-primary/30 bg-primary/5 p-5 backdrop-blur", className)}>
+      <div
+        className={cn(
+          "rounded-2xl border border-primary/30 bg-primary/5 p-5 backdrop-blur",
+          className,
+        )}
+      >
         <h4 className="text-sm font-medium">{copy.bet.resolvingTitle}</h4>
         <p className="mt-2 text-sm text-muted-foreground">{copy.bet.resolvingDesc}</p>
       </div>
@@ -184,7 +208,9 @@ export function OrderBox({
 
   if (m.status === "dispute") {
     return (
-      <div className={cn("rounded-2xl border border-warn/30 bg-warn/5 p-5 backdrop-blur", className)}>
+      <div
+        className={cn("rounded-2xl border border-warn/30 bg-warn/5 p-5 backdrop-blur", className)}
+      >
         <h4 className="text-sm font-medium">{copy.bet.disputeTitle}</h4>
         <p className="mt-2 text-sm text-muted-foreground">{copy.bet.disputeDesc}</p>
       </div>
@@ -245,7 +271,8 @@ export function OrderBox({
         className,
       )}
     >
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <AnonAccountBanner />
+      <div className="flex flex-wrap items-center justify-between gap-2 mt-3">
         <h4 className="text-sm font-medium">{copy.bet.operateMarket}</h4>
         <EdgeBadge m={m} />
       </div>
@@ -382,7 +409,9 @@ export function OrderBox({
               rows={2}
               className="w-full resize-none rounded-lg border bg-surface px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary/50"
             />
-            <div className="mt-1 text-right text-[10px] text-muted-foreground">{note.length}/140</div>
+            <div className="mt-1 text-right text-[10px] text-muted-foreground">
+              {note.length}/140
+            </div>
           </div>
         )}
       </div>
@@ -422,6 +451,11 @@ export function OrderBox({
         />
       </div>
 
+      <AnonFirstBetDialog
+        open={anonAckOpen}
+        onOpenChange={setAnonAckOpen}
+        onContinue={proceedAfterAnonAck}
+      />
       <BetConfirmDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}

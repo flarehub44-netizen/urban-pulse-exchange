@@ -9,14 +9,7 @@ import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import {
-  Bar,
-  BarChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { InlineError } from "@/components/viax/inline-error";
 import { AdminRegionVolumeChart } from "@/components/admin/admin-region-volume";
 
@@ -33,11 +26,13 @@ function AdminOverviewPage() {
     return <InlineError onRetry={() => refetch()} />;
   }
 
-  const lifecycle = metrics?.lifecycle as {
-    last_tick_ok?: boolean;
-    stale_minutes?: number;
-    last_tick_at?: string;
-  } | undefined;
+  const lifecycle = metrics?.lifecycle as
+    | {
+        last_tick_ok?: boolean;
+        stale_minutes?: number;
+        last_tick_at?: string;
+      }
+    | undefined;
 
   const chartData = (volumeHour ?? []).map((r) => ({
     label: new Date(r.hour).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
@@ -85,9 +80,7 @@ function AdminOverviewPage() {
               ? copy.settings.adminOpsHealthy
               : copy.settings.adminOpsStale
           }
-          tone={
-            lifecycle?.last_tick_ok && (lifecycle.stale_minutes ?? 99) < 5 ? "up" : "warn"
-          }
+          tone={lifecycle?.last_tick_ok && (lifecycle.stale_minutes ?? 99) < 5 ? "up" : "warn"}
           sub={
             lifecycle?.last_tick_at
               ? formatDistanceToNow(new Date(lifecycle.last_tick_at), {
@@ -143,9 +136,7 @@ function AdminOverviewPage() {
                 </p>
               </li>
             ))}
-            {!feed?.length && (
-              <li className="text-muted-foreground">Nenhum evento recente.</li>
-            )}
+            {!feed?.length && <li className="text-muted-foreground">Nenhum evento recente.</li>}
           </ul>
         </div>
       </div>

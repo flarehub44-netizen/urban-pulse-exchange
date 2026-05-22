@@ -67,9 +67,7 @@ function AdminUsersPage() {
               <tr key={u.id} className="border-b border-border/40">
                 <td className="px-3 py-2">
                   <span className="font-medium">{u.username}</span>
-                  {u.is_admin && (
-                    <span className="ml-2 text-[10px] text-primary">admin</span>
-                  )}
+                  {u.is_admin && <span className="ml-2 text-[10px] text-primary">admin</span>}
                 </td>
                 <td className="px-3 py-2 text-right mono">{formatBRL(Number(u.volume))}</td>
                 <td className="px-3 py-2">
@@ -106,9 +104,7 @@ function AdminUsersPage() {
                       type="number"
                       placeholder="Limite"
                       value={limitInput[u.id] ?? ""}
-                      onChange={(e) =>
-                        setLimitInput((s) => ({ ...s, [u.id]: e.target.value }))
-                      }
+                      onChange={(e) => setLimitInput((s) => ({ ...s, [u.id]: e.target.value }))}
                       className="w-20 rounded border bg-surface px-1 py-0.5 mono text-[10px]"
                     />
                     <button

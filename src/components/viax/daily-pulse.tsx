@@ -44,9 +44,8 @@ export function DailyPulse() {
         toast.message(copy.retention.alreadyCheckedIn);
         return;
       }
-      const xpMsg = multiplier > 1
-        ? `+${res.xp_awarded} XP (${multiplier}x streak)`
-        : `+${res.xp_awarded} XP`;
+      const xpMsg =
+        multiplier > 1 ? `+${res.xp_awarded} XP (${multiplier}x streak)` : `+${res.xp_awarded} XP`;
       toast.success(xpMsg, { description: res.insight });
       showAchievementToasts(res.progress?.achievements_unlocked);
     } catch (e: unknown) {
@@ -55,12 +54,14 @@ export function DailyPulse() {
   };
 
   return (
-    <div className={cn(
-      "rounded-2xl border p-4 backdrop-blur",
-      recoveryMode
-        ? "border-warn/30 bg-gradient-to-br from-warn/10 to-card/80"
-        : "border-primary/25 bg-gradient-to-br from-primary/10 to-card/80",
-    )}>
+    <div
+      className={cn(
+        "rounded-2xl border p-4 backdrop-blur",
+        recoveryMode
+          ? "border-warn/30 bg-gradient-to-br from-warn/10 to-card/80"
+          : "border-primary/25 bg-gradient-to-br from-primary/10 to-card/80",
+      )}
+    >
       {recoveryMode && (
         <div className="mb-3 flex items-center gap-2 rounded-lg bg-warn/10 px-3 py-1.5 text-xs text-warn">
           <ShieldCheck className="size-3.5" />
@@ -93,7 +94,8 @@ export function DailyPulse() {
               </p>
               {multiplier > 1 && (
                 <span className="flex items-center gap-0.5 rounded-full bg-warn/15 px-2 py-0.5 text-[10px] font-semibold text-warn">
-                  <Zap className="size-2.5" />{multiplier}x XP
+                  <Zap className="size-2.5" />
+                  {multiplier}x XP
                 </span>
               )}
             </div>

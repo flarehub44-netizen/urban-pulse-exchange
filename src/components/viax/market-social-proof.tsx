@@ -57,11 +57,16 @@ export function MarketSocialProof({ marketId }: { marketId: string }) {
                 <span className="text-xs font-medium text-foreground/80 truncate flex-1">
                   {bet.name || bet.handle}
                 </span>
-                <span className={`text-xs font-semibold shrink-0 ${bet.side === "YES" ? "text-up" : "text-down"}`}>
+                <span
+                  className={`text-xs font-semibold shrink-0 ${bet.side === "YES" ? "text-up" : "text-down"}`}
+                >
                   {bet.side} · {formatBRL(bet.stake)}
                 </span>
                 <span className="text-[10px] text-muted-foreground shrink-0">
-                  {formatDistanceToNowStrict(new Date(bet.created_at), { locale: ptBR, addSuffix: true })}
+                  {formatDistanceToNowStrict(new Date(bet.created_at), {
+                    locale: ptBR,
+                    addSuffix: true,
+                  })}
                 </span>
               </motion.div>
             ))}

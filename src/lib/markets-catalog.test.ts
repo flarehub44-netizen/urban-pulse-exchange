@@ -34,10 +34,7 @@ describe("markets-catalog", () => {
   });
 
   it("filterCatalogMarkets", () => {
-    const out = filterCatalogMarkets([
-      base,
-      { ...base, id: "paulista-rush" },
-    ]);
+    const out = filterCatalogMarkets([base, { ...base, id: "paulista-rush" }]);
     expect(out).toHaveLength(1);
   });
 });

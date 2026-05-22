@@ -29,9 +29,12 @@ function AdminSourcesPage() {
   const [name, setName] = useState("");
   const [regionId, setRegionId] = useState("");
   const [streamUrl, setStreamUrl] = useState("");
-  const [countLine, setCountLine] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(
-    null,
-  );
+  const [countLine, setCountLine] = useState<{
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+  } | null>(null);
 
   const onAddCamera = async () => {
     if (!name.trim() || !regionId) {

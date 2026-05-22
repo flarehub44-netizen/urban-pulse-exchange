@@ -8,6 +8,7 @@ import { MarketVolumeChart } from "@/components/viax/market-volume-chart";
 import { MarketCandles } from "@/components/viax/market-candles";
 import { SocialBook } from "@/components/viax/social-book";
 import { OrderBox } from "@/components/viax/order-box";
+import { AnonAccountBanner } from "@/components/viax/anon-account-banner";
 import { OpenPositionStrip } from "@/components/viax/open-position-strip";
 import { EdgeBadge } from "@/components/viax/edge-badge";
 import { ProbBar } from "@/components/viax/prob-bar";
@@ -111,6 +112,8 @@ function MarketDetail() {
           {questionShort}
         </span>
       </nav>
+
+      <AnonAccountBanner />
 
       <div className="flex flex-wrap items-center gap-2 text-sm">
         <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-primary">
@@ -217,10 +220,8 @@ function MarketDetail() {
                 </div>
                 <p className="mt-1 text-muted-foreground">
                   IA confiança:{" "}
-                  <span className="mono">
-                    {(m.aiPrediction.confidence * 100).toFixed(0)}%
-                  </span>{" "}
-                  · Previsão:{" "}
+                  <span className="mono">{(m.aiPrediction.confidence * 100).toFixed(0)}%</span> ·
+                  Previsão:{" "}
                   <span className={m.aiPrediction.side === "YES" ? "text-up" : "text-down"}>
                     {m.aiPrediction.side === "YES" ? "↑ SIM" : "↓ NÃO"}
                   </span>
@@ -348,7 +349,11 @@ function MarketDetail() {
                     key={p.id}
                     className="flex gap-3 border-t border-border/60 pt-3 first:border-0 first:pt-0"
                   >
-                    <img src={p.user.avatar} className="size-9 rounded-full bg-surface" alt={p.user.name} />
+                    <img
+                      src={p.user.avatar}
+                      className="size-9 rounded-full bg-surface"
+                      alt={p.user.name}
+                    />
                     <div className="min-w-0 flex-1">
                       <div className="text-xs text-muted-foreground">
                         <span className="font-medium text-foreground">{p.user.name}</span> @

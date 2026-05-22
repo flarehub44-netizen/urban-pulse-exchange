@@ -14,7 +14,9 @@ const LEGACY_SEED_IDS = new Set([
 ]);
 
 /** Client-side filter when `archived` column is not on cached rows yet. */
-export function isCatalogMarket(m: Pick<Market, "id" | "status"> & { archived?: boolean }): boolean {
+export function isCatalogMarket(
+  m: Pick<Market, "id" | "status"> & { archived?: boolean },
+): boolean {
   if (m.archived === true) return false;
   if (LEGACY_SEED_IDS.has(m.id)) return false;
   return true;

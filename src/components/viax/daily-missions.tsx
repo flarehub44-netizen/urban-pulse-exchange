@@ -43,7 +43,12 @@ function MissionRow({ mission }: { mission: DailyMission }) {
     >
       <span className="text-xl leading-none">{mission.icon}</span>
       <div className="flex-1 min-w-0">
-        <p className={cn("text-sm font-medium", mission.completed && "line-through text-muted-foreground")}>
+        <p
+          className={cn(
+            "text-sm font-medium",
+            mission.completed && "line-through text-muted-foreground",
+          )}
+        >
           {mission.label}
         </p>
         <p className="mt-0.5 text-xs text-muted-foreground leading-tight">{mission.description}</p>

@@ -59,19 +59,13 @@ export function useMarket(id: string) {
 export function useCatalogMarkets(): Market[] {
   const { data: dbMarkets } = useMarkets();
   const zustandMarkets = useViaX((s) => s.markets);
-  return pickDbOrEmptyArray(
-    dbMarkets,
-    filterCatalogMarkets(zustandMarkets),
-  );
+  return pickDbOrEmptyArray(dbMarkets, filterCatalogMarkets(zustandMarkets));
 }
 
 export function useMarketsList() {
   const query = useMarkets();
   const zustandMarkets = useViaX((s) => s.markets);
-  const markets = pickDbOrEmptyArray(
-    query.data,
-    filterCatalogMarkets(zustandMarkets),
-  );
+  const markets = pickDbOrEmptyArray(query.data, filterCatalogMarkets(zustandMarkets));
   return { ...query, markets };
 }
 

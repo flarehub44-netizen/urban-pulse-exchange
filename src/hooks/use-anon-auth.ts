@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getStoredPartnerRef, clearStoredPartnerRef } from "@/lib/partner-attribution";
+import { getBoundReferralSlug, markReferralBound } from "@/lib/anon-account-storage";
 
 export function useAnonAuth() {
   const [authReady, setAuthReady] = useState(false);
@@ -45,11 +46,22 @@ export function useAnonAuth() {
 async function tryBindPartnerRef() {
   const ref = getStoredPartnerRef();
   if (!ref?.slug) return;
+  if (getBoundReferralSlug() === ref.slug) {
+    clearStoredPartnerRef();
+    return;
+  }
   const { data, error } = await supabase.rpc("bind_referral_attribution", {
     p_slug: ref.slug,
     p_campaign_id: ref.campaignId ?? null,
   });
-  if (!error && (data as { ok?: boolean })?.ok) {
-    clearStoredPartnerRef();
+  if (!error) {
+    const payload = data as { ok?: boolean; reason?: string };
+    if (payload?.ok) {
+      markReferralBound(ref.slug);
+      clearStoredPartnerRef();
+    } else if (payload?.reason === "already_attributed") {
+      markReferralBound(ref.slug);
+      clearStoredPartnerRef();
+    }
   }
 }

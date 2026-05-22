@@ -1,10 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import {
-  useAdminPlatformSettings,
-  useAdminUpdateSetting,
-} from "@/hooks/use-admin-dashboard";
+import { useAdminPlatformSettings, useAdminUpdateSetting } from "@/hooks/use-admin-dashboard";
 import { copy } from "@/copy/pt-BR";
 import { InlineError } from "@/components/viax/inline-error";
 import { AdminAuditLog } from "@/components/admin/admin-audit-log";

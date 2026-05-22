@@ -20,6 +20,7 @@ import { AnimatedNumber } from "@/components/viax/animated-number";
 import { formatBRL } from "@/lib/parimutuel";
 import { ArrowDownLeft, ArrowUpRight, Plus, Minus, Trophy } from "lucide-react";
 import { EmptyState } from "@/components/viax/empty-state";
+import { SimulatedMoneyBanner } from "@/components/viax/simulated-money-banner";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { cn } from "@/lib/utils";
 import { isOpenBetStatus } from "@/lib/market-status";
@@ -199,6 +200,7 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
 
       {(tab === "Depositar" || tab === "Sacar") && (
         <div className="mx-auto max-w-md rounded-2xl border bg-card/60 p-5 backdrop-blur">
+          {tab === "Depositar" && <SimulatedMoneyBanner className="mb-4" />}
           <h3 className="text-sm font-medium">
             {tab === "Depositar" ? "Adicionar saldo" : "Sacar para conta"}
           </h3>
@@ -422,8 +424,7 @@ function RecentTx({ tx }: { tx: ReturnType<typeof useViaX.getState>["transaction
       <div className="border-b px-4 py-3 text-sm font-medium">Transações</div>
       <ul>
         {tx.map((t) => {
-          const positive =
-            t.type === "deposit" || t.type === "payout" || t.type === "refund";
+          const positive = t.type === "deposit" || t.type === "payout" || t.type === "refund";
           return (
             <li
               key={t.id}

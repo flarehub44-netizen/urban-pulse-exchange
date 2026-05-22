@@ -21,7 +21,11 @@ export function CameraLineEditor({
     <div className="rounded-xl border bg-surface/40 p-4 text-xs">
       <p className="mb-2 text-muted-foreground">Linha de contagem (coordenadas normalizadas 0–1)</p>
       <div className="relative mb-3 h-24 rounded-lg border bg-background">
-        <svg className="absolute inset-0 size-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <svg
+          className="absolute inset-0 size-full"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+        >
           <line
             x1={x1 * 100}
             y1={y1 * 100}
@@ -33,12 +37,40 @@ export function CameraLineEditor({
         </svg>
       </div>
       <div className="grid grid-cols-4 gap-2 mono">
-        <input type="number" step="0.1" value={x1} onChange={(e) => setX1(Number(e.target.value))} className="rounded border bg-surface px-1 py-0.5" />
-        <input type="number" step="0.1" value={y1} onChange={(e) => setY1(Number(e.target.value))} className="rounded border bg-surface px-1 py-0.5" />
-        <input type="number" step="0.1" value={x2} onChange={(e) => setX2(Number(e.target.value))} className="rounded border bg-surface px-1 py-0.5" />
-        <input type="number" step="0.1" value={y2} onChange={(e) => setY2(Number(e.target.value))} className="rounded border bg-surface px-1 py-0.5" />
+        <input
+          type="number"
+          step="0.1"
+          value={x1}
+          onChange={(e) => setX1(Number(e.target.value))}
+          className="rounded border bg-surface px-1 py-0.5"
+        />
+        <input
+          type="number"
+          step="0.1"
+          value={y1}
+          onChange={(e) => setY1(Number(e.target.value))}
+          className="rounded border bg-surface px-1 py-0.5"
+        />
+        <input
+          type="number"
+          step="0.1"
+          value={x2}
+          onChange={(e) => setX2(Number(e.target.value))}
+          className="rounded border bg-surface px-1 py-0.5"
+        />
+        <input
+          type="number"
+          step="0.1"
+          value={y2}
+          onChange={(e) => setY2(Number(e.target.value))}
+          className="rounded border bg-surface px-1 py-0.5"
+        />
       </div>
-      <button type="button" onClick={apply} className="mt-2 rounded border px-2 py-1 hover:bg-surface-2">
+      <button
+        type="button"
+        onClick={apply}
+        className="mt-2 rounded border px-2 py-1 hover:bg-surface-2"
+      >
         Aplicar linha
       </button>
       {value != null && (

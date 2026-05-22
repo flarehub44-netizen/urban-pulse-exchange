@@ -56,7 +56,9 @@ export function PartnerLayout() {
                 to={item.to}
                 className={cn(
                   "shrink-0 rounded-md px-2 py-1 text-[10px]",
-                  isPartnerNavActive(path, item) ? "bg-primary/20 text-primary" : "text-muted-foreground",
+                  isPartnerNavActive(path, item)
+                    ? "bg-primary/20 text-primary"
+                    : "text-muted-foreground",
                 )}
               >
                 {item.label}

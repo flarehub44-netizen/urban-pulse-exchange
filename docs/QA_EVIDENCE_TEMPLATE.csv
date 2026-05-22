@@ -1,0 +1,25 @@
+id,cenario,ambiente,url,resultado,esperado,obtido,gravidade,evidencia,executado_em
+T01,Primeira visita,producao,/,PASS,Landing + CTA,HTTP 200 + E2E titulo ViaX,,playwright 2026-05-21
+T01,dashboard,producao,/dashboard,PASS,Auth anon + conteudo,body > 80 chars,,playwright 2026-05-21
+T02,Lista mercados live,producao,/markets?status=live,PARCIAL,Cards ou empty,Empty state sem links /markets/,,playwright skip detalhe
+T02,Aposta SIM,producao,,NAO_EXEC,Stake + confirmar,,Requer sessao com saldo + mercado live,manual,
+T03,Saldo zero,producao,,NAO_EXEC,Erro + impulse bar,,Requer flag casino + saldo 0,manual,
+T04,Liquidacao,producao,,NAO_EXEC,Payout vencedores,,Requer admin settle,manual,
+T05,Perdedor,producao,,NAO_EXEC,payout=0,,Requer mercado resolvido,manual,
+T06,Check-in,dashboard,producao,NAO_EXEC,XP 1x/dia,,DailyPulse presente no codigo,manual,
+T07,Roleta 2x,dashboard,producao,NAO_EXEC,2o bloqueado,,SpinWheel no codigo,manual,
+T08,Partner ref,/r/qa-invalid,producao,PASS,Erro ou redirect,Redirect OK,,playwright 2026-05-21
+T09,Comissao partner,producao,,NAO_EXEC,partner_commission_ledger,,Requer 2 usuarios + settle,manual,
+T10,Ligas,/leagues,producao,PASS,Rota 200,titulo Ligas,,playwright 2026-05-21
+T11,Admin,/admin,producao,PARCIAL,Shell admin,Body contem Admin/Control,,playwright 2026-05-21
+T12,Email perfil,producao,,NAO_EXEC,Toast bonus,,Requer email unico,manual,
+T13,Mobile 375,dashboard,producao,PASS,Bottom nav,nav visivel,,playwright 2026-05-21
+T14,Offline mid-bet,producao,,NAO_EXEC,Erro amigavel,,DevTools offline,manual,
+T15,Double-click,static,,MITIGADO,1 aposta,isPending desabilita botao order-box,,code review
+UNIT,vitest,local,,PASS,10/10,10 passed,,npm run test 2026-05-21
+E2E,playwright prod,producao,,PASS,19/20,1 skipped sem mercado live,,playwright 2026-05-21
+PERF,Lighthouse landing,producao,/,FAIL,LCP < 3s,LCP 6.4s P51,,lighthouse 2026-05-21
+PERF,Lighthouse dashboard,producao,/dashboard,FAIL,LCP < 3s,LCP 7.8s P39 TTI 8.3s,,lighthouse 2026-05-21
+ADJ,Implementacao pos-QA,codigo,,DONE,Migrations+UX+lazy+E2E,,,2026-05-21
+ADJ,E2E retest prod,producao,,PASS,24 tests,20 pass 4 skip,,playwright pos-ajuste
+ADJ,db:push refresh markets,ops,,PENDENTE,>=3 live,CLI supabase ausente no agent,,manual

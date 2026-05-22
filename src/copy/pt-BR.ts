@@ -169,6 +169,15 @@ export const copy = {
     badgeRoi: "Retorno acima de 100% em um mercado",
   },
 
+  auth: {
+    anonFirstBetTitle: "Conta sem e-mail",
+    anonFirstBetDesc:
+      "Se você limpar o navegador ou trocar de dispositivo, pode perder saldo, apostas e ranking. Vincule um e-mail no perfil antes de operar.",
+    anonFirstBetProtect: "Vincular e-mail agora",
+    anonFirstBetContinue: "Entendi, continuar apostando",
+    anonBannerDismiss: "Lembrar depois",
+  },
+
   wallet: {
     totalReturn: "Retorno total",
     lowBalance: "Saldo baixo para apostar.",
@@ -178,6 +187,8 @@ export const copy = {
     withdraw: "Saque",
     refund: "Reembolso",
     winsPayouts: "Vitórias e ganhos",
+    simulatedTitle: "Saldo simulado",
+    simulatedDepositNote: "Sem Pix ou cartão real — valores são fictícios para demonstração.",
   },
 
   positions: {
@@ -406,7 +417,8 @@ export const copy = {
     freezeUsed: "Sequência protegida por hoje.",
     freezeUnavailable: "Sem congelamentos disponíveis.",
     urbanmindDigestTitle: "UrbanMind · seu treinador urbano",
-    vsAiRate: (w: number, t: number) => `Você vs IA: ${w} acertos em ${t} palpites contra a máquina`,
+    vsAiRate: (w: number, t: number) =>
+      `Você vs IA: ${w} acertos em ${t} palpites contra a máquina`,
     openUrbanmind: "Abrir UrbanMind",
     weeklyChallengeTitle: "Desafio da semana",
     precisionReportTitle: "Seu relatório de precisão",
@@ -503,7 +515,8 @@ export const copy = {
       payouts: "Pagamentos",
     },
     applyTitle: "Programa Creator ViaX",
-    applyDesc: "Monetize sua audiência com revenue share sobre o rake — estilo trading network, não marketing multinível.",
+    applyDesc:
+      "Monetize sua audiência com revenue share sobre o rake — estilo trading network, não marketing multinível.",
     applyCta: "Enviar candidatura",
     applyPending: "Candidatura em análise. Avisaremos quando aprovado.",
     portalCta: "Abrir Creator Hub",

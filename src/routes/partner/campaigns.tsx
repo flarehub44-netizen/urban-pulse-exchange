@@ -1,7 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { usePartnerCampaigns, useCreatePartnerCampaign, usePartnerOverview } from "@/hooks/use-partner";
+import {
+  usePartnerCampaigns,
+  useCreatePartnerCampaign,
+  usePartnerOverview,
+} from "@/hooks/use-partner";
 import { buildPartnerUrl, copyShareUrl } from "@/lib/share-url";
 import { copy } from "@/copy/pt-BR";
 
@@ -54,9 +58,7 @@ function PartnerCampaignsPage() {
           Criar link
         </button>
         {o?.slug && (
-          <p className="text-xs text-muted-foreground">
-            Link base: {buildPartnerUrl(o.slug)}
-          </p>
+          <p className="text-xs text-muted-foreground">Link base: {buildPartnerUrl(o.slug)}</p>
         )}
       </div>
       <div className="space-y-2">

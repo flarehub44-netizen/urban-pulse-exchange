@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useEffect, useState, useRef } from "react";
+import { useMemo, useEffect, useState, useRef, lazy, Suspense } from "react";
 import { useRegions } from "@/hooks/use-regions";
 import { findTopMarketForRegion } from "@/lib/region-market";
 import { toast } from "sonner";
@@ -16,10 +16,38 @@ import {
 } from "@/hooks/use-resolved-data";
 import { usePnlSeries } from "@/hooks/use-pnl-series";
 import { MarketCard } from "@/components/viax/market-card";
-import { CityHeatmap } from "@/components/viax/city-heatmap";
 import { AnimatedNumber } from "@/components/viax/animated-number";
 import { formatBRL, PRIZE_RATIO } from "@/lib/parimutuel";
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { useDeferredMount } from "@/hooks/use-deferred-mount";
+
+const DashboardPnlChart = lazy(() =>
+  import("@/components/viax/dashboard-pnl-chart").then((m) => ({ default: m.DashboardPnlChart })),
+);
+const CityHeatmap = lazy(() =>
+  import("@/components/viax/city-heatmap").then((m) => ({ default: m.CityHeatmap })),
+);
+const SpinWheel = lazy(() =>
+  import("@/components/viax/spin-wheel").then((m) => ({ default: m.SpinWheel })),
+);
+const UrbanMindDigestCard = lazy(() =>
+  import("@/components/viax/urbanmind-digest-card").then((m) => ({
+    default: m.UrbanMindDigestCard,
+  })),
+);
+const WeeklyChallengeCard = lazy(() =>
+  import("@/components/viax/weekly-challenge-card").then((m) => ({
+    default: m.WeeklyChallengeCard,
+  })),
+);
+const PrecisionReportCard = lazy(() =>
+  import("@/components/viax/precision-report-card").then((m) => ({
+    default: m.PrecisionReportCard,
+  })),
+);
+
+function ChartFallback() {
+  return <div className="h-[140px] animate-pulse rounded-xl bg-surface/60" />;
+}
 import { AnonAccountBanner } from "@/components/viax/anon-account-banner";
 import { TrendingUp, Users } from "lucide-react";
 import { useFollowedTraders } from "@/hooks/use-followed-traders";
@@ -33,10 +61,6 @@ import { buildDailyMission } from "@/lib/urbanmind-coach";
 import { DEFAULT_FEATURED_MARKET_ID } from "@/config/markets";
 import { DailyPulse } from "@/components/viax/daily-pulse";
 import { StreakRiskBanner } from "@/components/viax/streak-risk-banner";
-import { UrbanMindDigestCard } from "@/components/viax/urbanmind-digest-card";
-import { WeeklyChallengeCard } from "@/components/viax/weekly-challenge-card";
-import { PrecisionReportCard } from "@/components/viax/precision-report-card";
-import { SpinWheel } from "@/components/viax/spin-wheel";
 import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
 import { DailyMissions } from "@/components/viax/daily-missions";
 import { WeeklyReportModal } from "@/components/viax/weekly-report-modal";
@@ -66,6 +90,7 @@ export const Route = createFileRoute("/_app/dashboard")({
 
 function Dashboard() {
   const navigate = useNavigate();
+  const deferredReady = useDeferredMount(150);
   const { enabled: casinoEnabled } = useCasinoEnabled();
   const { from, highlight } = Route.useSearch();
   const { userId } = useAnonAuth();
@@ -97,9 +122,9 @@ function Dashboard() {
     prevDivisionRef.current = dbProfile.division;
   }, [dbProfile?.division]);
 
-  // Agendar push notifications diárias
+  // Agendar push notifications diárias (após primeiro paint)
   useEffect(() => {
-    if (!dbProfile) return;
+    if (!deferredReady || !dbProfile) return;
     const liveCount = markets.filter((m) => m.status === "live" || m.status === "closing").length;
     scheduleDailyPush({
       name: dbProfile.name?.split(" ")[0] ?? "Analista",
@@ -109,7 +134,7 @@ function Dashboard() {
       openMarkets: liveCount,
       multiplier: dbProfile.streakMultiplier ?? 1,
     });
-  }, [dbProfile, markets]);
+  }, [dbProfile, markets, deferredReady]);
 
   useEffect(() => {
     if (highlight !== "position") return;
@@ -163,11 +188,8 @@ function Dashboard() {
   return (
     <div className="space-y-6">
       {/* Weekly Pulse Report — segunda-feira */}
-      {showWeeklyReport && !weeklyReportDismissed && weeklyReport && (
-        <WeeklyReportModal
-          report={weeklyReport}
-          onClose={() => setWeeklyReportDismissed(true)}
-        />
+      {deferredReady && showWeeklyReport && !weeklyReportDismissed && weeklyReport && (
+        <WeeklyReportModal report={weeklyReport} onClose={() => setWeeklyReportDismissed(true)} />
       )}
 
       {/* Division-up celebration */}
@@ -176,21 +198,6 @@ function Dashboard() {
       <AnonAccountBanner />
       <EventsBanner />
       <StreakRiskBanner />
-      <DailyPulse />
-      <DailyMissions />
-      {casinoEnabled && (
-        <SpinWheel
-          onDepositBonusCta={() =>
-            navigate({ to: "/profile", search: { tab: "carteira" } })
-          }
-        />
-      )}
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <UrbanMindDigestCard />
-        <WeeklyChallengeCard accuracy={"accuracy" in me ? me.accuracy : 0.5} />
-      </div>
-      <PrecisionReportCard />
 
       <div>
         <div className="flex items-center justify-between">
@@ -315,7 +322,9 @@ function Dashboard() {
                     params={{ marketId: item.market.id }}
                     className="flex-1 rounded-xl border border-primary/30 bg-primary/10 px-3 py-2 text-sm hover:border-primary/50"
                   >
-                    <span className="text-xs uppercase text-primary">{copy.retention.dailyMission}</span>
+                    <span className="text-xs uppercase text-primary">
+                      {copy.retention.dailyMission}
+                    </span>
                     <div className="line-clamp-1 font-medium">{item.market.question}</div>
                     <div className="text-[10px] text-muted-foreground">{item.market.region}</div>
                   </Link>
@@ -333,7 +342,11 @@ function Dashboard() {
                       <Users className="size-3" /> Trader seguido
                     </span>
                     <div className="mt-0.5 flex items-center gap-1.5">
-                      <img src={item.trader.avatar} className="size-5 rounded-full bg-surface" alt={item.trader.name} />
+                      <img
+                        src={item.trader.avatar}
+                        className="size-5 rounded-full bg-surface"
+                        alt={item.trader.name}
+                      />
                       <span className="font-medium truncate">{item.trader.name}</span>
                     </div>
                     <div className="text-[10px] text-muted-foreground">
@@ -361,17 +374,7 @@ function Dashboard() {
         </div>
       )}
 
-      {/* Daily poll + Tomorrow preview + Neighborhood */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <DailyPoll />
-        <TomorrowPreview markets={markets} />
-        <NeighborhoodWidget
-          neighborhood={dbProfile?.neighborhood ?? null}
-          city={dbProfile?.city ?? "São Paulo"}
-        />
-      </div>
-
-      {/* Fold 2 — mercados em alta */}
+      {/* Core — mercados em alta */}
       <div>
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
@@ -391,6 +394,9 @@ function Dashboard() {
           ))}
         </div>
       </div>
+
+      <DailyPulse />
+      <DailyMissions />
 
       {/* Fold 3 — performance + posições abertas */}
       <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
@@ -416,40 +422,12 @@ function Dashboard() {
                 </span>
               )}
             </div>
-            <div style={{ width: "100%", height: 140 }}>
-              <ResponsiveContainer>
-                <AreaChart data={chartData}>
-                  <defs>
-                    <linearGradient id="pn" x1="0" x2="0" y1="0" y2="1">
-                      <stop offset="0%" stopColor="var(--color-up)" stopOpacity={0.4} />
-                      <stop offset="100%" stopColor="var(--color-up)" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="d" hide={chartData.length > 8} tick={{ fontSize: 10 }} />
-                  <YAxis hide />
-                  <Tooltip
-                    contentStyle={{
-                      background: "var(--color-popover)",
-                      border: "1px solid var(--color-border)",
-                      borderRadius: 12,
-                      fontSize: 12,
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="pnl"
-                    stroke="var(--color-up)"
-                    strokeWidth={1.6}
-                    fill="url(#pn)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-            {!pnlSeries.length && (
-              <p className="mt-2 text-center text-[11px] text-muted-foreground">
-                {copy.dashboard.gainsChartHint}
-              </p>
-            )}
+            <Suspense fallback={<ChartFallback />}>
+              <DashboardPnlChart
+                data={chartData}
+                showHint={!pnlSeries.length ? copy.dashboard.gainsChartHint : ""}
+              />
+            </Suspense>
           </div>
         </div>
 
@@ -523,63 +501,106 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Fold 4 — mapa + feed (menor prioridade) */}
-      <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
-        <div>
-          <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-            Mapa da cidade
-          </h2>
-          <CityHeatmap
-            height={360}
-            regions={regions}
-            showLiveLink
-            onRegionClick={(r) => {
-              const top = findTopMarketForRegion(markets, r);
-              if (top) navigate({ to: "/markets/$marketId", params: { marketId: top.id } });
-              else {
-                navigate({ to: "/markets", search: { region: r.name } });
-                toast.message("Lista filtrada por região");
-              }
-            }}
+      {deferredReady && (
+        <>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Suspense fallback={<ChartFallback />}>
+              <UrbanMindDigestCard />
+            </Suspense>
+            <Suspense fallback={<ChartFallback />}>
+              <WeeklyChallengeCard accuracy={"accuracy" in me ? me.accuracy : 0.5} />
+            </Suspense>
+          </div>
+          <Suspense fallback={<ChartFallback />}>
+            <PrecisionReportCard />
+          </Suspense>
+        </>
+      )}
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <DailyPoll />
+        <TomorrowPreview markets={markets} />
+        <NeighborhoodWidget
+          neighborhood={dbProfile?.neighborhood ?? null}
+          city={dbProfile?.city ?? "São Paulo"}
+        />
+      </div>
+
+      {casinoEnabled && deferredReady && (
+        <Suspense fallback={<ChartFallback />}>
+          <SpinWheel
+            onDepositBonusCta={() => navigate({ to: "/profile", search: { tab: "carteira" } })}
           />
-        </div>
-        <div>
-          <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-            Feed
-          </h2>
-          <div className="space-y-2">
-            {feed.slice(0, 4).map((p) => (
-              <Link
-                to="/feed"
-                key={p.id}
-                className="block rounded-xl border bg-card/60 p-3 backdrop-blur hover:bg-surface/60"
-              >
-                <div className="flex items-center gap-2">
-                  <img src={p.user.avatar} className="size-7 rounded-full bg-surface" alt={p.user.name} />
-                  <div className="min-w-0 flex-1">
-                    <div className="text-xs font-medium">
-                      {p.user.name}{" "}
-                      <span className="text-muted-foreground">@{p.user.handle}</span>
-                    </div>
-                    <div className="line-clamp-2 text-xs text-muted-foreground">{p.text}</div>
-                  </div>
-                  <span className="text-xs text-muted-foreground shrink-0">
-                    {formatDistanceToNow(p.time, { locale: ptBR, addSuffix: false })}
-                  </span>
-                </div>
-              </Link>
-            ))}
-            {feed.length === 0 && (
-              <EmptyState
-                compact
-                title={copy.empty.dashboardFeed.title}
-                description={copy.empty.dashboardFeed.description}
-                action={{ label: copy.empty.dashboardFeed.cta, to: "/feed" }}
+        </Suspense>
+      )}
+
+      {/* Mapa + feed (menor prioridade) */}
+      {deferredReady && (
+        <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
+          <div>
+            <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+              Mapa da cidade
+            </h2>
+            <Suspense
+              fallback={<div className="h-[360px] animate-pulse rounded-2xl bg-surface/60" />}
+            >
+              <CityHeatmap
+                height={360}
+                regions={regions}
+                showLiveLink
+                onRegionClick={(r) => {
+                  const top = findTopMarketForRegion(markets, r);
+                  if (top) navigate({ to: "/markets/$marketId", params: { marketId: top.id } });
+                  else {
+                    navigate({ to: "/markets", search: { region: r.name } });
+                    toast.message("Lista filtrada por região");
+                  }
+                }}
               />
-            )}
+            </Suspense>
+          </div>
+          <div>
+            <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+              Feed
+            </h2>
+            <div className="space-y-2">
+              {feed.slice(0, 4).map((p) => (
+                <Link
+                  to="/feed"
+                  key={p.id}
+                  className="block rounded-xl border bg-card/60 p-3 backdrop-blur hover:bg-surface/60"
+                >
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={p.user.avatar}
+                      className="size-7 rounded-full bg-surface"
+                      alt={p.user.name}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs font-medium">
+                        {p.user.name}{" "}
+                        <span className="text-muted-foreground">@{p.user.handle}</span>
+                      </div>
+                      <div className="line-clamp-2 text-xs text-muted-foreground">{p.text}</div>
+                    </div>
+                    <span className="text-xs text-muted-foreground shrink-0">
+                      {formatDistanceToNow(p.time, { locale: ptBR, addSuffix: false })}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+              {feed.length === 0 && (
+                <EmptyState
+                  compact
+                  title={copy.empty.dashboardFeed.title}
+                  description={copy.empty.dashboardFeed.description}
+                  action={{ label: copy.empty.dashboardFeed.cta, to: "/feed" }}
+                />
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
