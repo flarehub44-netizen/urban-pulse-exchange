@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { ArrowUpCircle, ArrowDownCircle, Trophy, ChevronRight, X, Zap, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
 
