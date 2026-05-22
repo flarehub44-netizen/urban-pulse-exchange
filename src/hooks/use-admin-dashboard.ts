@@ -222,6 +222,65 @@ export function useAdminReprocess() {
   });
 }
 
+export function useAdminPartnerApplications(enabled = true) {
+  return useQuery({
+    queryKey: ["admin", "partner-applications"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_list_partner_applications");
+      if (error) throw error;
+      return (data ?? []) as {
+        id: string;
+        user_id: string;
+        handle: string;
+        name: string;
+        bio: string;
+        focus_city: string | null;
+        created_at: string;
+      }[];
+    },
+    enabled,
+  });
+}
+
+export function useAdminApprovePartner() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      tier,
+      slug,
+    }: {
+      userId: string;
+      tier?: string;
+      slug?: string;
+    }) => {
+      const { data, error } = await supabase.rpc("admin_approve_partner", {
+        p_user_id: userId,
+        p_tier: tier ?? "Bronze",
+        p_slug: slug ?? null,
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "partner-applications"] }),
+  });
+}
+
+export function useAdminRejectPartner() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ userId, note }: { userId: string; note?: string }) => {
+      const { data, error } = await supabase.rpc("admin_reject_partner", {
+        p_user_id: userId,
+        p_note: note ?? null,
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "partner-applications"] }),
+  });
+}
+
 export function useAdminUpdateSetting() {
   const qc = useQueryClient();
   return useMutation({

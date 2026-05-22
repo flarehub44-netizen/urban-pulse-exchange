@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getStoredPartnerRef, clearStoredPartnerRef } from "@/lib/partner-attribution";
 
 export function useAnonAuth() {
   const [authReady, setAuthReady] = useState(false);
@@ -17,10 +18,12 @@ export function useAnonAuth() {
       if (session) {
         setUserId(session.user.id);
         setAuthReady(true);
+        void tryBindPartnerRef();
       } else {
         const { data } = await supabase.auth.signInAnonymously();
         setUserId(data.user?.id ?? null);
         setAuthReady(true);
+        void tryBindPartnerRef();
       }
     };
 
@@ -37,4 +40,16 @@ export function useAnonAuth() {
   }, []);
 
   return { authReady, userId };
+}
+
+async function tryBindPartnerRef() {
+  const ref = getStoredPartnerRef();
+  if (!ref?.slug) return;
+  const { data, error } = await supabase.rpc("bind_referral_attribution", {
+    p_slug: ref.slug,
+    p_campaign_id: ref.campaignId ?? null,
+  });
+  if (!error && (data as { ok?: boolean })?.ok) {
+    clearStoredPartnerRef();
+  }
 }

@@ -11,15 +11,28 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AppRouteImport } from './routes/_app'
+import { Route as PartnerRouteRouteImport } from './routes/partner/route'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PartnerIndexRouteImport } from './routes/partner/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as RSlugRouteImport } from './routes/r.$slug'
+import { Route as PartnerSubAffiliatesRouteImport } from './routes/partner/sub-affiliates'
+import { Route as PartnerRevenueRouteImport } from './routes/partner/revenue'
+import { Route as PartnerPerformanceRouteImport } from './routes/partner/performance'
+import { Route as PartnerPayoutsRouteImport } from './routes/partner/payouts'
+import { Route as PartnerLeaderboardRouteImport } from './routes/partner/leaderboard'
+import { Route as PartnerInvitesRouteImport } from './routes/partner/invites'
+import { Route as PartnerCreativesRouteImport } from './routes/partner/creatives'
+import { Route as PartnerCampaignsRouteImport } from './routes/partner/campaigns'
+import { Route as PartnerAnalyticsRouteImport } from './routes/partner/analytics'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminSystemRouteImport } from './routes/admin/system'
 import { Route as AdminSourcesRouteImport } from './routes/admin/sources'
 import { Route as AdminSimulatorRouteImport } from './routes/admin/simulator'
 import { Route as AdminSettlementRouteImport } from './routes/admin/settlement'
 import { Route as AdminRiskRouteImport } from './routes/admin/risk'
+import { Route as AdminPartnersRouteImport } from './routes/admin/partners'
 import { Route as AdminMarketsRouteImport } from './routes/admin/markets'
 import { Route as AdminIntelligenceRouteImport } from './routes/admin/intelligence'
 import { Route as AdminFinanceRouteImport } from './routes/admin/finance'
@@ -47,6 +60,11 @@ const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartnerRouteRoute = PartnerRouteRouteImport.update({
+  id: '/partner',
+  path: '/partner',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -57,10 +75,65 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartnerIndexRoute = PartnerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PartnerRouteRoute,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRouteRoute,
+} as any)
+const RSlugRoute = RSlugRouteImport.update({
+  id: '/r/$slug',
+  path: '/r/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerSubAffiliatesRoute = PartnerSubAffiliatesRouteImport.update({
+  id: '/sub-affiliates',
+  path: '/sub-affiliates',
+  getParentRoute: () => PartnerRouteRoute,
+} as any)
+const PartnerRevenueRoute = PartnerRevenueRouteImport.update({
+  id: '/revenue',
+  path: '/revenue',
+  getParentRoute: () => PartnerRouteRoute,
+} as any)
+const PartnerPerformanceRoute = PartnerPerformanceRouteImport.update({
+  id: '/performance',
+  path: '/performance',
+  getParentRoute: () => PartnerRouteRoute,
+} as any)
+const PartnerPayoutsRoute = PartnerPayoutsRouteImport.update({
+  id: '/payouts',
+  path: '/payouts',
+  getParentRoute: () => PartnerRouteRoute,
+} as any)
+const PartnerLeaderboardRoute = PartnerLeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => PartnerRouteRoute,
+} as any)
+const PartnerInvitesRoute = PartnerInvitesRouteImport.update({
+  id: '/invites',
+  path: '/invites',
+  getParentRoute: () => PartnerRouteRoute,
+} as any)
+const PartnerCreativesRoute = PartnerCreativesRouteImport.update({
+  id: '/creatives',
+  path: '/creatives',
+  getParentRoute: () => PartnerRouteRoute,
+} as any)
+const PartnerCampaignsRoute = PartnerCampaignsRouteImport.update({
+  id: '/campaigns',
+  path: '/campaigns',
+  getParentRoute: () => PartnerRouteRoute,
+} as any)
+const PartnerAnalyticsRoute = PartnerAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => PartnerRouteRoute,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
@@ -90,6 +163,11 @@ const AdminSettlementRoute = AdminSettlementRouteImport.update({
 const AdminRiskRoute = AdminRiskRouteImport.update({
   id: '/risk',
   path: '/risk',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminPartnersRoute = AdminPartnersRouteImport.update({
+  id: '/partners',
+  path: '/partners',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminMarketsRoute = AdminMarketsRouteImport.update({
@@ -181,6 +259,7 @@ const AppFeedPostIdRoute = AppFeedPostIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/partner': typeof PartnerRouteRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRouteWithChildren
@@ -196,13 +275,25 @@ export interface FileRoutesByFullPath {
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/intelligence': typeof AdminIntelligenceRoute
   '/admin/markets': typeof AdminMarketsRoute
+  '/admin/partners': typeof AdminPartnersRoute
   '/admin/risk': typeof AdminRiskRoute
   '/admin/settlement': typeof AdminSettlementRoute
   '/admin/simulator': typeof AdminSimulatorRoute
   '/admin/sources': typeof AdminSourcesRoute
   '/admin/system': typeof AdminSystemRoute
   '/admin/users': typeof AdminUsersRoute
+  '/partner/analytics': typeof PartnerAnalyticsRoute
+  '/partner/campaigns': typeof PartnerCampaignsRoute
+  '/partner/creatives': typeof PartnerCreativesRoute
+  '/partner/invites': typeof PartnerInvitesRoute
+  '/partner/leaderboard': typeof PartnerLeaderboardRoute
+  '/partner/payouts': typeof PartnerPayoutsRoute
+  '/partner/performance': typeof PartnerPerformanceRoute
+  '/partner/revenue': typeof PartnerRevenueRoute
+  '/partner/sub-affiliates': typeof PartnerSubAffiliatesRoute
+  '/r/$slug': typeof RSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/partner/': typeof PartnerIndexRoute
   '/feed/$postId': typeof AppFeedPostIdRoute
   '/markets/$marketId': typeof AppMarketsMarketIdRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
@@ -224,13 +315,25 @@ export interface FileRoutesByTo {
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/intelligence': typeof AdminIntelligenceRoute
   '/admin/markets': typeof AdminMarketsRoute
+  '/admin/partners': typeof AdminPartnersRoute
   '/admin/risk': typeof AdminRiskRoute
   '/admin/settlement': typeof AdminSettlementRoute
   '/admin/simulator': typeof AdminSimulatorRoute
   '/admin/sources': typeof AdminSourcesRoute
   '/admin/system': typeof AdminSystemRoute
   '/admin/users': typeof AdminUsersRoute
+  '/partner/analytics': typeof PartnerAnalyticsRoute
+  '/partner/campaigns': typeof PartnerCampaignsRoute
+  '/partner/creatives': typeof PartnerCreativesRoute
+  '/partner/invites': typeof PartnerInvitesRoute
+  '/partner/leaderboard': typeof PartnerLeaderboardRoute
+  '/partner/payouts': typeof PartnerPayoutsRoute
+  '/partner/performance': typeof PartnerPerformanceRoute
+  '/partner/revenue': typeof PartnerRevenueRoute
+  '/partner/sub-affiliates': typeof PartnerSubAffiliatesRoute
+  '/r/$slug': typeof RSlugRoute
   '/admin': typeof AdminIndexRoute
+  '/partner': typeof PartnerIndexRoute
   '/feed/$postId': typeof AppFeedPostIdRoute
   '/markets/$marketId': typeof AppMarketsMarketIdRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
@@ -239,6 +342,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/partner': typeof PartnerRouteRouteWithChildren
   '/_app': typeof AppRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_app/dashboard': typeof AppDashboardRoute
@@ -255,13 +359,25 @@ export interface FileRoutesById {
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/intelligence': typeof AdminIntelligenceRoute
   '/admin/markets': typeof AdminMarketsRoute
+  '/admin/partners': typeof AdminPartnersRoute
   '/admin/risk': typeof AdminRiskRoute
   '/admin/settlement': typeof AdminSettlementRoute
   '/admin/simulator': typeof AdminSimulatorRoute
   '/admin/sources': typeof AdminSourcesRoute
   '/admin/system': typeof AdminSystemRoute
   '/admin/users': typeof AdminUsersRoute
+  '/partner/analytics': typeof PartnerAnalyticsRoute
+  '/partner/campaigns': typeof PartnerCampaignsRoute
+  '/partner/creatives': typeof PartnerCreativesRoute
+  '/partner/invites': typeof PartnerInvitesRoute
+  '/partner/leaderboard': typeof PartnerLeaderboardRoute
+  '/partner/payouts': typeof PartnerPayoutsRoute
+  '/partner/performance': typeof PartnerPerformanceRoute
+  '/partner/revenue': typeof PartnerRevenueRoute
+  '/partner/sub-affiliates': typeof PartnerSubAffiliatesRoute
+  '/r/$slug': typeof RSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/partner/': typeof PartnerIndexRoute
   '/_app/feed/$postId': typeof AppFeedPostIdRoute
   '/_app/markets/$marketId': typeof AppMarketsMarketIdRoute
   '/_app/profile/$userId': typeof AppProfileUserIdRoute
@@ -271,6 +387,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/partner'
     | '/sitemap.xml'
     | '/dashboard'
     | '/feed'
@@ -286,13 +403,25 @@ export interface FileRouteTypes {
     | '/admin/finance'
     | '/admin/intelligence'
     | '/admin/markets'
+    | '/admin/partners'
     | '/admin/risk'
     | '/admin/settlement'
     | '/admin/simulator'
     | '/admin/sources'
     | '/admin/system'
     | '/admin/users'
+    | '/partner/analytics'
+    | '/partner/campaigns'
+    | '/partner/creatives'
+    | '/partner/invites'
+    | '/partner/leaderboard'
+    | '/partner/payouts'
+    | '/partner/performance'
+    | '/partner/revenue'
+    | '/partner/sub-affiliates'
+    | '/r/$slug'
     | '/admin/'
+    | '/partner/'
     | '/feed/$postId'
     | '/markets/$marketId'
     | '/profile/$userId'
@@ -314,13 +443,25 @@ export interface FileRouteTypes {
     | '/admin/finance'
     | '/admin/intelligence'
     | '/admin/markets'
+    | '/admin/partners'
     | '/admin/risk'
     | '/admin/settlement'
     | '/admin/simulator'
     | '/admin/sources'
     | '/admin/system'
     | '/admin/users'
+    | '/partner/analytics'
+    | '/partner/campaigns'
+    | '/partner/creatives'
+    | '/partner/invites'
+    | '/partner/leaderboard'
+    | '/partner/payouts'
+    | '/partner/performance'
+    | '/partner/revenue'
+    | '/partner/sub-affiliates'
+    | '/r/$slug'
     | '/admin'
+    | '/partner'
     | '/feed/$postId'
     | '/markets/$marketId'
     | '/profile/$userId'
@@ -328,6 +469,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/partner'
     | '/_app'
     | '/sitemap.xml'
     | '/_app/dashboard'
@@ -344,13 +486,25 @@ export interface FileRouteTypes {
     | '/admin/finance'
     | '/admin/intelligence'
     | '/admin/markets'
+    | '/admin/partners'
     | '/admin/risk'
     | '/admin/settlement'
     | '/admin/simulator'
     | '/admin/sources'
     | '/admin/system'
     | '/admin/users'
+    | '/partner/analytics'
+    | '/partner/campaigns'
+    | '/partner/creatives'
+    | '/partner/invites'
+    | '/partner/leaderboard'
+    | '/partner/payouts'
+    | '/partner/performance'
+    | '/partner/revenue'
+    | '/partner/sub-affiliates'
+    | '/r/$slug'
     | '/admin/'
+    | '/partner/'
     | '/_app/feed/$postId'
     | '/_app/markets/$marketId'
     | '/_app/profile/$userId'
@@ -359,8 +513,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  PartnerRouteRoute: typeof PartnerRouteRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  RSlugRoute: typeof RSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -379,6 +535,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/partner': {
+      id: '/partner'
+      path: '/partner'
+      fullPath: '/partner'
+      preLoaderRoute: typeof PartnerRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -393,12 +556,89 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/partner/': {
+      id: '/partner/'
+      path: '/'
+      fullPath: '/partner/'
+      preLoaderRoute: typeof PartnerIndexRouteImport
+      parentRoute: typeof PartnerRouteRoute
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    '/r/$slug': {
+      id: '/r/$slug'
+      path: '/r/$slug'
+      fullPath: '/r/$slug'
+      preLoaderRoute: typeof RSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner/sub-affiliates': {
+      id: '/partner/sub-affiliates'
+      path: '/sub-affiliates'
+      fullPath: '/partner/sub-affiliates'
+      preLoaderRoute: typeof PartnerSubAffiliatesRouteImport
+      parentRoute: typeof PartnerRouteRoute
+    }
+    '/partner/revenue': {
+      id: '/partner/revenue'
+      path: '/revenue'
+      fullPath: '/partner/revenue'
+      preLoaderRoute: typeof PartnerRevenueRouteImport
+      parentRoute: typeof PartnerRouteRoute
+    }
+    '/partner/performance': {
+      id: '/partner/performance'
+      path: '/performance'
+      fullPath: '/partner/performance'
+      preLoaderRoute: typeof PartnerPerformanceRouteImport
+      parentRoute: typeof PartnerRouteRoute
+    }
+    '/partner/payouts': {
+      id: '/partner/payouts'
+      path: '/payouts'
+      fullPath: '/partner/payouts'
+      preLoaderRoute: typeof PartnerPayoutsRouteImport
+      parentRoute: typeof PartnerRouteRoute
+    }
+    '/partner/leaderboard': {
+      id: '/partner/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/partner/leaderboard'
+      preLoaderRoute: typeof PartnerLeaderboardRouteImport
+      parentRoute: typeof PartnerRouteRoute
+    }
+    '/partner/invites': {
+      id: '/partner/invites'
+      path: '/invites'
+      fullPath: '/partner/invites'
+      preLoaderRoute: typeof PartnerInvitesRouteImport
+      parentRoute: typeof PartnerRouteRoute
+    }
+    '/partner/creatives': {
+      id: '/partner/creatives'
+      path: '/creatives'
+      fullPath: '/partner/creatives'
+      preLoaderRoute: typeof PartnerCreativesRouteImport
+      parentRoute: typeof PartnerRouteRoute
+    }
+    '/partner/campaigns': {
+      id: '/partner/campaigns'
+      path: '/campaigns'
+      fullPath: '/partner/campaigns'
+      preLoaderRoute: typeof PartnerCampaignsRouteImport
+      parentRoute: typeof PartnerRouteRoute
+    }
+    '/partner/analytics': {
+      id: '/partner/analytics'
+      path: '/analytics'
+      fullPath: '/partner/analytics'
+      preLoaderRoute: typeof PartnerAnalyticsRouteImport
+      parentRoute: typeof PartnerRouteRoute
     }
     '/admin/users': {
       id: '/admin/users'
@@ -440,6 +680,13 @@ declare module '@tanstack/react-router' {
       path: '/risk'
       fullPath: '/admin/risk'
       preLoaderRoute: typeof AdminRiskRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/partners': {
+      id: '/admin/partners'
+      path: '/partners'
+      fullPath: '/admin/partners'
+      preLoaderRoute: typeof AdminPartnersRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/markets': {
@@ -568,6 +815,7 @@ interface AdminRouteRouteChildren {
   AdminFinanceRoute: typeof AdminFinanceRoute
   AdminIntelligenceRoute: typeof AdminIntelligenceRoute
   AdminMarketsRoute: typeof AdminMarketsRoute
+  AdminPartnersRoute: typeof AdminPartnersRoute
   AdminRiskRoute: typeof AdminRiskRoute
   AdminSettlementRoute: typeof AdminSettlementRoute
   AdminSimulatorRoute: typeof AdminSimulatorRoute
@@ -581,6 +829,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminFinanceRoute: AdminFinanceRoute,
   AdminIntelligenceRoute: AdminIntelligenceRoute,
   AdminMarketsRoute: AdminMarketsRoute,
+  AdminPartnersRoute: AdminPartnersRoute,
   AdminRiskRoute: AdminRiskRoute,
   AdminSettlementRoute: AdminSettlementRoute,
   AdminSimulatorRoute: AdminSimulatorRoute,
@@ -592,6 +841,36 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
 
 const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
   AdminRouteRouteChildren,
+)
+
+interface PartnerRouteRouteChildren {
+  PartnerAnalyticsRoute: typeof PartnerAnalyticsRoute
+  PartnerCampaignsRoute: typeof PartnerCampaignsRoute
+  PartnerCreativesRoute: typeof PartnerCreativesRoute
+  PartnerInvitesRoute: typeof PartnerInvitesRoute
+  PartnerLeaderboardRoute: typeof PartnerLeaderboardRoute
+  PartnerPayoutsRoute: typeof PartnerPayoutsRoute
+  PartnerPerformanceRoute: typeof PartnerPerformanceRoute
+  PartnerRevenueRoute: typeof PartnerRevenueRoute
+  PartnerSubAffiliatesRoute: typeof PartnerSubAffiliatesRoute
+  PartnerIndexRoute: typeof PartnerIndexRoute
+}
+
+const PartnerRouteRouteChildren: PartnerRouteRouteChildren = {
+  PartnerAnalyticsRoute: PartnerAnalyticsRoute,
+  PartnerCampaignsRoute: PartnerCampaignsRoute,
+  PartnerCreativesRoute: PartnerCreativesRoute,
+  PartnerInvitesRoute: PartnerInvitesRoute,
+  PartnerLeaderboardRoute: PartnerLeaderboardRoute,
+  PartnerPayoutsRoute: PartnerPayoutsRoute,
+  PartnerPerformanceRoute: PartnerPerformanceRoute,
+  PartnerRevenueRoute: PartnerRevenueRoute,
+  PartnerSubAffiliatesRoute: PartnerSubAffiliatesRoute,
+  PartnerIndexRoute: PartnerIndexRoute,
+}
+
+const PartnerRouteRouteWithChildren = PartnerRouteRoute._addFileChildren(
+  PartnerRouteRouteChildren,
 )
 
 interface AppFeedRouteChildren {
@@ -662,8 +941,10 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  PartnerRouteRoute: PartnerRouteRouteWithChildren,
   AppRoute: AppRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  RSlugRoute: RSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

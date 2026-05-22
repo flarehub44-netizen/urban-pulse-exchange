@@ -13,6 +13,8 @@ import { toast } from "sonner";
 import { ArrowLeft, Lock, UserPlus, UserMinus, Zap, Link2, BarChart2, Activity, History } from "lucide-react";
 import { EmptyState } from "@/components/viax/empty-state";
 import { usePublicTraderBets } from "@/hooks/use-public-trader-bets";
+import { usePublicExpertProfile } from "@/hooks/use-partner";
+import { buildPartnerUrl } from "@/lib/share-url";
 import { copyShareUrl } from "@/lib/share-url";
 import { cn } from "@/lib/utils";
 
@@ -74,6 +76,7 @@ function PublicProfile() {
   const { isFollowing, toggle, isPending } = useFollowedTraders();
   const following = !isMe && isFollowing(targetId);
   const { data: publicBets } = usePublicTraderBets(targetId);
+  const { data: expert } = usePublicExpertProfile(targetId);
 
   useEffect(() => {
     document.title = `@${handle} · ViaX`;
@@ -130,10 +133,31 @@ function PublicProfile() {
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
           <img src={avatar} className="size-20 rounded-2xl border bg-surface" alt={name} />
           <div className="flex-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-2xl font-semibold">{name}</h1>
               <DivisionBadge division={division} />
+              {expert?.partner_verified && (
+                <span className="rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+                  {copy.partner.verified}
+                </span>
+              )}
             </div>
+            {expert?.is_partner && expert.partner_slug && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                <a
+                  href={buildPartnerUrl(expert.partner_slug)}
+                  className="text-xs text-primary hover:underline"
+                >
+                  {copy.partner.expertPage} →
+                </a>
+                {expert.top_regions?.length > 0 && (
+                  <span className="text-xs text-muted-foreground">
+                    {copy.partner.favoriteMarkets}:{" "}
+                    {expert.top_regions.map((r) => r.region).join(", ")}
+                  </span>
+                )}
+              </div>
+            )}
             <div className="text-sm text-muted-foreground">
               @{handle} · {city}
               {neighborhood ? ` · ${neighborhood}` : ""}

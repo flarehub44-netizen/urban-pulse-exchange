@@ -11,6 +11,11 @@ export function buildAppUrl(path: string, search?: Record<string, string | undef
   return url.toString();
 }
 
+export function buildPartnerUrl(slug: string, suffix?: string) {
+  const path = suffix ? `/r/${slug}/${suffix}` : `/r/${slug}`;
+  return buildAppUrl(path);
+}
+
 export async function copyShareUrl(path: string, search?: Record<string, string | undefined>) {
   const url = buildAppUrl(path, search);
   try {

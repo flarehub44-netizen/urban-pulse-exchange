@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { Bell, Moon, Sun, Shield, Info, Scale } from "lucide-react";
+import { Bell, Moon, Sun, Shield, Info, Scale, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { useMyPartnerStatus, useApplyPartner } from "@/hooks/use-partner";
 import { useTheme } from "@/hooks/use-theme";
 import { cn } from "@/lib/utils";
 import { copy } from "@/copy/pt-BR";
@@ -15,6 +17,9 @@ export function SettingsPanel() {
   const { prefs, update } = useNotificationPrefs();
   const { userId } = useAnonAuth();
   const { data: profile } = useProfile(userId);
+  const { data: partnerStatus } = useMyPartnerStatus(!!userId);
+  const { mutateAsync: applyPartner, isPending: applying } = useApplyPartner();
+  const [bio, setBio] = useState("");
   const { theme, setTheme, isDark } = useTheme();
   const { data: casinoStatus, refetch: refetchCasino } = useCasinoSpinStatus();
   const showCasinoSettings =
@@ -40,6 +45,44 @@ export function SettingsPanel() {
           <AdminClaimPanel />
         </Section>
       )}
+      <Section icon={<Sparkles className="size-4" />} title={copy.partner.applyTitle}>
+        <p className="text-xs text-muted-foreground">{copy.partner.applyDesc}</p>
+        {partnerStatus?.role === "partner" && partnerStatus.status === "active" ? (
+          <Link
+            to="/partner"
+            className="inline-flex rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground"
+          >
+            {copy.partner.portalCta}
+          </Link>
+        ) : partnerStatus?.role === "applicant" ? (
+          <p className="text-sm text-warn">{copy.partner.applyPending}</p>
+        ) : (
+          <>
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              placeholder="Por que você quer ser analista urbano na ViaX?"
+              className="mt-2 w-full rounded-lg border bg-surface px-3 py-2 text-sm min-h-[80px]"
+            />
+            <button
+              type="button"
+              disabled={applying || bio.length < 20}
+              onClick={async () => {
+                try {
+                  await applyPartner({ bio });
+                  toast.success(copy.partner.applyPending);
+                } catch (e: unknown) {
+                  toast.error(e instanceof Error ? e.message : copy.errors.generic);
+                }
+              }}
+              className="mt-2 rounded-lg border border-primary/40 bg-primary/15 px-4 py-2 text-sm text-primary disabled:opacity-50"
+            >
+              {copy.partner.applyCta}
+            </button>
+          </>
+        )}
+      </Section>
+
       {profile?.isAdmin && (
         <Section icon={<Scale className="size-4" />} title={copy.admin.title}>
           <p className="text-xs text-muted-foreground">

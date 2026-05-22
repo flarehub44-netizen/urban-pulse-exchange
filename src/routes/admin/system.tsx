@@ -20,6 +20,8 @@ function AdminSystemPage() {
   const [maxStake, setMaxStake] = useState("100000");
   const [casinoEnabled, setCasinoEnabled] = useState(true);
   const [impulseMax, setImpulseMax] = useState("3");
+  const [partnerEnabled, setPartnerEnabled] = useState(true);
+  const [partnerShare, setPartnerShare] = useState("0.20");
 
   useEffect(() => {
     if (!settings) return;
@@ -28,6 +30,12 @@ function AdminSystemPage() {
     if (settings.casino_enabled != null) setCasinoEnabled(Boolean(settings.casino_enabled));
     if (settings.casino_impulse_max_per_hour != null) {
       setImpulseMax(String(settings.casino_impulse_max_per_hour));
+    }
+    if (settings.partner_program_enabled != null) {
+      setPartnerEnabled(Boolean(settings.partner_program_enabled));
+    }
+    if (settings.default_revenue_share_pct != null) {
+      setPartnerShare(String(settings.default_revenue_share_pct));
     }
   }, [settings]);
 
@@ -39,6 +47,8 @@ function AdminSystemPage() {
       await update({ key: "max_stake", value: Number(maxStake) });
       await update({ key: "casino_enabled", value: casinoEnabled });
       await update({ key: "casino_impulse_max_per_hour", value: Number(impulseMax) });
+      await update({ key: "partner_program_enabled", value: partnerEnabled });
+      await update({ key: "default_revenue_share_pct", value: Number(partnerShare) });
       toast.success("Configurações salvas.");
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Erro");
@@ -81,6 +91,26 @@ function AdminSystemPage() {
           <span className="text-xs">{copy.admin.system.casinoEnabled}</span>
         </label>
         <p className="text-[11px] text-muted-foreground">{copy.admin.system.casinoEnabledHint}</p>
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={partnerEnabled}
+            onChange={(e) => setPartnerEnabled(e.target.checked)}
+          />
+          <span className="text-xs">Programa Creator ativo</span>
+        </label>
+        <label className="block">
+          <span className="text-xs text-muted-foreground">Revenue share padrão (0–1)</span>
+          <input
+            type="number"
+            step="0.01"
+            min={0}
+            max={1}
+            value={partnerShare}
+            onChange={(e) => setPartnerShare(e.target.value)}
+            className="mt-1 w-full rounded-lg border bg-surface px-3 py-2 mono"
+          />
+        </label>
         <label className="block">
           <span className="text-xs text-muted-foreground">{copy.admin.system.impulseMaxHour}</span>
           <input
