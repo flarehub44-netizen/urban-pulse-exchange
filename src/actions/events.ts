@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { SupabaseFnContext } from "@/integrations/supabase/loose";
+import { db } from "@/integrations/supabase/loose";
 
 export type PlatformEvent = {
   id: string;
@@ -13,10 +12,27 @@ export type PlatformEvent = {
 };
 
 export const getActiveEventsFn = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { supabase } = context as unknown as SupabaseFnContext;
-    const { data, error } = await supabase.rpc("get_active_events");
-    if (error) throw new Error(error.message);
-    return (Array.isArray(data) ? data : []) as PlatformEvent[];
+  .handler(async () => {
+    try {
+      const now = new Date().toISOString();
+      const { data, error } = (await db
+        .from("platform_events")
+        .select("id, name, slug, description, badge_icon, xp_boost, ends_at")
+        .lte("starts_at", now)
+        .gte("ends_at", now)
+        .order("ends_at", { ascending: true })) as {
+        data: PlatformEvent[] | null;
+        error: Error | null;
+      };
+
+      if (error) {
+        console.warn("[events] Failed to load active events:", error.message);
+        return [];
+      }
+
+      return data ?? [];
+    } catch (error) {
+      console.warn("[events] Active events unavailable:", error);
+      return [];
+    }
   });
