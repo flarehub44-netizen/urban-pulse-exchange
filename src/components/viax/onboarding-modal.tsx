@@ -149,6 +149,10 @@ export function OnboardingModal() {
       }}
     >
       <DialogContent className="max-w-sm overflow-hidden p-0">
+        <VisuallyHidden.Root>
+          <DialogTitle>{current.title}</DialogTitle>
+          <DialogDescription>{current.body}</DialogDescription>
+        </VisuallyHidden.Root>
         <div className={cn("bg-gradient-to-br p-6", current.color)}>
           <div className="flex items-center justify-between">
             <div className="flex gap-1.5">
