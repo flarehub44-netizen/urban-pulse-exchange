@@ -10,5 +10,7 @@ export function CameraStreamPreview({
   className?: string;
   offline?: boolean;
 }) {
-  return <CameraPlayer url={url} className={className} offline={offline} maxHeightClass="max-h-48" />;
+  return (
+    <CameraPlayer url={url} className={className} offline={offline} maxHeightClass="max-h-48" />
+  );
 }

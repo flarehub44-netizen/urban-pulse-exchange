@@ -67,7 +67,11 @@ export function CameraLineEditor({
           onPointerLeave={onPointerUp}
         >
           <CameraPlayer url={previewUrl} maxHeightClass="max-h-56" autoPlay={false} />
-          <svg className="pointer-events-none absolute inset-0 size-full" viewBox="0 0 1 1" preserveAspectRatio="none">
+          <svg
+            className="pointer-events-none absolute inset-0 size-full"
+            viewBox="0 0 1 1"
+            preserveAspectRatio="none"
+          >
             <line
               x1={line.x1}
               y1={line.y1}
@@ -100,7 +104,11 @@ export function CameraLineEditor({
         </div>
       ) : (
         <div className="relative mb-3 h-24 rounded-lg border bg-background">
-          <svg className="absolute inset-0 size-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <svg
+            className="absolute inset-0 size-full"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+          >
             <line
               x1={line.x1 * 100}
               y1={line.y1 * 100}

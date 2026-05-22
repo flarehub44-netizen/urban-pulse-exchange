@@ -43,6 +43,8 @@ describe("isInsecureStreamInProd", () => {
 
 describe("youtubeEmbed", () => {
   it("embeds watch URLs", () => {
-    expect(youtubeEmbed("https://www.youtube.com/watch?v=dQw4w9WgXcQ")).toContain("embed/dQw4w9WgXcQ");
+    expect(youtubeEmbed("https://www.youtube.com/watch?v=dQw4w9WgXcQ")).toContain(
+      "embed/dQw4w9WgXcQ",
+    );
   });
 });

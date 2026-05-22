@@ -74,20 +74,14 @@ function MarketCommentsPanel({ marketId }: { marketId: string }) {
       </div>
       <div className="mt-3 space-y-3">
         {feed.length === 0 && (
-          <p className="text-sm text-muted-foreground">
-            Seja o primeiro a comentar este mercado.
-          </p>
+          <p className="text-sm text-muted-foreground">Seja o primeiro a comentar este mercado.</p>
         )}
         {feed.map((p) => (
           <div
             key={p.id}
             className="flex gap-3 border-t border-border/60 pt-3 first:border-0 first:pt-0"
           >
-            <img
-              src={p.user.avatar}
-              className="size-9 rounded-full bg-surface"
-              alt={p.user.name}
-            />
+            <img src={p.user.avatar} className="size-9 rounded-full bg-surface" alt={p.user.name} />
             <div className="min-w-0 flex-1">
               <div className="text-xs text-muted-foreground">
                 <span className="font-medium text-foreground">{p.user.name}</span> @{p.user.handle}{" "}
@@ -218,9 +212,7 @@ function MarketDetail() {
 
       <OpenPositionStrip marketId={marketId} />
 
-      {(m.status === "live" || m.status === "closing") && (
-        <LiveCameraStrip regionId={m.regionId} />
-      )}
+      {(m.status === "live" || m.status === "closing") && <LiveCameraStrip regionId={m.regionId} />}
 
       <div className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
         <div className="space-y-5 min-w-0">
@@ -258,7 +250,9 @@ function MarketDetail() {
               <div className="glass-strong rounded-xl border border-up/30 bg-up/5 p-3 shadow-[var(--shadow-glow-up)]">
                 <div className="text-xs uppercase tracking-wider text-up">↑ SIM</div>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold text-up mono">{(pY * 100).toFixed(1)}</span>
+                  <span className="text-3xl font-semibold text-up mono">
+                    {(pY * 100).toFixed(1)}
+                  </span>
                   <span className="text-sm text-up/70">%</span>
                 </div>
                 <div className="mt-1 text-[11px] mono text-muted-foreground">
@@ -268,7 +262,9 @@ function MarketDetail() {
               <div className="glass-strong rounded-xl border border-down/30 bg-down/5 p-3 shadow-[var(--shadow-glow-down)]">
                 <div className="text-xs uppercase tracking-wider text-down">↓ NÃO</div>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold text-down mono">{((1 - pY) * 100).toFixed(1)}</span>
+                  <span className="text-3xl font-semibold text-down mono">
+                    {((1 - pY) * 100).toFixed(1)}
+                  </span>
                   <span className="text-sm text-down/70">%</span>
                 </div>
                 <div className="mt-1 text-[11px] mono text-muted-foreground">
@@ -356,7 +352,9 @@ function MarketDetail() {
                   </div>
                 </div>
                 <div className="mt-3">
-                  <Suspense fallback={<div className="h-[280px] animate-pulse rounded-xl bg-surface-2" />}>
+                  <Suspense
+                    fallback={<div className="h-[280px] animate-pulse rounded-xl bg-surface-2" />}
+                  >
                     <ProbChart m={m} history={history} />
                   </Suspense>
                 </div>
@@ -364,7 +362,9 @@ function MarketDetail() {
                   <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
                     <BarChart2 className="size-3.5" /> Volume · barras
                   </div>
-                  <Suspense fallback={<div className="h-[120px] animate-pulse rounded-xl bg-surface-2" />}>
+                  <Suspense
+                    fallback={<div className="h-[120px] animate-pulse rounded-xl bg-surface-2" />}
+                  >
                     <MarketVolumeChart history={history} />
                   </Suspense>
                 </div>

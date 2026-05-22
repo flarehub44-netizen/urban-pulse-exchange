@@ -81,7 +81,7 @@ function todayKey(): string {
 function scheduleForWindow(win: PushWindow, ctx: PushCtx, delayMs: number) {
   setTimeout(() => {
     if (!canNotify() || !loadPushPref()) return;
-    // eslint-disable-next-line no-new
+
     new Notification(win.title, {
       body: win.body(ctx),
       tag: win.tag,

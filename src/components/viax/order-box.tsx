@@ -317,11 +317,7 @@ export function OrderBox({
                 <span
                   className={cn(
                     "flex size-6 items-center justify-center rounded-full",
-                    active
-                      ? isYes
-                        ? "bg-up/15"
-                        : "bg-down/15"
-                      : "bg-surface-2",
+                    active ? (isYes ? "bg-up/15" : "bg-down/15") : "bg-surface-2",
                   )}
                 >
                   {isYes ? <ArrowUp className="size-3" /> : <ArrowDown className="size-3" />}

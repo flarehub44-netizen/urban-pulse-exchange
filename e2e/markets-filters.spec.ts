@@ -32,9 +32,9 @@ test.describe("D — Mercados e Filtros", () => {
     await page.waitForTimeout(3000);
 
     // Clica no filtro de região se existir
-    const regionFilter = page.getByTestId("filter-region").or(
-      page.getByRole("button", { name: /região|centro|zona/i }).first()
-    );
+    const regionFilter = page
+      .getByTestId("filter-region")
+      .or(page.getByRole("button", { name: /região|centro|zona/i }).first());
     if (await regionFilter.isVisible({ timeout: 3_000 }).catch(() => false)) {
       await regionFilter.click();
       await page.waitForTimeout(1500);
@@ -72,7 +72,10 @@ test.describe("D — Mercados e Filtros", () => {
   test("D6: detalhe de mercado exibe tabs de chart, book e comentários", async ({ page }) => {
     await primeAppStorage(page);
     const { cards } = await waitForMarketCards(page, 1, 25_000);
-    const href = await cards.first().locator('[data-testid="market-card-link"]').getAttribute("href");
+    const href = await cards
+      .first()
+      .locator('[data-testid="market-card-link"]')
+      .getAttribute("href");
     if (!href) {
       test.skip();
       return;
@@ -89,7 +92,10 @@ test.describe("D — Mercados e Filtros", () => {
   test("D6: order box aparece no detalhe de mercado live", async ({ page }) => {
     await primeAppStorage(page);
     const { cards } = await waitForMarketCards(page, 1, 25_000);
-    const href = await cards.first().locator('[data-testid="market-card-link"]').getAttribute("href");
+    const href = await cards
+      .first()
+      .locator('[data-testid="market-card-link"]')
+      .getAttribute("href");
     if (!href) {
       test.skip();
       return;
@@ -103,7 +109,10 @@ test.describe("D — Mercados e Filtros", () => {
   test("D8: edge badge ou previsão da UrbanMind aparece no detalhe", async ({ page }) => {
     await primeAppStorage(page);
     const { cards } = await waitForMarketCards(page, 1, 25_000);
-    const href = await cards.first().locator('[data-testid="market-card-link"]').getAttribute("href");
+    const href = await cards
+      .first()
+      .locator('[data-testid="market-card-link"]')
+      .getAttribute("href");
     if (!href) {
       test.skip();
       return;
@@ -137,7 +146,10 @@ test.describe("D — Mercados e Filtros", () => {
       await expect(page.locator("body")).toBeVisible();
     } else {
       // Botão de favorito pode estar no detalhe do mercado
-      const href = await cards.first().locator('[data-testid="market-card-link"]').getAttribute("href");
+      const href = await cards
+        .first()
+        .locator('[data-testid="market-card-link"]')
+        .getAttribute("href");
       if (href) {
         await page.goto(href);
         await page.waitForTimeout(3000);

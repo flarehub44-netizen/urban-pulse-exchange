@@ -6,10 +6,10 @@ const API_KEY = process.env.SYNCPAY_API_KEY ?? "";
 const WEBHOOK_SECRET = process.env.SYNCPAY_WEBHOOK_SECRET ?? "";
 
 export type PixChargeResponse = {
-  id: string;           // provider_id
-  qr_code: string;      // EMV Pix Copia e Cola
+  id: string; // provider_id
+  qr_code: string; // EMV Pix Copia e Cola
   qr_code_base64: string;
-  expiration: string;   // ISO 8601
+  expiration: string; // ISO 8601
   status: "ACTIVE" | "COMPLETED" | "EXPIRED" | "CANCELLED";
 };
 
@@ -19,11 +19,16 @@ export type PixPayoutResponse = {
 };
 
 export type SyncPayWebhookPayload = {
-  event: "PAYMENT_RECEIVED" | "PAYMENT_FAILED" | "PAYMENT_EXPIRED" | "PAYOUT_COMPLETED" | "PAYOUT_FAILED";
+  event:
+    | "PAYMENT_RECEIVED"
+    | "PAYMENT_FAILED"
+    | "PAYMENT_EXPIRED"
+    | "PAYOUT_COMPLETED"
+    | "PAYOUT_FAILED";
   data: {
-    id: string;           // provider_id
+    id: string; // provider_id
     status: string;
-    amount: number;       // em reais
+    amount: number; // em reais
     payer?: {
       name?: string;
       document?: string;
@@ -38,7 +43,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     ...init,
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${API_KEY}`,
+      Authorization: `Bearer ${API_KEY}`,
       ...init.headers,
     },
   });
@@ -58,7 +63,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
  */
 export async function createPixCharge(opts: {
   amount: number;
-  correlationId: string;    // payment_intent.id
+  correlationId: string; // payment_intent.id
   description?: string;
   expiresInMinutes?: number;
 }): Promise<PixChargeResponse> {

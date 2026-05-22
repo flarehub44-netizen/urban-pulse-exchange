@@ -22,7 +22,8 @@ test.describe("C1 — Autenticação anônima automática", () => {
     await page.waitForTimeout(4000);
 
     // Banner de anon deve aparecer (pode estar em qualquer posição)
-    const banner = page.getByTestId("anon-account-banner")
+    const banner = page
+      .getByTestId("anon-account-banner")
       .or(page.getByText(/vincule seu email|criar conta|salvar progresso/i).first());
 
     // Pode estar visível ou não dependendo do dismiss — só verificamos que não quebra

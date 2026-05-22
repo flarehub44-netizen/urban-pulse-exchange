@@ -79,9 +79,7 @@ function Ranking() {
     <div className="space-y-5">
       <PageHeader
         title={<span className="text-highlight">Ranking</span>}
-        description={
-          tab === "amigos" ? copy.ranking.followingSort : copy.ranking.defaultSort
-        }
+        description={tab === "amigos" ? copy.ranking.followingSort : copy.ranking.defaultSort}
       />
 
       <div className="flex flex-wrap gap-2">

@@ -81,7 +81,10 @@ function UrbanMind() {
     <div className="space-y-6">
       <UrbanMindDigestCard />
       <LiveCameraStrip regionId={top.regionId} />
-      <SurfaceCard variant="featured" className="bg-gradient-to-br from-primary/10 via-card/60 to-card/30 p-6">
+      <SurfaceCard
+        variant="featured"
+        className="bg-gradient-to-br from-primary/10 via-card/60 to-card/30 p-6"
+      >
         <div className="flex items-center gap-2 text-primary">
           <Brain className="size-5" />
           <span className="text-xs uppercase tracking-wider">UrbanMind AI</span>
@@ -115,8 +118,7 @@ function UrbanMind() {
           >
             {top.aiPrediction.side === "YES" ? "SIM" : "NÃO"}
           </span>{" "}
-          para o mercado entre{" "}
-          <span className="text-emphasis">18h–19h</span> com base em{" "}
+          para o mercado entre <span className="text-emphasis">18h–19h</span> com base em{" "}
           <span className="text-emphasis">14 dias</span> de dados de fluxo, clima e padrões
           históricos.
         </p>
@@ -252,4 +254,3 @@ function UrbanMind() {
     </div>
   );
 }
-

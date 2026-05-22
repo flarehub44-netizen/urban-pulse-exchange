@@ -44,9 +44,7 @@ test.describe("E — Feed e Social", () => {
       await page.waitForTimeout(500);
 
       // Botão de enviar deve estar desabilitado ou o texto deve ser truncado
-      const submitBtn = page
-        .getByRole("button", { name: /publicar|postar|enviar/i })
-        .first();
+      const submitBtn = page.getByRole("button", { name: /publicar|postar|enviar/i }).first();
       const isDisabled = await submitBtn.isDisabled({ timeout: 2_000 }).catch(() => false);
       const inputValue = await postInput.inputValue().catch(() => "");
       const textLength = inputValue.length;
@@ -85,9 +83,7 @@ test.describe("E — Feed e Social", () => {
     await page.goto("/ranking");
     await page.waitForTimeout(4000);
 
-    const followBtn = page
-      .getByRole("button", { name: /seguir|follow/i })
-      .first();
+    const followBtn = page.getByRole("button", { name: /seguir|follow/i }).first();
 
     if (await followBtn.isVisible({ timeout: 5_000 }).catch(() => false)) {
       await followBtn.click();
@@ -106,10 +102,7 @@ test.describe("E — Feed e Social", () => {
     await page.goto("/ranking");
     await page.waitForTimeout(4000);
 
-    const profileLink = page
-      .getByRole("link")
-      .filter({ hasText: /@\w+/ })
-      .first();
+    const profileLink = page.getByRole("link").filter({ hasText: /@\w+/ }).first();
 
     if (await profileLink.isVisible({ timeout: 5_000 }).catch(() => false)) {
       const href = await profileLink.getAttribute("href");

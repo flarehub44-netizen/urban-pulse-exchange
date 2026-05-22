@@ -32,7 +32,9 @@ test.describe("Camera stream UI", () => {
         await expect(video).toBeVisible({ timeout: 20_000 });
       } else {
         const hasVideo = (await video.count()) > 0;
-        expect(hasVideo || (await page.getByText(/Paulista|Marginal|Pinheiros|demo/i).count()) > 0).toBeTruthy();
+        expect(
+          hasVideo || (await page.getByText(/Paulista|Marginal|Pinheiros|demo/i).count()) > 0,
+        ).toBeTruthy();
       }
     }
   });

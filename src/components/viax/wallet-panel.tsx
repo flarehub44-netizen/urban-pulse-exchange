@@ -81,7 +81,9 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
     onError: (err) => {
       const msg = err instanceof Error ? err.message : "Saque falhou.";
       if (msg.includes("kyc_required")) {
-        toast.error("Verificação necessária", { description: "Complete o KYC para sacar acima de R$ 100." });
+        toast.error("Verificação necessária", {
+          description: "Complete o KYC para sacar acima de R$ 100.",
+        });
       } else {
         toast.error(msg);
       }
@@ -99,12 +101,16 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
           setDepositQr(null);
           queryClient.invalidateQueries({ queryKey: ["me"] });
           queryClient.invalidateQueries({ queryKey: ["transactions"] });
-          toast.success("Depósito confirmado!", { description: `R$ ${status.amount.toFixed(2)} adicionado ao seu saldo.` });
+          toast.success("Depósito confirmado!", {
+            description: `R$ ${status.amount.toFixed(2)} adicionado ao seu saldo.`,
+          });
         } else if (status.status === "failed" || status.status === "expired") {
           setDepositQr(null);
           toast.error("QR Code expirado ou pagamento falhou. Tente novamente.");
         }
-      } catch { /* silencioso */ }
+      } catch {
+        /* silencioso */
+      }
     }, 5000);
     return () => clearInterval(interval);
   }, [depositQr, depositDone, queryClient]);
@@ -246,9 +252,13 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
         <div className="surface-card mx-auto max-w-md space-y-4">
           <h3 className="heading-section">
             {tab === "Depositar" ? (
-              <>Adicionar <span className="text-highlight">saldo</span></>
+              <>
+                Adicionar <span className="text-highlight">saldo</span>
+              </>
             ) : (
-              <>Sacar para <span className="text-highlight">conta Pix</span></>
+              <>
+                Sacar para <span className="text-highlight">conta Pix</span>
+              </>
             )}
           </h3>
 

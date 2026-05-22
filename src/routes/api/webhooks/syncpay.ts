@@ -99,10 +99,7 @@ export const Route = createFileRoute("/api/webhooks/syncpay")({
             });
           }
 
-          await supabase
-            .from("payment_intents")
-            .update({ status: newStatus })
-            .eq("id", intent.id);
+          await supabase.from("payment_intents").update({ status: newStatus }).eq("id", intent.id);
 
           return json({ ok: true });
         }

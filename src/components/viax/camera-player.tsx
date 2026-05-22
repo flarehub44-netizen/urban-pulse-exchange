@@ -136,7 +136,12 @@ export function CameraPlayer({
         )}
       >
         <p>{copy.cameras.mixedContent}</p>
-        <a href={url} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-primary hover:underline">
+        <a
+          href={url}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-1 inline-flex items-center gap-1 text-primary hover:underline"
+        >
           <ExternalLink className="size-3" />
           {copy.cameras.openExternal}
         </a>
@@ -197,7 +202,11 @@ export function CameraPlayer({
       <img
         src={url}
         alt={copy.cameras.previewAlt}
-        className={cn("aspect-video w-full rounded-lg border object-cover", maxHeightClass, className)}
+        className={cn(
+          "aspect-video w-full rounded-lg border object-cover",
+          maxHeightClass,
+          className,
+        )}
         onLoad={() => setLoading(false)}
         onError={() => setHlsError(copy.cameras.streamError)}
       />

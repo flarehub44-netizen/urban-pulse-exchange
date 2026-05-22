@@ -9,7 +9,8 @@ test.describe("G — Admin e Partner Guards", () => {
     await primeAppStorage(page);
     await page.goto("/admin");
     // Aguarda possível redirect client-side
-    await page.waitForURL(/\/(dashboard|profile|markets|feed|ranking)/, { timeout: 10_000 })
+    await page
+      .waitForURL(/\/(dashboard|profile|markets|feed|ranking)/, { timeout: 10_000 })
       .catch(() => null);
     await page.waitForTimeout(2000);
 
@@ -27,7 +28,8 @@ test.describe("G — Admin e Partner Guards", () => {
   test("G2: partner portal redireciona usuário comum para área pública", async ({ page }) => {
     await primeAppStorage(page);
     await page.goto("/partner");
-    await page.waitForURL(/\/(dashboard|profile|markets|feed|ranking|partner)/, { timeout: 10_000 })
+    await page
+      .waitForURL(/\/(dashboard|profile|markets|feed|ranking|partner)/, { timeout: 10_000 })
       .catch(() => null);
     await page.waitForTimeout(2000);
 

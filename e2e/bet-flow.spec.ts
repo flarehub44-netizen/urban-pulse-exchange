@@ -125,7 +125,10 @@ test.describe("B9 — Mercado não-live rejeita aposta na UI", () => {
       test.skip();
       return;
     }
-    const href = await cards.first().locator('[data-testid="market-card-link"]').getAttribute("href");
+    const href = await cards
+      .first()
+      .locator('[data-testid="market-card-link"]')
+      .getAttribute("href");
     if (!href) {
       test.skip();
       return;

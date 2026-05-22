@@ -160,10 +160,7 @@ function Feed() {
           const liked = likedIds.has(p.id);
           const isRepost = p.text.startsWith("🔁");
           return (
-            <li
-              key={p.id}
-              className="surface-card-interactive p-4 transition hover:bg-surface/30"
-            >
+            <li key={p.id} className="surface-card-interactive p-4 transition hover:bg-surface/30">
               <div className="flex gap-3">
                 <img
                   src={p.user.avatar}

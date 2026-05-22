@@ -222,8 +222,8 @@ function Landing() {
             }
           />
           <p className="text-lead mt-3 max-w-2xl">
-            Mercados sobre <span className="text-emphasis">trânsito e mobilidade</span> em São Paulo.
-            Pools atualizam em tempo real — entre antes do fechamento.
+            Mercados sobre <span className="text-emphasis">trânsito e mobilidade</span> em São
+            Paulo. Pools atualizam em tempo real — entre antes do fechamento.
           </p>
           <MobileMarketsCarousel markets={markets.slice(0, 6)} className="mt-10 md:hidden" />
           <div className="mt-10 hidden gap-4 md:grid md:grid-cols-2 lg:grid-cols-3">

@@ -205,8 +205,7 @@ function Dashboard() {
         <PageHeader
           title={
             <>
-              Olá,{" "}
-              <span className="text-highlight">{me.name.split(" ")[0]}</span>.
+              Olá, <span className="text-highlight">{me.name.split(" ")[0]}</span>.
             </>
           }
           description={
@@ -613,4 +612,3 @@ function Dashboard() {
     </div>
   );
 }
-
