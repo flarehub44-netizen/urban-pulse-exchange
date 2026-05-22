@@ -142,7 +142,7 @@ function Dashboard() {
     if (highlight !== "position") return;
     const el = document.getElementById("open-positions");
     el?.scrollIntoView({ behavior: "smooth", block: "start" });
-    navigate({ search: (prev) => ({ ...prev, highlight: undefined }), replace: true });
+    navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, highlight: undefined }), replace: true });
   }, [highlight, navigate]);
 
   const { data: bets } = useBets();

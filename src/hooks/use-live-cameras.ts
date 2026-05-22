@@ -23,7 +23,7 @@ export function useLiveCameras(regionId: string | null | undefined, enabled = tr
     queryKey: ["cameras", "live", regionId ?? "all"],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("list_live_cameras", {
-        p_region_id: regionId ?? null,
+        p_region_id: regionId ?? undefined,
       });
       if (error) throw error;
       return (data ?? []) as LiveCamera[];
