@@ -2559,6 +2559,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_allowed_stream_url: { Args: { p_url: string }; Returns: boolean }
       is_casino_enabled: { Args: never; Returns: boolean }
       is_partner_program_enabled: { Args: never; Returns: boolean }
