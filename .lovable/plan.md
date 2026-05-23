@@ -1,84 +1,56 @@
-## Plano de Ajuste — Correções Pós-QA
+# O que falta para o Stream ficar 100% funcional
 
-Foco: eliminar os bloqueadores P0 (mercados não aparecem, site publicado quebrado, hidratação) e mitigar P1 (segurança DB, acessibilidade). Sem mudanças de escopo de produto.
+Hoje o pipeline está **~70% pronto**: o front (`CameraPlayer` + `live-camera-strip`), o schema (`cameras`, `camera_metrics`, RPCs `list_live_cameras` / `ingest_camera_metrics`), o worker Python (`services/vision-worker`) e o admin de fontes já existem. As 3 câmeras demo (`paulista`, `marginal`, `pinheiros`) estão `online` no banco apontando para o HLS de teste do Mux.
 
----
+O que **falta** para sair do "playback demo" e chegar em "pipeline real, ao vivo, com oráculo por câmera":
 
-### Fase 1 — P0: Listagem de mercados (dashboard + /markets)
+## 1. Rodar o vision-worker em produção (bloqueio principal)
+Hoje todas as câmeras estão com `detection_ok = false` — ninguém está chamando `ingest_camera_metrics`. Sem worker rodando, o Oráculo por câmera nunca pode ser ligado.
 
-**Problema:** `useMarkets` usa `enabled: isBrowser`, gerando mismatch SSR×CSR e árvore descartada. Resultado: "0 mercados" mesmo com dados no banco.
+Opções (escolher uma):
+- **VPS + Docker** (recomendado): `infra/stream-stack/docker-compose.yml` já pronto. Falta provisionar host, preencher `.env` com `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` e subir.
+- **GitHub Actions agendado**: hoje o workflow `vision-worker.yml` é `workflow_dispatch` (manual) e roda 1 ciclo. Precisa virar `schedule: cron` a cada 1–5 min e os secrets `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` precisam ser cadastrados no repo.
+- **Lovable serverless**: não cabe (precisa de ffmpeg + processo longo).
 
-**Ações:**
-1. Em `src/hooks/use-markets.ts`: remover o guard `enabled: isBrowser`. Deixar a query rodar no SSR e no cliente (dados são públicos, sem auth).
-2. Garantir que o `queryKey` é estável entre servidor e cliente (sem `Date.now()`, `Math.random()`, `window.*`).
-3. Em `src/routes/markets.tsx` e no dashboard: remover qualquer branch `if (typeof window !== 'undefined')` que renderize markup diferente; usar classes responsivas Tailwind (`hidden md:grid` / `grid md:hidden`) para alternar layout mobile/desktop sem condicional JS.
-4. Pré-buscar no loader via `context.queryClient.ensureQueryData(marketsQueryOptions)` e consumir com `useSuspenseQuery` para render imediato e SSR-safe.
+## 2. Substituir as URLs demo por câmeras reais
+As 3 câmeras hoje apontam para `test-streams.mux.dev` (vídeo genérico do Mux, sem trânsito). Para o contador de veículos fazer sentido:
+- Conseguir HLS HTTPS público de Paulista / Marginal / Pinheiros (ex.: CET-SP, prefeitura, parceiros), **ou**
+- Subir o **MediaMTX** (`infra/mediamtx/`) numa VPS, ingerir RTSP das câmeras reais e expor HLS em `https://stream.seudominio.com/...` (fase 2 já documentada em `docs/CAMERA_STREAMING.md`).
 
-**Validação:** abrir `/markets?status=live` e `/dashboard` → contagem > 0; sem warning de hydration no console.
+Sem isso, o `LineCrossCounter` vai produzir contagens sem relação com tráfego real.
 
----
+## 3. Ligar o Oráculo por câmera
+Depois que o worker estiver estável e `detection_ok = true` por ~10 min:
+- Admin → Sistema → **Oráculo por câmera = ON**
+- Desligar o **Simulador de regiões** (senão duas fontes brigam pelo `regions.flow`)
+- Mercados `*-live` passam a usar `data_source = camera` (migration `20260605000001` já existe)
 
-### Fase 2 — P0: Site publicado sem variáveis Supabase
+## 4. Monitoramento e saúde do stream
+Faltam sinais operacionais hoje:
+- Coluna/heartbeat `last_seen_at` por câmera (o worker já faz upsert via RPC, mas a UI não mostra "há quanto tempo a última métrica chegou")
+- Badge amarelo/vermelho no admin quando worker está parado > N min
+- Alerta (toast/notification) quando uma câmera cai de `online` para `offline`
 
-**Problema:** `viax.lovable.app` retorna `Missing SUPABASE_URL`. Build publicado antigo, sem env.
+## 5. Conformidade e UX final
+- **Aviso de LGPD** visível no `CameraPlayer` em produção ("imagem pública, sem identificação de pessoas/placas")
+- Confirmar que nenhuma URL `rtsp://` ou `http://` (não-HTTPS) entra no banco — `is_allowed_stream_url` já existe mas precisa ser plugada como CHECK/trigger no `cameras.stream_url` para garantir
+- Testar fallback "Sem sinal ao vivo" em mobile (Safari iOS exige `playsInline` no `<video>` — vale conferir no `CameraPlayer`)
 
-**Ações:**
-1. Confirmar que `.env` da preview contém `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`.
-2. Republicar o projeto (botão Publish → Update) para propagar env vars ao runtime do Worker.
-3. Após deploy, smoke test em `/`, `/markets`, `/dashboard` no domínio publicado.
-
----
-
-### Fase 3 — P0: Hydration mismatches residuais
-
-**Ações:**
-1. Auditar componentes que usam `useEffect` + `useState(false)` para "is mounted" e renderizam markup diferente — substituir por CSS responsivo.
-2. Remover usos de `window`, `localStorage`, `navigator` no render inicial; mover para `useEffect`.
-3. Conferir `src/routes/_app.tsx` e `__root.tsx` para skeleton/guards que dependam de auth não-determinística.
-
-**Validação:** console limpo de `Hydration failed` / `did not match` em todas as rotas públicas.
-
----
-
-### Fase 4 — P1: Acessibilidade (Radix Dialog)
-
-**Ações:**
-1. Adicionar `<DialogTitle>` (visível ou via `VisuallyHidden`) em:
-   - Modal de onboarding
-   - Modal de confirmação de aposta
-   - Quaisquer outros `DialogContent` flagados no console
-2. Adicionar `DialogDescription` quando aplicável.
+## 6. Testes E2E em produção
+- `e2e/camera-stream.spec.ts` já cobre o caminho feliz no preview, mas hoje só roda em `PLAYWRIGHT_BASE_URL=workers.dev` se setado manualmente. Falta adicionar um job no `ci.yml` que rode esse spec contra `viax.lovable.app` pós-deploy.
+- Rodar `supabase/tests/camera_pipeline_acceptance.sql` no CI (hoje é manual).
 
 ---
 
-### Fase 5 — P1: Segurança Supabase (linter)
+## Ordem sugerida (caminho mais curto até "100%")
+1. Cadastrar `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` como secrets no GitHub e mudar o workflow para `cron */2 * * * *` — isso já liga o pipeline com as câmeras demo (rápido, sem VPS).
+2. Adicionar heartbeat (`last_seen_at`) + badge no admin para enxergar se o worker está vivo.
+3. Trocar as 3 URLs demo por HLS reais (parceiro / MediaMTX).
+4. Ligar Oráculo por câmera e desligar simulador.
+5. Plugar trigger de validação de URL + aviso LGPD no player.
+6. Adicionar job de E2E pós-deploy no CI.
 
-**Ações:**
-1. Recriar a view com `SECURITY DEFINER` como `SECURITY INVOKER` (ou remover se desnecessária).
-2. Em todas as funções flagadas: adicionar `SET search_path = public` no `CREATE OR REPLACE FUNCTION`.
-3. Rodar `supabase--linter` novamente até zerar erros e reduzir warnings críticos.
-
-Migração única consolidando todos os fixes de função/view.
-
----
-
-### Fase 6 — Validação final
-
-1. `bunx vitest run` (esperado: 40/40 verde).
-2. Navegação manual: `/`, `/markets`, `/markets/:id`, `/dashboard`, `/wallet`, `/social`, login → bet flow.
-3. `supabase--linter`: zero ERRORs.
-4. Console: zero hydration errors, zero Radix warnings.
-5. Atualizar `/mnt/documents/QA_REPORT_2026-05-22.md` com status pós-fix.
-
----
-
-### Fora de escopo
-
-- Refatorações maiores de arquitetura
-- Novas features
-- Mudanças de design
-- Otimizações de performance além das que removem mismatches
-
-### Ordem de execução
-
-Fase 1 → 3 → 4 → 5 → 2 (republish por último, após código estável) → 6.
+## Decisões que preciso de você
+- **Onde rodar o worker?** GitHub Actions cron (grátis, ~2 min de latência) ou VPS Docker (latência real, custo ~5 USD/mês)?
+- **Fonte das câmeras reais?** Já tem URLs HLS públicas, ou vamos pelo caminho RTSP → MediaMTX?
+- **Quer que eu já implemente o heartbeat + badge no admin** como primeiro passo enquanto você decide infra?

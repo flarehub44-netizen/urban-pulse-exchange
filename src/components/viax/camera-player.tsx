@@ -165,34 +165,37 @@ export function CameraPlayer({
 
   if (kind === "hls") {
     return (
-      <div className={cn("relative overflow-hidden rounded-lg border bg-black/80", className)}>
-        {loading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
-            <Loader2 className="size-6 animate-spin text-muted-foreground" />
-          </div>
-        )}
-        <video
-          ref={videoRef}
-          controls
-          playsInline
-          muted
-          className={cn("aspect-video w-full object-contain", maxHeightClass)}
-        />
-        {hlsError && (
-          <div className="space-y-1 px-2 py-1">
-            <p className="text-[10px] text-warn">{hlsError}</p>
-            <p className="text-[10px] text-muted-foreground">{copy.cameras.corsHint}</p>
-            <a
-              href={url}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline"
-            >
-              <ExternalLink className="size-3" />
-              {copy.cameras.openExternal}
-            </a>
-          </div>
-        )}
+      <div className={cn("space-y-1", className)}>
+        <div className="relative overflow-hidden rounded-lg border bg-black/80">
+          {loading && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
+              <Loader2 className="size-6 animate-spin text-muted-foreground" />
+            </div>
+          )}
+          <video
+            ref={videoRef}
+            controls
+            playsInline
+            muted
+            className={cn("aspect-video w-full object-contain", maxHeightClass)}
+          />
+          {hlsError && (
+            <div className="space-y-1 px-2 py-1">
+              <p className="text-[10px] text-warn">{hlsError}</p>
+              <p className="text-[10px] text-muted-foreground">{copy.cameras.corsHint}</p>
+              <a
+                href={url}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline"
+              >
+                <ExternalLink className="size-3" />
+                {copy.cameras.openExternal}
+              </a>
+            </div>
+          )}
+        </div>
+        <p className="text-[10px] text-muted-foreground">{copy.cameras.privacyNote}</p>
       </div>
     );
   }
