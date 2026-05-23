@@ -46,8 +46,22 @@ export function CameraPlayer({
       }
 
       hlsRef.current?.destroy();
-      const instance = new HlsMod({ enableWorker: true, lowLatencyMode: true });
+      const instance = new HlsMod({
+        enableWorker: true,
+        lowLatencyMode: false,
+        liveSyncDurationCount: 3,
+        liveMaxLatencyDurationCount: 6,
+        backBufferLength: 10,
+      });
       hlsRef.current = instance;
+
+      // Snap to live edge if user/playback drifts behind
+      const snapToLive = () => {
+        if (!instance.liveSyncPosition) return;
+        const drift = instance.liveSyncPosition - video.currentTime;
+        if (drift > 8) video.currentTime = instance.liveSyncPosition;
+      };
+      video.addEventListener("playing", snapToLive);
 
       instance.loadSource(url);
       instance.attachMedia(video);
