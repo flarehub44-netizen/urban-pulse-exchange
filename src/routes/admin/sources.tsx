@@ -158,9 +158,27 @@ function AdminSourcesPage() {
                 {c.last_vehicle_count != null &&
                   ` · ${copy.admin.sources.lastCount}: ${c.last_vehicle_count}`}
               </p>
-              {staleById.get(c.id) && (
-                <p className="mt-1 text-[10px] text-warn">{copy.cameras.staleDetection}</p>
-              )}
+              {(() => {
+                const h = healthById.get(c.id);
+                if (!h) return null;
+                const stale = h.is_stale;
+                const mins = h.minutes_stale;
+                const last = h.last_metric_at
+                  ? new Date(h.last_metric_at).toLocaleString("pt-BR")
+                  : "—";
+                return (
+                  <p
+                    className={cn(
+                      "mt-1 text-[10px]",
+                      stale ? "text-warn" : "text-muted-foreground",
+                    )}
+                  >
+                    {copy.cameras.lastReading}: {last}
+                    {mins != null && ` · ${Math.round(mins)} min atrás`}
+                    {stale && ` · ${copy.cameras.staleDetection}`}
+                  </p>
+                );
+              })()}
               {c.stream_url && (
                 <div className="mt-2 space-y-2">
                   <CameraStreamPreview url={c.stream_url} />
