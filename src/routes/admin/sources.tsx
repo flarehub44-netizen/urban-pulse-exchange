@@ -128,6 +128,20 @@ function AdminSourcesPage() {
           {copy.admin.sources.cameras}
         </h2>
         <div className="flex flex-wrap gap-2">
+          <select
+            value={provider}
+            onChange={(e) => {
+              setProvider(e.target.value as CameraProvider);
+              setStreamUrl("");
+            }}
+            className="rounded-lg border bg-surface px-3 py-2 text-xs"
+          >
+            {CAMERA_PROVIDERS.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.label}
+              </option>
+            ))}
+          </select>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -137,8 +151,8 @@ function AdminSourcesPage() {
           <input
             value={streamUrl}
             onChange={(e) => setStreamUrl(e.target.value)}
-            placeholder="URL stream (HLS/WebRTC)"
-            className="min-w-[200px] flex-1 rounded-lg border bg-surface px-3 py-2 text-xs"
+            placeholder={preset.placeholder}
+            className="min-w-[260px] flex-1 rounded-lg border bg-surface px-3 py-2 text-xs"
           />
           <select
             value={regionId}
@@ -160,6 +174,8 @@ function AdminSourcesPage() {
             {copy.admin.sources.addCamera}
           </button>
         </div>
+        <p className="mt-2 text-[10px] text-muted-foreground">{preset.description}</p>
+
 
         <ul className="mt-4 space-y-2">
           {(cameras ?? []).map((c) => (
