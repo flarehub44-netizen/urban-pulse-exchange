@@ -53,6 +53,7 @@ import { Route as ApiWebhooksSyncpayRouteImport } from './routes/api/webhooks/sy
 import { Route as AppProfileUserIdRouteImport } from './routes/_app/profile.$userId'
 import { Route as AppMarketsMarketIdRouteImport } from './routes/_app/markets.$marketId'
 import { Route as AppFeedPostIdRouteImport } from './routes/_app/feed.$postId'
+import { Route as ApiPublicHlsProxySplatRouteImport } from './routes/api/public/hls-proxy/$'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -273,6 +274,11 @@ const AppFeedPostIdRoute = AppFeedPostIdRouteImport.update({
   path: '/$postId',
   getParentRoute: () => AppFeedRoute,
 } as any)
+const ApiPublicHlsProxySplatRoute = ApiPublicHlsProxySplatRouteImport.update({
+  id: '/api/public/hls-proxy/$',
+  path: '/api/public/hls-proxy/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -318,6 +324,7 @@ export interface FileRoutesByFullPath {
   '/profile/$userId': typeof AppProfileUserIdRoute
   '/api/webhooks/syncpay': typeof ApiWebhooksSyncpayRoute
   '/markets/': typeof AppMarketsIndexRoute
+  '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -360,6 +367,7 @@ export interface FileRoutesByTo {
   '/profile/$userId': typeof AppProfileUserIdRoute
   '/api/webhooks/syncpay': typeof ApiWebhooksSyncpayRoute
   '/markets': typeof AppMarketsIndexRoute
+  '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -407,6 +415,7 @@ export interface FileRoutesById {
   '/_app/profile/$userId': typeof AppProfileUserIdRoute
   '/api/webhooks/syncpay': typeof ApiWebhooksSyncpayRoute
   '/_app/markets/': typeof AppMarketsIndexRoute
+  '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -454,6 +463,7 @@ export interface FileRouteTypes {
     | '/profile/$userId'
     | '/api/webhooks/syncpay'
     | '/markets/'
+    | '/api/public/hls-proxy/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -496,6 +506,7 @@ export interface FileRouteTypes {
     | '/profile/$userId'
     | '/api/webhooks/syncpay'
     | '/markets'
+    | '/api/public/hls-proxy/$'
   id:
     | '__root__'
     | '/'
@@ -542,6 +553,7 @@ export interface FileRouteTypes {
     | '/_app/profile/$userId'
     | '/api/webhooks/syncpay'
     | '/_app/markets/'
+    | '/api/public/hls-proxy/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -552,6 +564,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   RSlugRoute: typeof RSlugRoute
   ApiWebhooksSyncpayRoute: typeof ApiWebhooksSyncpayRoute
+  ApiPublicHlsProxySplatRoute: typeof ApiPublicHlsProxySplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -864,6 +877,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFeedPostIdRouteImport
       parentRoute: typeof AppFeedRoute
     }
+    '/api/public/hls-proxy/$': {
+      id: '/api/public/hls-proxy/$'
+      path: '/api/public/hls-proxy/$'
+      fullPath: '/api/public/hls-proxy/$'
+      preLoaderRoute: typeof ApiPublicHlsProxySplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1006,6 +1026,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   RSlugRoute: RSlugRoute,
   ApiWebhooksSyncpayRoute: ApiWebhooksSyncpayRoute,
+  ApiPublicHlsProxySplatRoute: ApiPublicHlsProxySplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
