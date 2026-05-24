@@ -56,7 +56,7 @@ export function MarketCard({ m, compact }: { m: Market; compact?: boolean }) {
         {isUrgent && (
           <div className="absolute inset-x-0 top-0 flex items-center justify-center gap-1.5 bg-warn/10 py-1.5 text-[11px] font-medium text-warn">
             <Zap className="size-3 animate-pulse" />
-            Últimos {Math.ceil(minsLeft)} min — apostas encerram em breve!
+            {copy.markets.closingSoon(minsLeft)}
           </div>
         )}
         <div

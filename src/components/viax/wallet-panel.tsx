@@ -82,7 +82,7 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
       const msg = err instanceof Error ? err.message : "Saque falhou.";
       if (msg.includes("kyc_required")) {
         toast.error("Verificação necessária", {
-          description: "Complete o KYC para sacar acima de R$ 100.",
+          description: "Complete o KYC para sacar acima de 100 BRL.",
         });
       } else {
         toast.error(msg);
@@ -102,7 +102,7 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
           queryClient.invalidateQueries({ queryKey: ["me"] });
           queryClient.invalidateQueries({ queryKey: ["transactions"] });
           toast.success("Depósito confirmado!", {
-            description: `R$ ${status.amount.toFixed(2)} adicionado ao seu saldo.`,
+            description: `${formatBRL(status.amount)} adicionado ao seu saldo.`,
           });
         } else if (status.status === "failed" || status.status === "expired") {
           setDepositQr(null);
@@ -136,7 +136,7 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
             <span className="text-highlight">Carteira</span>
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Saldo, movimentações e histórico de apostas.
+            {copy.wallet.subtitle}
           </p>
         </div>
       )}
@@ -321,7 +321,6 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
                   Valor
                 </label>
                 <div className="mt-1 flex items-center gap-2 rounded-xl border bg-surface px-3 py-2">
-                  <span className="text-muted-foreground">R$</span>
                   <input
                     type="number"
                     min={1}
@@ -329,6 +328,7 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
                     onChange={(e) => setWalletAmount(e.target.value)}
                     className="w-full bg-transparent mono text-lg outline-none"
                   />
+                  <span className="shrink-0 text-muted-foreground text-sm">BRL</span>
                 </div>
               </div>
 
@@ -346,7 +346,7 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
                   />
                   {Number(walletAmount) > 100 && (
                     <p className="mt-1 text-[11px] text-warn">
-                      Saques acima de R$ 100 exigem verificação de identidade (KYC).
+                      Saques acima de 100 BRL exigem verificação de identidade (KYC).
                     </p>
                   )}
                 </div>
@@ -436,7 +436,7 @@ function EnrichedHistory({
             )}
           >
             {f === "todos"
-              ? `Apostas (${resolved.length})`
+              ? copy.wallet.predictionsTab(resolved.length)
               : f === "wins"
                 ? `✓ Vitórias (${wins.length})`
                 : `✗ Derrotas (${losses.length})`}
@@ -493,7 +493,8 @@ function EnrichedHistory({
                       </span>
                     )}
                     <span>
-                      Apostado: <span className="mono text-foreground">{formatBRL(b.stake)}</span>
+                      {copy.wallet.stakeLabel}:{" "}
+                      <span className="mono text-foreground">{formatBRL(b.stake)}</span>
                     </span>
                     {b.payout != null && (
                       <span>

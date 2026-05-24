@@ -21,7 +21,7 @@ function PartnerInvitesPage() {
               <th className="px-3 py-2 text-left">Trader</th>
               <th className="px-3 py-2">Cidade</th>
               <th className="px-3 py-2">Depósito</th>
-              <th className="px-3 py-2">Aposta</th>
+              <th className="px-3 py-2">{copy.partner.inviteBetColumn}</th>
               <th className="px-3 py-2 text-right">Entrou</th>
             </tr>
           </thead>

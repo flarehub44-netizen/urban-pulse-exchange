@@ -8,11 +8,11 @@ import { cn } from "@/lib/utils";
 import type { SpinResult } from "@/actions/casino";
 
 const SECTORS = [
-  { key: "balance_25", label: "R$ 25", color: "hsl(160 70% 42%)" },
+  { key: "balance_25", label: "25 BRL", color: "hsl(160 70% 42%)" },
   { key: "xp_50", label: "50 XP", color: "hsl(220 80% 55%)" },
   { key: "near_miss_jackpot", label: "JACKPOT", color: "hsl(45 95% 52%)" },
-  { key: "balance_75", label: "R$ 75", color: "hsl(280 65% 55%)" },
-  { key: "balance_200", label: "R$ 200", color: "hsl(0 75% 55%)" },
+  { key: "balance_75", label: "75 BRL", color: "hsl(280 65% 55%)" },
+  { key: "balance_200", label: "200 BRL", color: "hsl(0 75% 55%)" },
 ] as const;
 
 const SECTOR_DEG = 360 / SECTORS.length;

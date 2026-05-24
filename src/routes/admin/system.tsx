@@ -81,7 +81,7 @@ function AdminSystemPage() {
           />
         </label>
         <label className="block">
-          <span className="text-xs text-muted-foreground">Aposta máxima (R$)</span>
+          <span className="text-xs text-muted-foreground">{copy.admin.system.maxStake}</span>
           <input
             type="number"
             value={maxStake}

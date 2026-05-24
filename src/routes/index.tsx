@@ -86,7 +86,7 @@ function Landing() {
                 className="heading-page mt-6 text-5xl leading-[1.04] md:text-6xl lg:text-7xl"
               >
                 Transforme o movimento da cidade em{" "}
-                <span className="text-highlight">palpites que valem prêmio</span>.
+                <span className="text-highlight">previsões que valem prêmio</span>.
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0, y: 16 }}
@@ -94,11 +94,7 @@ function Landing() {
                 transition={{ delay: 0.1 }}
                 className="text-lead mt-5 max-w-xl text-base"
               >
-                Preveja trânsito, fluxo e velocidade em{" "}
-                <span className="text-emphasis">tempo real</span>. Você aposta{" "}
-                <span className="text-emphasis">SIM ou NÃO</span> junto com a comunidade e com a{" "}
-                <span className="text-emphasis">UrbanMind AI</span>. Quase todo o prêmio (
-                <span className="text-emphasis">90%</span>) vai para quem acertar.
+                {copy.landing.heroBody}
               </motion.p>
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
@@ -164,7 +160,7 @@ function Landing() {
           eyebrow={copy.landing.howEyebrow}
           title={
             <>
-              Da rua para a <span className="text-highlight">aposta</span>, em poucos passos.
+              Da rua para a <span className="text-highlight">previsão</span>, em poucos passos.
             </>
           }
         />
@@ -214,12 +210,7 @@ function Landing() {
         <div className="mx-auto max-w-7xl px-6 py-20">
           <SectionHeader
             eyebrow="Mercados ViaX"
-            title={
-              <>
-                <span className="text-highlight">Mercados reais</span> da cidade, não casa de
-                apostas.
-              </>
-            }
+            title={copy.landing.marketsTitle}
           />
           <p className="text-lead mt-3 max-w-2xl">
             Mercados sobre <span className="text-emphasis">trânsito e mobilidade</span> em São
@@ -264,7 +255,7 @@ function Landing() {
               <KpiTile label={copy.landing.kpiAiPrecision} value="78.4%" tone="primary" />
               <KpiTile label={copy.landing.kpiHumanPrecision} value="64.1%" />
               <KpiTile label="Mercados resolvidos" value="12.482" />
-              <KpiTile label="Volume movimentado" value="R$ 18.4M" />
+              <KpiTile label="Volume movimentado" value="18,4 mi BRL" />
             </div>
           </div>
           <div className="surface-card-featured">

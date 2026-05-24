@@ -4,6 +4,7 @@ import { formatBRL } from "@/lib/parimutuel";
 import { useMarketSocialProof } from "@/hooks/use-market-social-proof";
 import { formatDistanceToNowStrict } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { copy } from "@/copy/pt-BR";
 
 export function MarketSocialProof({ marketId }: { marketId: string }) {
   const { data } = useMarketSocialProof(marketId);
@@ -27,7 +28,7 @@ export function MarketSocialProof({ marketId }: { marketId: string }) {
             animate={{ opacity: 1, scale: 1 }}
             className="flex items-center gap-1 rounded-full bg-warn/10 px-2 py-0.5 text-warn"
           >
-            <Flame className="size-3" /> Apostas acelerando
+            <Flame className="size-3" /> {copy.social.predictionsAccelerating}
           </motion.span>
         )}
       </div>
@@ -37,7 +38,7 @@ export function MarketSocialProof({ marketId }: { marketId: string }) {
         <div className="overflow-hidden rounded-xl border border-border/40 bg-surface/40">
           <div className="border-b border-border/30 px-3 py-1.5">
             <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-              Apostas recentes
+              {copy.social.recentPredictions}
             </p>
           </div>
           <AnimatePresence>

@@ -110,7 +110,7 @@ function AdminSimulatorPage() {
           </label>
         </div>
         <label>
-          Sua aposta (R$)
+          {copy.admin.simulator.yourStake}
           <input
             type="number"
             value={stake}

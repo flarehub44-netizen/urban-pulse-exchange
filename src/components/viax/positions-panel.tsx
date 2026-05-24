@@ -44,7 +44,7 @@ export function PositionsPanel({ embedded }: { embedded?: boolean }) {
       {!embedded && (
         <div>
           <h1 className="heading-page text-2xl">
-            Minhas <span className="text-highlight">apostas</span>
+            Minhas <span className="text-highlight">previsões</span>
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">{copy.positions.subtitle}</p>
         </div>
@@ -139,7 +139,7 @@ export function PositionsPanel({ embedded }: { embedded?: boolean }) {
                       </span>
                     }
                   />
-                  <Stat label="Apostado" value={formatBRL(bet.stake)} />
+                  <Stat label={copy.positions.stakeLabel} value={formatBRL(bet.stake)} />
                   <Stat
                     label={copy.positions.estWin}
                     value={<span className="text-up">{formatBRL(estPayout)}</span>}
@@ -237,7 +237,7 @@ function ResolvedBetRow({ bet }: { bet: import("@/hooks/use-bets").OpenBet }) {
       </div>
       <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
         <span>
-          Apostado: <span className="mono text-foreground">{formatBRL(bet.stake)}</span>
+          {copy.positions.stakeLabel}: <span className="mono text-foreground">{formatBRL(bet.stake)}</span>
         </span>
         <span>
           Lado:{" "}
@@ -276,9 +276,9 @@ function ResolvedBetRow({ bet }: { bet: import("@/hooks/use-bets").OpenBet }) {
           </button>
           {showAnalysis && (
             <div className="mt-2 rounded-lg border border-down/20 bg-down/5 p-3 text-xs space-y-1.5 text-muted-foreground">
-              <p className="font-medium text-foreground">Análise da aposta perdida</p>
+              <p className="font-medium text-foreground">{copy.positions.lostAnalysisTitle}</p>
               <p>
-                Você apostou{" "}
+                {copy.positions.lostAnalysisLine}{" "}
                 <span className={cn("font-medium", bet.side === "YES" ? "text-up" : "text-down")}>
                   {bet.side === "YES" ? "SIM" : "NÃO"}
                 </span>{" "}

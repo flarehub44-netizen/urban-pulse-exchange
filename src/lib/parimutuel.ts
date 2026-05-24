@@ -101,12 +101,17 @@ export const estimatePayout = (
   return { payout, profit, roi, share };
 };
 
-export const formatBRL = (n: number) =>
-  n.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    maximumFractionDigits: n >= 1000 ? 0 : 2,
+export const CURRENCY_CODE = "BRL";
+
+/** Valor monetário com código ISO após o número — ex.: `1.234,56 BRL` */
+export const formatBRL = (n: number) => {
+  const fractionDigits = n >= 1000 ? 0 : 2;
+  const formatted = n.toLocaleString("pt-BR", {
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
   });
+  return `${formatted} ${CURRENCY_CODE}`;
+};
 
 export const formatPct = (n: number, digits = 1) => `${(n * 100).toFixed(digits)}%`;
 

@@ -361,7 +361,7 @@ const seedFeed: FeedPost[] = [
   {
     id: "seed-f1",
     user: { ...fallbackTraders[0], verified: true },
-    text: "Marginal Tietê deve fechar abaixo de 18 km/h no rush — muita gente apostou no NÃO.",
+    text: "Marginal Tietê deve fechar abaixo de 18 km/h no rush — muita gente previu o NÃO.",
     time: NOW - 12 * min,
     marketId: "marginal-tietê",
     likes: 42,
@@ -372,7 +372,7 @@ const seedFeed: FeedPost[] = [
   {
     id: "seed-f2",
     user: { ...fallbackTraders[1], verified: true },
-    text: "Alerta: acidente reportado altura Cebolão. Evitem apostar em fluxo alto na Marginal nas próximas 2h.",
+    text: "Alerta: acidente reportado altura Cebolão. Evitem prever fluxo alto na Marginal nas próximas 2h.",
     time: NOW - 28 * min,
     marketId: "marginal-tietê",
     likes: 118,
@@ -383,7 +383,7 @@ const seedFeed: FeedPost[] = [
   {
     id: "seed-f3",
     user: { ...fallbackTraders[2], verified: true },
-    text: "Paulista 18h–19h: UrbanMind e eu divergem. Vou no SIM com aposta menor.",
+    text: "Paulista 18h–19h: UrbanMind e eu divergem. Vou no SIM com participação menor.",
     time: NOW - 45 * min,
     marketId: "paulista-rush",
     likes: 67,
@@ -416,14 +416,14 @@ const seedNotifications: ViaXNotification[] = [
   {
     id: "seed-n4",
     kind: "win",
-    text: "Você ganhou R$ 184 no mercado Av. Paulista",
+    text: "Você ganhou 184 BRL no mercado Av. Paulista",
     time: NOW - 4 * 60 * min,
     marketId: "paulista-rush",
   },
   {
     id: "seed-n5",
     kind: "market",
-    text: "Prêmio da Faria Lima passou de R$ 60 mil",
+    text: "Prêmio da Faria Lima passou de 60 mil BRL",
     time: NOW - 55 * min,
     marketId: "faria-lima",
   },

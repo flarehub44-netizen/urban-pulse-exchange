@@ -42,7 +42,8 @@ export function OpenPositionStrip({ marketId }: { marketId: string }) {
           {bet.side === "YES" ? "↑ SIM" : "↓ NÃO"}
         </span>
         <span className="text-muted-foreground">
-          Apostado <span className="mono text-foreground">{formatBRL(bet.stake)}</span>
+          {copy.positions.stakeLabel}{" "}
+          <span className="mono text-foreground">{formatBRL(bet.stake)}</span>
         </span>
         <span className={cn("mono font-medium", estPnL >= 0 ? "text-up" : "text-down")}>
           {copy.positions.estGain} {estPnL >= 0 ? "+" : ""}

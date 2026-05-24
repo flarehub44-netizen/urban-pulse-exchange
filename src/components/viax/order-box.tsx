@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { copy, toastBetSuccess } from "@/copy/pt-BR";
 import type { AchievementUnlock } from "@/actions/retention";
 import {
+  CURRENCY_CODE,
   estimatePayout,
   probability,
   formatBRL,
@@ -169,7 +170,7 @@ export function OrderBox({
       setConfirmOpen(false);
       onSuccess?.();
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Erro ao colocar aposta");
+      toast.error(err instanceof Error ? err.message : copy.bet.placeError);
     }
   };
 
@@ -268,7 +269,7 @@ export function OrderBox({
       <AnonAccountBanner />
       <div className="flex flex-wrap items-center justify-between gap-2 mt-3">
         <h4 className="heading-section">
-          Apostar neste <span className="text-highlight">mercado</span>
+          Prever neste <span className="text-highlight">mercado</span>
         </h4>
         <EdgeBadge m={m} />
       </div>
@@ -333,7 +334,6 @@ export function OrderBox({
       <div className="mt-4">
         <label className="text-xs uppercase tracking-wider text-muted-foreground">Valor</label>
         <div className="mt-1 flex items-center gap-2 rounded-xl border bg-surface px-3 py-2">
-          <span className="text-muted-foreground">R$</span>
           <input
             type="number"
             data-testid="order-box-stake"
@@ -341,6 +341,7 @@ export function OrderBox({
             onChange={(e) => setStake(Number(e.target.value) || 0)}
             className="w-full bg-transparent mono text-lg outline-none"
           />
+          <span className="shrink-0 text-muted-foreground text-sm">{CURRENCY_CODE}</span>
         </div>
         <div className="mt-2 flex flex-wrap gap-2">
           {fixedPresets.map((v) => (
@@ -350,7 +351,7 @@ export function OrderBox({
               onClick={() => setStake(Math.min(v, balance))}
               className="rounded-md border border-border bg-surface px-2 py-1 text-xs mono hover:bg-surface-2"
             >
-              R$ {v}
+              {formatBRL(v)}
             </button>
           ))}
           {pctPresets.map((p) => (
@@ -409,7 +410,7 @@ export function OrderBox({
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value.slice(0, 140))}
-              placeholder="Por que você está apostando nisso? (máx 140 caracteres)"
+              placeholder={copy.bet.rationalePlaceholder}
               rows={2}
               className="w-full resize-none rounded-lg border bg-surface px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary/50"
             />

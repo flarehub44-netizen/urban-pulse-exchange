@@ -42,7 +42,7 @@ function AdminFinancePage() {
           value={formatBRL(Number(exposure?.open_pool_total ?? 0))}
         />
         <AdminStatCard
-          label="Apostas em jogo"
+          label={copy.admin.finance.openPredictions}
           value={formatBRL(Number(exposure?.open_bets_total ?? 0))}
           sub={`${exposure?.markets_with_bets ?? 0} mercados`}
         />

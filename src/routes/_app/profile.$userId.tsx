@@ -46,7 +46,7 @@ const badges = [
   { name: "Urban Oracle", desc: "Top 100 global" },
   { name: "Maratonista", desc: "30 mercados em 1 dia" },
   { name: "Marginal Master", desc: "10 wins na Marginal" },
-  { name: "Volume Beast", desc: "R$ 50k movimentados" },
+  { name: "Volume Beast", desc: "50k BRL movimentados" },
 ];
 
 function PublicProfile() {
@@ -223,7 +223,7 @@ function PublicProfile() {
           {hasPnlHistory ? null : (
             <div className="mt-3 flex flex-col items-center justify-center gap-2 py-12 text-center text-muted-foreground">
               <BarChart2 className="size-8 opacity-25" />
-              <p className="text-sm">Histórico disponível após apostas resolvidas</p>
+              <p className="text-sm">{copy.profile.publicHistoryHint}</p>
             </div>
           )}
         </div>
@@ -243,7 +243,7 @@ function PublicProfile() {
 
       <div>
         <h2 className="heading-subsection mb-3">
-          Últimas <span className="text-highlight">apostas</span> públicas
+          Últimas <span className="text-highlight">previsões</span> públicas
         </h2>
         {(publicBets ?? []).length === 0 ? (
           <EmptyState

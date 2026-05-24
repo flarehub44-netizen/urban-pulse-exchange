@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import { Trophy, ArrowUp } from "lucide-react";
+import { copy } from "@/copy/pt-BR";
 
 const DIVISION_LABELS: Record<string, string> = {
   bronze: "Bronze",
@@ -97,7 +98,7 @@ export function DivisionUpModal({ newDivision, onClose }: Props) {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
             >
-              Continue apostando para manter e avançar sua divisão.
+              {copy.social.divisionKeepPredicting}
             </motion.p>
 
             <motion.button
@@ -110,7 +111,7 @@ export function DivisionUpModal({ newDivision, onClose }: Props) {
               transition={{ delay: 0.6 }}
               whileTap={{ scale: 0.97 }}
             >
-              Continuar apostando
+              {copy.social.continuePredicting}
             </motion.button>
           </motion.div>
         </motion.div>

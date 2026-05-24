@@ -45,7 +45,7 @@ export function CreativeGenerator() {
     ctx.font = "bold 28px system-ui";
     const line =
       template === "odds"
-        ? `${formatPct(pYes)} apostam SIM`
+        ? copy.partner.creativeYesPct(formatPct(pYes))
         : `🔥 ${formatPct(pYes)} na ${live?.region ?? "cidade"}`;
     ctx.fillText(line, 20, h - 60);
 

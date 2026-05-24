@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { copy } from "@/copy/pt-BR";
 import { useTraderArchetype } from "@/hooks/use-trader-archetype";
 
 export function TraderArchetypeCard() {
@@ -28,7 +29,9 @@ export function TraderArchetypeCard() {
         <div className="mt-3 flex flex-wrap gap-2">
           {data.accuracy > 0 && <Chip label={`${data.accuracy}% de acerto`} />}
           {data.top_region && <Chip label={`📍 ${data.top_region}`} />}
-          {data.total_bets > 0 && <Chip label={`${data.total_bets} apostas`} />}
+          {data.total_bets > 0 && (
+            <Chip label={copy.social.traderPredictions(data.total_bets)} />
+          )}
         </div>
       )}
     </motion.div>

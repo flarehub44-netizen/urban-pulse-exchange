@@ -6,7 +6,7 @@ import {
   waitForMarketCards,
 } from "./helpers/markets";
 
-test.describe("Fluxo core — aposta e carteira", () => {
+test.describe("Fluxo core — previsão e carteira", () => {
   test.describe.configure({ timeout: 60_000 });
   const minLive = minLiveMarketsExpected();
 
@@ -112,7 +112,7 @@ test.describe("Fluxo core — aposta e carteira", () => {
   });
 });
 
-test.describe("B9 — Mercado não-live rejeita aposta na UI", () => {
+test.describe("B9 — Mercado não-live rejeita previsão na UI", () => {
   test("mercado resolvido não exibe order box com botão ativo", async ({ page }) => {
     await primeAppStorage(page);
     // Tenta navegar para um mercado com status não-live (resolved)
@@ -135,7 +135,7 @@ test.describe("B9 — Mercado não-live rejeita aposta na UI", () => {
     }
     await page.goto(href);
     await page.waitForTimeout(3000);
-    // Em mercados resolvidos, o botão de apostar não deve estar habilitado
+    // Em mercados resolvidos, o botão de prever não deve estar habilitado
     const operateBtn = page.getByTestId("order-box-operate");
     if (await operateBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
       await expect(operateBtn).toBeDisabled({ timeout: 5_000 });

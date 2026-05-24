@@ -1,11 +1,14 @@
 /**
  * Copy em português simples — glossário de referência:
- * - pool / prize pool → prêmio total / total apostado
+ * - previsão / prever → ação e registro do usuário (não "aposta")
+ * - participação → valor financeiro (stake) em um mercado
+ * - previsões → lista de posições abertas ou histórico
+ * - pool / prize pool → prêmio total / volume no mercado
  * - payout → quanto você pode ganhar / ganho
  * - ROI → retorno (%)
  * - PnL → ganhos acumulados
- * - edge → dica da IA
- * - operar / pregão / terminal → apostar / mercados / painel
+ * - previsão da UrbanMind → indicação da IA (não "palpite" na UI)
+ * - operar / terminal → prever / mercados / painel
  * - accuracy → precisão
  * - SIM/NÃO → mantidos nos botões
  */
@@ -22,7 +25,7 @@ export const copy = {
     account: "Minha conta",
     settings: "Configurações",
     notifications: "Notificações",
-    positions: "Minhas apostas",
+    positions: "Minhas previsões",
     wallet: "Carteira",
     more: "Mais",
     backToApp: "Voltar ao app",
@@ -31,30 +34,30 @@ export const copy = {
   landing: {
     metaTitle: "ViaX — Previsões sobre trânsito e cidade",
     metaDescription:
-      "Preveja trânsito e fluxo urbano em tempo real. Aposte com outras pessoas e compare com a UrbanMind AI. Ranking ao vivo e prêmios justos.",
-    ogTitle: "ViaX — Entenda a cidade apostando no trânsito",
+      "Preveja trânsito e fluxo urbano em tempo real. Preveja com outras pessoas e compare com a UrbanMind AI. Ranking ao vivo e prêmios justos.",
+    ogTitle: "ViaX — Entenda a cidade prevendo o trânsito",
     ogDescription:
-      "Mercados ao vivo sobre São Paulo. Prêmio compartilhado, palpite da IA e ranking da comunidade.",
+      "Mercados ao vivo sobre São Paulo. Prêmio compartilhado, previsão da IA e ranking da comunidade.",
     badge: "Previsões urbanas · Ao vivo",
-    heroTitle: "Transforme o movimento da cidade em palpites que valem prêmio.",
+    heroTitle: "Transforme o movimento da cidade em previsões que valem prêmio.",
     heroBody:
-      "Preveja trânsito, fluxo e velocidade em tempo real. Você aposta SIM ou NÃO junto com a comunidade e com a UrbanMind AI. Quase todo o prêmio (90%) vai para quem acertar.",
+      "Preveja trânsito, fluxo e velocidade em tempo real. Você prevê SIM ou NÃO junto com a comunidade e com a UrbanMind AI. Quase todo o prêmio (90%) vai para quem acertar.",
     ctaEnter: "Começar agora",
     ctaMarkets: "Ver mercados",
     howEyebrow: "Como funciona",
-    howTitle: "Da rua para a aposta, em poucos passos.",
+    howTitle: "Da rua para a previsão, em poucos passos.",
     step1: "1. Escolha um mercado",
     step1Desc: "Perguntas sobre trânsito, velocidade e congestionamento em São Paulo.",
-    step2: "2. Todo mundo aposta junto",
-    step2Desc: "Traders entram em SIM ou NÃO. As chances mudam conforme as apostas chegam.",
+    step2: "2. Todo mundo prevê junto",
+    step2Desc: "Traders entram em SIM ou NÃO. As chances mudam conforme as previsões chegam.",
     step3: "3. Acompanhe ao vivo",
-    step3Desc: "Mapa, feed e palpite da IA para decidir com mais contexto.",
+    step3Desc: "Mapa, feed e previsão da UrbanMind para decidir com mais contexto.",
     step4: "4. Prêmio para quem acertar",
-    step4Desc: "90% do total apostado é dividido entre os vencedores do lado certo.",
-    marketsTitle: "Mercados reais da cidade, não casa de apostas.",
+    step4Desc: "90% do volume no mercado é dividido entre os vencedores do lado certo.",
+    marketsTitle: "Mercados reais da cidade, não plataforma genérica de jogos.",
     marketsBody:
-      "O dinheiro vai para um prêmio único. Não há odds fixas contra a plataforma — você compete com outros participantes.",
-    kpiVolume: "Total apostado",
+      "O dinheiro vai para um prêmio único. Não há chances fixas contra a plataforma — você compete com outros participantes.",
+    kpiVolume: "Volume no mercado",
     kpiTraders: "Participantes",
     kpiAiPrecision: "Precisão da IA (30d)",
     kpiHumanPrecision: "Precisão da comunidade",
@@ -64,7 +67,7 @@ export const copy = {
     leaderboardAccuracy: "Precisão",
     leaderboardReturn: "Retorno",
     mobileTitle: "Tudo no celular.",
-    mobileBody: "Aposte, acompanhe e receba alertas onde estiver.",
+    mobileBody: "Preveja, acompanhe e receba alertas onde estiver.",
     ctaTerminal: "Abrir app",
     footerTerminal: "Painel",
     mockLive: "Ao vivo · ViaX",
@@ -74,26 +77,30 @@ export const copy = {
     step1Title: "O que é uma previsão?",
     step1Body:
       "No ViaX você prevê o trânsito de São Paulo: escolhe SIM ou NÃO em perguntas sobre fluxo, velocidade e congestionamento.",
-    step2Title: "Como apostar",
+    step2Title: "Como prever",
     step2Body:
-      "Escolha um mercado, toque em SIM ou NÃO e defina o valor. Quanto antes você acertar, maior pode ser o que você ganha. Todo mundo aposta no mesmo prêmio.",
+      "Escolha um mercado, toque em SIM ou NÃO e defina a participação. Quanto antes você acertar, maior pode ser o que você ganha. Todo mundo prevê no mesmo prêmio.",
     step3Title: "Ganhe com precisão",
     step3Body:
-      "Cada acerto melhora sua posição no ranking e desbloqueia conquistas. Use o mapa ao vivo e a UrbanMind (nossa IA) para embasar seus palpites.",
+      "Cada acerto melhora sua posição no ranking e desbloqueia conquistas. Use o mapa ao vivo e a UrbanMind (nossa IA) para embasar suas previsões.",
     skip: "Pular",
     next: "Próximo",
     finish: "Ver mercado em alta",
+    step2Cta: "Prever SIM ou NÃO",
+    step2StakeLabel: "Participação",
+    step3WinLine: "Previu SIM · Acertou!",
+    firstPredictionCta: "Fazer minha primeira previsão",
   },
 
   bet: {
-    operateMarket: "Fazer aposta",
+    operateMarket: "Fazer previsão",
     prizeTotal: "Prêmio total agora",
-    yourShare: "Sua parte das apostas",
+    yourShare: "Sua parte das previsões",
     potentialWin: "Se ganhar, você recebe até",
     estimatedReturn: "Retorno estimado",
     poolNote: "90% do total vai para quem acertar · Resultado pela UrbanMind AI",
     operateCta: (side: Side, amount: string) =>
-      `Apostar ${side === "YES" ? "SIM" : "NÃO"} · ${amount}`,
+      `Prever ${side === "YES" ? "SIM" : "NÃO"} · ${amount}`,
     processing: "Processando...",
     resolvedTitle: "Mercado encerrado",
     resolvedResult: "Resultado oficial:",
@@ -102,29 +109,33 @@ export const copy = {
     resolvingTitle: "Resolvendo mercado",
     resolvingDesc: "Oráculo coletando dados urbanos em tempo real.",
     disputeTitle: "Mercado em disputa",
-    disputeDesc: "Validação manual em andamento. Apostas congeladas.",
+    disputeDesc: "Validação manual em andamento. Previsões congeladas.",
     voidTitle: "Mercado cancelado",
     voidDesc: "Reembolso integral creditado na carteira.",
     imbalanceWarn: "Liquidez desequilibrada — risco de cancelamento com reembolso.",
     viewWallet: "Ver carteira",
-    viewHistory: "Histórico de apostas",
+    viewHistory: "Histórico de previsões",
     sideYes: "SIM",
     sideNo: "NÃO",
     draftTitle: "Mercado em rascunho",
     draftDesc: "Aguardando abertura oficial pelo admin.",
-    confirmTitle: "Confirmar aposta",
-    confirmSide: "Seu palpite",
-    confirmStake: "Valor da aposta",
+    confirmTitle: "Confirmar previsão",
+    confirmSide: "Sua previsão",
+    confirmStake: "Participação",
     confirmCancel: "Voltar",
     confirmSubmit: (side: Side, amount: string) =>
       `Confirmar ${side === "YES" ? "SIM" : "NÃO"} · ${amount}`,
     confirmFeeNote: (housePct: number, prizePct: number) =>
       `A plataforma retém ${housePct.toFixed(0)}% do prêmio; ${prizePct.toFixed(0)}% é dividido entre quem acertar.`,
     confirmReturn: "Retorno estimado se ganhar",
+    placeError: "Erro ao registrar previsão",
+    operateHeading: "Prever neste mercado",
+    rationalePlaceholder: "Por que você está prevendo isso? (máx 140 caracteres)",
   },
 
   ia: {
-    badgeTooltip: "Compara o palpite da UrbanMind com o que as pessoas já apostaram neste mercado.",
+    badgeTooltip:
+      "Compara a previsão da UrbanMind com o que as pessoas já previram neste mercado.",
     filterLabel: "Com dica da IA",
     neutral: (side: Side) => `IA em dúvida · ${side === "YES" ? "SIM" : "NÃO"}`,
     favors: (side: Side) => `A IA indica ${side === "YES" ? "SIM" : "NÃO"}`,
@@ -134,7 +145,7 @@ export const copy = {
 
   dashboard: {
     metaTitle: "Início · ViaX",
-    metaDescription: "Seu painel com mercados ao vivo, saldo e palpite da UrbanMind AI.",
+    metaDescription: "Seu painel com mercados ao vivo, saldo e previsão da UrbanMind AI.",
     welcomeToast: "Bem-vindo ao ViaX",
     welcomeToastDesc: "Explore mercados ao vivo ou use ⌘K para buscar.",
     greeting: (name: string) => `Olá, ${name}.`,
@@ -144,14 +155,14 @@ export const copy = {
     precisionSub: "Últimos 30 mercados",
     gainsChart: "Seus ganhos",
     performance: "Seus ganhos",
-    gainsChartHint: "Faça sua primeira aposta para ver o gráfico de ganhos.",
+    gainsChartHint: "Faça sua primeira previsão para ver o gráfico de ganhos.",
     actionNow: "Ação agora",
-    positionLine: "Sua aposta",
+    positionLine: "Sua previsão",
     positionEst: (amount: string) => `ganho estimado ${amount}`,
-    operateMarket: "Apostar neste mercado",
+    operateMarket: "Prever neste mercado",
     viewPanel: "Ver no painel",
     marketsHot: "Mercados em alta",
-    openPositions: "Apostas abertas",
+    openPositions: "Previsões abertas",
   },
 
   profile: {
@@ -160,28 +171,30 @@ export const copy = {
     profit24h: "Lucro 24h",
     gains60d: "Ganhos · 60 dias",
     tabOverview: "Visão geral",
-    tabPositions: "Minhas apostas",
+    tabPositions: "Minhas previsões",
     tabWallet: "Carteira",
     tabFavorites: "Favoritos",
     tabBadges: "Conquistas",
     tabActivity: "Atividade",
     tabSettings: "Configurações",
     badgeRoi: "Retorno acima de 100% em um mercado",
+    publicHistoryHint: "Histórico disponível após previsões resolvidas",
+    publicPredictionsTitle: "Últimas previsões públicas",
   },
 
   auth: {
     anonFirstBetTitle: "Conta sem e-mail",
     anonFirstBetDesc:
-      "Se você limpar o navegador ou trocar de dispositivo, pode perder saldo, apostas e ranking. Vincule um e-mail no perfil antes de operar.",
+      "Se você limpar o navegador ou trocar de dispositivo, pode perder saldo, previsões e ranking. Vincule um e-mail no perfil antes de operar.",
     anonFirstBetProtect: "Vincular e-mail agora",
-    anonFirstBetContinue: "Entendi, continuar apostando",
+    anonFirstBetContinue: "Entendi, continuar prevendo",
     anonBannerDismiss: "Lembrar depois",
   },
 
   wallet: {
     totalReturn: "Retorno total",
-    lowBalance: "Saldo baixo para apostar.",
-    entry: "Aposta feita",
+    lowBalance: "Saldo baixo para prever.",
+    entry: "Previsão registrada",
     payout: "Ganho de mercado",
     deposit: "Depósito",
     withdraw: "Saque",
@@ -189,28 +202,35 @@ export const copy = {
     winsPayouts: "Vitórias e ganhos",
     simulatedTitle: "Saldo simulado",
     simulatedDepositNote: "Sem Pix ou cartão real — valores são fictícios para demonstração.",
+    subtitle: "Saldo, movimentações e histórico de previsões.",
+    predictionsTab: (count: number) => `Previsões (${count})`,
+    stakeLabel: "Participação",
   },
 
   positions: {
-    title: "Minhas apostas",
-    subtitle: "Apostas em andamento com ganho estimado · histórico dos mercados já encerrados.",
-    openCount: "Apostas abertas",
+    title: "Minhas previsões",
+    subtitle:
+      "Previsões em andamento com ganho estimado · histórico dos mercados já encerrados.",
+    openCount: "Previsões abertas",
     totalOpen: "Total em jogo",
     estimatedGain: "Ganho estimado",
     estWin: "Se ganhar, recebe",
     estGain: "Ganho estimado",
-    emptyOpen: "Nenhuma aposta aberta.",
+    emptyOpen: "Nenhuma previsão aberta.",
     explore: "Explorar mercados",
     payout: "Ganho:",
+    stakeLabel: "Participação",
+    lostAnalysisTitle: "Análise da previsão perdida",
+    lostAnalysisLine: "Você previu",
   },
 
   settings: {
     winsGains: "Vitórias e ganhos",
     platformName: "ViaX — previsões urbanas",
     intro:
-      "O ViaX é um app de previsões sobre a cidade. Quase todo o dinheiro apostado (90%) vai para quem acertar; a plataforma retém 10% para manter o serviço.",
+      "O ViaX é um app de previsões sobre a cidade. Quase todo o dinheiro em jogo (90%) vai para quem acertar; a plataforma retém 10% para manter o serviço.",
     houseRetention: "Taxa da plataforma",
-    houseRetentionValue: "10% do total apostado",
+    houseRetentionValue: "10% do volume no mercado",
     adminTitle: "Resolução admin",
     adminDesc: "Mercados em disputa aguardam decisão manual antes da liquidação.",
     adminNoDisputes: "Nenhum mercado em disputa no momento.",
@@ -222,7 +242,7 @@ export const copy = {
     adminUnfrozen: "Mercado descongelado.",
     adminDraftTitle: "Rascunhos",
     adminOpenBtn: "Abrir mercado",
-    adminOpened: "Mercado aberto para apostas.",
+    adminOpened: "Mercado aberto para previsões.",
     adminFrozenList: "Congelados",
     adminUnfreezeBtn: "Descongelar",
     adminCreateTitle: "Novo mercado (rascunho)",
@@ -260,14 +280,14 @@ export const copy = {
   markets: {
     metaDescription: "Mercados ao vivo sobre trânsito e cidade na ViaX.",
     detailMeta:
-      "Veja chances ao vivo, apostas da comunidade e o palpite da UrbanMind AI neste mercado.",
+      "Veja chances ao vivo, previsões da comunidade e a previsão da UrbanMind AI neste mercado.",
     sortEdge: "Com dica da IA",
     sortTrend: "Em alta",
     sortClosing: "Encerrando",
-    poolTotal: "Total apostado",
+    poolTotal: "Volume no mercado",
     prizeTotal: "Prêmio total",
-    tabBook: "Apostas",
-    bookPressure: "Força das apostas",
+    tabBook: "Previsões",
+    bookPressure: "Força das previsões",
     candlesNote: "Histórico (baseado nas chances)",
     participants: "participantes",
     tabAudit: "Auditoria",
@@ -278,6 +298,8 @@ export const copy = {
     auditNoSnapshots: "Sem snapshots na janela.",
     auditLedger: "Taxa da plataforma (ledger)",
     auditRaw: "Valor medido",
+    closingSoon: (mins: number) =>
+      `Últimos ${Math.ceil(mins)} min — previsões encerram em breve!`,
   },
 
   marketCard: {
@@ -287,21 +309,21 @@ export const copy = {
 
   ranking: {
     followingSort: "Quem você segue, ordenado pelo retorno da última semana.",
-    defaultSort: "Os melhores palpiteiros da comunidade.",
+    defaultSort: "Os melhores previsores da comunidade.",
     precision: "Precisão",
     return: "Retorno",
   },
 
   urbanmind: {
     iaPrecisionChart: "Precisão da IA e da comunidade · 30 dias",
-    betWithIa: "Apostar seguindo a IA",
-    edgeVsPool: "Diferença IA × apostas",
+    betWithIa: "Prever seguindo a IA",
+    edgeVsPool: "Diferença IA × previsões",
   },
 
   feed: {
-    metaDescription: "Análises, alertas e previsões de quem aposta no trânsito da cidade.",
-    betYes: "Apostar SIM",
-    betNo: "Apostar NÃO",
+    metaDescription: "Análises, alertas e previsões de quem prevê o trânsito da cidade.",
+    betYes: "Prever SIM",
+    betNo: "Prever NÃO",
     prize: "Prêmio",
   },
 
@@ -310,7 +332,7 @@ export const copy = {
     errorTitle: "Algo deu errado",
     errorDesc: "Não foi possível carregar esta página. Tente de novo.",
     metaDescription:
-      "Previsões sobre trânsito e cidade em tempo real. Ranking da comunidade e palpite da UrbanMind AI.",
+      "Previsões sobre trânsito e cidade em tempo real. Ranking da comunidade e previsão da UrbanMind AI.",
   },
 
   sidebar: {
@@ -361,7 +383,7 @@ export const copy = {
     ranking: {
       title: "Ranking ainda sem dados",
       description: "Participe de mercados para aparecer no placar da comunidade.",
-      cta: "Fazer uma aposta",
+      cta: "Fazer uma previsão",
     },
     live: {
       regions: {
@@ -376,7 +398,7 @@ export const copy = {
       },
     },
     positions: {
-      title: "Nenhuma aposta aberta",
+      title: "Nenhuma previsão aberta",
       description: "Escolha SIM ou NÃO em um mercado ao vivo para começar.",
       cta: "Explorar mercados",
     },
@@ -418,7 +440,7 @@ export const copy = {
     freezeUnavailable: "Sem congelamentos disponíveis.",
     urbanmindDigestTitle: "UrbanMind · seu treinador urbano",
     vsAiRate: (w: number, t: number) =>
-      `Você vs IA: ${w} acertos em ${t} palpites contra a máquina`,
+      `Você vs IA: ${w} acertos em ${t} previsões contra a máquina`,
     openUrbanmind: "Abrir UrbanMind",
     weeklyChallengeTitle: "Desafio da semana",
     precisionReportTitle: "Seu relatório de precisão",
@@ -436,6 +458,8 @@ export const copy = {
     buyFreezeLabel: "Comprar freeze (200 XP)",
     weeklyReportTitle: "Sua Semana em SP",
     missionComplete: (label: string, xp: number) => `✅ ${label} — +${xp} XP`,
+    weeklyReportKeepPredicting: "Continue prevendo aí — você conhece o terreno.",
+    weeklyReportExplore: "Preveja em mais mercados para descobrir sua região forte!",
   },
 
   leagues: {
@@ -464,23 +488,23 @@ export const copy = {
 
   casino: {
     wheelTitle: "Roleta diária",
-    wheelDesc: "1 giro grátis por dia. Depósito de R$ 100+ libera giro bônus em 24h.",
+    wheelDesc: "1 giro grátis por dia. Depósito de 100 BRL+ libera giro bônus em 24h.",
     spinFree: "Girar grátis",
     alreadySpunToday: "Você já girou hoje",
     spinWin: (label: string) => `Resultado: ${label}`,
-    nearMissJackpot: "Quase no jackpot! Deposite R$ 100 e ganhe +1 giro.",
+    nearMissJackpot: "Quase no jackpot! Deposite 100 BRL e ganhe +1 giro.",
     depositBonusCta: "Depositar e ganhar giro",
     bonusSpinGranted: "Giro bônus liberado!",
     nearMissTitle: "Quase!",
     nearMissBody: (gap: number) =>
       `Você ficou a cerca de ${gap}% do equilíbrio do prêmio — na próxima pode virar.`,
-    nearMissStake: (stake: string) => `Aposta: ${stake}`,
+    nearMissStake: (stake: string) => `Participação: ${stake}`,
     tryAnotherMarket: "Tentar outro mercado",
     reloadAndContinue: (amt: string) => `Recarregar ${amt} e continuar`,
     lowBalanceBanner: (bal: string) => `Saldo baixo (${bal}) — recarregue em 1 toque`,
     oneTapReload: (amt: string) => `Recarregar ${amt}`,
     depositSuccess: (bal: string) => `Saldo atualizado: ${bal}`,
-    maxQuick: (amt: number) => `Máx. rápido · R$ ${amt}`,
+    maxQuick: (amt: number) => `Máx. rápido · ${amt} BRL`,
     impulseDepositTitle: "Recarga rápida",
     impulseDepositHint: "Valores pré-definidos — máx. 3 recargas por hora.",
     hotZoneLabel: "Zona quente",
@@ -538,6 +562,9 @@ export const copy = {
     simulatedPayout: "Saques simulados (Pix em breve).",
     subInvite: "Código para sub-creators (máx. 2 níveis)",
     missionsTitle: "Missões da semana",
+    predictions24h: "Previsões 24h (indicados)",
+    inviteBetColumn: "Previsão",
+    creativeYesPct: (pct: string) => `${pct} prevêem SIM`,
   },
 
   admin: {
@@ -595,6 +622,7 @@ export const copy = {
       rain: "Chuva forte",
       preview: "Preview regiões",
       applyNote: "Cenários afetam apenas simulação local até integração completa.",
+      yourStake: "Sua participação (BRL)",
     },
     sources: {
       title: "Fontes de dados",
@@ -613,7 +641,7 @@ export const copy = {
     users: {
       freeze: "Congelar",
       unfreeze: "Descongelar",
-      betLimit: "Limite aposta",
+      betLimit: "Limite de participação",
     },
     risk: {
       title: "Risco & fraude",
@@ -625,7 +653,30 @@ export const copy = {
       casinoEnabled: "Mecânicas estilo cassino",
       casinoEnabledHint: "Roleta, near-miss e depósito impulsivo no app.",
       impulseMaxHour: "Máx. recargas rápidas / hora",
+      maxStake: "Participação máxima (BRL)",
     },
+    finance: {
+      openPredictions: "Previsões em jogo",
+    },
+    overview: {
+      noPredictions24h: "Sem previsões nas últimas 24h.",
+    },
+  },
+
+  social: {
+    recentPredictionsLoading: "Carregando previsões recentes…",
+    noRecentPredictions: "Nenhuma previsão recente neste mercado.",
+    predictionsAccelerating: "Previsões acelerando",
+    recentPredictions: "Previsões recentes",
+    predictionsLabel: "Previsões",
+    traderPredictions: (n: number) => `${n} previsões`,
+    divisionKeepPredicting: "Continue prevendo para manter e avançar sua divisão.",
+    continuePredicting: "Continuar prevendo",
+  },
+
+  push: {
+    predictBeforeClose: (n: number) =>
+      `${n} mercados de congestionamento abertos agora. Preveja antes de fechar.`,
   },
 
   cameras: {
@@ -653,7 +704,7 @@ export function betSideLabel(side: Side): "SIM" | "NÃO" {
 
 export function toastBetSuccess(side: Side, stake: string, payout: string) {
   return {
-    title: `Aposta ${betSideLabel(side)} · ${stake}`,
+    title: `Previsão ${betSideLabel(side)} · ${stake}`,
     description: `${copy.bet.potentialWin}: ${payout}`,
   };
 }

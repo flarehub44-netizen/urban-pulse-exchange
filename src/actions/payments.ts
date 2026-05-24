@@ -4,6 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { SupabaseFnContext } from "@/integrations/supabase/loose";
 import { createClient } from "@supabase/supabase-js";
 import { createPixCharge } from "@/lib/syncpay";
+import { formatBRL } from "@/lib/parimutuel";
 
 // Service-role client para escrita nas tabelas de pagamento
 function getServiceClient() {
@@ -48,7 +49,7 @@ export const initiateDepositFn = createServerFn({ method: "POST" })
     const charge = await createPixCharge({
       amount: data.amount,
       correlationId: intent.id,
-      description: `Depósito ViaX — R$ ${data.amount.toFixed(2)}`,
+      description: `Depósito ViaX — ${formatBRL(data.amount)}`,
       expiresInMinutes: 30,
     });
 

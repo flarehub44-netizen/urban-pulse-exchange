@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   estimatePayout,
+  formatBRL,
   isValidForSettlement,
   minorityPoolRatio,
   poolImbalanceWarning,
@@ -134,6 +135,20 @@ describe("minorityPoolRatio", () => {
 
   it("returns 0.5 for balanced pool", () => {
     expect(minorityPoolRatio(500, 500)).toBeCloseTo(0.5);
+  });
+});
+
+describe("formatBRL", () => {
+  it("uses BRL suffix instead of R$ symbol", () => {
+    const formatted = formatBRL(10);
+    expect(formatted).toContain("BRL");
+    expect(formatted).not.toContain("R$");
+    expect(formatted).toMatch(/10,00 BRL/);
+  });
+
+  it("omits decimals for amounts >= 1000", () => {
+    const formatted = formatBRL(1500);
+    expect(formatted).toBe("1.500 BRL");
   });
 });
 

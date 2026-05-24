@@ -117,7 +117,7 @@ function AdminOverviewPage() {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-xs text-muted-foreground">Sem apostas nas últimas 24h.</p>
+              <p className="text-xs text-muted-foreground">{copy.admin.overview.noPredictions24h}</p>
             )}
           </div>
         </div>

@@ -51,7 +51,7 @@ export const notificationsNav: NavItem = {
   icon: Bell,
 };
 
-/** Mobile bottom bar — Início · Mercados · Ao vivo · Apostas · Conta */
+/** Mobile bottom bar — Início · Mercados · Ao vivo · Previsões · Conta */
 export const bottomNavPrimary: NavItem[] = [
   { to: "/dashboard", label: copy.nav.home, icon: LayoutDashboard },
   { to: "/markets", label: copy.nav.markets, icon: Radio, matchPrefix: true },

@@ -20,7 +20,9 @@ export function SocialBook({ m }: { m: Market }) {
         <TrendingUp className="size-4 text-primary" /> {copy.markets.bookPressure}
       </div>
       <div className="mt-3 space-y-2 text-xs">
-        {isLoading && <p className="text-muted-foreground">Carregando apostas recentes…</p>}
+        {isLoading && (
+          <p className="text-muted-foreground">{copy.social.recentPredictionsLoading}</p>
+        )}
         {showFeed &&
           feedFallback.map((p) => (
             <div key={p.id} className="flex items-center justify-between gap-2">
@@ -41,7 +43,7 @@ export function SocialBook({ m }: { m: Market }) {
             </div>
           ))}
         {!showFeed && !isLoading && (!bets || bets.length === 0) && (
-          <p className="text-muted-foreground">Nenhuma aposta recente neste mercado.</p>
+          <p className="text-muted-foreground">{copy.social.noRecentPredictions}</p>
         )}
         {!showFeed &&
           bets?.map((b, i) => (

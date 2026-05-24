@@ -63,8 +63,8 @@ test.describe("C6 — Carteira: abas e histórico", () => {
     await page.waitForTimeout(8000);
 
     const body = await page.locator("body").innerText();
-    // Saldo em R$ deve estar visível (mostrado no cabeçalho do perfil)
-    expect(/R\$|saldo|carteira|SALDO/i.test(body)).toBeTruthy();
+    // Saldo em BRL deve estar visível (mostrado no cabeçalho do perfil)
+    expect(/BRL|saldo|carteira|SALDO/i.test(body)).toBeTruthy();
   });
 
   test("aba posicoes carrega sem erro", async ({ page }) => {

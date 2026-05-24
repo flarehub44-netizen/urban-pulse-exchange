@@ -1,4 +1,5 @@
 import { MapPin, TrendingUp } from "lucide-react";
+import { copy } from "@/copy/pt-BR";
 import { useBets } from "@/hooks/use-bets";
 import { useViaX } from "@/store/viax-store";
 
@@ -41,7 +42,9 @@ export function NeighborhoodWidget({ neighborhood, city = "São Paulo" }: Props)
 
       <div className="mt-3 grid grid-cols-3 gap-2 text-center">
         <div className="rounded-xl border bg-surface/60 p-2">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Apostas</div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            {copy.social.predictionsLabel}
+          </div>
           <div className="mono mt-1 text-lg font-semibold">{neighborhoodBets.length}</div>
         </div>
         <div className="rounded-xl border bg-surface/60 p-2">

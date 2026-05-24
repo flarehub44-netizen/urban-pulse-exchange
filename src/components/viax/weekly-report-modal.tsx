@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, TrendingUp, TrendingDown, Flame, MapPin, Star, Trophy } from "lucide-react";
+import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
 import { markWeeklyReportSeen } from "@/hooks/use-weekly-report";
 import type { WeeklyReport } from "@/actions/retention";
@@ -111,12 +112,12 @@ export function WeeklyReportModal({ report, onClose }: WeeklyReportModalProps) {
                       </p>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Continue apostando aí — você conhece o terreno.
+                      {copy.retention.weeklyReportKeepPredicting}
                     </p>
                   </>
                 ) : (
                   <p className="text-sm text-muted-foreground">
-                    Aposte em mais mercados para descobrir sua região forte!
+                    {copy.retention.weeklyReportExplore}
                   </p>
                 )}
               </div>

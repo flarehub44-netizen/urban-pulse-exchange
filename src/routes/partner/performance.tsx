@@ -19,7 +19,7 @@ function PartnerPerformancePage() {
       </p>
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="rounded-xl border p-4">
-          <div className="text-xs text-muted-foreground">Apostas 24h (indicados)</div>
+          <div className="text-xs text-muted-foreground">{copy.partner.predictions24h}</div>
           <div className="mt-1 text-2xl font-semibold">{a?.active_bets_24h ?? 0}</div>
         </div>
         <div className="rounded-xl border p-4">
@@ -35,7 +35,7 @@ function PartnerPerformancePage() {
         <h2 className="text-sm font-medium">{copy.partner.missionsTitle}</h2>
         <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
           <li>· Convide 10 traders esta semana → +5% comissão temporária</li>
-          <li>· R$ 50k volume indicado → +8% boost</li>
+          <li>· 50k BRL volume indicado → +8% boost</li>
         </ul>
       </div>
     </div>

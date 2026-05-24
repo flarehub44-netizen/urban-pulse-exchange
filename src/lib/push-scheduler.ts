@@ -1,6 +1,8 @@
 // Morning Pulse + Rush Hour push notification scheduler
 // Usa Web Notifications API (browser). Não requer service worker.
 
+import { copy } from "@/copy/pt-BR";
+
 export type PushWindow = {
   hour: number;
   minute: number;
@@ -38,7 +40,7 @@ const WINDOWS: PushWindow[] = [
     title: "🚦 Hora do Pico — mercados ao vivo",
     body: (ctx) =>
       ctx.openMarkets > 0
-        ? `${ctx.openMarkets} mercados de congestionamento abertos agora. Aposte antes de fechar.`
+        ? copy.push.predictBeforeClose(ctx.openMarkets)
         : "O trânsito de São Paulo está no pico. Confira os mercados ao vivo.",
   },
   {

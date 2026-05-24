@@ -110,7 +110,7 @@ test.describe("E — Feed e Social", () => {
         await page.goto(href);
         await page.waitForTimeout(3000);
         const body = await page.locator("body").innerText();
-        expect(/ROI|acertos|apostas|divisão|perfil/i.test(body)).toBeTruthy();
+        expect(/ROI|acertos|apostas|previsões|divisão|perfil/i.test(body)).toBeTruthy();
       }
     } else {
       expect(true).toBeTruthy();

@@ -4,6 +4,8 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/compone
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { ArrowUpCircle, ArrowDownCircle, Trophy, ChevronRight, X, Zap, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { copy } from "@/copy/pt-BR";
+import { formatBRL } from "@/lib/parimutuel";
 
 const STORAGE_KEY = "viax_onboarded";
 
@@ -31,8 +33,8 @@ const stepData = [
   },
   {
     color: "from-up/15 to-primary/5",
-    title: "Aposte SIM ou NÃO",
-    body: "Escolha um lado e defina o valor. As probabilidades mudam conforme as apostas chegam — entre cedo para as melhores odds.",
+    title: copy.onboarding.step2Cta,
+    body: copy.onboarding.step2Body,
     visual: (
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="flex items-center justify-center gap-1.5 rounded-xl border border-up/40 bg-up/15 px-3 py-2.5 text-sm font-semibold text-up">
@@ -42,8 +44,8 @@ const stepData = [
           <ArrowDownCircle className="size-4" /> NÃO
         </div>
         <div className="col-span-2 rounded-xl border bg-background/50 px-3 py-2 text-center text-xs text-muted-foreground">
-          Valor: <span className="font-semibold text-foreground">R$ 10,00</span> · Ganho estimado:{" "}
-          <span className="font-semibold text-up">R$ 16,10</span>
+          Valor: <span className="font-semibold text-foreground">{formatBRL(10)}</span> · Ganho
+          estimado: <span className="font-semibold text-up">{formatBRL(16.1)}</span>
         </div>
       </div>
     ),
@@ -60,8 +62,8 @@ const stepData = [
             W
           </div>
           <div>
-            <div className="font-medium">Apostou SIM · Acertou!</div>
-            <div className="text-xs text-up">+R$ 6,10 creditado</div>
+            <div className="font-medium">{copy.onboarding.step3WinLine}</div>
+            <div className="text-xs text-up">+{formatBRL(6.1)} creditado</div>
           </div>
           <Trophy className="ml-auto size-4 text-warn" />
         </div>
@@ -192,7 +194,7 @@ export function OnboardingModal() {
             onClick={close}
             className="text-sm text-muted-foreground hover:text-foreground"
           >
-            Pular
+            {copy.onboarding.skip}
           </button>
           <button
             type="button"
@@ -205,11 +207,11 @@ export function OnboardingModal() {
               </>
             ) : isLast ? (
               <>
-                <Zap className="size-3.5" /> Fazer minha primeira aposta
+                <Zap className="size-3.5" /> {copy.onboarding.firstPredictionCta}
               </>
             ) : (
               <>
-                Próximo <ChevronRight className="size-4" />
+                {copy.onboarding.next} <ChevronRight className="size-4" />
               </>
             )}
           </button>
