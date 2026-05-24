@@ -35,8 +35,10 @@ function AdminSourcesPage() {
   const { data: regions } = useRegions();
   const { mutateAsync: upsertCamera } = useAdminUpsertCamera();
   const { mutateAsync: setCameraStatus } = useAdminSetCameraStatus();
+  const { mutateAsync: createUpstream } = useAdminCreateCameraUpstream();
   const [name, setName] = useState("");
   const [regionId, setRegionId] = useState("");
+  const [provider, setProvider] = useState<CameraProvider>("der-sp");
   const [streamUrl, setStreamUrl] = useState("");
   const [countLine, setCountLine] = useState<{
     x1: number;
@@ -45,30 +47,51 @@ function AdminSourcesPage() {
     y2: number;
   } | null>(null);
 
+  const preset = getProvider(provider);
+
   const onAddCamera = async () => {
     if (!name.trim() || !regionId) {
       toast.error("Nome e região obrigatórios");
       return;
     }
-    if (streamUrl.trim() && !isAllowedStreamUrl(streamUrl.trim())) {
-      toast.error(copy.cameras.invalidUrl);
+    const rawUrl = streamUrl.trim();
+    if (!rawUrl) {
+      toast.error("Cole a URL da câmera");
       return;
     }
-    if (streamUrl.trim() && isInsecureStreamInProd(streamUrl.trim())) {
+    const validationError = preset.validate(rawUrl);
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+    if (isInsecureStreamInProd(rawUrl)) {
       toast.error(copy.cameras.mixedContent);
       return;
     }
     try {
+      // 1) Registra o upstream (gera slug + path do proxy)
+      const { proxy_path } = await createUpstream({
+        provider,
+        upstreamUrl: rawUrl,
+        label: name.trim(),
+        kind: preset.defaultKind,
+      });
+      // 2) Cria a câmera apontando para o proxy (não para a URL bruta)
+      if (!isAllowedStreamUrl(proxy_path)) {
+        toast.error(copy.cameras.invalidUrl);
+        return;
+      }
       await upsertCamera({
         p_id: null,
         p_region_id: regionId,
         p_name: name.trim(),
-        p_status: "offline",
-        p_stream_url: streamUrl.trim() || null,
+        p_status: "online",
+        p_stream_url: proxy_path,
         p_count_line: countLine,
       });
-      toast.success("Câmera registrada.");
+      toast.success(`Câmera registrada (${preset.label}).`);
       setName("");
+      setStreamUrl("");
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Erro");
     }
