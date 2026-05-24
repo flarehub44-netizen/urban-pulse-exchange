@@ -1,0 +1,216 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { getUpstream } from "@/lib/hls-upstream-map";
+
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+  "Access-Control-Allow-Headers": "Range, Content-Type, Accept",
+  "Access-Control-Expose-Headers": "Content-Length, Content-Range, Accept-Ranges",
+  "Access-Control-Max-Age": "86400",
+};
+
+function b64urlEncode(s: string): string {
+  // btoa is available in Workers/Web runtime
+  return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function b64urlDecode(s: string): string {
+  const padded = s.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((s.length + 3) % 4);
+  return atob(padded);
+}
+
+function isAllowedUpstreamUrl(slug: string, urlStr: string): boolean {
+  const u = getUpstream(slug);
+  if (!u) return false;
+  try {
+    const parsed = new URL(urlStr);
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return false;
+    return u.allowedHosts.includes(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Rewrites an HLS playlist so all segment URIs go back through this proxy.
+ * Handles:
+ * - Plain URI lines (after #EXTINF)
+ * - #EXT-X-MAP:URI="..."
+ * - #EXT-X-KEY:...,URI="..."
+ * - Variant playlists (master m3u8 referencing other m3u8 files)
+ */
+function rewritePlaylist(playlist: string, slug: string, playlistUrl: string): string {
+  const base = new URL(playlistUrl);
+  const proxyOrigin = `/api/public/hls-proxy/${slug}`;
+
+  const toProxied = (uri: string, isPlaylist: boolean): string => {
+    let absolute: string;
+    try {
+      absolute = new URL(uri, base).toString();
+    } catch {
+      return uri;
+    }
+    const encoded = b64urlEncode(absolute);
+    return isPlaylist
+      ? `${proxyOrigin}/sub?u=${encoded}`
+      : `${proxyOrigin}/seg?u=${encoded}`;
+  };
+
+  const lines = playlist.split(/\r?\n/);
+  const out: string[] = [];
+
+  for (const line of lines) {
+    if (line.length === 0) {
+      out.push(line);
+      continue;
+    }
+    if (line.startsWith("#")) {
+      // Rewrite URI="..." attributes inside tags
+      const rewritten = line.replace(/URI="([^"]+)"/g, (_m, uri: string) => {
+        const isPlaylist = /\.m3u8(\?|$)/i.test(uri);
+        return `URI="${toProxied(uri, isPlaylist)}"`;
+      });
+      out.push(rewritten);
+    } else {
+      // URI line (segment or sub-playlist)
+      const isPlaylist = /\.m3u8(\?|$)/i.test(line);
+      out.push(toProxied(line, isPlaylist));
+    }
+  }
+
+  return out.join("\n");
+}
+
+async function fetchPlaylist(slug: string, playlistUrl: string): Promise<Response> {
+  const u = getUpstream(slug);
+  if (!u) return new Response("Unknown camera", { status: 404, headers: CORS_HEADERS });
+
+  const upstream = await fetch(playlistUrl, {
+    method: "GET",
+    headers: u.headers,
+  });
+  if (!upstream.ok) {
+    return new Response(`Upstream error: ${upstream.status}`, {
+      status: 502,
+      headers: CORS_HEADERS,
+    });
+  }
+  const text = await upstream.text();
+  const rewritten = rewritePlaylist(text, slug, playlistUrl);
+  return new Response(rewritten, {
+    status: 200,
+    headers: {
+      ...CORS_HEADERS,
+      "Content-Type": "application/vnd.apple.mpegurl",
+      "Cache-Control": "no-store, max-age=1",
+    },
+  });
+}
+
+async function fetchSegment(
+  slug: string,
+  upstreamUrl: string,
+  request: Request,
+): Promise<Response> {
+  const u = getUpstream(slug);
+  if (!u) return new Response("Unknown camera", { status: 404, headers: CORS_HEADERS });
+
+  const range = request.headers.get("Range");
+  const headers: Record<string, string> = { ...u.headers };
+  if (range) headers["Range"] = range;
+
+  const upstream = await fetch(upstreamUrl, { method: "GET", headers });
+  if (!upstream.ok && upstream.status !== 206) {
+    return new Response(`Upstream error: ${upstream.status}`, {
+      status: 502,
+      headers: CORS_HEADERS,
+    });
+  }
+
+  const respHeaders = new Headers();
+  for (const [k, v] of upstream.headers) {
+    const lk = k.toLowerCase();
+    if (
+      lk === "content-type" ||
+      lk === "content-length" ||
+      lk === "content-range" ||
+      lk === "accept-ranges" ||
+      lk === "last-modified" ||
+      lk === "etag"
+    ) {
+      respHeaders.set(k, v);
+    }
+  }
+  for (const [k, v] of Object.entries(CORS_HEADERS)) respHeaders.set(k, v);
+  respHeaders.set("Cache-Control", "public, max-age=60");
+
+  return new Response(upstream.body, { status: upstream.status, headers: respHeaders });
+}
+
+export const Route = createFileRoute("/api/public/hls-proxy/$")({
+  server: {
+    handlers: {
+      OPTIONS: async () => new Response(null, { status: 204, headers: CORS_HEADERS }),
+
+      GET: async ({ request, params }) => {
+        const splat = (params as { _splat?: string })._splat ?? "";
+        const [slug, ...rest] = splat.split("/");
+        const action = rest.join("/"); // "index.m3u8" | "seg" | "sub"
+
+        if (!slug) {
+          return new Response("Missing camera slug", { status: 400, headers: CORS_HEADERS });
+        }
+
+        const upstream = getUpstream(slug);
+        if (!upstream) {
+          return new Response("Unknown camera", { status: 404, headers: CORS_HEADERS });
+        }
+
+        const url = new URL(request.url);
+
+        // Master/main playlist request
+        if (action === "index.m3u8" || action === "") {
+          return fetchPlaylist(slug, upstream.playlistUrl);
+        }
+
+        // Nested playlist (variant) — URL passed in ?u=
+        if (action === "sub") {
+          const encoded = url.searchParams.get("u");
+          if (!encoded) {
+            return new Response("Missing u param", { status: 400, headers: CORS_HEADERS });
+          }
+          let target: string;
+          try {
+            target = b64urlDecode(encoded);
+          } catch {
+            return new Response("Bad u param", { status: 400, headers: CORS_HEADERS });
+          }
+          if (!isAllowedUpstreamUrl(slug, target)) {
+            return new Response("Upstream not allowed", { status: 403, headers: CORS_HEADERS });
+          }
+          return fetchPlaylist(slug, target);
+        }
+
+        // Segment fetch
+        if (action === "seg") {
+          const encoded = url.searchParams.get("u");
+          if (!encoded) {
+            return new Response("Missing u param", { status: 400, headers: CORS_HEADERS });
+          }
+          let target: string;
+          try {
+            target = b64urlDecode(encoded);
+          } catch {
+            return new Response("Bad u param", { status: 400, headers: CORS_HEADERS });
+          }
+          if (!isAllowedUpstreamUrl(slug, target)) {
+            return new Response("Upstream not allowed", { status: 403, headers: CORS_HEADERS });
+          }
+          return fetchSegment(slug, target, request);
+        }
+
+        return new Response("Not found", { status: 404, headers: CORS_HEADERS });
+      },
+    },
+  },
+});
