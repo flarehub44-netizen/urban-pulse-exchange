@@ -29,6 +29,9 @@ function mapMarket(row: Record<string, unknown>): Market {
     frozen: Boolean(row.frozen),
     resolved: row.resolved as Market["resolved"],
     archived: Boolean(row.archived),
+    marketKind: (row.market_kind as Market["marketKind"]) ?? "platform",
+    visibility: row.visibility as Market["visibility"],
+    createdBy: (row.created_by as string | null) ?? null,
   };
 }
 

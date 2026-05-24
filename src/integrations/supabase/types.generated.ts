@@ -1087,6 +1087,46 @@ export type Database = {
         }
         Relationships: []
       }
+      market_access: {
+        Row: {
+          joined_at: string
+          market_id: string
+          user_id: string
+        }
+        Insert: {
+          joined_at?: string
+          market_id: string
+          user_id: string
+        }
+        Update: {
+          joined_at?: string
+          market_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_access_market_id_fkey"
+            columns: ["market_id"]
+            isOneToOne: false
+            referencedRelation: "markets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "market_access_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "market_access_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       market_alerts: {
         Row: {
           created_at: string
@@ -1253,6 +1293,7 @@ export type Database = {
       markets: {
         Row: {
           accept_bets: boolean
+          access_token: string | null
           ai_confidence: number
           ai_side: Database["public"]["Enums"]["bet_side"]
           ai_value: number
@@ -1260,11 +1301,13 @@ export type Database = {
           category: Database["public"]["Enums"]["market_category"]
           comparison_op: string | null
           created_at: string
+          created_by: string | null
           data_source: string
           ends_at: string
           frozen: boolean
           house_fee_pct: number
           id: string
+          market_kind: string
           participants: number
           pool_no: number
           pool_yes: number
@@ -1272,6 +1315,7 @@ export type Database = {
           region: string
           region_id: string | null
           resolution_metric: string | null
+          resolution_mode: string
           resolution_rule: Json
           resolved: Database["public"]["Enums"]["bet_side"] | null
           resolved_at: string | null
@@ -1281,9 +1325,11 @@ export type Database = {
           target: number
           trend: number
           updated_at: string
+          visibility: string
         }
         Insert: {
           accept_bets?: boolean
+          access_token?: string | null
           ai_confidence: number
           ai_side?: Database["public"]["Enums"]["bet_side"]
           ai_value: number
@@ -1291,11 +1337,13 @@ export type Database = {
           category: Database["public"]["Enums"]["market_category"]
           comparison_op?: string | null
           created_at?: string
+          created_by?: string | null
           data_source?: string
           ends_at: string
           frozen?: boolean
           house_fee_pct?: number
           id: string
+          market_kind?: string
           participants?: number
           pool_no?: number
           pool_yes?: number
@@ -1303,6 +1351,7 @@ export type Database = {
           region: string
           region_id?: string | null
           resolution_metric?: string | null
+          resolution_mode?: string
           resolution_rule?: Json
           resolved?: Database["public"]["Enums"]["bet_side"] | null
           resolved_at?: string | null
@@ -1312,9 +1361,11 @@ export type Database = {
           target: number
           trend?: number
           updated_at?: string
+          visibility?: string
         }
         Update: {
           accept_bets?: boolean
+          access_token?: string | null
           ai_confidence?: number
           ai_side?: Database["public"]["Enums"]["bet_side"]
           ai_value?: number
@@ -1322,11 +1373,13 @@ export type Database = {
           category?: Database["public"]["Enums"]["market_category"]
           comparison_op?: string | null
           created_at?: string
+          created_by?: string | null
           data_source?: string
           ends_at?: string
           frozen?: boolean
           house_fee_pct?: number
           id?: string
+          market_kind?: string
           participants?: number
           pool_no?: number
           pool_yes?: number
@@ -1334,6 +1387,7 @@ export type Database = {
           region?: string
           region_id?: string | null
           resolution_metric?: string | null
+          resolution_mode?: string
           resolution_rule?: Json
           resolved?: Database["public"]["Enums"]["bet_side"] | null
           resolved_at?: string | null
@@ -1343,8 +1397,23 @@ export type Database = {
           target?: number
           trend?: number
           updated_at?: string
+          visibility?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "markets_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "markets_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "markets_region_id_fkey"
             columns: ["region_id"]
@@ -2865,6 +2934,14 @@ export type Database = {
         Returns: Json
       }
       assert_admin: { Args: never; Returns: undefined }
+      assert_community_market_access: {
+        Args: {
+          p_access_token?: string
+          p_market: Database["public"]["Tables"]["markets"]["Row"]
+          p_user_id: string
+        }
+        Returns: boolean
+      }
       bind_referral_attribution: {
         Args: { p_campaign_id?: string; p_slug: string }
         Returns: Json
@@ -2885,9 +2962,17 @@ export type Database = {
         Args: { p_post_id: string; p_text: string }
         Returns: number
       }
+      community_market_row_to_json: {
+        Args: { m: Database["public"]["Tables"]["markets"]["Row"] }
+        Returns: Json
+      }
       complete_mission: { Args: { p_mission_id: string }; Returns: Json }
       complete_registration: {
         Args: { p_display_name?: string }
+        Returns: Json
+      }
+      create_community_market: {
+        Args: { p_ends_at: string; p_question: string; p_visibility?: string }
         Returns: Json
       }
       create_league: { Args: { p_name: string }; Returns: Json }
@@ -2970,6 +3055,10 @@ export type Database = {
           slug: string
           upstream_url: string
         }[]
+      }
+      get_community_market: {
+        Args: { p_access_token?: string; p_market_id: string }
+        Returns: Json
       }
       get_daily_missions: { Args: never; Returns: Json }
       get_following_active_bets: {
@@ -3079,12 +3168,18 @@ export type Database = {
       is_partner_program_enabled: { Args: never; Returns: boolean }
       is_user_anonymous: { Args: { p_user_id?: string }; Returns: boolean }
       is_user_registered: { Args: { p_user_id?: string }; Returns: boolean }
+      join_community_market: { Args: { p_access_token: string }; Returns: Json }
       join_league: { Args: { p_invite_code: string }; Returns: Json }
       leave_league: { Args: { p_league_id: string }; Returns: Json }
       like_feed_post: { Args: { p_post_id: string }; Returns: number }
       list_cameras_for_ingest: { Args: never; Returns: Json }
       list_football_markets_for_resolve: { Args: never; Returns: number[] }
       list_live_cameras: { Args: { p_region_id?: string }; Returns: Json }
+      list_my_community_markets: { Args: never; Returns: Json }
+      list_public_community_markets: {
+        Args: { p_limit?: number }
+        Returns: Json
+      }
       min_minority_ratio: { Args: never; Returns: number }
       min_oracle_confidence: { Args: never; Returns: number }
       open_market: {
@@ -3164,6 +3259,13 @@ export type Database = {
       repost_feed_post: { Args: { p_post_id: string }; Returns: number }
       request_withdrawal: {
         Args: { p_amount: number; p_pix_key: string }
+        Returns: Json
+      }
+      resolve_community_market: {
+        Args: {
+          p_market_id: string
+          p_winning_side: Database["public"]["Enums"]["bet_side"]
+        }
         Returns: Json
       }
       resolve_expired_markets: { Args: never; Returns: number }
@@ -3299,6 +3401,10 @@ export type Database = {
       }
       validate_oracle_reading: {
         Args: { p_market_id: string; p_resolution_id: string }
+        Returns: Json
+      }
+      void_community_market: {
+        Args: { p_market_id: string; p_reason?: string }
         Returns: Json
       }
       vote_daily_poll: { Args: { p_vote: boolean }; Returns: Json }

@@ -32,10 +32,19 @@ import { MarketAuditPanel } from "@/components/viax/market-audit-panel";
 import { LiveCameraStrip } from "@/components/viax/live-camera-strip";
 import { MarketSocialProof } from "@/components/viax/market-social-proof";
 import { MarketAlertButton } from "@/components/viax/market-alert-button";
+import {
+  useCommunityMarketDetail,
+  useJoinCommunityMarket,
+} from "@/hooks/use-community-markets";
+import { CommunityMarketResolvePanel } from "@/components/viax/community-market-resolve-panel";
+import { CommunityReportButton } from "@/components/viax/community-report-button";
+import { useAuth } from "@/hooks/use-auth";
+import type { Market } from "@/store/viax-store";
 
 export type MarketDetailSearch = {
   tab?: "chart" | "book" | "comments" | "audit";
   side?: "YES" | "NO";
+  access?: string;
 };
 
 export const Route = createFileRoute("/_app/markets/$marketId")({
@@ -53,17 +62,18 @@ export const Route = createFileRoute("/_app/markets/$marketId")({
     const validTab =
       tab === "chart" || tab === "book" || tab === "comments" || tab === "audit" ? tab : undefined;
     const side = search.side === "YES" || search.side === "NO" ? search.side : undefined;
-    return { tab: validTab, side };
+    const access = typeof search.access === "string" && search.access ? search.access : undefined;
+    return { tab: validTab, side, access };
   },
   component: MarketDetail,
 });
 
-const tabs = [
+const allTabs = [
   { key: "chart" as const, label: "Gráfico" },
   { key: "book" as const, label: copy.markets.tabBook },
   { key: "comments" as const, label: "Comentários" },
   { key: "audit" as const, label: copy.markets.tabAudit },
-];
+] as const;
 
 function MarketCommentsPanel({ marketId }: { marketId: string }) {
   const { feed } = useResolvedFeedForMarket(marketId);
@@ -102,16 +112,39 @@ function MarketCommentsPanel({ marketId }: { marketId: string }) {
 
 function MarketDetail() {
   const { enabled: casinoEnabled } = useCasinoEnabled();
+  const { userId } = useAuth();
   const { marketId } = Route.useParams();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/markets/$marketId" });
   const activeTab = search.tab ?? "book";
   const initialSide = search.side ?? undefined;
   const [showSocialBook, setShowSocialBook] = useState(false);
+  const isCommunityId = marketId.startsWith("cm-");
 
   const { markets, isLoading: marketsLoading } = useMarketsList();
-  const m = markets.find((x) => x.id === marketId);
-  const { data: dbHistory } = useMarketHistory(marketId);
+  const fromList = markets.find((x) => x.id === marketId);
+  const {
+    data: communityDetail,
+    isLoading: communityLoading,
+    refetch: refetchCommunity,
+  } = useCommunityMarketDetail(marketId, search.access, Boolean(fromList));
+  const { mutateAsync: joinMarket } = useJoinCommunityMarket();
+
+  useEffect(() => {
+    if (!search.access || !userId || !isCommunityId) return;
+    void joinMarket(search.access).then(() => refetchCommunity());
+  }, [search.access, userId, isCommunityId, joinMarket, refetchCommunity]);
+
+  const m: Market | undefined =
+    fromList ?? communityDetail?.market ?? undefined;
+  const isCreator = Boolean(
+    communityDetail?.isCreator || (userId && fromList?.createdBy === userId),
+  );
+  const isCommunity = m?.marketKind === "community" || isCommunityId;
+  const detailLoading =
+    marketsLoading || (isCommunityId && !fromList && communityLoading);
+
+  const { data: dbHistory } = useMarketHistory(marketId, !isCommunity);
   const history = useMemo(() => {
     if (dbHistory?.length) return dbHistory;
     return m?.history ?? [];
@@ -135,12 +168,23 @@ function MarketDetail() {
     };
   }, [activeTab, marketId]);
 
-  if (marketsLoading) {
+  if (detailLoading) {
     return (
       <div className="space-y-4 animate-pulse">
         <div className="h-8 w-48 rounded-lg bg-surface-2" />
         <div className="h-40 rounded-2xl bg-surface-2" />
         <div className="h-64 rounded-2xl bg-surface-2" />
+      </div>
+    );
+  }
+
+  if (!m && communityDetail?.reason === "access_denied") {
+    return (
+      <div className="mx-auto max-w-md space-y-3 p-6 text-center">
+        <p className="text-sm text-warn">{copy.community.accessDenied}</p>
+        <Link to="/markets" search={{ view: "community" }} className="text-sm text-primary underline">
+          {copy.community.backToList}
+        </Link>
       </div>
     );
   }
@@ -157,20 +201,32 @@ function MarketDetail() {
     navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, tab }), replace: true });
   };
 
+  const visibleTabs = isCommunity
+    ? allTabs.filter((t) => t.key !== "audit")
+    : [...allTabs];
+
   return (
     <div className="space-y-5">
       <nav className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-        <Link to="/markets" className="inline-flex items-center gap-1 hover:text-foreground">
-          <ArrowLeft className="size-4" /> Mercados
-        </Link>
-        <span className="text-muted-foreground/40">›</span>
         <Link
           to="/markets"
-          search={{ region: m.region.split(" · ")[0] }}
-          className="hover:text-foreground"
+          search={isCommunity ? { view: "community" } : undefined}
+          className="inline-flex items-center gap-1 hover:text-foreground"
         >
-          {m.region.split(" · ")[0]}
+          <ArrowLeft className="size-4" /> Mercados
         </Link>
+        {!isCommunity && (
+          <>
+            <span className="text-muted-foreground/40">›</span>
+            <Link
+              to="/markets"
+              search={{ region: m.region.split(" · ")[0] }}
+              className="hover:text-foreground"
+            >
+              {m.region.split(" · ")[0]}
+            </Link>
+          </>
+        )}
         <span className="text-muted-foreground/40">›</span>
         <span className="truncate text-foreground/80 max-w-[200px] md:max-w-md">
           {questionShort}
@@ -180,13 +236,26 @@ function MarketDetail() {
       <AnonAccountBanner />
 
       <div className="flex flex-wrap items-center gap-2 text-sm">
-        <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-primary">
-          {m.category}
-        </span>
-        <span className="text-muted-foreground inline-flex items-center gap-1">
-          <MapPin className="size-3" />
-          {m.region}
-        </span>
+        {isCommunity ? (
+          <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-primary">
+            {copy.community.communityBadge}
+          </span>
+        ) : (
+          <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-primary">
+            {m.category}
+          </span>
+        )}
+        {m.visibility === "unlisted" && (
+          <span className="rounded-md border px-2 py-0.5 text-[10px] uppercase text-warn">
+            {copy.community.privateBadge}
+          </span>
+        )}
+        {!isCommunity && (
+          <span className="text-muted-foreground inline-flex items-center gap-1">
+            <MapPin className="size-3" />
+            {m.region}
+          </span>
+        )}
         <span
           className={cn(
             "rounded-md border px-2 py-0.5 text-[10px] uppercase tracking-wider",
@@ -201,20 +270,33 @@ function MarketDetail() {
         >
           {statusLabel(m.status)}
         </span>
-        <EdgeBadge m={m} />
-        {(m.status === "live" || m.status === "closing") && <MarketAlertButton m={m} />}
-        <Link
-          to="/urbanmind"
-          search={{ marketId: m.id }}
-          className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-        >
-          <Brain className="size-3" /> UrbanMind
-        </Link>
+        {!isCommunity && <EdgeBadge m={m} />}
+        {!isCommunity && (m.status === "live" || m.status === "closing") && (
+          <MarketAlertButton m={m} />
+        )}
+        {!isCommunity && (
+          <Link
+            to="/urbanmind"
+            search={{ marketId: m.id }}
+            className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+          >
+            <Brain className="size-3" /> UrbanMind
+          </Link>
+        )}
       </div>
+
+      {isCommunity && <CommunityMarketResolvePanel market={m} isCreator={isCreator} />}
+      {isCommunity && !isCreator && (
+        <div className="flex justify-end">
+          <CommunityReportButton market={m} />
+        </div>
+      )}
 
       <OpenPositionStrip marketId={marketId} />
 
-      {(m.status === "live" || m.status === "closing") && <LiveCameraStrip regionId={m.regionId} />}
+      {!isCommunity && (m.status === "live" || m.status === "closing") && (
+        <LiveCameraStrip regionId={m.regionId} />
+      )}
 
       <div className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
         <div className="space-y-5 min-w-0">
@@ -324,7 +406,7 @@ function MarketDetail() {
           </div>
 
           <div className="flex gap-1 rounded-xl border bg-card/40 p-1">
-            {tabs.map((t) => (
+            {visibleTabs.map((t) => (
               <button
                 key={t.key}
                 type="button"

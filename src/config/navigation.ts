@@ -14,6 +14,7 @@ import {
   Bell,
   Shield,
   Flag,
+  PlusCircle,
 } from "lucide-react";
 
 export type NavSearch = Record<string, string>;
@@ -32,6 +33,7 @@ export type NavItem = {
 export const sidebarNav: NavItem[] = [
   { to: "/dashboard", label: copy.nav.home, icon: LayoutDashboard },
   { to: "/markets", label: copy.nav.markets, icon: Radio, matchPrefix: true },
+  { to: "/markets/create", label: copy.community.createLink, icon: PlusCircle },
   { to: "/football", label: copy.nav.football, icon: Flag, matchPrefix: true },
   { to: "/live", label: copy.nav.live, icon: Map },
   { to: "/ranking", label: copy.nav.ranking, icon: Trophy },

@@ -486,7 +486,9 @@ export function OrderBox({
         {isPending ? copy.bet.processing : copy.bet.operateCta(side, formatBRL(stake))}
       </motion.button>
 
-      <p className="mt-3 text-center text-[10px] text-muted-foreground">{copy.bet.poolNote}</p>
+      <p className="mt-3 text-center text-[10px] text-muted-foreground">
+        {m.marketKind === "community" ? copy.community.poolNote : copy.bet.poolNote}
+      </p>
     </div>
   );
 }

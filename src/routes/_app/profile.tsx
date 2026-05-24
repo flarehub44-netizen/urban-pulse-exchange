@@ -20,6 +20,7 @@ import { useBets } from "@/hooks/use-bets";
 import { useRegionPerformance } from "@/hooks/use-region-performance";
 import { TraderArchetypeCard } from "@/components/viax/trader-archetype-card";
 import { EmptyState } from "@/components/viax/empty-state";
+import { useMyCommunityMarkets } from "@/hooks/use-community-markets";
 import {
   Area,
   AreaChart,
@@ -33,7 +34,7 @@ import {
 } from "recharts";
 import { cn } from "@/lib/utils";
 export type ProfileSearch = {
-  tab?: "visao" | "posicoes" | "carteira" | "favoritos" | "badges" | "atividade" | "config";
+  tab?: "visao" | "posicoes" | "carteira" | "favoritos" | "badges" | "atividade" | "mercados" | "config";
 };
 
 export const Route = createFileRoute("/_app/profile")({
@@ -51,6 +52,7 @@ export const Route = createFileRoute("/_app/profile")({
       t === "favoritos" ||
       t === "badges" ||
       t === "atividade" ||
+      t === "mercados" ||
       t === "config"
     )
       return { tab: t };
@@ -66,6 +68,7 @@ const profileTabs = [
   { key: "favoritos" as const, label: "Favoritos" },
   { key: "badges" as const, label: "Badges" },
   { key: "atividade" as const, label: "Atividade" },
+  { key: "mercados" as const, label: "Meus mercados" },
   { key: "config" as const, label: "Configurações" },
 ];
 
@@ -207,6 +210,8 @@ function Profile() {
           </button>
         ))}
       </div>
+
+      {tab === "mercados" && <ProfileMyMarketsTab isRegistered={isRegistered} />}
 
       {tab === "config" && <SettingsPanel />}
       {tab === "posicoes" && <PositionsPanel embedded />}
@@ -422,6 +427,37 @@ function Profile() {
         </div>
       )}
 
+    </div>
+  );
+}
+
+function ProfileMyMarketsTab({ isRegistered }: { isRegistered: boolean }) {
+  const { data: myMarkets = [], isLoading } = useMyCommunityMarkets(isRegistered);
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm text-muted-foreground">{copy.community.listSubtitle}</p>
+        <Link
+          to="/markets/create"
+          className="rounded-lg bg-primary px-3 py-1.5 text-sm text-primary-foreground"
+        >
+          {copy.community.createLink}
+        </Link>
+      </div>
+      {isLoading && <p className="text-sm text-muted-foreground">{copy.auth.loading}</p>}
+      {!isLoading && myMarkets.length === 0 && (
+        <EmptyState
+          title={copy.empty.markets.title}
+          description={copy.community.listSubtitle}
+          action={{ label: copy.community.createLink, to: "/markets/create" }}
+        />
+      )}
+      <div className="grid gap-4 md:grid-cols-2">
+        {myMarkets.map((m) => (
+          <MarketCard key={m.id} m={m} />
+        ))}
+      </div>
     </div>
   );
 }

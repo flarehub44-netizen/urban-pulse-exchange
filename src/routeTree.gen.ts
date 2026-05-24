@@ -62,6 +62,7 @@ import { Route as ApiWebhooksSyncpayRouteImport } from './routes/api/webhooks/sy
 import { Route as ApiCronFootballSyncRouteImport } from './routes/api/cron/football-sync'
 import { Route as ApiCronFootballResolveRouteImport } from './routes/api/cron/football-resolve'
 import { Route as AppProfileUserIdRouteImport } from './routes/_app/profile.$userId'
+import { Route as AppMarketsCreateRouteImport } from './routes/_app/markets/create'
 import { Route as AppMarketsMarketIdRouteImport } from './routes/_app/markets.$marketId'
 import { Route as AppFootballMarketIdRouteImport } from './routes/_app/football/$marketId'
 import { Route as AppFeedPostIdRouteImport } from './routes/_app/feed.$postId'
@@ -332,6 +333,11 @@ const AppProfileUserIdRoute = AppProfileUserIdRouteImport.update({
   path: '/$userId',
   getParentRoute: () => AppProfileRoute,
 } as any)
+const AppMarketsCreateRoute = AppMarketsCreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => AppMarketsRoute,
+} as any)
 const AppMarketsMarketIdRoute = AppMarketsMarketIdRouteImport.update({
   id: '/$marketId',
   path: '/$marketId',
@@ -409,6 +415,7 @@ export interface FileRoutesByFullPath {
   '/feed/$postId': typeof AppFeedPostIdRoute
   '/football/$marketId': typeof AppFootballMarketIdRoute
   '/markets/$marketId': typeof AppMarketsMarketIdRoute
+  '/markets/create': typeof AppMarketsCreateRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
   '/api/cron/football-resolve': typeof ApiCronFootballResolveRoute
   '/api/cron/football-sync': typeof ApiCronFootballSyncRoute
@@ -465,6 +472,7 @@ export interface FileRoutesByTo {
   '/feed/$postId': typeof AppFeedPostIdRoute
   '/football/$marketId': typeof AppFootballMarketIdRoute
   '/markets/$marketId': typeof AppMarketsMarketIdRoute
+  '/markets/create': typeof AppMarketsCreateRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
   '/api/cron/football-resolve': typeof ApiCronFootballResolveRoute
   '/api/cron/football-sync': typeof ApiCronFootballSyncRoute
@@ -526,6 +534,7 @@ export interface FileRoutesById {
   '/_app/feed/$postId': typeof AppFeedPostIdRoute
   '/_app/football/$marketId': typeof AppFootballMarketIdRoute
   '/_app/markets/$marketId': typeof AppMarketsMarketIdRoute
+  '/_app/markets/create': typeof AppMarketsCreateRoute
   '/_app/profile/$userId': typeof AppProfileUserIdRoute
   '/api/cron/football-resolve': typeof ApiCronFootballResolveRoute
   '/api/cron/football-sync': typeof ApiCronFootballSyncRoute
@@ -587,6 +596,7 @@ export interface FileRouteTypes {
     | '/feed/$postId'
     | '/football/$marketId'
     | '/markets/$marketId'
+    | '/markets/create'
     | '/profile/$userId'
     | '/api/cron/football-resolve'
     | '/api/cron/football-sync'
@@ -643,6 +653,7 @@ export interface FileRouteTypes {
     | '/feed/$postId'
     | '/football/$marketId'
     | '/markets/$marketId'
+    | '/markets/create'
     | '/profile/$userId'
     | '/api/cron/football-resolve'
     | '/api/cron/football-sync'
@@ -703,6 +714,7 @@ export interface FileRouteTypes {
     | '/_app/feed/$postId'
     | '/_app/football/$marketId'
     | '/_app/markets/$marketId'
+    | '/_app/markets/create'
     | '/_app/profile/$userId'
     | '/api/cron/football-resolve'
     | '/api/cron/football-sync'
@@ -1101,6 +1113,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProfileUserIdRouteImport
       parentRoute: typeof AppProfileRoute
     }
+    '/_app/markets/create': {
+      id: '/_app/markets/create'
+      path: '/create'
+      fullPath: '/markets/create'
+      preLoaderRoute: typeof AppMarketsCreateRouteImport
+      parentRoute: typeof AppMarketsRoute
+    }
     '/_app/markets/$marketId': {
       id: '/_app/markets/$marketId'
       path: '/$marketId'
@@ -1238,11 +1257,13 @@ const AppFeedRouteWithChildren =
 
 interface AppMarketsRouteChildren {
   AppMarketsMarketIdRoute: typeof AppMarketsMarketIdRoute
+  AppMarketsCreateRoute: typeof AppMarketsCreateRoute
   AppMarketsIndexRoute: typeof AppMarketsIndexRoute
 }
 
 const AppMarketsRouteChildren: AppMarketsRouteChildren = {
   AppMarketsMarketIdRoute: AppMarketsMarketIdRoute,
+  AppMarketsCreateRoute: AppMarketsCreateRoute,
   AppMarketsIndexRoute: AppMarketsIndexRoute,
 }
 

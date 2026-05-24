@@ -48,6 +48,7 @@ function ChartFallback() {
   return <div className="h-[140px] animate-pulse rounded-xl bg-surface/60" />;
 }
 import { AnonAccountBanner } from "@/components/viax/anon-account-banner";
+import { useAuth } from "@/hooks/use-auth";
 import { TrendingUp, Users } from "lucide-react";
 import { PageHeader } from "@/components/viax/page-header";
 import { KpiTile } from "@/components/viax/kpi-tile";
@@ -99,6 +100,7 @@ function Dashboard() {
   const { enabled: casinoEnabled } = useCasinoEnabled();
   const { from, highlight } = Route.useSearch();
   const { userId } = useAnonAuth();
+  const { isRegistered } = useAuth();
   const { me, profile: dbProfile } = useResolvedProfile();
   const { data: weeklyReport, shouldShow: showWeeklyReport } = useWeeklyReport();
   const [weeklyReportDismissed, setWeeklyReportDismissed] = useState(false);
@@ -243,6 +245,22 @@ function Dashboard() {
       <DivisionUpModal newDivision={divisionUp} onClose={() => setDivisionUp(null)} />
 
       <AnonAccountBanner />
+      {isRegistered && (
+        <Link
+          to="/markets/create"
+          className="flex items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 px-4 py-3 text-sm hover:bg-primary/10"
+        >
+          <span>
+            <span className="font-medium text-foreground">{copy.community.createTitle}</span>
+            <span className="mt-0.5 block text-xs text-muted-foreground">
+              {copy.community.createSubtitle}
+            </span>
+          </span>
+          <span className="shrink-0 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground">
+            {copy.community.createLink}
+          </span>
+        </Link>
+      )}
       <EventsBanner />
       <StreakRiskBanner />
 

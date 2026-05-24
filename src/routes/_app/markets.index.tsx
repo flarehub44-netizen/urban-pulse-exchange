@@ -24,6 +24,7 @@ import {
 import { useAnonAuth } from "@/hooks/use-anon-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { PageHeader } from "@/components/viax/page-header";
+import { CommunityMarketsList } from "@/components/viax/community-markets-list";
 
 export const Route = createFileRoute("/_app/markets/")({
   head: () => ({
@@ -46,7 +47,9 @@ export const Route = createFileRoute("/_app/markets/")({
     const validCat = MARKET_CATEGORY_FILTERS.includes(cat as MarketCategoryFilter)
       ? (cat as MarketCategoryFilter)
       : undefined;
+    const view = search.view === "community" ? "community" : "urban";
     return {
+      view,
       region: typeof search.region === "string" && search.region ? search.region : undefined,
       status: validStatus,
       category: validCat,
@@ -89,6 +92,7 @@ function MarketsList() {
     [bets],
   );
 
+  const view = search.view ?? "urban";
   const statusKey = search.status ?? "all";
   const category = search.category ?? null;
   const showFavorites = search.favorites === "1";
@@ -194,8 +198,49 @@ function MarketsList() {
     aiPicks,
   ]);
 
+  if (view === "community") {
+    return (
+      <div className="space-y-4">
+        <div className="flex gap-2 border-b pb-2">
+          <button
+            type="button"
+            onClick={() => patchSearch({ view: "urban" })}
+            className="rounded-lg px-3 py-1.5 text-sm text-muted-foreground hover:bg-surface"
+          >
+            {copy.markets.urbanTab}
+          </button>
+          <button
+            type="button"
+            className={cn(
+              "rounded-lg px-3 py-1.5 text-sm font-medium",
+              "bg-primary/15 text-primary",
+            )}
+          >
+            {copy.markets.communityTab}
+          </button>
+        </div>
+        <CommunityMarketsList />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-5">
+      <div className="flex gap-2 border-b pb-2">
+        <button
+          type="button"
+          className={cn("rounded-lg px-3 py-1.5 text-sm font-medium", "bg-primary/15 text-primary")}
+        >
+          {copy.markets.urbanTab}
+        </button>
+        <button
+          type="button"
+          onClick={() => patchSearch({ view: "community" })}
+          className="rounded-lg px-3 py-1.5 text-sm text-muted-foreground hover:bg-surface"
+        >
+          {copy.markets.communityTab}
+        </button>
+      </div>
       <div className="page-section flex flex-wrap items-end justify-between gap-4">
         <PageHeader
           title={<span className="text-highlight">Mercados</span>}

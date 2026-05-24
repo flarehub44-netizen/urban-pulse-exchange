@@ -22,6 +22,9 @@ export interface Market {
   frozen?: boolean;
   resolved?: Side;
   archived?: boolean;
+  marketKind?: "platform" | "community";
+  visibility?: "public" | "unlisted";
+  createdBy?: string | null;
 }
 
 export interface FeedPost {

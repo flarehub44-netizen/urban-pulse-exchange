@@ -2561,6 +2561,25 @@ export type Database = {
       is_user_anonymous: { Args: { p_user_id?: string }; Returns: boolean };
       is_user_registered: { Args: { p_user_id?: string }; Returns: boolean };
       complete_registration: { Args: { p_display_name?: string }; Returns: Json };
+      create_community_market: {
+        Args: { p_question: string; p_ends_at: string; p_visibility?: string };
+        Returns: Json;
+      };
+      join_community_market: { Args: { p_access_token: string }; Returns: Json };
+      get_community_market: {
+        Args: { p_market_id: string; p_access_token?: string };
+        Returns: Json;
+      };
+      list_public_community_markets: { Args: { p_limit?: number }; Returns: Json };
+      list_my_community_markets: { Args: never; Returns: Json };
+      resolve_community_market: {
+        Args: { p_market_id: string; p_winning_side: Database["public"]["Enums"]["bet_side"] };
+        Returns: Json;
+      };
+      void_community_market: {
+        Args: { p_market_id: string; p_reason?: string };
+        Returns: Json;
+      };
       get_partner_analytics: { Args: never; Returns: Json };
       get_partner_campaigns: { Args: never; Returns: Json };
       get_partner_events_feed: { Args: { p_limit?: number }; Returns: Json };

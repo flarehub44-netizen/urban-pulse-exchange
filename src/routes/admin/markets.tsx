@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AdminCreateMarketForm } from "@/components/viax/admin-create-market-form";
 import { AdminDisputePanel } from "@/components/viax/admin-dispute-panel";
 import { AdminMarketsTable } from "@/components/admin/admin-markets-table";
+import { AdminCommunityMarketsPanel } from "@/components/admin/admin-community-markets-panel";
 import { copy } from "@/copy/pt-BR";
 
 export const Route = createFileRoute("/admin/markets")({
@@ -22,6 +23,12 @@ function AdminMarketsPage() {
         <AdminCreateMarketForm />
       </div>
       <AdminMarketsTable />
+      <div className="rounded-xl border bg-card/60 p-4">
+        <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          {copy.community.adminCommunityTitle}
+        </h2>
+        <AdminCommunityMarketsPanel />
+      </div>
       <div className="rounded-xl border bg-card/60 p-4">
         <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Disputas & rascunhos

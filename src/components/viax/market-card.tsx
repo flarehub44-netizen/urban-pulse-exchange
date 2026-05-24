@@ -67,10 +67,23 @@ export function MarketCard({ m, compact }: { m: Market; compact?: boolean }) {
         />
         <div className="flex items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-primary">
-              {m.category}
-            </span>
-            <EdgeBadge m={m} />
+            {m.marketKind === "community" ? (
+              <>
+                <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-primary">
+                  {copy.community.communityBadge}
+                </span>
+                {m.visibility === "unlisted" && (
+                  <span className="rounded-md border border-warn/40 bg-warn/10 px-2 py-0.5 text-[10px] uppercase text-warn">
+                    {copy.community.privateBadge}
+                  </span>
+                )}
+              </>
+            ) : (
+              <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-primary">
+                {m.category}
+              </span>
+            )}
+            {m.marketKind !== "community" && <EdgeBadge m={m} />}
             {(m.status === "dispute" || m.status === "draft" || m.status === "void") && (
               <span
                 className={cn(
@@ -119,7 +132,9 @@ export function MarketCard({ m, compact }: { m: Market; compact?: boolean }) {
           >
             {m.question}
           </h3>
-          <p className="mt-1 text-xs text-muted-foreground">{m.region}</p>
+          {m.marketKind !== "community" && (
+            <p className="mt-1 text-xs text-muted-foreground">{m.region}</p>
+          )}
         </Link>
 
         <div className="mt-4 flex items-end justify-between gap-3">
