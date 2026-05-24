@@ -1,7 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { requireGuestOnly } from "@/lib/auth-guards";
 
+/** Layout sem guard — login/signup usam requireGuestOnly; callback processa tokens. */
 export const Route = createFileRoute("/auth")({
-  beforeLoad: () => requireGuestOnly(),
   component: () => <Outlet />,
 });

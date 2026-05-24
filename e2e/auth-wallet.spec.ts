@@ -31,6 +31,14 @@ test.describe("C1 — Autenticação e sessão", () => {
 });
 
 test.describe("C1b — Páginas de auth formal", () => {
+  test("callback de auth carrega sem erro", async ({ page }) => {
+    await page.goto("/auth/callback");
+    await page.waitForTimeout(2000);
+    const body = await page.locator("body").innerText();
+    expect(/confirmando|aguarde|erro/i.test(body)).toBeTruthy();
+    expect(/500|server error/i.test(body)).toBeFalsy();
+  });
+
   test("login e signup carregam formulários", async ({ page }) => {
     await page.goto("/auth/login");
     await expect(page.getByRole("heading", { name: /entrar na viax/i })).toBeVisible();
@@ -69,6 +77,23 @@ test.describe("C5 — Redirects de rota", () => {
     await page.goto("/settings");
     await page.waitForURL(/profile|config|settings/, { timeout: 8_000 }).catch(() => null);
     expect(page.url()).toMatch(/profile|config|settings/i);
+  });
+});
+
+test.describe("C6b — Carteira bloqueada sem cadastro formal", () => {
+  test("aba depositar pede cadastro para sessão anon", async ({ page }) => {
+    await page.goto("/profile?tab=carteira");
+    await page.waitForTimeout(6000);
+
+    const depositTab = page.getByRole("button", { name: /depositar/i }).first();
+    if (await depositTab.isVisible().catch(() => false)) {
+      await depositTab.click();
+      await page.waitForTimeout(1000);
+      const body = await page.locator("body").innerText();
+      const needsRegister =
+        /criar conta|cadastro formal|e-mail confirmado/i.test(body);
+      expect(needsRegister).toBeTruthy();
+    }
   });
 });
 

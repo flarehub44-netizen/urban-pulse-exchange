@@ -1,24 +1,22 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { db as supabase } from "@/integrations/supabase/loose";
+import { useAccountContext } from "@/hooks/use-account-context";
 
 export function useMyPartnerStatus(enabled = true) {
-  return useQuery({
-    queryKey: ["partner", "status"],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_my_partner_status");
-      if (error) throw error;
-      return data as {
-        role?: string;
-        status?: string;
-        slug?: string;
-        tier?: string;
-        verified?: boolean;
-        balance?: number;
-      };
-    },
-    enabled,
-    staleTime: 30_000,
-  });
+  const ctx = useAccountContext(enabled);
+  return {
+    ...ctx,
+    data: ctx.data
+      ? {
+          role: ctx.data.partner.role === "none" ? undefined : ctx.data.partner.role,
+          status: ctx.data.partner.status,
+          slug: ctx.data.partner.slug,
+          tier: ctx.data.partner.tier,
+          verified: ctx.data.partner.verified,
+          balance: ctx.data.partner.balance,
+        }
+      : undefined,
+  };
 }
 
 export function usePartnerOverview(enabled = true) {

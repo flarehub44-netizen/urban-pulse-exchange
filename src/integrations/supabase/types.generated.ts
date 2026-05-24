@@ -2058,6 +2058,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_kind: string
           accuracy: number
           avatar: string
           balance: number
@@ -2089,6 +2090,7 @@ export type Database = {
           xp_to_next: number
         }
         Insert: {
+          account_kind?: string
           accuracy?: number
           avatar: string
           balance?: number
@@ -2120,6 +2122,7 @@ export type Database = {
           xp_to_next?: number
         }
         Update: {
+          account_kind?: string
           accuracy?: number
           avatar?: string
           balance?: number
@@ -2883,6 +2886,10 @@ export type Database = {
         Returns: number
       }
       complete_mission: { Args: { p_mission_id: string }; Returns: Json }
+      complete_registration: {
+        Args: { p_display_name?: string }
+        Returns: Json
+      }
       create_league: { Args: { p_name: string }; Returns: Json }
       create_market: {
         Args: {
@@ -2998,6 +3005,7 @@ export type Database = {
         }[]
       }
       get_market_social_proof: { Args: { p_market_id: string }; Returns: Json }
+      get_my_account_context: { Args: never; Returns: Json }
       get_my_leagues: { Args: never; Returns: Json }
       get_my_partner_status: { Args: never; Returns: Json }
       get_partner_analytics: { Args: never; Returns: Json }
@@ -3069,6 +3077,8 @@ export type Database = {
       is_casino_enabled: { Args: never; Returns: boolean }
       is_football_enabled: { Args: never; Returns: boolean }
       is_partner_program_enabled: { Args: never; Returns: boolean }
+      is_user_anonymous: { Args: { p_user_id?: string }; Returns: boolean }
+      is_user_registered: { Args: { p_user_id?: string }; Returns: boolean }
       join_league: { Args: { p_invite_code: string }; Returns: Json }
       leave_league: { Args: { p_league_id: string }; Returns: Json }
       like_feed_post: { Args: { p_post_id: string }; Returns: number }

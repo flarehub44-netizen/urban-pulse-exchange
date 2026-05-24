@@ -3,11 +3,13 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { signInWithEmail } from "@/lib/auth-actions";
+import { requireGuestOnly } from "@/lib/auth-guards";
 import { copy } from "@/copy/pt-BR";
 
 export type LoginSearch = { redirect?: string };
 
 export const Route = createFileRoute("/auth/login")({
+  beforeLoad: () => requireGuestOnly(),
   validateSearch: (s: Record<string, unknown>): LoginSearch => ({
     redirect: typeof s.redirect === "string" ? s.redirect : undefined,
   }),

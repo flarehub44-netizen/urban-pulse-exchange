@@ -38,7 +38,7 @@ export async function signUpWithEmail(email: string, password: string, displayNa
     password,
     options: {
       data: { display_name: displayName.trim() },
-      emailRedirectTo: `${window.location.origin}/auth/verify`,
+      emailRedirectTo: `${window.location.origin}/auth/callback`,
     },
   });
   if (error) throw new Error(authErrorMessage(error));
@@ -53,7 +53,7 @@ export async function signUpWithEmail(email: string, password: string, displayNa
 
 export async function sendPasswordReset(email: string) {
   const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-    redirectTo: `${window.location.origin}/auth/login`,
+    redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
   });
   if (error) throw new Error(authErrorMessage(error));
 }

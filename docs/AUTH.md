@@ -23,7 +23,8 @@ Papéis são **acumulativos**: um partner continua sendo trader; admin pode coex
 
 - Habilitar **Email** provider e confirmação de e-mail.
 - Habilitar **Anonymous sign-ins** para o boot automático.
-- Redirect URLs: `{origin}/auth/verify`, `{origin}/auth/login`.
+- **Site URL** e **Redirect URLs**: `{origin}/auth/callback`, `{origin}/auth/verify`, `{origin}/auth/login`.
+- Confirmação de e-mail e reset de senha devem apontar para `/auth/callback` (PKCE + `detectSessionInUrl` no client).
 
 ## RPC
 

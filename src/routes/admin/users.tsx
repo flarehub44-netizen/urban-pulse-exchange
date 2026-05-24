@@ -56,6 +56,7 @@ function AdminUsersPage() {
           <thead className="border-b bg-surface/60 text-[10px] uppercase text-muted-foreground">
             <tr>
               <th className="px-3 py-2 text-left">Usuário</th>
+              <th className="px-3 py-2 text-left">Afiliado</th>
               <th className="px-3 py-2 text-right">Volume</th>
               <th className="px-3 py-2 text-left">KYC</th>
               <th className="px-3 py-2 text-left">Risco</th>
@@ -68,6 +69,13 @@ function AdminUsersPage() {
                 <td className="px-3 py-2">
                   <span className="font-medium">{u.username}</span>
                   {u.is_admin && <span className="ml-2 text-[10px] text-primary">admin</span>}
+                </td>
+                <td className="px-3 py-2">
+                  {u.is_partner ? (
+                    <span className="text-[10px] text-primary">{copy.admin.partnerBadge}</span>
+                  ) : (
+                    <span className="text-[10px] text-muted-foreground">—</span>
+                  )}
                 </td>
                 <td className="px-3 py-2 text-right mono">{formatBRL(Number(u.volume))}</td>
                 <td className="px-3 py-2">

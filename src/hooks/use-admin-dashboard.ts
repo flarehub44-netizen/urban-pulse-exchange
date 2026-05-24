@@ -135,6 +135,7 @@ export type AdminUserRow = {
   username: string;
   balance: number;
   is_admin: boolean;
+  is_partner?: boolean;
   kyc_status: string;
   risk_score: number;
   frozen: boolean;

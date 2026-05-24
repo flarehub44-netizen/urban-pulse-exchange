@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireRegisteredAuth } from "@/integrations/supabase/require-registered-middleware";
 import type { SupabaseFnContext } from "@/integrations/supabase/loose";
 import { createClient } from "@supabase/supabase-js";
 import { createPixCharge } from "@/lib/syncpay";
@@ -28,7 +29,7 @@ const withdrawSchema = z.object({
  * Retorna qr_code (EMV) e qr_code_img (base64) para exibição na UI.
  */
 export const initiateDepositFn = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseAuth, requireRegisteredAuth])
   .inputValidator(depositSchema)
   .handler(async ({ data, context }) => {
     const { userId } = context as unknown as SupabaseFnContext;
@@ -80,7 +81,7 @@ export const initiateDepositFn = createServerFn({ method: "POST" })
  * A efetivação ocorre via webhook ao confirmar o payout.
  */
 export const initiateWithdrawFn = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseAuth, requireRegisteredAuth])
   .inputValidator(withdrawSchema)
   .handler(async ({ data, context }) => {
     const { supabase } = context as unknown as SupabaseFnContext;

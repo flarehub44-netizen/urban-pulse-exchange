@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AuthShell } from "@/components/auth/auth-shell";
+import { requireGuestOnly } from "@/lib/auth-guards";
 import { copy } from "@/copy/pt-BR";
 
 export const Route = createFileRoute("/auth/verify")({
+  beforeLoad: () => requireGuestOnly(),
   component: VerifyPage,
 });
 

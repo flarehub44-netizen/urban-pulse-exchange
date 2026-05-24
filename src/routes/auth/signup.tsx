@@ -3,11 +3,14 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { signUpWithEmail } from "@/lib/auth-actions";
+import { requireGuestOnly } from "@/lib/auth-guards";
+import { runPostRegistrationFlow } from "@/lib/post-registration";
 import { copy } from "@/copy/pt-BR";
 
 export type SignupSearch = { upgrade?: string };
 
 export const Route = createFileRoute("/auth/signup")({
+  beforeLoad: () => requireGuestOnly(),
   validateSearch: (s: Record<string, unknown>): SignupSearch => ({
     upgrade: typeof s.upgrade === "string" ? s.upgrade : undefined,
   }),
@@ -36,6 +39,7 @@ function SignupPage() {
         toast.success(copy.auth.verifySent);
         navigate({ to: "/auth/verify" });
       } else {
+        await runPostRegistrationFlow(name.trim());
         toast.success(copy.auth.signupSuccess);
         navigate({ to: "/dashboard" });
       }

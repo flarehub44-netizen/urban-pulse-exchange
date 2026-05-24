@@ -232,6 +232,8 @@ export const copy = {
     upgradeSubtitle: "Vincule e-mail e senha à sua conta atual sem perder saldo nem histórico.",
     forgotTitle: "Recuperar senha",
     forgotSubtitle: "Enviaremos um link de redefinição para seu e-mail.",
+    callbackTitle: "Confirmando acesso",
+    callbackSubtitle: "Estamos validando seu link de e-mail. Aguarde um instante.",
     verifyTitle: "Confirme seu e-mail",
     verifySubtitle: "Quase lá — falta um passo para ativar sua conta.",
     verifyHint: "Abra o link que enviamos na sua caixa de entrada. Depois volte e faça login.",
@@ -254,6 +256,7 @@ export const copy = {
     loginLink: "Entrar",
     backToLogin: "Voltar ao login",
     registerRequired: "Crie uma conta formal para continuar.",
+    walletRegisterHint: "Depósitos e saques Pix exigem e-mail confirmado.",
     registerCta: "Criar conta",
     roleTrader: "Trader",
     rolePartner: "Afiliado",
@@ -612,6 +615,11 @@ export const copy = {
       "Monetize sua audiência com revenue share sobre o rake — estilo trading network, não marketing multinível.",
     applyCta: "Enviar candidatura",
     applyPending: "Candidatura em análise. Avisaremos quando aprovado.",
+    pendingPageTitle: "Candidatura em análise",
+    pendingPageDesc:
+      "Nossa equipe está revisando seu perfil de creator. Você receberá acesso ao hub assim que for aprovado.",
+    pendingPageLink: "Ver status da candidatura",
+    pendingBackToSettings: "Voltar às configurações",
     portalCta: "Abrir Creator Hub",
     stats: {
       revenue: "Receita total",
@@ -641,6 +649,7 @@ export const copy = {
     subtitle: "Trading & Urban Intelligence",
     backToApp: "Voltar ao app",
     accessDenied: "Acesso restrito a operadores.",
+    partnerBadge: "Afiliado",
     nav: {
       overview: "Overview",
       markets: "Mercados",

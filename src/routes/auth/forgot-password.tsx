@@ -3,9 +3,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { sendPasswordReset } from "@/lib/auth-actions";
+import { requireGuestOnly } from "@/lib/auth-guards";
 import { copy } from "@/copy/pt-BR";
 
 export const Route = createFileRoute("/auth/forgot-password")({
+  beforeLoad: () => requireGuestOnly(),
   component: ForgotPasswordPage,
 });
 

@@ -12,6 +12,8 @@ import { Copy, QrCode, Clock } from "lucide-react";
 import { copy } from "@/copy/pt-BR";
 import { useBalanceSeries } from "@/hooks/use-balance-series";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
+import { RegisterRequiredCta } from "@/components/auth/register-required-cta";
 import { useBets } from "@/hooks/use-bets";
 import {
   useResolvedProfile,
@@ -39,6 +41,7 @@ type WalletTab = (typeof tabs)[number];
 
 export function WalletPanel({ embedded }: { embedded?: boolean }) {
   useAnonAuth();
+  const { isRegistered } = useAuth();
   const { me } = useResolvedProfile();
   const { transactions: tx } = useResolvedTransactions();
   const { data: bets } = useBets();
@@ -246,7 +249,11 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
         />
       )}
 
-      {(tab === "Depositar" || tab === "Sacar") && (
+      {(tab === "Depositar" || tab === "Sacar") && !isRegistered && (
+        <RegisterRequiredCta />
+      )}
+
+      {(tab === "Depositar" || tab === "Sacar") && isRegistered && (
         <div className="surface-card mx-auto max-w-md space-y-4">
           <h3 className="heading-section">
             {tab === "Depositar" ? (

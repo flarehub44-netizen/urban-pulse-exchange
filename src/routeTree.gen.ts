@@ -21,6 +21,7 @@ import { Route as RSlugRouteImport } from './routes/r.$slug'
 import { Route as PartnerSubAffiliatesRouteImport } from './routes/partner/sub-affiliates'
 import { Route as PartnerRevenueRouteImport } from './routes/partner/revenue'
 import { Route as PartnerPerformanceRouteImport } from './routes/partner/performance'
+import { Route as PartnerPendingRouteImport } from './routes/partner/pending'
 import { Route as PartnerPayoutsRouteImport } from './routes/partner/payouts'
 import { Route as PartnerLeaderboardRouteImport } from './routes/partner/leaderboard'
 import { Route as PartnerInvitesRouteImport } from './routes/partner/invites'
@@ -31,6 +32,7 @@ import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
+import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminSystemRouteImport } from './routes/admin/system'
 import { Route as AdminSourcesRouteImport } from './routes/admin/sources'
@@ -125,6 +127,11 @@ const PartnerPerformanceRoute = PartnerPerformanceRouteImport.update({
   path: '/performance',
   getParentRoute: () => PartnerRouteRoute,
 } as any)
+const PartnerPendingRoute = PartnerPendingRouteImport.update({
+  id: '/pending',
+  path: '/pending',
+  getParentRoute: () => PartnerRouteRoute,
+} as any)
 const PartnerPayoutsRoute = PartnerPayoutsRouteImport.update({
   id: '/payouts',
   path: '/payouts',
@@ -173,6 +180,11 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
   getParentRoute: () => AuthRouteRoute,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
@@ -376,6 +388,7 @@ export interface FileRoutesByFullPath {
   '/admin/sources': typeof AdminSourcesRoute
   '/admin/system': typeof AdminSystemRoute
   '/admin/users': typeof AdminUsersRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
@@ -386,6 +399,7 @@ export interface FileRoutesByFullPath {
   '/partner/invites': typeof PartnerInvitesRoute
   '/partner/leaderboard': typeof PartnerLeaderboardRoute
   '/partner/payouts': typeof PartnerPayoutsRoute
+  '/partner/pending': typeof PartnerPendingRoute
   '/partner/performance': typeof PartnerPerformanceRoute
   '/partner/revenue': typeof PartnerRevenueRoute
   '/partner/sub-affiliates': typeof PartnerSubAffiliatesRoute
@@ -430,6 +444,7 @@ export interface FileRoutesByTo {
   '/admin/sources': typeof AdminSourcesRoute
   '/admin/system': typeof AdminSystemRoute
   '/admin/users': typeof AdminUsersRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
@@ -440,6 +455,7 @@ export interface FileRoutesByTo {
   '/partner/invites': typeof PartnerInvitesRoute
   '/partner/leaderboard': typeof PartnerLeaderboardRoute
   '/partner/payouts': typeof PartnerPayoutsRoute
+  '/partner/pending': typeof PartnerPendingRoute
   '/partner/performance': typeof PartnerPerformanceRoute
   '/partner/revenue': typeof PartnerRevenueRoute
   '/partner/sub-affiliates': typeof PartnerSubAffiliatesRoute
@@ -489,6 +505,7 @@ export interface FileRoutesById {
   '/admin/sources': typeof AdminSourcesRoute
   '/admin/system': typeof AdminSystemRoute
   '/admin/users': typeof AdminUsersRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
@@ -499,6 +516,7 @@ export interface FileRoutesById {
   '/partner/invites': typeof PartnerInvitesRoute
   '/partner/leaderboard': typeof PartnerLeaderboardRoute
   '/partner/payouts': typeof PartnerPayoutsRoute
+  '/partner/pending': typeof PartnerPendingRoute
   '/partner/performance': typeof PartnerPerformanceRoute
   '/partner/revenue': typeof PartnerRevenueRoute
   '/partner/sub-affiliates': typeof PartnerSubAffiliatesRoute
@@ -548,6 +566,7 @@ export interface FileRouteTypes {
     | '/admin/sources'
     | '/admin/system'
     | '/admin/users'
+    | '/auth/callback'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/signup'
@@ -558,6 +577,7 @@ export interface FileRouteTypes {
     | '/partner/invites'
     | '/partner/leaderboard'
     | '/partner/payouts'
+    | '/partner/pending'
     | '/partner/performance'
     | '/partner/revenue'
     | '/partner/sub-affiliates'
@@ -602,6 +622,7 @@ export interface FileRouteTypes {
     | '/admin/sources'
     | '/admin/system'
     | '/admin/users'
+    | '/auth/callback'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/signup'
@@ -612,6 +633,7 @@ export interface FileRouteTypes {
     | '/partner/invites'
     | '/partner/leaderboard'
     | '/partner/payouts'
+    | '/partner/pending'
     | '/partner/performance'
     | '/partner/revenue'
     | '/partner/sub-affiliates'
@@ -660,6 +682,7 @@ export interface FileRouteTypes {
     | '/admin/sources'
     | '/admin/system'
     | '/admin/users'
+    | '/auth/callback'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/signup'
@@ -670,6 +693,7 @@ export interface FileRouteTypes {
     | '/partner/invites'
     | '/partner/leaderboard'
     | '/partner/payouts'
+    | '/partner/pending'
     | '/partner/performance'
     | '/partner/revenue'
     | '/partner/sub-affiliates'
@@ -790,6 +814,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartnerPerformanceRouteImport
       parentRoute: typeof PartnerRouteRoute
     }
+    '/partner/pending': {
+      id: '/partner/pending'
+      path: '/pending'
+      fullPath: '/partner/pending'
+      preLoaderRoute: typeof PartnerPendingRouteImport
+      parentRoute: typeof PartnerRouteRoute
+    }
     '/partner/payouts': {
       id: '/partner/payouts'
       path: '/payouts'
@@ -858,6 +889,13 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/auth/forgot-password'
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof AuthRouteRoute
     }
     '/admin/users': {
@@ -1136,6 +1174,7 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 )
 
 interface AuthRouteRouteChildren {
+  AuthCallbackRoute: typeof AuthCallbackRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
@@ -1143,6 +1182,7 @@ interface AuthRouteRouteChildren {
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthCallbackRoute: AuthCallbackRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
@@ -1160,6 +1200,7 @@ interface PartnerRouteRouteChildren {
   PartnerInvitesRoute: typeof PartnerInvitesRoute
   PartnerLeaderboardRoute: typeof PartnerLeaderboardRoute
   PartnerPayoutsRoute: typeof PartnerPayoutsRoute
+  PartnerPendingRoute: typeof PartnerPendingRoute
   PartnerPerformanceRoute: typeof PartnerPerformanceRoute
   PartnerRevenueRoute: typeof PartnerRevenueRoute
   PartnerSubAffiliatesRoute: typeof PartnerSubAffiliatesRoute
@@ -1173,6 +1214,7 @@ const PartnerRouteRouteChildren: PartnerRouteRouteChildren = {
   PartnerInvitesRoute: PartnerInvitesRoute,
   PartnerLeaderboardRoute: PartnerLeaderboardRoute,
   PartnerPayoutsRoute: PartnerPayoutsRoute,
+  PartnerPendingRoute: PartnerPendingRoute,
   PartnerPerformanceRoute: PartnerPerformanceRoute,
   PartnerRevenueRoute: PartnerRevenueRoute,
   PartnerSubAffiliatesRoute: PartnerSubAffiliatesRoute,

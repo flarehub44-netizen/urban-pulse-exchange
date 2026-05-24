@@ -4,6 +4,7 @@ import { parseAuthSession, type AuthSessionState } from "@/lib/auth";
 import { ensureAuthSession } from "@/lib/auth-session";
 import { getStoredPartnerRef, clearStoredPartnerRef } from "@/lib/partner-attribution";
 import { getBoundReferralSlug, markReferralBound } from "@/lib/anon-account-storage";
+import { runPostRegistrationFlow } from "@/lib/post-registration";
 
 export type UseAuthResult = AuthSessionState & {
   authReady: boolean;
@@ -13,6 +14,7 @@ export function useAuth(): UseAuthResult {
   const [authReady, setAuthReady] = useState(false);
   const [state, setState] = useState<AuthSessionState>(() => parseAuthSession(null));
   const initialized = useRef(false);
+  const wasRegistered = useRef(false);
 
   useEffect(() => {
     if (initialized.current) return;
@@ -26,11 +28,23 @@ export function useAuth(): UseAuthResult {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       const next = parseAuthSession(session);
       setState(next);
       setAuthReady(true);
-      if (next.userId && next.isRegistered) void tryBindPartnerRef();
+      if (next.userId && next.isRegistered) {
+        if (!wasRegistered.current && (event === "SIGNED_IN" || event === "USER_UPDATED")) {
+          const displayName =
+            session?.user.user_metadata?.display_name ??
+            session?.user.user_metadata?.full_name ??
+            null;
+          void runPostRegistrationFlow(
+            typeof displayName === "string" ? displayName : null,
+          );
+        }
+        void tryBindPartnerRef();
+      }
+      wasRegistered.current = next.isRegistered;
     });
 
     return () => subscription.unsubscribe();

@@ -68,7 +68,15 @@ export function SettingsPanel() {
             {copy.partner.portalCta}
           </Link>
         ) : partnerStatus?.role === "applicant" ? (
-          <p className="text-sm text-warn">{copy.partner.applyPending}</p>
+          <div className="space-y-2">
+            <p className="text-sm text-warn">{copy.partner.applyPending}</p>
+            <Link
+              to="/partner/pending"
+              className="inline-flex text-sm text-primary hover:underline"
+            >
+              {copy.partner.pendingPageLink}
+            </Link>
+          </div>
         ) : (
           <>
             <textarea

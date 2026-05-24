@@ -8,6 +8,8 @@ import { ImpulseDepositChips } from "@/components/viax/impulse-deposit-bar";
 import { setLastImpulseAmount } from "@/lib/impulse-deposit";
 import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
 import { formatBRL } from "@/lib/parimutuel";
+import { useAuth } from "@/hooks/use-auth";
+import { RegisterRequiredCta } from "@/components/auth/register-required-cta";
 
 interface QuickDepositSheetProps {
   open: boolean;
@@ -21,6 +23,7 @@ export function QuickDepositSheet({
   suggestedAmount = 200,
 }: QuickDepositSheetProps) {
   const queryClient = useQueryClient();
+  const { isRegistered } = useAuth();
   const { enabled: casinoEnabled } = useCasinoEnabled();
   const [amount, setAmount] = useState(String(suggestedAmount));
   const [qr, setQr] = useState<{
@@ -96,7 +99,9 @@ export function QuickDepositSheet({
           </SheetTitle>
         </SheetHeader>
 
-        {qr ? (
+        {!isRegistered ? (
+          <RegisterRequiredCta className="space-y-3 p-2 text-center" />
+        ) : qr ? (
           <div className="space-y-4 text-center">
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
               <Clock className="size-3" />

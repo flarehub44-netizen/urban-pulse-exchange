@@ -47,7 +47,7 @@ export async function requirePartnerRoute() {
   if (partner?.role === "partner" && partner?.status === "active") return;
 
   if (partner?.role === "applicant") {
-    throw redirect({ to: "/profile", search: { tab: "config" } });
+    throw redirect({ to: "/partner/pending" });
   }
 
   throw redirect({ to: "/profile", search: { tab: "config" } });
