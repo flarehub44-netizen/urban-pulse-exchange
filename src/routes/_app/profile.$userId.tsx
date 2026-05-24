@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { EmptyState } from "@/components/viax/empty-state";
 import { usePublicTraderBets } from "@/hooks/use-public-trader-bets";
+import { usePublicActiveBets } from "@/hooks/use-public-active-bets";
 import { usePublicExpertProfile } from "@/hooks/use-partner";
 import { buildPartnerUrl } from "@/lib/share-url";
 import { copyShareUrl } from "@/lib/share-url";
@@ -86,6 +87,7 @@ function PublicProfile() {
   const { isFollowing, toggle, isPending } = useFollowedTraders();
   const following = !isMe && isFollowing(targetId);
   const { data: publicBets } = usePublicTraderBets(targetId);
+  const { data: activeBets } = usePublicActiveBets(targetId);
   const { data: expert } = usePublicExpertProfile(targetId);
 
   useEffect(() => {
@@ -240,6 +242,45 @@ function PublicProfile() {
           )}
         </div>
       </div>
+
+      {!isMe && (activeBets ?? []).length > 0 && (
+        <div>
+          <h2 className="heading-subsection mb-3 flex items-center gap-2">
+            <span className="size-2 rounded-full bg-up animate-pulse inline-block" />
+            Previsões <span className="text-highlight ml-1">ativas agora</span>
+          </h2>
+          <div className="space-y-2">
+            {(activeBets ?? []).map((b) => (
+              <Link
+                key={b.id}
+                to="/markets/$marketId"
+                params={{ marketId: b.marketId }}
+                search={{ side: b.side }}
+                className="flex items-center gap-3 rounded-xl border bg-card/60 px-4 py-3 backdrop-blur hover:border-primary/30 transition"
+              >
+                <span
+                  className={cn(
+                    "shrink-0 rounded-lg px-2 py-0.5 text-xs font-bold mono",
+                    b.side === "YES"
+                      ? "bg-up/15 text-up border border-up/30"
+                      : "bg-down/15 text-down border border-down/30",
+                  )}
+                >
+                  {b.side === "YES" ? "SIM" : "NÃO"}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="line-clamp-1 text-sm">{b.marketQuestion}</div>
+                  <div className="text-[11px] text-muted-foreground">{b.marketRegion}</div>
+                </div>
+                <span className="shrink-0 rounded-lg border border-primary/40 bg-primary/10 px-2.5 py-1.5 text-[11px] font-medium text-primary">
+                  <Zap className="size-3 inline mr-1" />
+                  Copiar
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div>
         <h2 className="heading-subsection mb-3">

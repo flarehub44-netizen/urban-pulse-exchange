@@ -91,15 +91,13 @@ function UrbanMind() {
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <EdgeBadge m={top} />
-          {marketIdFromUrl && (
-            <Link
-              to="/markets/$marketId"
-              params={{ marketId: top.id }}
-              className="text-xs text-primary hover:underline"
-            >
-              Ver mercado →
-            </Link>
-          )}
+          <Link
+            to="/markets/$marketId"
+            params={{ marketId: top.id }}
+            className="text-xs text-primary hover:underline"
+          >
+            Ver mercado →
+          </Link>
         </div>
         <h1 className="heading-page mt-2 text-3xl md:text-4xl">
           <span className="text-highlight">Previsão ativa</span>:{" "}
@@ -144,6 +142,15 @@ function UrbanMind() {
           />
           <KpiTile embedded label={copy.ia.edgeLabel} value={<>{getMarketEdge(top).label}</>} />
         </div>
+        <button
+          type="button"
+          onClick={() => setBetTarget({ market: top, side: top.aiPrediction.side })}
+          className="mt-5 inline-flex items-center gap-2 rounded-xl border border-primary/50 bg-primary/15 px-5 py-2.5 text-sm font-medium text-primary transition hover:bg-primary/25"
+        >
+          <Zap className="size-4" />
+          Prever {top.aiPrediction.side === "YES" ? "SIM" : "NÃO"} com UrbanMind ·{" "}
+          {(top.aiPrediction.confidence * 100).toFixed(0)}% confiança
+        </button>
       </SurfaceCard>
 
       <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
@@ -172,7 +179,14 @@ function UrbanMind() {
               Previsões <span className="text-highlight">ativas</span>
             </h2>
             <ul className="space-y-2">
-              {markets.slice(0, 5).map((m) => (
+              {markets
+                .filter(
+                  (m) =>
+                    m.aiPrediction.confidence >= 0.75 &&
+                    (m.status === "live" || m.status === "closing"),
+                )
+                .slice(0, 5)
+                .map((m) => (
                 <li
                   key={m.id}
                   className="flex items-center justify-between gap-2 rounded-lg border bg-surface/50 p-2.5 text-sm"

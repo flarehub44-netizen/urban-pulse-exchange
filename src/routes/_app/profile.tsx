@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { SettingsPanel } from "@/components/viax/settings-panel";
 import { PositionsPanel } from "@/components/viax/positions-panel";
@@ -18,11 +18,23 @@ import { AnimatedNumber } from "@/components/viax/animated-number";
 import { MarketCard } from "@/components/viax/market-card";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
-import { Lock, Mail, ShieldCheck, AlertTriangle, Star } from "lucide-react";
+import { Lock, Mail, ShieldCheck, AlertTriangle, Star, MapPin } from "lucide-react";
+import { useBets } from "@/hooks/use-bets";
+import { useRegionPerformance } from "@/hooks/use-region-performance";
 import { TraderArchetypeCard } from "@/components/viax/trader-archetype-card";
 import { EmptyState } from "@/components/viax/empty-state";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -89,6 +101,8 @@ function Profile() {
   const { transactions } = useResolvedTransactions();
   const pnl = usePnlSeries(transactions);
   const calendar = useActivityCalendar(transactions);
+  const { data: allBets } = useBets();
+  const regionPerf = useRegionPerformance(allBets);
   const { markets } = useResolvedMarkets();
   const { ids: watchlist } = useWatchlist();
   const favMarkets = markets.filter((m) => watchlist.includes(m.id));
@@ -324,6 +338,70 @@ function Profile() {
               </div>
               <span>Mais</span>
             </div>
+          </div>
+        </div>
+      )}
+
+      {tab === "visao" && regionPerf.length > 0 && (
+        <div className="surface-card">
+          <div className="flex items-center justify-between">
+            <h2 className="heading-section flex items-center gap-2">
+              <MapPin className="size-4 text-primary" />
+              Precisão por <span className="text-highlight ml-1">região</span>
+            </h2>
+            <span className="text-xs text-muted-foreground">
+              {regionPerf.length} regiões · últimas {allBets?.length ?? 0} previsões
+            </span>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Região onde você mais acerta:{" "}
+            <Link
+              to="/markets"
+              search={{ region: regionPerf[0].region }}
+              className="font-medium text-primary hover:underline"
+            >
+              {regionPerf[0].region} ({(regionPerf[0].accuracy * 100).toFixed(0)}%)
+            </Link>
+          </p>
+          <div className="mt-4" style={{ width: "100%", height: 160 }}>
+            <ResponsiveContainer>
+              <BarChart data={regionPerf} layout="vertical" margin={{ left: 0, right: 8 }}>
+                <XAxis
+                  type="number"
+                  domain={[0, 1]}
+                  tickFormatter={(v: number) => `${(v * 100).toFixed(0)}%`}
+                  tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="region"
+                  width={90}
+                  tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  formatter={(v: number) => [`${(v * 100).toFixed(1)}%`, "Precisão"]}
+                  contentStyle={{
+                    background: "var(--color-popover)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: 10,
+                    fontSize: 12,
+                  }}
+                />
+                <Bar dataKey="accuracy" radius={[0, 4, 4, 0]}>
+                  {regionPerf.map((entry, i) => (
+                    <Cell
+                      key={entry.region}
+                      fill={i === 0 ? "var(--color-up)" : "var(--color-primary)"}
+                      opacity={i === 0 ? 1 : 0.6 - i * 0.08}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       )}

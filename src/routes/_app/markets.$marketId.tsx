@@ -31,6 +31,7 @@ import { isSettledDisplay, statusLabel } from "@/lib/market-status";
 import { MarketAuditPanel } from "@/components/viax/market-audit-panel";
 import { LiveCameraStrip } from "@/components/viax/live-camera-strip";
 import { MarketSocialProof } from "@/components/viax/market-social-proof";
+import { MarketAlertButton } from "@/components/viax/market-alert-button";
 
 export type MarketDetailSearch = {
   tab?: "chart" | "book" | "comments" | "audit";
@@ -201,6 +202,7 @@ function MarketDetail() {
           {statusLabel(m.status)}
         </span>
         <EdgeBadge m={m} />
+        {(m.status === "live" || m.status === "closing") && <MarketAlertButton m={m} />}
         <Link
           to="/urbanmind"
           search={{ marketId: m.id }}

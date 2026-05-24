@@ -70,12 +70,24 @@ export async function runFootballSync(): Promise<Record<string, unknown>> {
     return { ok: false, error: "API_FOOTBALL_KEY not configured", upserted: 0 };
   }
 
+  const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
+  let autoApproved = 0;
+
   for (const date of dates) {
     try {
       const fixtures = await getFixturesByDate(date, leagueIds);
       for (const f of fixtures) {
         await upsertFixture(supabase, f);
         upserted++;
+
+        // Auto-approve fixtures from enabled leagues with kickoff > 2h from now
+        const kickoffMs = new Date(f.kickoff_at).getTime();
+        if (kickoffMs > Date.now() + TWO_HOURS_MS) {
+          const { error: approveErr } = await supabase.rpc("admin_approve_football_fixture", {
+            p_fixture_id: f.api_fixture_id,
+          });
+          if (!approveErr) autoApproved++;
+        }
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
@@ -86,7 +98,7 @@ export async function runFootballSync(): Promise<Record<string, unknown>> {
 
   await supabase.rpc("cron_close_football_bets");
 
-  return { ok: true, upserted, dates: dates.length, errors };
+  return { ok: true, upserted, autoApproved, dates: dates.length, errors };
 }
 
 export async function runFootballResolve(): Promise<Record<string, unknown>> {

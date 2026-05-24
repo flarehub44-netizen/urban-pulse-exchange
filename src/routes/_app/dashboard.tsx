@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useEffect, useState, useRef, lazy, Suspense } from "react";
+import { useMemo, useEffect, useState, useRef, lazy, Suspense, useCallback } from "react";
 import { findTopMarketForRegion } from "@/lib/region-market";
 import { toast } from "sonner";
 import { useViaX } from "@/store/viax-store";
@@ -73,6 +73,8 @@ import { TomorrowPreview } from "@/components/viax/tomorrow-preview";
 import { NeighborhoodWidget } from "@/components/viax/neighborhood-widget";
 import { DailyPoll } from "@/components/viax/daily-poll";
 import { DivisionUpModal } from "@/components/viax/division-up-modal";
+import { QuickDepositSheet } from "@/components/viax/quick-deposit-sheet";
+import { useFollowingActiveBets } from "@/hooks/use-following-active-bets";
 
 export type DashboardSearch = { from?: string; highlight?: "position" };
 
@@ -100,6 +102,8 @@ function Dashboard() {
   const { data: weeklyReport, shouldShow: showWeeklyReport } = useWeeklyReport();
   const [weeklyReportDismissed, setWeeklyReportDismissed] = useState(false);
   const [divisionUp, setDivisionUp] = useState<string | null>(null);
+  const [depositSheetOpen, setDepositSheetOpen] = useState(false);
+  const openDepositSheet = useCallback(() => setDepositSheetOpen(true), []);
   const prevDivisionRef = useRef<string | null>(null);
   const { markets } = useResolvedMarkets();
   const { regions } = useResolvedRegions();
@@ -163,6 +167,7 @@ function Dashboard() {
   }, [traders, userId]);
 
   const { ids: followedIds } = useFollowedTraders();
+  const { data: followingBets } = useFollowingActiveBets();
 
   const liveCount = markets.filter((m) => m.status === "live" || m.status === "closing").length;
   const top = [...markets].sort((a, b) => Math.abs(b.trend) - Math.abs(a.trend)).slice(0, 4);
@@ -180,6 +185,18 @@ function Dashboard() {
     traders,
     dailyMission,
   );
+
+  const todayStart = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d.getTime();
+  }, []);
+
+  const pnlToday = useMemo(() => {
+    return (transactions ?? [])
+      .filter((tx) => tx.time >= todayStart)
+      .reduce((acc, tx) => acc + (tx.type === "entry" ? -tx.amount : tx.amount), 0);
+  }, [transactions, todayStart]);
 
   const pnlTotal = pnlSeries.length ? pnlSeries[pnlSeries.length - 1].v : "pnl" in me ? me.pnl : 0;
   const pnlStart = pnlSeries.length > 1 ? pnlSeries[0].v : 0;
@@ -203,6 +220,24 @@ function Dashboard() {
       <AnonAccountBanner />
       <EventsBanner />
       <StreakRiskBanner />
+
+      {/* Banner de saldo baixo — abre sheet de depósito sem navegar */}
+      {me.balance < 80 && me.balance >= 0 && (
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-warn/35 bg-warn/10 px-4 py-3 text-sm">
+          <span className="text-muted-foreground">
+            Saldo baixo: <span className="font-medium text-warn">{formatBRL(me.balance)}</span>
+          </span>
+          <button
+            type="button"
+            onClick={openDepositSheet}
+            className="shrink-0 rounded-lg bg-warn px-4 py-2 text-sm font-semibold text-warn-foreground hover:opacity-90 transition"
+          >
+            Depositar agora
+          </button>
+        </div>
+      )}
+
+      <QuickDepositSheet open={depositSheetOpen} onOpenChange={setDepositSheetOpen} />
 
       <div className="page-section">
         <PageHeader
@@ -228,38 +263,40 @@ function Dashboard() {
         />
 
         <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
-          <Link to="/profile" search={{ tab: "carteira" }}>
+          <button type="button" onClick={openDepositSheet} className="text-left">
             <KpiTile
               label="Saldo"
               icon={TrendingUp}
               value={<AnimatedNumber value={me.balance} format={formatBRL} />}
               interactive
             />
-          </Link>
+          </button>
           <Link to="/profile" search={{ tab: "carteira" }}>
             <KpiTile
               label={copy.dashboard.profit24h}
               icon={TrendingUp}
               value={
-                <span className={cn(("pnl" in me ? me.pnl : 0) >= 0 ? "text-up" : "text-down")}>
-                  <AnimatedNumber value={"pnl" in me ? me.pnl : 0} format={formatBRL} />
+                <span className={cn(pnlToday >= 0 ? "text-up" : "text-down")}>
+                  <AnimatedNumber value={pnlToday} format={formatBRL} />
                 </span>
               }
-              sub={dbProfile ? "Atualizado em tempo real" : undefined}
+              sub={pnlToday >= 0 ? "Acumulado hoje" : "Perda acumulada hoje"}
               interactive
             />
           </Link>
           <Link to="/profile">
             <KpiTile
-              label={copy.dashboard.precision}
+              label={copy.dashboard.roi}
               value={
-                <AnimatedNumber
-                  value={("accuracy" in me ? me.accuracy : 0.5) * 100}
-                  decimals={1}
-                  suffix="%"
-                />
+                <span className={cn(("roi" in me ? me.roi : 0) >= 0 ? "text-up" : "text-down")}>
+                  <AnimatedNumber
+                    value={("roi" in me ? me.roi : 0) * 100}
+                    decimals={1}
+                    suffix="%"
+                  />
+                </span>
               }
-              sub={copy.dashboard.precisionSub}
+              sub="Retorno sobre capital"
               interactive
             />
           </Link>
@@ -381,6 +418,56 @@ function Dashboard() {
               }
               return null;
             })}
+          </div>
+        </div>
+      )}
+
+      {/* Traders seguidos — posições ativas */}
+      {(followingBets ?? []).length > 0 && (
+        <div>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="heading-subsection flex items-center gap-2">
+              <span className="size-2 rounded-full bg-up animate-pulse inline-block" />
+              Traders <span className="text-highlight ml-1">seguidos prevendo agora</span>
+            </h2>
+            <Link to="/ranking" className="text-xs text-primary hover:underline">
+              Ver ranking →
+            </Link>
+          </div>
+          <div className="space-y-2">
+            {(followingBets ?? []).slice(0, 4).map((b) => (
+              <Link
+                key={b.betId}
+                to="/markets/$marketId"
+                params={{ marketId: b.marketId }}
+                search={{ side: b.side }}
+                className="flex items-center gap-3 rounded-xl border bg-card/60 px-4 py-3 backdrop-blur hover:border-primary/30 transition"
+              >
+                <img
+                  src={b.traderAvatar}
+                  alt={b.traderName}
+                  className="size-8 rounded-full border shrink-0"
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <span className="font-medium text-foreground">{b.traderName}</span>
+                    <span>previu</span>
+                    <span
+                      className={cn(
+                        "font-bold mono",
+                        b.side === "YES" ? "text-up" : "text-down",
+                      )}
+                    >
+                      {b.side === "YES" ? "SIM" : "NÃO"}
+                    </span>
+                  </div>
+                  <div className="line-clamp-1 text-sm">{b.marketQuestion}</div>
+                </div>
+                <span className="shrink-0 rounded-lg border border-primary/40 bg-primary/10 px-2 py-1 text-[11px] text-primary">
+                  Copiar →
+                </span>
+              </Link>
+            ))}
           </div>
         </div>
       )}

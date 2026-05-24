@@ -1,0 +1,185 @@
+import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Copy, QrCode, Clock, Wallet } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { initiateDepositFn, getDepositStatusFn } from "@/actions/payments";
+import { ImpulseDepositChips } from "@/components/viax/impulse-deposit-bar";
+import { setLastImpulseAmount } from "@/lib/impulse-deposit";
+import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
+import { formatBRL } from "@/lib/parimutuel";
+
+interface QuickDepositSheetProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  suggestedAmount?: number;
+}
+
+export function QuickDepositSheet({
+  open,
+  onOpenChange,
+  suggestedAmount = 200,
+}: QuickDepositSheetProps) {
+  const queryClient = useQueryClient();
+  const { enabled: casinoEnabled } = useCasinoEnabled();
+  const [amount, setAmount] = useState(String(suggestedAmount));
+  const [qr, setQr] = useState<{
+    qrCode: string;
+    qrCodeImg: string;
+    intentId: string;
+    expiresAt: string;
+  } | null>(null);
+  const [done, setDone] = useState(false);
+
+  const depositMut = useMutation({
+    mutationFn: (amt: number) => initiateDepositFn({ data: { amount: amt } }),
+    onSuccess: (res) =>
+      setQr({
+        qrCode: res.qrCode,
+        qrCodeImg: res.qrCodeImg,
+        intentId: res.intentId,
+        expiresAt: res.expiresAt,
+      }),
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Depósito falhou."),
+  });
+
+  // Poll for payment confirmation while QR is shown
+  useEffect(() => {
+    if (!qr || done) return;
+    const id = setInterval(async () => {
+      try {
+        const status = await getDepositStatusFn({ data: { intentId: qr.intentId } });
+        if (status.status === "paid") {
+          setDone(true);
+          setQr(null);
+          queryClient.invalidateQueries({ queryKey: ["me"] });
+          queryClient.invalidateQueries({ queryKey: ["transactions"] });
+          toast.success("Depósito confirmado!", {
+            description: `${formatBRL(status.amount)} adicionado ao seu saldo.`,
+          });
+          onOpenChange(false);
+        } else if (status.status === "failed" || status.status === "expired") {
+          setQr(null);
+          toast.error("QR Code expirado ou pagamento falhou. Tente novamente.");
+        }
+      } catch {
+        /* silencioso */
+      }
+    }, 5000);
+    return () => clearInterval(id);
+  }, [qr, done, queryClient, onOpenChange]);
+
+  // Reset state when sheet closes
+  useEffect(() => {
+    if (!open) {
+      setQr(null);
+      setDone(false);
+    }
+  }, [open]);
+
+  const handleGenerate = () => {
+    const amt = Number(amount);
+    if (!amt || amt < 1) {
+      toast.error("Informe um valor válido.");
+      return;
+    }
+    depositMut.mutate(amt);
+  };
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="bottom" className="rounded-t-2xl pb-8">
+        <SheetHeader className="mb-4">
+          <SheetTitle className="flex items-center gap-2">
+            <Wallet className="size-4 text-primary" />
+            Adicionar <span className="text-primary ml-1">saldo</span>
+          </SheetTitle>
+        </SheetHeader>
+
+        {qr ? (
+          <div className="space-y-4 text-center">
+            <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+              <Clock className="size-3" />
+              <span>Escaneie o QR Code no app do seu banco</span>
+            </div>
+            {qr.qrCodeImg ? (
+              <img
+                src={`data:image/png;base64,${qr.qrCodeImg}`}
+                alt="QR Code Pix"
+                className="mx-auto size-48 rounded-xl border"
+              />
+            ) : (
+              <div className="mx-auto flex size-48 items-center justify-center rounded-xl border bg-surface-2">
+                <QrCode className="size-16 text-muted-foreground" />
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                navigator.clipboard.writeText(qr.qrCode);
+                toast.success("Código Pix copiado!");
+              }}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border bg-surface px-3 py-2 text-xs hover:bg-surface-2"
+            >
+              <Copy className="size-3" /> Pix Copia e Cola
+            </button>
+            <p className="text-[11px] text-muted-foreground">
+              Aguardando confirmação… O saldo será atualizado automaticamente.
+            </p>
+            <button
+              type="button"
+              onClick={() => setQr(null)}
+              className="text-xs text-muted-foreground underline"
+            >
+              Cancelar e gerar novo código
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {casinoEnabled && (
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">Valor sugerido</p>
+                <ImpulseDepositChips
+                  disabled={depositMut.isPending}
+                  onSelect={(amt) => {
+                    setAmount(String(amt));
+                    setLastImpulseAmount(amt);
+                  }}
+                />
+              </div>
+            )}
+
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-muted-foreground">
+                Valor (BRL)
+              </label>
+              <div className="mt-1 flex items-center gap-2 rounded-xl border bg-surface px-3 py-2">
+                <input
+                  type="number"
+                  min={1}
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="w-full bg-transparent mono text-lg outline-none"
+                />
+                <span className="shrink-0 text-sm text-muted-foreground">BRL</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              disabled={depositMut.isPending}
+              onClick={handleGenerate}
+              className="w-full rounded-xl bg-primary px-4 py-3 font-medium text-primary-foreground disabled:opacity-60 hover:opacity-90 transition"
+            >
+              {depositMut.isPending ? "Gerando QR Code…" : `Gerar QR Code Pix · ${formatBRL(Number(amount) || 0)}`}
+            </button>
+
+            <p className="text-center text-[11px] text-muted-foreground">
+              Pagamento via Pix · Crédito imediato após confirmação
+            </p>
+          </div>
+        )}
+      </SheetContent>
+    </Sheet>
+  );
+}
