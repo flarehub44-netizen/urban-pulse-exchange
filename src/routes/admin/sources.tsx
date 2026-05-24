@@ -6,6 +6,7 @@ import {
   useAdminCameraHealth,
   useAdminUpsertCamera,
   useAdminSetCameraStatus,
+  useAdminCreateCameraUpstream,
 } from "@/hooks/use-admin-dashboard";
 import { useRegions } from "@/hooks/use-regions";
 import { useAdminOracleHealth } from "@/hooks/use-admin-dashboard";
@@ -17,6 +18,7 @@ import { CameraStreamPreview } from "@/components/admin/camera-stream-preview";
 import { EmptyState } from "@/components/viax/empty-state";
 import { Video } from "lucide-react";
 import { isAllowedStreamUrl, isInsecureStreamInProd } from "@/lib/camera-stream-url";
+import { CAMERA_PROVIDERS, getProvider, type CameraProvider } from "@/lib/camera-providers";
 
 export const Route = createFileRoute("/admin/sources")({
   component: AdminSourcesPage,
