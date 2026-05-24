@@ -1,29 +1,25 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
 import { SettingsPanel } from "@/components/viax/settings-panel";
 import { PositionsPanel } from "@/components/viax/positions-panel";
 import { WalletPanel } from "@/components/viax/wallet-panel";
 import { useViaX } from "@/store/viax-store";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { useAchievements } from "@/hooks/use-achievements";
-import { grantEmailLinkBonusFn } from "@/actions/retention";
 import { useResolvedMarkets, useResolvedTransactions } from "@/hooks/use-resolved-data";
 import { useWatchlist } from "@/hooks/use-watchlist";
 import { usePnlSeries } from "@/hooks/use-pnl-series";
 import { useActivityCalendar } from "@/hooks/use-activity-calendar";
-import { supabase } from "@/integrations/supabase/client";
 import { DivisionBadge } from "@/components/viax/division-badge";
 import { AnimatedNumber } from "@/components/viax/animated-number";
 import { MarketCard } from "@/components/viax/market-card";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
-import { Lock, Mail, ShieldCheck, AlertTriangle, Star, MapPin } from "lucide-react";
+import { Lock, ShieldCheck, AlertTriangle, Star, MapPin } from "lucide-react";
 import { useBets } from "@/hooks/use-bets";
 import { useRegionPerformance } from "@/hooks/use-region-performance";
 import { TraderArchetypeCard } from "@/components/viax/trader-archetype-card";
 import { EmptyState } from "@/components/viax/empty-state";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Area,
   AreaChart,
@@ -36,8 +32,6 @@ import {
   YAxis,
 } from "recharts";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
-
 export type ProfileSearch = {
   tab?: "visao" | "posicoes" | "carteira" | "favoritos" | "badges" | "atividade" | "config";
 };
@@ -79,7 +73,7 @@ function Profile() {
   const navigate = useNavigate({ from: "/profile" });
   const { tab = "visao" } = Route.useSearch();
   const zustandMe = useViaX((s) => s.me);
-  const { userId } = useAnonAuth();
+  const { userId, isRegistered, isAnonymous, email } = useAuth();
   const { data: dbProfile } = useProfile(userId);
   const { data: achievements = [] } = useAchievements(userId);
   const me = dbProfile
@@ -106,42 +100,6 @@ function Profile() {
   const { markets } = useResolvedMarkets();
   const { ids: watchlist } = useWatchlist();
   const favMarkets = markets.filter((m) => watchlist.includes(m.id));
-  const [isAnon, setIsAnon] = useState(true);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [emailDialog, setEmailDialog] = useState(false);
-  const [emailInput, setEmailInput] = useState("");
-  const [linkState, setLinkState] = useState<"idle" | "loading" | "sent" | "error">("idle");
-
-  useEffect(() => {
-    if (!userId) return;
-    supabase.auth.getUser().then(({ data }) => {
-      const email = data.user?.email ?? null;
-      setUserEmail(email);
-      setIsAnon(!email);
-    });
-  }, [userId]);
-
-  const linkEmail = async () => {
-    if (!emailInput) return;
-    setLinkState("loading");
-    const { error } = await supabase.auth.updateUser({ email: emailInput });
-    if (!error) {
-      try {
-        const bonus = await grantEmailLinkBonusFn({});
-        if (!bonus.already_claimed) {
-          toast.success(copy.retention.emailBonusToast);
-        }
-      } catch {
-        /* migration pendente */
-      }
-    }
-    if (error) {
-      setLinkState("error");
-      return;
-    }
-    setLinkState("sent");
-  };
-
   const chartData =
     pnl.length > 0
       ? pnl
@@ -151,29 +109,30 @@ function Profile() {
 
   return (
     <div className="space-y-6">
-      {isAnon && (
+      {isAnonymous && !isRegistered && (
         <div className="flex items-start gap-3 rounded-2xl border border-warn/30 bg-warn/5 p-4">
           <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warn" />
           <div className="flex-1 text-sm">
-            <span className="font-medium text-warn">Conta anônima</span>
+            <span className="font-medium text-warn">Conta sem cadastro formal</span>
             <span className="ml-1 text-muted-foreground">
-              — seu histórico será perdido se você limpar os cookies.
+              — crie e-mail e senha para não perder saldo e histórico.
             </span>
           </div>
-          <button
-            onClick={() => setEmailDialog(true)}
+          <Link
+            to="/auth/signup"
+            search={{ upgrade: "1" }}
             className="shrink-0 rounded-xl border border-warn/40 bg-warn/10 px-3 py-1.5 text-xs font-medium text-warn hover:bg-warn/20"
           >
-            Proteger conta
-          </button>
+            {copy.auth.registerCta}
+          </Link>
         </div>
       )}
 
-      {!isAnon && userEmail && (
+      {isRegistered && email && (
         <div className="flex items-center gap-2 rounded-xl border border-up/30 bg-up/5 px-4 py-2.5 text-sm">
           <ShieldCheck className="size-4 text-up" />
-          <span className="text-muted-foreground">Conta vinculada a</span>
-          <span className="font-medium">{userEmail}</span>
+          <span className="text-muted-foreground">Conta registrada</span>
+          <span className="font-medium">{email}</span>
         </div>
       )}
 
@@ -463,67 +422,6 @@ function Profile() {
         </div>
       )}
 
-      <Dialog
-        open={emailDialog}
-        onOpenChange={(o) => {
-          if (!o) {
-            setEmailDialog(false);
-            setLinkState("idle");
-          }
-        }}
-      >
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Mail className="size-4 text-primary" /> Proteger minha conta
-            </DialogTitle>
-          </DialogHeader>
-          {linkState === "sent" ? (
-            <div className="space-y-3 py-2 text-center">
-              <ShieldCheck className="mx-auto size-10 text-up" />
-              <p className="text-sm font-medium">Confirme seu e-mail!</p>
-              <p className="text-xs text-muted-foreground">
-                Enviamos um link de confirmação para <strong>{emailInput}</strong>. Clique nele para
-                vincular o e-mail à sua conta.
-              </p>
-              <button
-                onClick={() => setEmailDialog(false)}
-                className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-              >
-                Entendido
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4 py-1">
-              <p className="text-sm text-muted-foreground">
-                Vincule um e-mail para não perder seu saldo e histórico ao trocar de dispositivo.
-              </p>
-              <div>
-                <label className="mb-1 block text-xs uppercase tracking-wider text-muted-foreground">
-                  E-mail
-                </label>
-                <input
-                  type="email"
-                  value={emailInput}
-                  onChange={(e) => setEmailInput(e.target.value)}
-                  placeholder="seu@email.com"
-                  className="w-full rounded-xl border bg-surface px-3 py-2.5 text-sm outline-none focus:border-primary/60"
-                />
-              </div>
-              {linkState === "error" && (
-                <p className="text-xs text-down">Erro ao vincular. Tente novamente.</p>
-              )}
-              <button
-                onClick={linkEmail}
-                disabled={!emailInput || linkState === "loading"}
-                className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground disabled:opacity-50"
-              >
-                {linkState === "loading" ? "Enviando…" : "Vincular e-mail"}
-              </button>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { requireAuth } from "@/lib/auth-guards";
 import { AppSidebar } from "@/components/viax/sidebar";
 import { Topbar } from "@/components/viax/topbar";
 import { BottomNav } from "@/components/viax/bottom-nav";
@@ -13,6 +14,7 @@ import { CasinoBoot } from "@/components/viax/casino-boot";
 import { usePushDigest } from "@/hooks/use-push-digest";
 
 export const Route = createFileRoute("/_app")({
+  beforeLoad: () => requireAuth(),
   component: AppLayout,
 });
 

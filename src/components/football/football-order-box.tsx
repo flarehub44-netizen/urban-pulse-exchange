@@ -4,7 +4,7 @@ import type { FootballMarketRow } from "@/hooks/use-football-markets";
 import type { FootballOutcome } from "@/lib/football-parimutuel";
 import { usePlaceFootballBet } from "@/hooks/use-place-football-bet";
 import { useProfile } from "@/hooks/use-profile";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 import {
   estimatePayout3,
   poolImbalanceWarning3,
@@ -17,7 +17,7 @@ import { copy } from "@/copy/pt-BR";
 import { cn } from "@/lib/utils";
 
 export function FootballOrderBox({ m }: { m: FootballMarketRow }) {
-  const { userId } = useAnonAuth();
+  const { userId, isRegistered } = useAuth();
   const { data: profile } = useProfile(userId);
   const balance = profile?.balance ?? 0;
   const [outcome, setOutcome] = useState<FootballOutcome>("HOME");
@@ -32,8 +32,8 @@ export function FootballOrderBox({ m }: { m: FootballMarketRow }) {
   const warn = poolImbalanceWarning3(pool);
 
   const onSubmit = async () => {
-    if (!userId) {
-      toast.error(copy.football.loginRequired);
+    if (!userId || !isRegistered) {
+      toast.error(isRegistered ? copy.football.loginRequired : copy.auth.registerRequired);
       return;
     }
     if (stake > balance) {

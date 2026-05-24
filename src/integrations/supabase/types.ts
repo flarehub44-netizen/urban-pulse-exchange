@@ -2556,7 +2556,11 @@ export type Database = {
       };
       get_market_social_proof: { Args: { p_market_id: string }; Returns: Json };
       get_my_leagues: { Args: never; Returns: Json };
+      get_my_account_context: { Args: never; Returns: Json };
       get_my_partner_status: { Args: never; Returns: Json };
+      is_user_anonymous: { Args: { p_user_id?: string }; Returns: boolean };
+      is_user_registered: { Args: { p_user_id?: string }; Returns: boolean };
+      complete_registration: { Args: { p_display_name?: string }; Returns: Json };
       get_partner_analytics: { Args: never; Returns: Json };
       get_partner_campaigns: { Args: never; Returns: Json };
       get_partner_events_feed: { Args: { p_limit?: number }; Returns: Json };

@@ -6,7 +6,8 @@ import { useTheme } from "@/hooks/use-theme";
 import { cn } from "@/lib/utils";
 import { copy } from "@/copy/pt-BR";
 import { useNotificationPrefs } from "@/hooks/use-notification-prefs";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
+import { useAccountContext } from "@/hooks/use-account-context";
 import { useProfile } from "@/hooks/use-profile";
 import { AdminClaimPanel } from "@/components/viax/admin-claim-panel";
 import { useCasinoSpinStatus } from "@/hooks/use-casino-spin";
@@ -15,8 +16,9 @@ import { toast } from "sonner";
 
 export function SettingsPanel() {
   const { prefs, update } = useNotificationPrefs();
-  const { userId } = useAnonAuth();
+  const { userId, isRegistered } = useAuth();
   const { data: profile } = useProfile(userId);
+  const { data: accountCtx } = useAccountContext(!!userId);
   const { data: partnerStatus } = useMyPartnerStatus(!!userId);
   const { mutateAsync: applyPartner, isPending: applying } = useApplyPartner();
   const [bio, setBio] = useState("");
@@ -40,14 +42,25 @@ export function SettingsPanel() {
 
   return (
     <div className="space-y-6">
-      {!profile?.isAdmin && (
+      {accountCtx?.admin?.can_claim_invite && !profile?.isAdmin && (
         <Section icon={<Shield className="size-4" />} title={copy.settings.adminClaimTitle}>
           <AdminClaimPanel />
         </Section>
       )}
       <Section icon={<Sparkles className="size-4" />} title={copy.partner.applyTitle}>
         <p className="text-xs text-muted-foreground">{copy.partner.applyDesc}</p>
-        {partnerStatus?.role === "partner" && partnerStatus.status === "active" ? (
+        {!isRegistered ? (
+          <div className="mt-2 space-y-2">
+            <p className="text-sm text-warn">{copy.auth.registerRequired}</p>
+            <Link
+              to="/auth/signup"
+              search={{ upgrade: "1" }}
+              className="inline-flex rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground"
+            >
+              {copy.auth.registerCta}
+            </Link>
+          </div>
+        ) : partnerStatus?.role === "partner" && partnerStatus.status === "active" ? (
           <Link
             to="/partner"
             className="inline-flex rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground"
@@ -69,7 +82,12 @@ export function SettingsPanel() {
               disabled={applying || bio.length < 20}
               onClick={async () => {
                 try {
-                  await applyPartner({ bio });
+                  const res = await applyPartner({ bio });
+                  const payload = res as { ok?: boolean; reason?: string };
+                  if (payload?.reason === "registration_required") {
+                    toast.error(copy.auth.registerRequired);
+                    return;
+                  }
                   toast.success(copy.partner.applyPending);
                 } catch (e: unknown) {
                   toast.error(e instanceof Error ? e.message : copy.errors.generic);
@@ -135,18 +153,35 @@ export function SettingsPanel() {
       </Section>
 
       <Section icon={<Shield className="size-4" />} title="Conta">
-        <div className="rounded-xl border bg-card/40 p-4">
-          <div className="text-sm font-medium">Conta anônima</div>
-          <div className="mt-1 text-xs text-muted-foreground">
-            Vincule um e-mail na aba Visão geral do perfil para proteger seu histórico.
-          </div>
-          <Link
-            to="/profile"
-            search={{ tab: "visao" }}
-            className="mt-3 inline-block rounded-lg border border-primary/30 bg-primary/15 px-4 py-2 text-xs text-primary hover:bg-primary/20 transition"
-          >
-            Ir para perfil
-          </Link>
+        <div className="rounded-xl border bg-card/40 p-4 space-y-3">
+          {isRegistered ? (
+            <p className="text-sm text-muted-foreground">Conta formal ativa com e-mail confirmado.</p>
+          ) : (
+            <>
+              <div className="text-sm font-medium">Cadastro pendente</div>
+              <p className="text-xs text-muted-foreground">{copy.auth.registerRequired}</p>
+              <Link
+                to="/auth/signup"
+                search={{ upgrade: "1" }}
+                className="inline-block rounded-lg border border-primary/30 bg-primary/15 px-4 py-2 text-xs text-primary hover:bg-primary/20"
+              >
+                {copy.auth.registerCta}
+              </Link>
+            </>
+          )}
+          {isRegistered && (
+            <button
+              type="button"
+              onClick={async () => {
+                const { signOut } = await import("@/lib/auth-actions");
+                await signOut();
+                window.location.href = "/auth/login";
+              }}
+              className="text-xs text-muted-foreground hover:text-foreground underline"
+            >
+              Sair da conta
+            </button>
+          )}
         </div>
       </Section>
 

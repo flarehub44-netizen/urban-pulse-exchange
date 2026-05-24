@@ -29,8 +29,8 @@ export function AnonFirstBetDialog({ open, onOpenChange, onContinue }: Props) {
         </DialogHeader>
         <DialogFooter className="flex-col gap-2 sm:flex-col">
           <Link
-            to="/profile"
-            search={{ tab: "visao" }}
+            to="/auth/signup"
+            search={{ upgrade: "1" }}
             className="w-full rounded-lg border border-warn/40 bg-warn/10 px-4 py-2.5 text-center text-sm font-medium text-warn hover:bg-warn/20"
             onClick={() => onOpenChange(false)}
           >

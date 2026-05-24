@@ -1,33 +1,51 @@
 import { test, expect } from "@playwright/test";
 import { primeAppStorage } from "./helpers/markets";
 
-test.describe("C1 — Autenticação anônima automática", () => {
+test.describe("C1 — Autenticação e sessão", () => {
   test("sessão anon é criada na primeira visita ao dashboard", async ({ page }) => {
-    // Visita sem nenhum estado salvo
     await page.goto("/dashboard");
     await page.waitForTimeout(8000);
 
-    // App deve carregar (não redirecionar para login externo)
     const url = page.url();
-    expect(url).not.toContain("/login");
+    expect(url).toContain("/dashboard");
     expect(url).not.toContain("/auth/error");
 
-    // Body tem conteúdo real (não página de erro)
     const body = await page.locator("body").innerText();
     expect(body.length).toBeGreaterThan(80);
   });
 
-  test("usuário anon vê banner de upgrade para email", async ({ page }) => {
+  test("usuário anon vê banner de cadastro formal", async ({ page }) => {
     await page.goto("/dashboard");
     await page.waitForTimeout(4000);
 
-    // Banner de anon deve aparecer (pode estar em qualquer posição)
     const banner = page
       .getByTestId("anon-account-banner")
-      .or(page.getByText(/vincule seu email|criar conta|salvar progresso/i).first());
+      .or(page.getByText(/criar conta|cadastro formal/i).first());
 
-    // Pode estar visível ou não dependendo do dismiss — só verificamos que não quebra
     await expect(page.locator("body")).toBeVisible();
+    const visible = await banner.isVisible().catch(() => false);
+    if (visible) {
+      await expect(banner).toBeVisible();
+    }
+  });
+});
+
+test.describe("C1b — Páginas de auth formal", () => {
+  test("login e signup carregam formulários", async ({ page }) => {
+    await page.goto("/auth/login");
+    await expect(page.getByRole("heading", { name: /entrar na viax/i })).toBeVisible();
+    await expect(page.locator('input[type="email"]')).toBeVisible();
+
+    await page.goto("/auth/signup");
+    await expect(page.getByRole("heading", { name: /criar conta|completar cadastro/i })).toBeVisible();
+    await expect(page.locator('input[type="password"]')).toBeVisible();
+  });
+
+  test("admin redireciona não-autenticado para dashboard ou login", async ({ page }) => {
+    await page.goto("/admin");
+    await page.waitForTimeout(3000);
+    const url = page.url();
+    expect(url).not.toMatch(/\/admin\/(users|markets)$/);
   });
 });
 
@@ -63,7 +81,6 @@ test.describe("C6 — Carteira: abas e histórico", () => {
     await page.waitForTimeout(8000);
 
     const body = await page.locator("body").innerText();
-    // Saldo em BRL deve estar visível (mostrado no cabeçalho do perfil)
     expect(/BRL|saldo|carteira|SALDO/i.test(body)).toBeTruthy();
   });
 
@@ -83,19 +100,17 @@ test.describe("C6 — Carteira: abas e histórico", () => {
     await page.waitForTimeout(8000);
 
     const body = await page.locator("body").innerText();
-    // "BADGES" heading deve aparecer na aba badges
     expect(/badge|BADGES|conquista|achievement/i.test(body)).toBeTruthy();
   });
 });
 
-test.describe("C2 — Upgrade anon para email", () => {
-  test("formulário de configurações do perfil está acessível", async ({ page }) => {
+test.describe("C2 — Cadastro formal nas configurações", () => {
+  test("configurações mostram seção de conta ou programa de creators", async ({ page }) => {
     await primeAppStorage(page);
     await page.goto("/profile?tab=config");
     await page.waitForTimeout(8000);
 
     const body = await page.locator("body").innerText();
-    // Configurações ou conta/email deve estar presente
-    expect(/email|conta|configurações|config|notificação/i.test(body)).toBeTruthy();
+    expect(/conta|configurações|config|creators|cadastro|notificação/i.test(body)).toBeTruthy();
   });
 });

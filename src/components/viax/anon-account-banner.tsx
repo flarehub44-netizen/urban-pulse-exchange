@@ -1,25 +1,23 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { AlertTriangle } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { copy } from "@/copy/pt-BR";
 import { dismissAnonBanner, isAnonBannerDismissed } from "@/lib/anon-account-storage";
 
 export function AnonAccountBanner({ onProtect }: { onProtect?: () => void }) {
-  const { userId } = useAnonAuth();
-  const [isAnon, setIsAnon] = useState(false);
+  const { userId, isAnonymous, isRegistered } = useAuth();
   const [hidden, setHidden] = useState(() => isAnonBannerDismissed());
 
-  useEffect(() => {
-    if (!userId) return;
-    supabase.auth.getUser().then(({ data }) => setIsAnon(!data.user?.email));
-  }, [userId]);
+  const isAnon = isAnonymous && !isRegistered;
 
-  if (!isAnon || hidden) return null;
+  if (!userId || !isAnon || hidden) return null;
 
   return (
-    <div className="flex items-start gap-3 rounded-2xl border border-warn/30 bg-warn/5 p-4">
+    <div
+      data-testid="anon-account-banner"
+      className="flex items-start gap-3 rounded-2xl border border-warn/30 bg-warn/5 p-4"
+    >
       <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warn" />
       <div className="flex-1 text-sm">
         <span className="font-medium text-warn">Conta anônima</span>
@@ -38,11 +36,11 @@ export function AnonAccountBanner({ onProtect }: { onProtect?: () => void }) {
           </button>
         ) : (
           <Link
-            to="/profile"
-            search={{ tab: "visao" }}
+            to="/auth/signup"
+            search={{ upgrade: "1" }}
             className="rounded-xl border border-warn/40 bg-warn/10 px-3 py-1.5 text-xs font-medium text-warn hover:bg-warn/20"
           >
-            Proteger conta
+            {copy.auth.registerCta}
           </Link>
         )}
         <button

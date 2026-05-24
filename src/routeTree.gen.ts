@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as PartnerRouteRouteImport } from './routes/partner/route'
+import { Route as AuthRouteRouteImport } from './routes/auth/route'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PartnerIndexRouteImport } from './routes/partner/index'
@@ -26,6 +27,10 @@ import { Route as PartnerInvitesRouteImport } from './routes/partner/invites'
 import { Route as PartnerCreativesRouteImport } from './routes/partner/creatives'
 import { Route as PartnerCampaignsRouteImport } from './routes/partner/campaigns'
 import { Route as PartnerAnalyticsRouteImport } from './routes/partner/analytics'
+import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
+import { Route as AuthSignupRouteImport } from './routes/auth/signup'
+import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminSystemRouteImport } from './routes/admin/system'
 import { Route as AdminSourcesRouteImport } from './routes/admin/sources'
@@ -73,6 +78,11 @@ const AppRoute = AppRouteImport.update({
 const PartnerRouteRoute = PartnerRouteRouteImport.update({
   id: '/partner',
   path: '/partner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRouteRoute = AuthRouteRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
@@ -144,6 +154,26 @@ const PartnerAnalyticsRoute = PartnerAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
   getParentRoute: () => PartnerRouteRoute,
+} as any)
+const AuthVerifyRoute = AuthVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthSignupRoute = AuthSignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => AuthRouteRoute,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
@@ -320,6 +350,7 @@ const ApiPublicHlsProxySplatRoute = ApiPublicHlsProxySplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/auth': typeof AuthRouteRouteWithChildren
   '/partner': typeof PartnerRouteRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AppDashboardRoute
@@ -345,6 +376,10 @@ export interface FileRoutesByFullPath {
   '/admin/sources': typeof AdminSourcesRoute
   '/admin/system': typeof AdminSystemRoute
   '/admin/users': typeof AdminUsersRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/signup': typeof AuthSignupRoute
+  '/auth/verify': typeof AuthVerifyRoute
   '/partner/analytics': typeof PartnerAnalyticsRoute
   '/partner/campaigns': typeof PartnerCampaignsRoute
   '/partner/creatives': typeof PartnerCreativesRoute
@@ -371,6 +406,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRouteRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRouteWithChildren
@@ -394,6 +430,10 @@ export interface FileRoutesByTo {
   '/admin/sources': typeof AdminSourcesRoute
   '/admin/system': typeof AdminSystemRoute
   '/admin/users': typeof AdminUsersRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/signup': typeof AuthSignupRoute
+  '/auth/verify': typeof AuthVerifyRoute
   '/partner/analytics': typeof PartnerAnalyticsRoute
   '/partner/campaigns': typeof PartnerCampaignsRoute
   '/partner/creatives': typeof PartnerCreativesRoute
@@ -422,6 +462,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/auth': typeof AuthRouteRouteWithChildren
   '/partner': typeof PartnerRouteRouteWithChildren
   '/_app': typeof AppRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -448,6 +489,10 @@ export interface FileRoutesById {
   '/admin/sources': typeof AdminSourcesRoute
   '/admin/system': typeof AdminSystemRoute
   '/admin/users': typeof AdminUsersRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/signup': typeof AuthSignupRoute
+  '/auth/verify': typeof AuthVerifyRoute
   '/partner/analytics': typeof PartnerAnalyticsRoute
   '/partner/campaigns': typeof PartnerCampaignsRoute
   '/partner/creatives': typeof PartnerCreativesRoute
@@ -477,6 +522,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/auth'
     | '/partner'
     | '/sitemap.xml'
     | '/dashboard'
@@ -502,6 +548,10 @@ export interface FileRouteTypes {
     | '/admin/sources'
     | '/admin/system'
     | '/admin/users'
+    | '/auth/forgot-password'
+    | '/auth/login'
+    | '/auth/signup'
+    | '/auth/verify'
     | '/partner/analytics'
     | '/partner/campaigns'
     | '/partner/creatives'
@@ -528,6 +578,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/sitemap.xml'
     | '/dashboard'
     | '/feed'
@@ -551,6 +602,10 @@ export interface FileRouteTypes {
     | '/admin/sources'
     | '/admin/system'
     | '/admin/users'
+    | '/auth/forgot-password'
+    | '/auth/login'
+    | '/auth/signup'
+    | '/auth/verify'
     | '/partner/analytics'
     | '/partner/campaigns'
     | '/partner/creatives'
@@ -578,6 +633,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/auth'
     | '/partner'
     | '/_app'
     | '/sitemap.xml'
@@ -604,6 +660,10 @@ export interface FileRouteTypes {
     | '/admin/sources'
     | '/admin/system'
     | '/admin/users'
+    | '/auth/forgot-password'
+    | '/auth/login'
+    | '/auth/signup'
+    | '/auth/verify'
     | '/partner/analytics'
     | '/partner/campaigns'
     | '/partner/creatives'
@@ -632,6 +692,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  AuthRouteRoute: typeof AuthRouteRouteWithChildren
   PartnerRouteRoute: typeof PartnerRouteRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -664,6 +725,13 @@ declare module '@tanstack/react-router' {
       path: '/partner'
       fullPath: '/partner'
       preLoaderRoute: typeof PartnerRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -763,6 +831,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/partner/analytics'
       preLoaderRoute: typeof PartnerAnalyticsRouteImport
       parentRoute: typeof PartnerRouteRoute
+    }
+    '/auth/verify': {
+      id: '/auth/verify'
+      path: '/verify'
+      fullPath: '/auth/verify'
+      preLoaderRoute: typeof AuthVerifyRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/auth/signup': {
+      id: '/auth/signup'
+      path: '/signup'
+      fullPath: '/auth/signup'
+      preLoaderRoute: typeof AuthSignupRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/auth/forgot-password': {
+      id: '/auth/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof AuthRouteRoute
     }
     '/admin/users': {
       id: '/admin/users'
@@ -1039,6 +1135,24 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
   AdminRouteRouteChildren,
 )
 
+interface AuthRouteRouteChildren {
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
+  AuthLoginRoute: typeof AuthLoginRoute
+  AuthSignupRoute: typeof AuthSignupRoute
+  AuthVerifyRoute: typeof AuthVerifyRoute
+}
+
+const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
+  AuthLoginRoute: AuthLoginRoute,
+  AuthSignupRoute: AuthSignupRoute,
+  AuthVerifyRoute: AuthVerifyRoute,
+}
+
+const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
+  AuthRouteRouteChildren,
+)
+
 interface PartnerRouteRouteChildren {
   PartnerAnalyticsRoute: typeof PartnerAnalyticsRoute
   PartnerCampaignsRoute: typeof PartnerCampaignsRoute
@@ -1145,6 +1259,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  AuthRouteRoute: AuthRouteRouteWithChildren,
   PartnerRouteRoute: PartnerRouteRouteWithChildren,
   AppRoute: AppRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

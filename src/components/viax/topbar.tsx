@@ -8,7 +8,9 @@ import {
   Search,
   Shield,
 } from "lucide-react";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
+import { useAccountContext } from "@/hooks/use-account-context";
+import { AccountRoleBadges } from "@/components/auth/account-role-badges";
 import { useResolvedProfile, useResolvedNotifications } from "@/hooks/use-resolved-data";
 import { useProfile } from "@/hooks/use-profile";
 import { cn } from "@/lib/utils";
@@ -29,9 +31,12 @@ import { ptBR } from "date-fns/locale";
 
 export function Topbar() {
   const navigate = useNavigate();
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
   const { me } = useResolvedProfile();
   const { data: profile } = useProfile(userId);
+  const { data: accountCtx } = useAccountContext(!!userId);
+  const isActivePartner =
+    accountCtx?.partner?.role === "partner" && accountCtx.partner.status === "active";
   const { notifications } = useResolvedNotifications();
 
   const { data: bets } = useBets();
@@ -83,6 +88,15 @@ export function Topbar() {
             Ops
           </Link>
         )}
+        {isActivePartner && (
+          <Link
+            to="/partner"
+            className="hidden sm:flex items-center gap-1.5 rounded-full border border-warn/30 bg-warn/10 px-2.5 py-1 text-[10px] text-warn hover:bg-warn/20"
+            title={copy.partner.portalCta}
+          >
+            {copy.auth.rolePartner}
+          </Link>
+        )}
         <button
           type="button"
           onClick={() => openCommandPalette()}
@@ -130,6 +144,7 @@ export function Topbar() {
           <span className="mono text-xs text-foreground">{me.xp}</span>
         </div>
         <DivisionBadge division={me.division} className="hidden sm:inline-flex" />
+        <AccountRoleBadges />
         <div
           className={cn(
             "hidden md:flex items-center gap-1 rounded-full border bg-card px-2.5 py-1 text-xs",

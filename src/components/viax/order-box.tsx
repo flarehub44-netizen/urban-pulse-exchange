@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { toast } from "sonner";
 import type { Market, Side } from "@/store/viax-store";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { useViaX } from "@/store/viax-store";
 import { usePlaceBet } from "@/hooks/use-place-bet";
@@ -44,7 +44,7 @@ export function OrderBox({
   className?: string;
 }) {
   const navigate = useNavigate();
-  const { userId } = useAnonAuth();
+  const { userId, isRegistered, isAnonymous } = useAuth();
   const { data: profile } = useProfile(userId);
   const zustandBalance = useViaX((s) => s.me.balance);
   const balance = profile?.balance ?? zustandBalance;
@@ -57,16 +57,12 @@ export function OrderBox({
   const [showNote, setShowNote] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [anonAckOpen, setAnonAckOpen] = useState(false);
-  const [isAnonUser, setIsAnonUser] = useState(false);
 
   useEffect(() => {
     setSide(initialSide);
   }, [initialSide, m.id]);
 
-  useEffect(() => {
-    if (!userId) return;
-    supabase.auth.getUser().then(({ data }) => setIsAnonUser(!data.user?.email));
-  }, [userId]);
+  const isAnonUser = isAnonymous && !isRegistered;
 
   const settled = isSettledDisplay(m.status);
   const canBet = canPlaceBets(m.status, m.acceptBets ?? true, m.endsAt);
@@ -87,6 +83,15 @@ export function OrderBox({
 
   const openConfirm = () => {
     if (!canBet) return;
+    if (!isRegistered) {
+      toast.error(copy.auth.registerRequired, {
+        action: {
+          label: copy.auth.registerCta,
+          onClick: () => navigate({ to: "/auth/signup", search: { upgrade: "1" } }),
+        },
+      });
+      return;
+    }
     if (stake <= 0) {
       toast.error("Informe um valor válido");
       return;
