@@ -216,16 +216,13 @@ export function CameraPlayer({
 
   if (kind === "image") {
     return (
-      <img
-        src={url}
-        alt={copy.cameras.previewAlt}
-        className={cn(
-          "aspect-video w-full rounded-lg border object-cover",
-          maxHeightClass,
-          className,
-        )}
-        onLoad={() => setLoading(false)}
+      <SnapshotImage
+        url={url}
+        autoPlay={autoPlay && !offline}
+        className={className}
+        maxHeightClass={maxHeightClass}
         onError={() => setHlsError(copy.cameras.streamError)}
+        onLoad={() => setLoading(false)}
       />
     );
   }

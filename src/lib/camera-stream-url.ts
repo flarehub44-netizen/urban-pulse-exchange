@@ -22,8 +22,13 @@ export function isAllowedStreamUrl(url: string | null | undefined): boolean {
   if (url == null || url.trim() === "") return true;
   const v = url.trim().toLowerCase();
   if (v.startsWith("rtsp://") || v.startsWith("rtmp://")) return false;
-  // Same-origin proxied path (e.g. /api/public/hls-proxy/.../index.m3u8)
-  if (v.startsWith("/") && (v.includes(".m3u8") || v.includes("mpegurl"))) return true;
+  // Same-origin proxied path (e.g. /api/public/hls-proxy/.../index.m3u8 or snapshot-proxy/*.jpg)
+  if (v.startsWith("/")) {
+    if (v.includes(".m3u8") || v.includes("mpegurl")) return true;
+    if (/\.(jpg|jpeg|png|webp|gif)(\?|$)/i.test(v) || /snapshot|frame|shot/i.test(v))
+      return true;
+    return false;
+  }
   if (!v.startsWith("http://") && !v.startsWith("https://")) return false;
   if (v.includes(".m3u8") || v.includes("mpegurl")) return true;
   if (/\.(jpg|jpeg|png|webp|gif)(\?|$)/i.test(v) || /snapshot|frame|shot/i.test(v)) return true;
