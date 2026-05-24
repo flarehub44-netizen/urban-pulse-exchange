@@ -254,3 +254,53 @@ export function CameraPlayer({
     </a>
   );
 }
+
+type SnapshotImageProps = {
+  url: string;
+  autoPlay: boolean;
+  className?: string;
+  maxHeightClass: string;
+  onLoad: () => void;
+  onError: () => void;
+};
+
+function SnapshotImage({
+  url,
+  autoPlay,
+  className,
+  maxHeightClass,
+  onLoad,
+  onError,
+}: SnapshotImageProps) {
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    if (!autoPlay) return;
+    const id = setInterval(() => setTick((t) => t + 1), 2000);
+    return () => clearInterval(id);
+  }, [autoPlay]);
+
+  const sep = url.includes("?") ? "&" : "?";
+  const src = `${url}${sep}t=${tick}`;
+
+  return (
+    <div className={cn("relative", className)}>
+      <img
+        src={src}
+        alt={copy.cameras.previewAlt}
+        className={cn(
+          "aspect-video w-full rounded-lg border object-cover",
+          maxHeightClass,
+        )}
+        onLoad={onLoad}
+        onError={onError}
+      />
+      {autoPlay ? (
+        <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white">
+          <span className="size-1.5 animate-pulse rounded-full bg-red-500" />
+          AO VIVO
+        </span>
+      ) : null}
+    </div>
+  );
+}
