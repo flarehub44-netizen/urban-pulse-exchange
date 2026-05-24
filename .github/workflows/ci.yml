@@ -26,4 +26,6 @@ jobs:
         if: ${{ secrets.DATABASE_URL != '' }}
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: psql "$DATABASE_URL" -f supabase/tests/resolution_engine_acceptance.sql
+        run: |
+          psql "$DATABASE_URL" -f supabase/tests/resolution_engine_acceptance.sql
+          psql "$DATABASE_URL" -f supabase/tests/football_markets_acceptance.sql

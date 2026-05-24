@@ -16,6 +16,10 @@
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium",
     "db:push": "npx supabase db push --linked --yes",
+    "db:pull": "npx supabase db pull remote_sync --linked --yes",
+    "db:start": "npx supabase start",
+    "db:reset": "npx supabase db reset",
+    "db:sync-remote": "npx supabase start && npx supabase db pull remote_sync --linked --yes && npx supabase db reset && npm run db:types",
     "db:tick": "npx supabase db query --linked",
     "db:types": "node scripts/gen-supabase-types.mjs",
     "db:test-sql": "echo Run: psql $DATABASE_URL -f supabase/tests/resolution_engine_acceptance.sql"

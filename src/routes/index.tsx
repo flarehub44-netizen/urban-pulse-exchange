@@ -208,10 +208,7 @@ function Landing() {
       {/* MERCADOS */}
       <section className="border-y border-border/60 bg-card/30">
         <div className="mx-auto max-w-7xl px-6 py-20">
-          <SectionHeader
-            eyebrow="Mercados ViaX"
-            title={copy.landing.marketsTitle}
-          />
+          <SectionHeader eyebrow="Mercados ViaX" title={copy.landing.marketsTitle} />
           <p className="text-lead mt-3 max-w-2xl">
             Mercados sobre <span className="text-emphasis">trânsito e mobilidade</span> em São
             Paulo. Pools atualizam em tempo real — entre antes do fechamento.

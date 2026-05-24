@@ -4,10 +4,10 @@
 
 Câmeras demo seedadas com stream HTTPS Mux — playback sem VPS.
 
-| Região | Camera ID | Stream |
-|--------|-----------|--------|
-| paulista | `demo-cam-paulista` | Mux test HLS |
-| marginal | `demo-cam-marginal` | Mux test HLS |
+| Região    | Camera ID            | Stream       |
+| --------- | -------------------- | ------------ |
+| paulista  | `demo-cam-paulista`  | Mux test HLS |
+| marginal  | `demo-cam-marginal`  | Mux test HLS |
 | pinheiros | `demo-cam-pinheiros` | Mux test HLS |
 
 ## Checklist pós-deploy
@@ -81,9 +81,9 @@ Substitua URLs no admin por `https://stream.seudominio.com/paulista/index.m3u8`.
 
 ## Troubleshooting
 
-| Sintoma | Ação |
-|---------|------|
-| "Sem sinal ao vivo" | `db:push` + câmeras `online` |
-| Vídeo não carrega | Abrir URL em nova aba; verificar CORS do host |
-| Detecção parada | Worker down ou ffmpeg ausente — badge amarelo no admin |
-| Oráculo falha | `camera_oracle_enabled` + câmera `detection_ok` |
+| Sintoma             | Ação                                                   |
+| ------------------- | ------------------------------------------------------ |
+| "Sem sinal ao vivo" | `db:push` + câmeras `online`                           |
+| Vídeo não carrega   | Abrir URL em nova aba; verificar CORS do host          |
+| Detecção parada     | Worker down ou ffmpeg ausente — badge amarelo no admin |
+| Oráculo falha       | `camera_oracle_enabled` + câmera `detection_ok`        |

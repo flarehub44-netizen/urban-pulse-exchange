@@ -2,10 +2,10 @@
 
 ## Jobs pg_cron (Supabase)
 
-| Job | Schedule | Função |
-|-----|----------|--------|
-| `viax-lifecycle` | cada minuto | `tick_market_lifecycle()` — closing → resolved |
-| `viax-refresh-demo-markets` | a cada 6h | `refresh_demo_live_markets()` — reabre `*-live` / backup |
+| Job                         | Schedule    | Função                                                   |
+| --------------------------- | ----------- | -------------------------------------------------------- |
+| `viax-lifecycle`            | cada minuto | `tick_market_lifecycle()` — closing → resolved           |
+| `viax-refresh-demo-markets` | a cada 6h   | `refresh_demo_live_markets()` — reabre `*-live` / backup |
 
 Ver também [RESOLUTION_ENGINE.md](./RESOLUTION_ENGINE.md).
 

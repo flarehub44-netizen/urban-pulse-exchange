@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useBets } from "@/hooks/use-bets";
+import { useFootballBets, type FootballOpenBet } from "@/hooks/use-football-bets";
 import { useViaX } from "@/store/viax-store";
 import { AnimatedNumber } from "@/components/viax/animated-number";
 import { Countdown } from "@/components/viax/countdown";
 import { copy } from "@/copy/pt-BR";
+import { estimatePayout3, type FootballOutcome } from "@/lib/football-parimutuel";
 import { formatBRL, PRIZE_RATIO } from "@/lib/parimutuel";
 import {
   Activity,
@@ -21,23 +23,36 @@ import { isOpenBetStatus, statusLabel, type MarketStatus } from "@/lib/market-st
 
 export function PositionsPanel({ embedded }: { embedded?: boolean }) {
   const { data: bets, isLoading } = useBets();
+  const { data: fbBets, isLoading: fbLoading } = useFootballBets();
   const markets = useViaX((s) => s.markets);
 
   const open = (bets ?? []).filter((b) => isOpenBetStatus(b.marketStatus));
   const resolved = (bets ?? []).filter((b) => !isOpenBetStatus(b.marketStatus));
+  const fbOpen = (fbBets ?? []).filter((b) => isOpenBetStatus(b.marketStatus));
+  const fbResolved = (fbBets ?? []).filter((b) => !isOpenBetStatus(b.marketStatus));
 
-  const totalAtStake = open.reduce((s, b) => s + b.stake, 0);
+  const totalAtStake =
+    open.reduce((s, b) => s + b.stake, 0) + fbOpen.reduce((s, b) => s + b.stake, 0);
 
-  const estimatedPnL = open.reduce((sum, bet) => {
-    const live = markets.find((m) => m.id === bet.marketId);
-    const poolYes = live ? live.pool.YES : bet.poolYes;
-    const poolNo = live ? live.pool.NO : bet.poolNo;
-    const totalPool = poolYes + poolNo;
-    const sidePool = bet.side === "YES" ? poolYes : poolNo;
-    const share = bet.share ?? (sidePool > 0 ? bet.stake / sidePool : 0);
-    const estPayout = share * totalPool * PRIZE_RATIO;
-    return sum + estPayout - bet.stake;
-  }, 0);
+  const estimatedPnL =
+    open.reduce((sum, bet) => {
+      const live = markets.find((m) => m.id === bet.marketId);
+      const poolYes = live ? live.pool.YES : bet.poolYes;
+      const poolNo = live ? live.pool.NO : bet.poolNo;
+      const totalPool = poolYes + poolNo;
+      const sidePool = bet.side === "YES" ? poolYes : poolNo;
+      const share = bet.share ?? (sidePool > 0 ? bet.stake / sidePool : 0);
+      const estPayout = share * totalPool * PRIZE_RATIO;
+      return sum + estPayout - bet.stake;
+    }, 0) +
+    fbOpen.reduce((sum, bet) => {
+      const pool = { HOME: bet.poolHome, DRAW: bet.poolDraw, AWAY: bet.poolAway };
+      const estPayout = estimatePayout3(pool, bet.outcome, bet.stake);
+      return sum + estPayout - bet.stake;
+    }, 0);
+
+  const loading = isLoading || fbLoading;
+  const openCount = open.length + fbOpen.length;
 
   return (
     <div className="space-y-6">
@@ -51,7 +66,7 @@ export function PositionsPanel({ embedded }: { embedded?: boolean }) {
       )}
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-        <KPI label={copy.positions.openCount} value={<span className="mono">{open.length}</span>} />
+        <KPI label={copy.positions.openCount} value={<span className="mono">{openCount}</span>} />
         <KPI
           label={copy.positions.totalOpen}
           value={<AnimatedNumber value={totalAtStake} format={formatBRL} />}
@@ -74,10 +89,10 @@ export function PositionsPanel({ embedded }: { embedded?: boolean }) {
           <h2 className="heading-subsection">
             <span className="text-highlight">Abertas</span>
           </h2>
-          <span className="text-xs text-muted-foreground">{open.length} posições</span>
+          <span className="text-xs text-muted-foreground">{openCount} posições</span>
         </div>
 
-        {isLoading && (
+        {loading && (
           <div className="space-y-2">
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-24 animate-pulse rounded-xl border bg-card/60" />
@@ -85,7 +100,7 @@ export function PositionsPanel({ embedded }: { embedded?: boolean }) {
           </div>
         )}
 
-        {!isLoading && open.length === 0 && (
+        {!loading && openCount === 0 && (
           <EmptyState
             icon={Activity}
             title={copy.empty.positions.title}
@@ -167,10 +182,13 @@ export function PositionsPanel({ embedded }: { embedded?: boolean }) {
               </Link>
             );
           })}
+          {fbOpen.map((bet) => (
+            <FootballOpenBetRow key={bet.id} bet={bet} />
+          ))}
         </div>
       </section>
 
-      {resolved.length > 0 && (
+      {(resolved.length > 0 || fbResolved.length > 0) && (
         <section>
           <h2 className="heading-subsection mb-3">
             <span className="text-highlight">Resolvidas</span>
@@ -178,6 +196,9 @@ export function PositionsPanel({ embedded }: { embedded?: boolean }) {
           <div className="space-y-2">
             {resolved.slice(0, 10).map((bet) => (
               <ResolvedBetRow key={bet.id} bet={bet} />
+            ))}
+            {fbResolved.slice(0, 10).map((bet) => (
+              <FootballResolvedBetRow key={bet.id} bet={bet} />
             ))}
           </div>
           <Link
@@ -237,7 +258,8 @@ function ResolvedBetRow({ bet }: { bet: import("@/hooks/use-bets").OpenBet }) {
       </div>
       <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
         <span>
-          {copy.positions.stakeLabel}: <span className="mono text-foreground">{formatBRL(bet.stake)}</span>
+          {copy.positions.stakeLabel}:{" "}
+          <span className="mono text-foreground">{formatBRL(bet.stake)}</span>
         </span>
         <span>
           Lado:{" "}
@@ -305,6 +327,103 @@ function ResolvedBetRow({ bet }: { bet: import("@/hooks/use-bets").OpenBet }) {
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+function footballOutcomeLabel(o: FootballOutcome, bet: FootballOpenBet): string {
+  if (o === "HOME") return bet.homeTeam;
+  if (o === "AWAY") return bet.awayTeam;
+  return copy.football.draw;
+}
+
+function FootballOpenBetRow({ bet }: { bet: FootballOpenBet }) {
+  const pool = { HOME: bet.poolHome, DRAW: bet.poolDraw, AWAY: bet.poolAway };
+  const estPayout = estimatePayout3(pool, bet.outcome, bet.stake);
+  const estPnL = estPayout - bet.stake;
+
+  return (
+    <Link
+      to="/football/$marketId"
+      params={{ marketId: bet.marketId }}
+      className="group block rounded-xl border bg-card/60 p-4 backdrop-blur transition hover:bg-surface/40"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
+            <span>{copy.positions.footballBadge}</span>
+            <StatusPill status={bet.marketStatus} />
+          </div>
+          <div className="mt-0.5 line-clamp-2 text-sm font-medium">
+            {bet.homeTeam} x {bet.awayTeam}
+          </div>
+        </div>
+        <ArrowUpRight className="mt-0.5 size-4 shrink-0 text-muted-foreground/40 group-hover:text-primary" />
+      </div>
+      <div className="mt-3 grid grid-cols-4 gap-2 text-center text-xs">
+        <Stat
+          label="Lado"
+          value={<span className="text-primary">{footballOutcomeLabel(bet.outcome, bet)}</span>}
+        />
+        <Stat label={copy.positions.stakeLabel} value={formatBRL(bet.stake)} />
+        <Stat
+          label={copy.positions.estWin}
+          value={<span className="text-up">{formatBRL(estPayout)}</span>}
+        />
+        <Stat
+          label={copy.positions.estGain}
+          value={
+            <span className={estPnL >= 0 ? "text-up" : "text-down"}>
+              {estPnL >= 0 ? "+" : ""}
+              {formatBRL(estPnL)}
+            </span>
+          }
+        />
+      </div>
+    </Link>
+  );
+}
+
+function FootballResolvedBetRow({ bet }: { bet: FootballOpenBet }) {
+  const isWin = bet.payout != null && bet.payout > 0;
+  return (
+    <div className="rounded-xl border bg-card/60 p-4 backdrop-blur">
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground">
+            {copy.positions.footballBadge}
+          </div>
+          <div className="mt-0.5 line-clamp-1 text-sm">
+            {bet.homeTeam} x {bet.awayTeam}
+          </div>
+        </div>
+        <div
+          className={cn(
+            "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium",
+            isWin ? "bg-up/15 text-up" : "bg-down/15 text-down",
+          )}
+        >
+          {isWin ? "GANHOU" : "PERDEU"}
+        </div>
+      </div>
+      <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
+        <span>
+          {copy.positions.stakeLabel}:{" "}
+          <span className="mono text-foreground">{formatBRL(bet.stake)}</span>
+        </span>
+        <span>
+          Lado:{" "}
+          <span className="mono text-foreground">{footballOutcomeLabel(bet.outcome, bet)}</span>
+        </span>
+        {bet.payout != null && (
+          <span>
+            {copy.positions.payout}{" "}
+            <span className={cn("mono", isWin ? "text-up" : "text-down")}>
+              {formatBRL(bet.payout)}
+            </span>
+          </span>
+        )}
+      </div>
     </div>
   );
 }

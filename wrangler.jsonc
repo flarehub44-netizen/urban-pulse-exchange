@@ -4,6 +4,10 @@
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/server.ts",
+  // Secrets (wrangler secret put): SUPABASE_SERVICE_ROLE_KEY, API_FOOTBALL_KEY, CRON_SECRET
+  "triggers": {
+    "crons": ["*/30 * * * *", "*/5 * * * *"],
+  },
   "vars": {
     "SUPABASE_URL": "https://rzhffxiicufqcabmhscq.supabase.co",
     "SUPABASE_PUBLISHABLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6aGZmeGlpY3VmcWNhYm1oc2NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNjczNzUsImV4cCI6MjA5NDk0MzM3NX0.mZioGLaEUpRhsl0Hdkcj01GysdYA3nOhOMXj7msTMHA",

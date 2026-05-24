@@ -29,9 +29,7 @@ export function TraderArchetypeCard() {
         <div className="mt-3 flex flex-wrap gap-2">
           {data.accuracy > 0 && <Chip label={`${data.accuracy}% de acerto`} />}
           {data.top_region && <Chip label={`📍 ${data.top_region}`} />}
-          {data.total_bets > 0 && (
-            <Chip label={copy.social.traderPredictions(data.total_bets)} />
-          )}
+          {data.total_bets > 0 && <Chip label={copy.social.traderPredictions(data.total_bets)} />}
         </div>
       )}
     </motion.div>

@@ -44,8 +44,7 @@ export const Route = createFileRoute("/api/public/snapshot-proxy/$")({
               headers: CORS_HEADERS,
             });
           }
-          const contentType =
-            upstreamRes.headers.get("content-type") ?? "image/jpeg";
+          const contentType = upstreamRes.headers.get("content-type") ?? "image/jpeg";
           return new Response(upstreamRes.body, {
             status: 200,
             headers: {

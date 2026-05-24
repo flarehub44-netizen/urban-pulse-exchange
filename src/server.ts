@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { runFootballResolve, runFootballSync } from "./lib/football-cron.server";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -66,6 +67,8 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
   return brandedErrorResponse();
 }
 
+type ScheduledContext = { waitUntil: (p: Promise<unknown>) => void };
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
@@ -76,5 +79,24 @@ export default {
       console.error(error);
       return brandedErrorResponse();
     }
+  },
+
+  /** Cloudflare Cron — ver wrangler.jsonc triggers.crons */
+  scheduled(event: { cron?: string }, _env: unknown, ctx: ScheduledContext) {
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return;
+    const cron = event.cron ?? "";
+    ctx.waitUntil(
+      (async () => {
+        try {
+          if (cron === "*/30 * * * *") {
+            await runFootballSync();
+          } else if (cron === "*/5 * * * *") {
+            await runFootballResolve();
+          }
+        } catch (e) {
+          console.error("[FootballCron]", cron, e);
+        }
+      })(),
+    );
   },
 };

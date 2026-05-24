@@ -9,11 +9,15 @@ export type NotificationLink =
       search?: { status?: "all" | "live" | "closing" | "dispute" | "resolved" | "draft" };
     }
   | { to: "/markets/$marketId"; params: { marketId: string } }
+  | { to: "/football/$marketId"; params: { marketId: string } }
   | { to: "/live" }
   | null;
 
 /** Resolve navigation target from notification kind + optional marketId */
 export function getNotificationLink(n: ViaXNotification): NotificationLink {
+  if (n.marketId?.startsWith("fb-")) {
+    return { to: "/football/$marketId", params: { marketId: n.marketId } };
+  }
   if (n.marketId) {
     return { to: "/markets/$marketId", params: { marketId: n.marketId } };
   }
@@ -28,6 +32,9 @@ export function getNotificationLink(n: ViaXNotification): NotificationLink {
       return { to: "/markets", search: { status: "live" } };
     case "alert":
     case "closing":
+      if (n.marketId?.startsWith("fb-")) {
+        return { to: "/football/$marketId", params: { marketId: n.marketId } };
+      }
       return n.marketId
         ? { to: "/markets/$marketId", params: { marketId: n.marketId } }
         : { to: "/live" };

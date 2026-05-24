@@ -288,10 +288,7 @@ function SnapshotImage({
       <img
         src={src}
         alt={copy.cameras.previewAlt}
-        className={cn(
-          "aspect-video w-full rounded-lg border object-cover",
-          maxHeightClass,
-        )}
+        className={cn("aspect-video w-full rounded-lg border object-cover", maxHeightClass)}
         onLoad={onLoad}
         onError={onError}
       />

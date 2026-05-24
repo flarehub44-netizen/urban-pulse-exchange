@@ -18,10 +18,7 @@ function b64urlDecode(s: string): string {
   return atob(padded);
 }
 
-function isAllowedUpstreamUrl(
-  allowedHosts: string[],
-  urlStr: string,
-): boolean {
+function isAllowedUpstreamUrl(allowedHosts: string[], urlStr: string): boolean {
   try {
     const parsed = new URL(urlStr);
     if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return false;
@@ -43,9 +40,7 @@ function rewritePlaylist(playlist: string, slug: string, playlistUrl: string): s
       return uri;
     }
     const encoded = b64urlEncode(absolute);
-    return isPlaylist
-      ? `${proxyOrigin}/sub?u=${encoded}`
-      : `${proxyOrigin}/seg?u=${encoded}`;
+    return isPlaylist ? `${proxyOrigin}/sub?u=${encoded}` : `${proxyOrigin}/seg?u=${encoded}`;
   };
 
   const lines = playlist.split(/\r?\n/);

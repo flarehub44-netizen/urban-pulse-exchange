@@ -13,6 +13,7 @@ import {
   Briefcase,
   Bell,
   Shield,
+  Flag,
 } from "lucide-react";
 
 export type NavSearch = Record<string, string>;
@@ -31,6 +32,7 @@ export type NavItem = {
 export const sidebarNav: NavItem[] = [
   { to: "/dashboard", label: copy.nav.home, icon: LayoutDashboard },
   { to: "/markets", label: copy.nav.markets, icon: Radio, matchPrefix: true },
+  { to: "/football", label: copy.nav.football, icon: Flag, matchPrefix: true },
   { to: "/live", label: copy.nav.live, icon: Map },
   { to: "/ranking", label: copy.nav.ranking, icon: Trophy },
   { to: "/feed", label: copy.nav.feed, icon: MessageSquare },
@@ -62,6 +64,7 @@ export const bottomNavPrimary: NavItem[] = [
 
 /** Secondary routes in mobile "Mais" sheet */
 export const bottomNavMore: NavItem[] = [
+  { to: "/football", label: copy.nav.football, icon: Flag, matchPrefix: true },
   { to: "/ranking", label: copy.nav.ranking, icon: Trophy },
   { to: "/feed", label: copy.nav.feed, icon: MessageSquare },
   { to: "/notifications", label: copy.nav.notifications, icon: Bell },

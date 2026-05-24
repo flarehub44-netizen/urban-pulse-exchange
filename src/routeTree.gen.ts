@@ -35,6 +35,7 @@ import { Route as AdminRiskRouteImport } from './routes/admin/risk'
 import { Route as AdminPartnersRouteImport } from './routes/admin/partners'
 import { Route as AdminMarketsRouteImport } from './routes/admin/markets'
 import { Route as AdminIntelligenceRouteImport } from './routes/admin/intelligence'
+import { Route as AdminFootballRouteImport } from './routes/admin/football'
 import { Route as AdminFinanceRouteImport } from './routes/admin/finance'
 import { Route as AppWalletRouteImport } from './routes/_app/wallet'
 import { Route as AppUrbanmindRouteImport } from './routes/_app/urbanmind'
@@ -49,9 +50,13 @@ import { Route as AppLeaguesRouteImport } from './routes/_app/leagues'
 import { Route as AppFeedRouteImport } from './routes/_app/feed'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppMarketsIndexRouteImport } from './routes/_app/markets.index'
+import { Route as AppFootballIndexRouteImport } from './routes/_app/football/index'
 import { Route as ApiWebhooksSyncpayRouteImport } from './routes/api/webhooks/syncpay'
+import { Route as ApiCronFootballSyncRouteImport } from './routes/api/cron/football-sync'
+import { Route as ApiCronFootballResolveRouteImport } from './routes/api/cron/football-resolve'
 import { Route as AppProfileUserIdRouteImport } from './routes/_app/profile.$userId'
 import { Route as AppMarketsMarketIdRouteImport } from './routes/_app/markets.$marketId'
+import { Route as AppFootballMarketIdRouteImport } from './routes/_app/football/$marketId'
 import { Route as AppFeedPostIdRouteImport } from './routes/_app/feed.$postId'
 import { Route as ApiPublicSnapshotProxySplatRouteImport } from './routes/api/public/snapshot-proxy/$'
 import { Route as ApiPublicHlsProxySplatRouteImport } from './routes/api/public/hls-proxy/$'
@@ -185,6 +190,11 @@ const AdminIntelligenceRoute = AdminIntelligenceRouteImport.update({
   path: '/intelligence',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminFootballRoute = AdminFootballRouteImport.update({
+  id: '/football',
+  path: '/football',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminFinanceRoute = AdminFinanceRouteImport.update({
   id: '/finance',
   path: '/finance',
@@ -255,9 +265,24 @@ const AppMarketsIndexRoute = AppMarketsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppMarketsRoute,
 } as any)
+const AppFootballIndexRoute = AppFootballIndexRouteImport.update({
+  id: '/football/',
+  path: '/football/',
+  getParentRoute: () => AppRoute,
+} as any)
 const ApiWebhooksSyncpayRoute = ApiWebhooksSyncpayRouteImport.update({
   id: '/api/webhooks/syncpay',
   path: '/api/webhooks/syncpay',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCronFootballSyncRoute = ApiCronFootballSyncRouteImport.update({
+  id: '/api/cron/football-sync',
+  path: '/api/cron/football-sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCronFootballResolveRoute = ApiCronFootballResolveRouteImport.update({
+  id: '/api/cron/football-resolve',
+  path: '/api/cron/football-resolve',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppProfileUserIdRoute = AppProfileUserIdRouteImport.update({
@@ -269,6 +294,11 @@ const AppMarketsMarketIdRoute = AppMarketsMarketIdRouteImport.update({
   id: '/$marketId',
   path: '/$marketId',
   getParentRoute: () => AppMarketsRoute,
+} as any)
+const AppFootballMarketIdRoute = AppFootballMarketIdRouteImport.update({
+  id: '/football/$marketId',
+  path: '/football/$marketId',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppFeedPostIdRoute = AppFeedPostIdRouteImport.update({
   id: '/$postId',
@@ -305,6 +335,7 @@ export interface FileRoutesByFullPath {
   '/urbanmind': typeof AppUrbanmindRoute
   '/wallet': typeof AppWalletRoute
   '/admin/finance': typeof AdminFinanceRoute
+  '/admin/football': typeof AdminFootballRoute
   '/admin/intelligence': typeof AdminIntelligenceRoute
   '/admin/markets': typeof AdminMarketsRoute
   '/admin/partners': typeof AdminPartnersRoute
@@ -327,9 +358,13 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/partner/': typeof PartnerIndexRoute
   '/feed/$postId': typeof AppFeedPostIdRoute
+  '/football/$marketId': typeof AppFootballMarketIdRoute
   '/markets/$marketId': typeof AppMarketsMarketIdRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
+  '/api/cron/football-resolve': typeof ApiCronFootballResolveRoute
+  '/api/cron/football-sync': typeof ApiCronFootballSyncRoute
   '/api/webhooks/syncpay': typeof ApiWebhooksSyncpayRoute
+  '/football/': typeof AppFootballIndexRoute
   '/markets/': typeof AppMarketsIndexRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
   '/api/public/snapshot-proxy/$': typeof ApiPublicSnapshotProxySplatRoute
@@ -349,6 +384,7 @@ export interface FileRoutesByTo {
   '/urbanmind': typeof AppUrbanmindRoute
   '/wallet': typeof AppWalletRoute
   '/admin/finance': typeof AdminFinanceRoute
+  '/admin/football': typeof AdminFootballRoute
   '/admin/intelligence': typeof AdminIntelligenceRoute
   '/admin/markets': typeof AdminMarketsRoute
   '/admin/partners': typeof AdminPartnersRoute
@@ -371,9 +407,13 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/partner': typeof PartnerIndexRoute
   '/feed/$postId': typeof AppFeedPostIdRoute
+  '/football/$marketId': typeof AppFootballMarketIdRoute
   '/markets/$marketId': typeof AppMarketsMarketIdRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
+  '/api/cron/football-resolve': typeof ApiCronFootballResolveRoute
+  '/api/cron/football-sync': typeof ApiCronFootballSyncRoute
   '/api/webhooks/syncpay': typeof ApiWebhooksSyncpayRoute
+  '/football': typeof AppFootballIndexRoute
   '/markets': typeof AppMarketsIndexRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
   '/api/public/snapshot-proxy/$': typeof ApiPublicSnapshotProxySplatRoute
@@ -398,6 +438,7 @@ export interface FileRoutesById {
   '/_app/urbanmind': typeof AppUrbanmindRoute
   '/_app/wallet': typeof AppWalletRoute
   '/admin/finance': typeof AdminFinanceRoute
+  '/admin/football': typeof AdminFootballRoute
   '/admin/intelligence': typeof AdminIntelligenceRoute
   '/admin/markets': typeof AdminMarketsRoute
   '/admin/partners': typeof AdminPartnersRoute
@@ -420,9 +461,13 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/partner/': typeof PartnerIndexRoute
   '/_app/feed/$postId': typeof AppFeedPostIdRoute
+  '/_app/football/$marketId': typeof AppFootballMarketIdRoute
   '/_app/markets/$marketId': typeof AppMarketsMarketIdRoute
   '/_app/profile/$userId': typeof AppProfileUserIdRoute
+  '/api/cron/football-resolve': typeof ApiCronFootballResolveRoute
+  '/api/cron/football-sync': typeof ApiCronFootballSyncRoute
   '/api/webhooks/syncpay': typeof ApiWebhooksSyncpayRoute
+  '/_app/football/': typeof AppFootballIndexRoute
   '/_app/markets/': typeof AppMarketsIndexRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
   '/api/public/snapshot-proxy/$': typeof ApiPublicSnapshotProxySplatRoute
@@ -447,6 +492,7 @@ export interface FileRouteTypes {
     | '/urbanmind'
     | '/wallet'
     | '/admin/finance'
+    | '/admin/football'
     | '/admin/intelligence'
     | '/admin/markets'
     | '/admin/partners'
@@ -469,9 +515,13 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/partner/'
     | '/feed/$postId'
+    | '/football/$marketId'
     | '/markets/$marketId'
     | '/profile/$userId'
+    | '/api/cron/football-resolve'
+    | '/api/cron/football-sync'
     | '/api/webhooks/syncpay'
+    | '/football/'
     | '/markets/'
     | '/api/public/hls-proxy/$'
     | '/api/public/snapshot-proxy/$'
@@ -491,6 +541,7 @@ export interface FileRouteTypes {
     | '/urbanmind'
     | '/wallet'
     | '/admin/finance'
+    | '/admin/football'
     | '/admin/intelligence'
     | '/admin/markets'
     | '/admin/partners'
@@ -513,9 +564,13 @@ export interface FileRouteTypes {
     | '/admin'
     | '/partner'
     | '/feed/$postId'
+    | '/football/$marketId'
     | '/markets/$marketId'
     | '/profile/$userId'
+    | '/api/cron/football-resolve'
+    | '/api/cron/football-sync'
     | '/api/webhooks/syncpay'
+    | '/football'
     | '/markets'
     | '/api/public/hls-proxy/$'
     | '/api/public/snapshot-proxy/$'
@@ -539,6 +594,7 @@ export interface FileRouteTypes {
     | '/_app/urbanmind'
     | '/_app/wallet'
     | '/admin/finance'
+    | '/admin/football'
     | '/admin/intelligence'
     | '/admin/markets'
     | '/admin/partners'
@@ -561,9 +617,13 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/partner/'
     | '/_app/feed/$postId'
+    | '/_app/football/$marketId'
     | '/_app/markets/$marketId'
     | '/_app/profile/$userId'
+    | '/api/cron/football-resolve'
+    | '/api/cron/football-sync'
     | '/api/webhooks/syncpay'
+    | '/_app/football/'
     | '/_app/markets/'
     | '/api/public/hls-proxy/$'
     | '/api/public/snapshot-proxy/$'
@@ -576,6 +636,8 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   RSlugRoute: typeof RSlugRoute
+  ApiCronFootballResolveRoute: typeof ApiCronFootballResolveRoute
+  ApiCronFootballSyncRoute: typeof ApiCronFootballSyncRoute
   ApiWebhooksSyncpayRoute: typeof ApiWebhooksSyncpayRoute
   ApiPublicHlsProxySplatRoute: typeof ApiPublicHlsProxySplatRoute
   ApiPublicSnapshotProxySplatRoute: typeof ApiPublicSnapshotProxySplatRoute
@@ -765,6 +827,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIntelligenceRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/football': {
+      id: '/admin/football'
+      path: '/football'
+      fullPath: '/admin/football'
+      preLoaderRoute: typeof AdminFootballRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/finance': {
       id: '/admin/finance'
       path: '/finance'
@@ -863,11 +932,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMarketsIndexRouteImport
       parentRoute: typeof AppMarketsRoute
     }
+    '/_app/football/': {
+      id: '/_app/football/'
+      path: '/football'
+      fullPath: '/football/'
+      preLoaderRoute: typeof AppFootballIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/api/webhooks/syncpay': {
       id: '/api/webhooks/syncpay'
       path: '/api/webhooks/syncpay'
       fullPath: '/api/webhooks/syncpay'
       preLoaderRoute: typeof ApiWebhooksSyncpayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cron/football-sync': {
+      id: '/api/cron/football-sync'
+      path: '/api/cron/football-sync'
+      fullPath: '/api/cron/football-sync'
+      preLoaderRoute: typeof ApiCronFootballSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cron/football-resolve': {
+      id: '/api/cron/football-resolve'
+      path: '/api/cron/football-resolve'
+      fullPath: '/api/cron/football-resolve'
+      preLoaderRoute: typeof ApiCronFootballResolveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/profile/$userId': {
@@ -883,6 +973,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/markets/$marketId'
       preLoaderRoute: typeof AppMarketsMarketIdRouteImport
       parentRoute: typeof AppMarketsRoute
+    }
+    '/_app/football/$marketId': {
+      id: '/_app/football/$marketId'
+      path: '/football/$marketId'
+      fullPath: '/football/$marketId'
+      preLoaderRoute: typeof AppFootballMarketIdRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_app/feed/$postId': {
       id: '/_app/feed/$postId'
@@ -910,6 +1007,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteRouteChildren {
   AdminFinanceRoute: typeof AdminFinanceRoute
+  AdminFootballRoute: typeof AdminFootballRoute
   AdminIntelligenceRoute: typeof AdminIntelligenceRoute
   AdminMarketsRoute: typeof AdminMarketsRoute
   AdminPartnersRoute: typeof AdminPartnersRoute
@@ -924,6 +1022,7 @@ interface AdminRouteRouteChildren {
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminFinanceRoute: AdminFinanceRoute,
+  AdminFootballRoute: AdminFootballRoute,
   AdminIntelligenceRoute: AdminIntelligenceRoute,
   AdminMarketsRoute: AdminMarketsRoute,
   AdminPartnersRoute: AdminPartnersRoute,
@@ -1020,6 +1119,8 @@ interface AppRouteChildren {
   AppSettingsRoute: typeof AppSettingsRoute
   AppUrbanmindRoute: typeof AppUrbanmindRoute
   AppWalletRoute: typeof AppWalletRoute
+  AppFootballMarketIdRoute: typeof AppFootballMarketIdRoute
+  AppFootballIndexRoute: typeof AppFootballIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -1035,6 +1136,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppSettingsRoute: AppSettingsRoute,
   AppUrbanmindRoute: AppUrbanmindRoute,
   AppWalletRoute: AppWalletRoute,
+  AppFootballMarketIdRoute: AppFootballMarketIdRoute,
+  AppFootballIndexRoute: AppFootballIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -1046,6 +1149,8 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   RSlugRoute: RSlugRoute,
+  ApiCronFootballResolveRoute: ApiCronFootballResolveRoute,
+  ApiCronFootballSyncRoute: ApiCronFootballSyncRoute,
   ApiWebhooksSyncpayRoute: ApiWebhooksSyncpayRoute,
   ApiPublicHlsProxySplatRoute: ApiPublicHlsProxySplatRoute,
   ApiPublicSnapshotProxySplatRoute: ApiPublicSnapshotProxySplatRoute,
@@ -1053,3 +1158,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

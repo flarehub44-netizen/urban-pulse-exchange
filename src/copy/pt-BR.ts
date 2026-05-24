@@ -15,9 +15,14 @@
 import type { Side } from "@/store/viax-store";
 
 export const copy = {
+  common: {
+    loading: "Carregando…",
+  },
+
   nav: {
     home: "Início",
     markets: "Mercados",
+    football: "Futebol",
     live: "Ao vivo",
     ranking: "Ranking",
     feed: "Feed",
@@ -29,6 +34,36 @@ export const copy = {
     wallet: "Carteira",
     more: "Mais",
     backToApp: "Voltar ao app",
+  },
+
+  football: {
+    metaTitle: "Futebol · ViaX",
+    metaDescription: "Preveja o resultado de jogos: vitória do mandante, empate ou visitante.",
+    title: "Futebol",
+    subtitle: "Mercados 1X2 aprovados pela equipe ViaX.",
+    disabled: "Mercados de futebol estão temporariamente desativados.",
+    emptyTitle: "Nenhum jogo aberto",
+    emptyDesc: "Novos jogos aparecem aqui após aprovação da equipe.",
+    backUrban: "Ver mercados urbanos",
+    backList: "Voltar aos jogos",
+    notFound: "Mercado não encontrado.",
+    leagueLabel: "Liga",
+    home: "Casa",
+    draw: "Empate",
+    away: "Fora",
+    poolTotal: "Prêmio no mercado",
+    participants: "participantes",
+    placeBet: "Fazer previsão",
+    stake: "Valor (BRL)",
+    estPayout: "Retorno estimado",
+    confirmBet: "Confirmar previsão",
+    betSuccess: "Previsão registrada!",
+    loginRequired: "Entre na conta para prever.",
+    bettingClosed: "Apostas encerradas para este jogo.",
+    settled: "Mercado liquidado:",
+    insufficientBalance: "Saldo insuficiente.",
+    errorGeneric: "Não foi possível registrar a previsão.",
+    placing: "Processando…",
   },
 
   landing: {
@@ -134,8 +169,7 @@ export const copy = {
   },
 
   ia: {
-    badgeTooltip:
-      "Compara a previsão da UrbanMind com o que as pessoas já previram neste mercado.",
+    badgeTooltip: "Compara a previsão da UrbanMind com o que as pessoas já previram neste mercado.",
     filterLabel: "Com dica da IA",
     neutral: (side: Side) => `IA em dúvida · ${side === "YES" ? "SIM" : "NÃO"}`,
     favors: (side: Side) => `A IA indica ${side === "YES" ? "SIM" : "NÃO"}`,
@@ -209,8 +243,7 @@ export const copy = {
 
   positions: {
     title: "Minhas previsões",
-    subtitle:
-      "Previsões em andamento com ganho estimado · histórico dos mercados já encerrados.",
+    subtitle: "Previsões em andamento com ganho estimado · histórico dos mercados já encerrados.",
     openCount: "Previsões abertas",
     totalOpen: "Total em jogo",
     estimatedGain: "Ganho estimado",
@@ -220,6 +253,7 @@ export const copy = {
     explore: "Explorar mercados",
     payout: "Ganho:",
     stakeLabel: "Participação",
+    footballBadge: "Futebol",
     lostAnalysisTitle: "Análise da previsão perdida",
     lostAnalysisLine: "Você previu",
   },
@@ -298,8 +332,7 @@ export const copy = {
     auditNoSnapshots: "Sem snapshots na janela.",
     auditLedger: "Taxa da plataforma (ledger)",
     auditRaw: "Valor medido",
-    closingSoon: (mins: number) =>
-      `Últimos ${Math.ceil(mins)} min — previsões encerram em breve!`,
+    closingSoon: (mins: number) => `Últimos ${Math.ceil(mins)} min — previsões encerram em breve!`,
   },
 
   marketCard: {
@@ -584,6 +617,45 @@ export const copy = {
       system: "Sistema",
       simulator: "Simulador",
       partners: "Creators",
+      football: "Futebol",
+    },
+    football: {
+      title: "Futebol · API-Sports",
+      subtitle: "Sincronização automática · publicação manual",
+      tabPending: "Pendentes",
+      tabDrafts: "Rascunhos",
+      tabPublished: "Publicados",
+      tabSettings: "Configuração",
+      emptyPending: "Nenhum jogo aguardando aprovação.",
+      emptyDrafts: "Nenhum mercado em rascunho.",
+      emptyPublished: "Nenhum mercado publicado ou liquidado.",
+      void: "Anular mercado",
+      voidDone: "Mercado anulado — apostas reembolsadas.",
+      regulationHint:
+        "Resultado: placar final reportado pela API (FT/AET). Com football_regulation=90min no banco, o sync usa o placar do intervalo regulamentar quando disponível.",
+      approve: "Aprovar",
+      reject: "Rejeitar",
+      publish: "Publicar",
+      approved: "Jogo aprovado — mercado em rascunho.",
+      rejected: "Jogo rejeitado.",
+      published: "Mercado publicado — apostas abertas.",
+      enabledLabel: "Ativo",
+      leaguesLabel: "IDs de ligas (API-Sports)",
+      settingsHint: "IDs numéricos da API-Sports (ex.: 71 = Brasileirão).",
+      leaguesHint: "Separados por vírgula.",
+      syncDaysLabel: "Dias à frente no sync",
+      closeMinutesLabel: "Minutos antes do apito para fechar apostas",
+      saveSettings: "Salvar configuração",
+      settingsSaved: "Configuração de futebol salva.",
+      syncNow: "Sincronizar API agora",
+      resolveNow: "Liquidar jogos finalizados",
+      syncDone: "Sync concluído — veja a fila Pendentes.",
+      resolveDone: "Resolução executada.",
+      syncFailed: "Falha no sync (verifique API_FOOTBALL_KEY no servidor).",
+      resolveFailed: "Falha na resolução.",
+      cronHint: "Produção: cron Cloudflare */30 sync e */5 resolve (wrangler.jsonc).",
+      yes: "Sim",
+      no: "Não",
     },
     partners: {
       title: "Fila Creator",

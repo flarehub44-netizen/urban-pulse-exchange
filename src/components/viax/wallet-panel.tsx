@@ -135,9 +135,7 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
           <h1 className="heading-page text-2xl">
             <span className="text-highlight">Carteira</span>
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {copy.wallet.subtitle}
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">{copy.wallet.subtitle}</p>
         </div>
       )}
 

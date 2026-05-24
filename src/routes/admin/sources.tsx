@@ -27,10 +27,7 @@ export const Route = createFileRoute("/admin/sources")({
 function AdminSourcesPage() {
   const { data: cameras, isError: camErr, refetch: refetchCam } = useAdminCameras();
   const { data: healthRows } = useAdminCameraHealth();
-  const healthById = useMemo(
-    () => new Map((healthRows ?? []).map((h) => [h.id, h])),
-    [healthRows],
-  );
+  const healthById = useMemo(() => new Map((healthRows ?? []).map((h) => [h.id, h])), [healthRows]);
   const { data: oracle } = useAdminOracleHealth();
   const { data: regions } = useRegions();
   const { mutateAsync: upsertCamera } = useAdminUpsertCamera();
@@ -175,7 +172,6 @@ function AdminSourcesPage() {
           </button>
         </div>
         <p className="mt-2 text-[10px] text-muted-foreground">{preset.description}</p>
-
 
         <ul className="mt-4 space-y-2">
           {(cameras ?? []).map((c) => (
