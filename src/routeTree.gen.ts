@@ -53,6 +53,7 @@ import { Route as ApiWebhooksSyncpayRouteImport } from './routes/api/webhooks/sy
 import { Route as AppProfileUserIdRouteImport } from './routes/_app/profile.$userId'
 import { Route as AppMarketsMarketIdRouteImport } from './routes/_app/markets.$marketId'
 import { Route as AppFeedPostIdRouteImport } from './routes/_app/feed.$postId'
+import { Route as ApiPublicSnapshotProxySplatRouteImport } from './routes/api/public/snapshot-proxy/$'
 import { Route as ApiPublicHlsProxySplatRouteImport } from './routes/api/public/hls-proxy/$'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -274,6 +275,12 @@ const AppFeedPostIdRoute = AppFeedPostIdRouteImport.update({
   path: '/$postId',
   getParentRoute: () => AppFeedRoute,
 } as any)
+const ApiPublicSnapshotProxySplatRoute =
+  ApiPublicSnapshotProxySplatRouteImport.update({
+    id: '/api/public/snapshot-proxy/$',
+    path: '/api/public/snapshot-proxy/$',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHlsProxySplatRoute = ApiPublicHlsProxySplatRouteImport.update({
   id: '/api/public/hls-proxy/$',
   path: '/api/public/hls-proxy/$',
@@ -325,6 +332,7 @@ export interface FileRoutesByFullPath {
   '/api/webhooks/syncpay': typeof ApiWebhooksSyncpayRoute
   '/markets/': typeof AppMarketsIndexRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
+  '/api/public/snapshot-proxy/$': typeof ApiPublicSnapshotProxySplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -368,6 +376,7 @@ export interface FileRoutesByTo {
   '/api/webhooks/syncpay': typeof ApiWebhooksSyncpayRoute
   '/markets': typeof AppMarketsIndexRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
+  '/api/public/snapshot-proxy/$': typeof ApiPublicSnapshotProxySplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -416,6 +425,7 @@ export interface FileRoutesById {
   '/api/webhooks/syncpay': typeof ApiWebhooksSyncpayRoute
   '/_app/markets/': typeof AppMarketsIndexRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
+  '/api/public/snapshot-proxy/$': typeof ApiPublicSnapshotProxySplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -464,6 +474,7 @@ export interface FileRouteTypes {
     | '/api/webhooks/syncpay'
     | '/markets/'
     | '/api/public/hls-proxy/$'
+    | '/api/public/snapshot-proxy/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -507,6 +518,7 @@ export interface FileRouteTypes {
     | '/api/webhooks/syncpay'
     | '/markets'
     | '/api/public/hls-proxy/$'
+    | '/api/public/snapshot-proxy/$'
   id:
     | '__root__'
     | '/'
@@ -554,6 +566,7 @@ export interface FileRouteTypes {
     | '/api/webhooks/syncpay'
     | '/_app/markets/'
     | '/api/public/hls-proxy/$'
+    | '/api/public/snapshot-proxy/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -565,6 +578,7 @@ export interface RootRouteChildren {
   RSlugRoute: typeof RSlugRoute
   ApiWebhooksSyncpayRoute: typeof ApiWebhooksSyncpayRoute
   ApiPublicHlsProxySplatRoute: typeof ApiPublicHlsProxySplatRoute
+  ApiPublicSnapshotProxySplatRoute: typeof ApiPublicSnapshotProxySplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -877,6 +891,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFeedPostIdRouteImport
       parentRoute: typeof AppFeedRoute
     }
+    '/api/public/snapshot-proxy/$': {
+      id: '/api/public/snapshot-proxy/$'
+      path: '/api/public/snapshot-proxy/$'
+      fullPath: '/api/public/snapshot-proxy/$'
+      preLoaderRoute: typeof ApiPublicSnapshotProxySplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hls-proxy/$': {
       id: '/api/public/hls-proxy/$'
       path: '/api/public/hls-proxy/$'
@@ -1027,6 +1048,7 @@ const rootRouteChildren: RootRouteChildren = {
   RSlugRoute: RSlugRoute,
   ApiWebhooksSyncpayRoute: ApiWebhooksSyncpayRoute,
   ApiPublicHlsProxySplatRoute: ApiPublicHlsProxySplatRoute,
+  ApiPublicSnapshotProxySplatRoute: ApiPublicSnapshotProxySplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
