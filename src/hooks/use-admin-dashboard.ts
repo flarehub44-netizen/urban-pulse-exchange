@@ -534,3 +534,23 @@ export function useAdminUpsertCamera() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "cameras"] }),
   });
 }
+
+export function useAdminCreateCameraUpstream() {
+  return useMutation({
+    mutationFn: async (args: {
+      provider: "der-sp" | "cet-sp" | "motiva" | "custom";
+      upstreamUrl: string;
+      label?: string;
+      kind?: "hls" | "image";
+    }) => {
+      const { data, error } = await supabase.rpc("admin_create_camera_upstream", {
+        p_provider: args.provider,
+        p_upstream_url: args.upstreamUrl,
+        p_label: args.label ?? null,
+        p_kind: args.kind ?? "hls",
+      });
+      if (error) throw error;
+      return data as { slug: string; proxy_path: string };
+    },
+  });
+}

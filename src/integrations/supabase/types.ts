@@ -234,6 +234,42 @@ export type Database = {
           },
         ]
       }
+      camera_upstreams: {
+        Row: {
+          allowed_hosts: string[]
+          created_at: string
+          created_by: string | null
+          headers: Json
+          kind: string
+          label: string | null
+          provider: string
+          slug: string
+          upstream_url: string
+        }
+        Insert: {
+          allowed_hosts: string[]
+          created_at?: string
+          created_by?: string | null
+          headers?: Json
+          kind?: string
+          label?: string | null
+          provider: string
+          slug: string
+          upstream_url: string
+        }
+        Update: {
+          allowed_hosts?: string[]
+          created_at?: string
+          created_by?: string | null
+          headers?: Json
+          kind?: string
+          label?: string | null
+          provider?: string
+          slug?: string
+          upstream_url?: string
+        }
+        Relationships: []
+      }
       cameras: {
         Row: {
           count_line: Json | null
@@ -2335,6 +2371,15 @@ export type Database = {
         Args: { p_slug?: string; p_tier?: string; p_user_id: string }
         Returns: Json
       }
+      admin_create_camera_upstream: {
+        Args: {
+          p_kind?: string
+          p_label?: string
+          p_provider: string
+          p_upstream_url: string
+        }
+        Returns: Json
+      }
       admin_extend_market: {
         Args: { p_extra_hours?: number; p_market_id: string }
         Returns: Json
@@ -2486,6 +2531,17 @@ export type Database = {
       get_camera_region_raw: {
         Args: { p_metric: string; p_region_id: string }
         Returns: number
+      }
+      get_camera_upstream: {
+        Args: { p_slug: string }
+        Returns: {
+          allowed_hosts: string[]
+          headers: Json
+          kind: string
+          provider: string
+          slug: string
+          upstream_url: string
+        }[]
       }
       get_daily_missions: { Args: never; Returns: Json }
       get_following_trader_ids: { Args: never; Returns: string[] }

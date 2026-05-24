@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getUpstream } from "@/lib/hls-upstream-map";
+import { getUpstream } from "@/lib/hls-upstream-map.server";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -10,7 +10,6 @@ const CORS_HEADERS = {
 };
 
 function b64urlEncode(s: string): string {
-  // btoa is available in Workers/Web runtime
   return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
@@ -19,26 +18,19 @@ function b64urlDecode(s: string): string {
   return atob(padded);
 }
 
-function isAllowedUpstreamUrl(slug: string, urlStr: string): boolean {
-  const u = getUpstream(slug);
-  if (!u) return false;
+function isAllowedUpstreamUrl(
+  allowedHosts: string[],
+  urlStr: string,
+): boolean {
   try {
     const parsed = new URL(urlStr);
     if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return false;
-    return u.allowedHosts.includes(parsed.hostname);
+    return allowedHosts.includes(parsed.hostname);
   } catch {
     return false;
   }
 }
 
-/**
- * Rewrites an HLS playlist so all segment URIs go back through this proxy.
- * Handles:
- * - Plain URI lines (after #EXTINF)
- * - #EXT-X-MAP:URI="..."
- * - #EXT-X-KEY:...,URI="..."
- * - Variant playlists (master m3u8 referencing other m3u8 files)
- */
 function rewritePlaylist(playlist: string, slug: string, playlistUrl: string): string {
   const base = new URL(playlistUrl);
   const proxyOrigin = `/api/public/hls-proxy/${slug}`;
@@ -65,14 +57,12 @@ function rewritePlaylist(playlist: string, slug: string, playlistUrl: string): s
       continue;
     }
     if (line.startsWith("#")) {
-      // Rewrite URI="..." attributes inside tags
       const rewritten = line.replace(/URI="([^"]+)"/g, (_m, uri: string) => {
         const isPlaylist = /\.m3u8(\?|$)/i.test(uri);
         return `URI="${toProxied(uri, isPlaylist)}"`;
       });
       out.push(rewritten);
     } else {
-      // URI line (segment or sub-playlist)
       const isPlaylist = /\.m3u8(\?|$)/i.test(line);
       out.push(toProxied(line, isPlaylist));
     }
@@ -81,14 +71,12 @@ function rewritePlaylist(playlist: string, slug: string, playlistUrl: string): s
   return out.join("\n");
 }
 
-async function fetchPlaylist(slug: string, playlistUrl: string): Promise<Response> {
-  const u = getUpstream(slug);
-  if (!u) return new Response("Unknown camera", { status: 404, headers: CORS_HEADERS });
-
-  const upstream = await fetch(playlistUrl, {
-    method: "GET",
-    headers: u.headers,
-  });
+async function fetchPlaylist(
+  slug: string,
+  playlistUrl: string,
+  headers: Record<string, string>,
+): Promise<Response> {
+  const upstream = await fetch(playlistUrl, { method: "GET", headers });
   if (!upstream.ok) {
     return new Response(`Upstream error: ${upstream.status}`, {
       status: 502,
@@ -108,15 +96,12 @@ async function fetchPlaylist(slug: string, playlistUrl: string): Promise<Respons
 }
 
 async function fetchSegment(
-  slug: string,
   upstreamUrl: string,
+  upstreamHeaders: Record<string, string>,
   request: Request,
 ): Promise<Response> {
-  const u = getUpstream(slug);
-  if (!u) return new Response("Unknown camera", { status: 404, headers: CORS_HEADERS });
-
   const range = request.headers.get("Range");
-  const headers: Record<string, string> = { ...u.headers };
+  const headers: Record<string, string> = { ...upstreamHeaders };
   if (range) headers["Range"] = range;
 
   const upstream = await fetch(upstreamUrl, { method: "GET", headers });
@@ -155,25 +140,24 @@ export const Route = createFileRoute("/api/public/hls-proxy/$")({
       GET: async ({ request, params }) => {
         const splat = (params as { _splat?: string })._splat ?? "";
         const [slug, ...rest] = splat.split("/");
-        const action = rest.join("/"); // "index.m3u8" | "seg" | "sub"
+        const action = rest.join("/");
 
         if (!slug) {
           return new Response("Missing camera slug", { status: 400, headers: CORS_HEADERS });
         }
 
-        const upstream = getUpstream(slug);
+        const upstream = await getUpstream(slug);
         if (!upstream) {
           return new Response("Unknown camera", { status: 404, headers: CORS_HEADERS });
         }
 
         const url = new URL(request.url);
 
-        // Master/main playlist request
-        if (action === "index.m3u8" || action === "") {
-          return fetchPlaylist(slug, upstream.playlistUrl);
+        // Root playlist: empty, or any *.m3u8 (index.m3u8, stream.m3u8, etc.)
+        if (action === "" || /\.m3u8$/i.test(action)) {
+          return fetchPlaylist(slug, upstream.playlistUrl, upstream.headers);
         }
 
-        // Nested playlist (variant) — URL passed in ?u=
         if (action === "sub") {
           const encoded = url.searchParams.get("u");
           if (!encoded) {
@@ -185,13 +169,12 @@ export const Route = createFileRoute("/api/public/hls-proxy/$")({
           } catch {
             return new Response("Bad u param", { status: 400, headers: CORS_HEADERS });
           }
-          if (!isAllowedUpstreamUrl(slug, target)) {
+          if (!isAllowedUpstreamUrl(upstream.allowedHosts, target)) {
             return new Response("Upstream not allowed", { status: 403, headers: CORS_HEADERS });
           }
-          return fetchPlaylist(slug, target);
+          return fetchPlaylist(slug, target, upstream.headers);
         }
 
-        // Segment fetch
         if (action === "seg") {
           const encoded = url.searchParams.get("u");
           if (!encoded) {
@@ -203,10 +186,10 @@ export const Route = createFileRoute("/api/public/hls-proxy/$")({
           } catch {
             return new Response("Bad u param", { status: 400, headers: CORS_HEADERS });
           }
-          if (!isAllowedUpstreamUrl(slug, target)) {
+          if (!isAllowedUpstreamUrl(upstream.allowedHosts, target)) {
             return new Response("Upstream not allowed", { status: 403, headers: CORS_HEADERS });
           }
-          return fetchSegment(slug, target, request);
+          return fetchSegment(target, upstream.headers, request);
         }
 
         return new Response("Not found", { status: 404, headers: CORS_HEADERS });

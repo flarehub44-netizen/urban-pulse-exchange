@@ -6,6 +6,7 @@ import {
   useAdminCameraHealth,
   useAdminUpsertCamera,
   useAdminSetCameraStatus,
+  useAdminCreateCameraUpstream,
 } from "@/hooks/use-admin-dashboard";
 import { useRegions } from "@/hooks/use-regions";
 import { useAdminOracleHealth } from "@/hooks/use-admin-dashboard";
@@ -17,6 +18,7 @@ import { CameraStreamPreview } from "@/components/admin/camera-stream-preview";
 import { EmptyState } from "@/components/viax/empty-state";
 import { Video } from "lucide-react";
 import { isAllowedStreamUrl, isInsecureStreamInProd } from "@/lib/camera-stream-url";
+import { CAMERA_PROVIDERS, getProvider, type CameraProvider } from "@/lib/camera-providers";
 
 export const Route = createFileRoute("/admin/sources")({
   component: AdminSourcesPage,
@@ -33,8 +35,10 @@ function AdminSourcesPage() {
   const { data: regions } = useRegions();
   const { mutateAsync: upsertCamera } = useAdminUpsertCamera();
   const { mutateAsync: setCameraStatus } = useAdminSetCameraStatus();
+  const { mutateAsync: createUpstream } = useAdminCreateCameraUpstream();
   const [name, setName] = useState("");
   const [regionId, setRegionId] = useState("");
+  const [provider, setProvider] = useState<CameraProvider>("der-sp");
   const [streamUrl, setStreamUrl] = useState("");
   const [countLine, setCountLine] = useState<{
     x1: number;
@@ -43,30 +47,51 @@ function AdminSourcesPage() {
     y2: number;
   } | null>(null);
 
+  const preset = getProvider(provider);
+
   const onAddCamera = async () => {
     if (!name.trim() || !regionId) {
       toast.error("Nome e região obrigatórios");
       return;
     }
-    if (streamUrl.trim() && !isAllowedStreamUrl(streamUrl.trim())) {
-      toast.error(copy.cameras.invalidUrl);
+    const rawUrl = streamUrl.trim();
+    if (!rawUrl) {
+      toast.error("Cole a URL da câmera");
       return;
     }
-    if (streamUrl.trim() && isInsecureStreamInProd(streamUrl.trim())) {
+    const validationError = preset.validate(rawUrl);
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+    if (isInsecureStreamInProd(rawUrl)) {
       toast.error(copy.cameras.mixedContent);
       return;
     }
     try {
+      // 1) Registra o upstream (gera slug + path do proxy)
+      const { proxy_path } = await createUpstream({
+        provider,
+        upstreamUrl: rawUrl,
+        label: name.trim(),
+        kind: preset.defaultKind,
+      });
+      // 2) Cria a câmera apontando para o proxy (não para a URL bruta)
+      if (!isAllowedStreamUrl(proxy_path)) {
+        toast.error(copy.cameras.invalidUrl);
+        return;
+      }
       await upsertCamera({
         p_id: null,
         p_region_id: regionId,
         p_name: name.trim(),
-        p_status: "offline",
-        p_stream_url: streamUrl.trim() || null,
+        p_status: "online",
+        p_stream_url: proxy_path,
         p_count_line: countLine,
       });
-      toast.success("Câmera registrada.");
+      toast.success(`Câmera registrada (${preset.label}).`);
       setName("");
+      setStreamUrl("");
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Erro");
     }
@@ -103,6 +128,20 @@ function AdminSourcesPage() {
           {copy.admin.sources.cameras}
         </h2>
         <div className="flex flex-wrap gap-2">
+          <select
+            value={provider}
+            onChange={(e) => {
+              setProvider(e.target.value as CameraProvider);
+              setStreamUrl("");
+            }}
+            className="rounded-lg border bg-surface px-3 py-2 text-xs"
+          >
+            {CAMERA_PROVIDERS.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.label}
+              </option>
+            ))}
+          </select>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -112,8 +151,8 @@ function AdminSourcesPage() {
           <input
             value={streamUrl}
             onChange={(e) => setStreamUrl(e.target.value)}
-            placeholder="URL stream (HLS/WebRTC)"
-            className="min-w-[200px] flex-1 rounded-lg border bg-surface px-3 py-2 text-xs"
+            placeholder={preset.placeholder}
+            className="min-w-[260px] flex-1 rounded-lg border bg-surface px-3 py-2 text-xs"
           />
           <select
             value={regionId}
@@ -135,6 +174,8 @@ function AdminSourcesPage() {
             {copy.admin.sources.addCamera}
           </button>
         </div>
+        <p className="mt-2 text-[10px] text-muted-foreground">{preset.description}</p>
+
 
         <ul className="mt-4 space-y-2">
           {(cameras ?? []).map((c) => (

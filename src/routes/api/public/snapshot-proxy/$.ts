@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getSnapshotUpstream } from "@/lib/snapshot-upstream-map";
+import { getSnapshotUpstream } from "@/lib/snapshot-upstream-map.server";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -11,8 +11,7 @@ const CORS_HEADERS = {
 export const Route = createFileRoute("/api/public/snapshot-proxy/$")({
   server: {
     handlers: {
-      OPTIONS: async () =>
-        new Response(null, { status: 204, headers: CORS_HEADERS }),
+      OPTIONS: async () => new Response(null, { status: 204, headers: CORS_HEADERS }),
       GET: async ({ params }) => {
         const splat = (params as { _splat?: string })._splat ?? "";
         const [slug] = splat.split("/");
@@ -22,7 +21,7 @@ export const Route = createFileRoute("/api/public/snapshot-proxy/$")({
             headers: CORS_HEADERS,
           });
         }
-        const upstream = getSnapshotUpstream(slug);
+        const upstream = await getSnapshotUpstream(slug);
         if (!upstream) {
           return new Response("Unknown camera", {
             status: 404,
@@ -30,7 +29,6 @@ export const Route = createFileRoute("/api/public/snapshot-proxy/$")({
           });
         }
 
-        // Cache-bust upstream so we always get a fresh frame
         const url = `${upstream.imageUrl}${
           upstream.imageUrl.includes("?") ? "&" : "?"
         }t=${Date.now()}`;
