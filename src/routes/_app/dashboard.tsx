@@ -75,6 +75,7 @@ import { DailyPoll } from "@/components/viax/daily-poll";
 import { DivisionUpModal } from "@/components/viax/division-up-modal";
 import { QuickDepositSheet } from "@/components/viax/quick-deposit-sheet";
 import { useFollowingActiveBets } from "@/hooks/use-following-active-bets";
+import { useWinToast } from "@/hooks/use-win-toast";
 
 export type DashboardSearch = { from?: string; highlight?: "position" };
 
@@ -168,6 +169,7 @@ function Dashboard() {
 
   const { ids: followedIds } = useFollowedTraders();
   const { data: followingBets } = useFollowingActiveBets();
+  useWinToast();
 
   const liveCount = markets.filter((m) => m.status === "live" || m.status === "closing").length;
   const top = [...markets].sort((a, b) => Math.abs(b.trend) - Math.abs(a.trend)).slice(0, 4);
@@ -191,6 +193,29 @@ function Dashboard() {
     d.setHours(0, 0, 0, 0);
     return d.getTime();
   }, []);
+
+  // Ticker para countdown dos mercados que encerram em breve
+  const [now, setNow] = useState(() => Date.now());
+  const THIRTY_MIN = 30 * 60 * 1000;
+  const closingSoon = useMemo(
+    () =>
+      markets
+        .filter(
+          (m) =>
+            (m.status === "live" || m.status === "closing") &&
+            m.endsAt > now &&
+            m.endsAt - now <= THIRTY_MIN,
+        )
+        .sort((a, b) => a.endsAt - b.endsAt)
+        .slice(0, 5),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [markets, now],
+  );
+  useEffect(() => {
+    if (!closingSoon.length) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [closingSoon.length]);
 
   const pnlToday = useMemo(() => {
     return (transactions ?? [])
@@ -468,6 +493,49 @@ function Dashboard() {
                 </span>
               </Link>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Encerra em breve — urgência */}
+      {closingSoon.length > 0 && (
+        <div>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="heading-subsection flex items-center gap-2">
+              <span className="size-2 rounded-full bg-warn animate-pulse inline-block" />
+              <span className="text-warn">Últimas apostas</span>
+            </h2>
+            <Link
+              to="/markets"
+              search={{ status: "closing" }}
+              className="text-xs text-primary hover:underline"
+            >
+              Ver todos →
+            </Link>
+          </div>
+          <div className="space-y-2">
+            {closingSoon.map((m) => {
+              const secsLeft = Math.max(0, Math.floor((m.endsAt - now) / 1000));
+              const mins = Math.floor(secsLeft / 60);
+              const secs = secsLeft % 60;
+              const countdown = `${mins}:${String(secs).padStart(2, "0")}`;
+              return (
+                <Link
+                  key={m.id}
+                  to="/markets/$marketId"
+                  params={{ marketId: m.id }}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-warn/20 bg-warn/5 px-4 py-3 text-sm hover:border-warn/40 transition"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[10px] uppercase text-muted-foreground">{m.region}</div>
+                    <div className="line-clamp-1 font-medium">{m.question}</div>
+                  </div>
+                  <span className="shrink-0 rounded-lg border border-warn/40 bg-warn/10 px-2 py-1 font-mono text-xs font-semibold text-warn">
+                    {countdown}
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}

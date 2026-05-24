@@ -37,6 +37,7 @@ async function upsertFixture(supabase: SupabaseClient, f: ApiFootballFixtureDto)
     p_away_logo_url: f.away_logo_url,
     p_goals_home_ht: f.goals_home_ht,
     p_goals_away_ht: f.goals_away_ht,
+    p_elapsed: f.elapsed,
   });
   if (error) throw new Error(error.message);
 }

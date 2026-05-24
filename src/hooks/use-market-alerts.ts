@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/supabase/loose";
 import { useAnonAuth } from "@/hooks/use-anon-auth";
 
 export interface MarketAlert {
@@ -11,13 +11,33 @@ export interface MarketAlert {
   createdAt: number;
 }
 
+type AlertRow = {
+  id: string;
+  market_id: string;
+  side: string;
+  threshold: number;
+  triggered: boolean;
+  created_at: string;
+};
+
+function mapAlert(row: Record<string, unknown>): MarketAlert {
+  return {
+    id: row.id as string,
+    marketId: row.market_id as string,
+    side: row.side as "YES" | "NO",
+    threshold: Number(row.threshold),
+    triggered: Boolean(row.triggered),
+    createdAt: new Date(row.created_at as string).getTime(),
+  };
+}
+
 export function useMarketAlerts(marketId?: string) {
   const { userId } = useAnonAuth();
 
   return useQuery({
     queryKey: ["market-alerts", userId, marketId],
     queryFn: async () => {
-      let q = supabase
+      let q = db
         .from("market_alerts")
         .select("id, market_id, side, threshold, triggered, created_at")
         .eq("user_id", userId as string)
@@ -26,14 +46,7 @@ export function useMarketAlerts(marketId?: string) {
       if (marketId) q = q.eq("market_id", marketId);
       const { data, error } = await q;
       if (error) throw error;
-      return (data ?? []).map((row) => ({
-        id: row.id,
-        marketId: row.market_id,
-        side: row.side as "YES" | "NO",
-        threshold: Number(row.threshold),
-        triggered: row.triggered,
-        createdAt: new Date(row.created_at).getTime(),
-      })) satisfies MarketAlert[];
+      return ((data as AlertRow[] | null) ?? []).map(mapAlert);
     },
     enabled: !!userId,
     staleTime: 30_000,
@@ -54,7 +67,7 @@ export function useCreateMarketAlert() {
       side: "YES" | "NO";
       threshold: number;
     }) => {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("market_alerts")
         .insert({ user_id: userId as string, market_id: marketId, side, threshold })
         .select()
@@ -75,7 +88,7 @@ export function useDeleteMarketAlert() {
 
   return useMutation({
     mutationFn: async (alertId: string) => {
-      const { error } = await supabase.from("market_alerts").delete().eq("id", alertId);
+      const { error } = await db.from("market_alerts").delete().eq("id", alertId);
       if (error) throw error;
     },
     onSuccess: () => {

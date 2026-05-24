@@ -1,4 +1,3 @@
-Initialising login role...
 export type Json =
   | string
   | number
@@ -697,6 +696,7 @@ export type Database = {
           away_team_id: number
           away_team_name: string
           created_at: string
+          elapsed: number | null
           goals_away: number | null
           goals_away_ht: number | null
           goals_home: number | null
@@ -722,6 +722,7 @@ export type Database = {
           away_team_id: number
           away_team_name: string
           created_at?: string
+          elapsed?: number | null
           goals_away?: number | null
           goals_away_ht?: number | null
           goals_home?: number | null
@@ -747,6 +748,7 @@ export type Database = {
           away_team_id?: number
           away_team_name?: string
           created_at?: string
+          elapsed?: number | null
           goals_away?: number | null
           goals_away_ht?: number | null
           goals_home?: number | null
@@ -3187,30 +3189,56 @@ export type Database = {
         Returns: Json
       }
       try_sync_admin_allowlist: { Args: never; Returns: Json }
-      upsert_football_fixture: {
-        Args: {
-          p_api_fixture_id: number
-          p_api_league_id: number
-          p_away_logo_url?: string
-          p_away_team_id: number
-          p_away_team_name: string
-          p_goals_away: number
-          p_goals_away_ht?: number
-          p_goals_home: number
-          p_goals_home_ht?: number
-          p_home_logo_url?: string
-          p_home_team_id: number
-          p_home_team_name: string
-          p_kickoff_at: string
-          p_league_country?: string
-          p_league_name?: string
-          p_raw?: Json
-          p_season: number
-          p_status_short: string
-          p_venue?: string
-        }
-        Returns: Json
-      }
+      upsert_football_fixture:
+        | {
+            Args: {
+              p_api_fixture_id: number
+              p_api_league_id: number
+              p_away_logo_url?: string
+              p_away_team_id: number
+              p_away_team_name: string
+              p_goals_away: number
+              p_goals_away_ht?: number
+              p_goals_home: number
+              p_goals_home_ht?: number
+              p_home_logo_url?: string
+              p_home_team_id: number
+              p_home_team_name: string
+              p_kickoff_at: string
+              p_league_country?: string
+              p_league_name?: string
+              p_raw?: Json
+              p_season: number
+              p_status_short: string
+              p_venue?: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_api_fixture_id: number
+              p_api_league_id: number
+              p_away_logo_url?: string
+              p_away_team_id: number
+              p_away_team_name: string
+              p_elapsed?: number
+              p_goals_away: number
+              p_goals_away_ht?: number
+              p_goals_home: number
+              p_goals_home_ht?: number
+              p_home_logo_url?: string
+              p_home_team_id: number
+              p_home_team_name: string
+              p_kickoff_at: string
+              p_league_country?: string
+              p_league_name?: string
+              p_raw?: Json
+              p_season: number
+              p_status_short: string
+              p_venue?: string
+            }
+            Returns: Json
+          }
       use_streak_freeze: { Args: never; Returns: Json }
       validate_football_pools: {
         Args: {

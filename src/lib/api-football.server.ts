@@ -10,6 +10,7 @@ export type ApiFootballFixtureDto = {
   season: number;
   kickoff_at: string;
   status_short: string;
+  elapsed: number | null;
   home_team_id: number;
   home_team_name: string;
   away_team_id: number;
@@ -30,7 +31,7 @@ type ApiFixtureItem = {
   fixture: {
     id: number;
     date: string;
-    status: { short: string };
+    status: { short: string; elapsed: number | null };
     venue?: { name?: string };
   };
   league: { id: number; season: number; name: string; country: string };
@@ -89,6 +90,7 @@ export function mapFixtureItem(item: ApiFixtureItem): ApiFootballFixtureDto {
     season: item.league.season,
     kickoff_at: item.fixture.date,
     status_short: item.fixture.status.short,
+    elapsed: item.fixture.status.elapsed ?? null,
     home_team_id: item.teams.home.id,
     home_team_name: item.teams.home.name,
     away_team_id: item.teams.away.id,

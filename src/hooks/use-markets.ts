@@ -35,7 +35,6 @@ function mapMarket(row: Record<string, unknown>): Market {
 export function useMarkets() {
   return useQuery({
     queryKey: ["markets"],
-    refetchOnMount: true,
     queryFn: async () => {
       const { data, error } = (await db
         .from("markets")
@@ -48,7 +47,9 @@ export function useMarkets() {
       if (error) throw error;
       return filterCatalogMarkets((data ?? []).map(mapMarket));
     },
-    staleTime: 30_000,
+    staleTime: 60_000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 }
 

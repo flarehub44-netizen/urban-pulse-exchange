@@ -18,6 +18,7 @@ export type FootballMarketRow = {
     api_fixture_id: number;
     kickoff_at: string;
     status_short: string;
+    elapsed: number | null;
     home_team_name: string;
     away_team_name: string;
     goals_home: number | null;
@@ -45,6 +46,7 @@ export function mapFootballMarket(row: Record<string, unknown>): FootballMarketR
       api_fixture_id: Number(fixture.api_fixture_id),
       kickoff_at: fixture.kickoff_at as string,
       status_short: fixture.status_short as string,
+      elapsed: fixture.elapsed != null ? Number(fixture.elapsed) : null,
       home_team_name: fixture.home_team_name as string,
       away_team_name: fixture.away_team_name as string,
       goals_home: fixture.goals_home != null ? Number(fixture.goals_home) : null,
@@ -71,6 +73,7 @@ const FOOTBALL_MARKET_SELECT = `
     api_fixture_id,
     kickoff_at,
     status_short,
+    elapsed,
     home_team_name,
     away_team_name,
     goals_home,
