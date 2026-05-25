@@ -17,9 +17,7 @@ type LivePageContentProps = {
 
 export function LivePageContent({ refreshRegions = false }: LivePageContentProps) {
   const { markets } = useResolvedMarkets();
-  const { regions } = useResolvedRegions(
-    refreshRegions ? { refetchInterval: 15_000 } : undefined,
-  );
+  const { regions } = useResolvedRegions(refreshRegions ? { refetchInterval: 15_000 } : undefined);
   const navigate = useNavigate();
   const events = LIVE_EVENTS;
 

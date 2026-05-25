@@ -9,8 +9,7 @@ export type AuthModalSearch = {
 
 export function parseAuthModalSearch(search: Record<string, unknown>): AuthModalSearch {
   const auth = search.auth;
-  const validAuth =
-    auth === "login" || auth === "signup" || auth === "forgot" ? auth : undefined;
+  const validAuth = auth === "login" || auth === "signup" || auth === "forgot" ? auth : undefined;
   return {
     auth: validAuth,
     redirect: typeof search.redirect === "string" && search.redirect ? search.redirect : undefined,

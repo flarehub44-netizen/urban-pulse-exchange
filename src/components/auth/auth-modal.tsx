@@ -81,7 +81,15 @@ export function AuthModal() {
     } else if (urlAuth.auth === "forgot") {
       openForgot();
     }
-  }, [urlAuth.auth, urlAuth.redirect, urlAuth.upgrade, urlAuth.deposit, openLogin, openSignup, openForgot]);
+  }, [
+    urlAuth.auth,
+    urlAuth.redirect,
+    urlAuth.upgrade,
+    urlAuth.deposit,
+    openLogin,
+    openSignup,
+    openForgot,
+  ]);
 
   useEffect(() => {
     if (open && mode !== "forgot") {
@@ -152,10 +160,7 @@ export function AuthModal() {
           )}
           <div className="mt-6">
             {mode === "login" && (
-              <LoginForm
-                onSuccess={finishAuth}
-                onForgotPassword={() => setMode("forgot")}
-              />
+              <LoginForm onSuccess={finishAuth} onForgotPassword={() => setMode("forgot")} />
             )}
             {mode === "signup" && (
               <SignupForm
@@ -170,9 +175,7 @@ export function AuthModal() {
                 }}
               />
             )}
-            {mode === "forgot" && (
-              <ForgotPasswordForm onBackToLogin={() => setMode("login")} />
-            )}
+            {mode === "forgot" && <ForgotPasswordForm onBackToLogin={() => setMode("login")} />}
           </div>
           {mode !== "forgot" && (
             <div className="mt-6 border-t pt-4 text-center text-sm">

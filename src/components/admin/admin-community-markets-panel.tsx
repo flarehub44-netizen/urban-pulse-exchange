@@ -1,9 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
-import {
-  useAdminCommunityMarkets,
-  useAdminCommunityReports,
-} from "@/hooks/use-admin-community";
+import { useAdminCommunityMarkets, useAdminCommunityReports } from "@/hooks/use-admin-community";
 import { useVoidCommunityMarket } from "@/hooks/use-community-markets";
 import { formatBRL } from "@/lib/parimutuel";
 import { copy } from "@/copy/pt-BR";

@@ -63,18 +63,14 @@ function AdminOverviewPage() {
             ).map((ev) => (
               <div key={ev} className="rounded-lg border bg-surface/40 px-3 py-2">
                 <div className="text-muted-foreground">{ev}</div>
-                <div className="mono mt-1 text-lg font-semibold">
-                  {funnel.counts?.[ev] ?? 0}
-                </div>
+                <div className="mono mt-1 text-lg font-semibold">{funnel.counts?.[ev] ?? 0}</div>
               </div>
             ))}
           </div>
           <p className="mt-2 text-[11px] text-muted-foreground">
             Conversão cadastro → pago:{" "}
-            <span className="font-medium text-foreground">
-              {funnel.conversion_pct ?? 0}%
-            </span>{" "}
-            ({funnel.deposit_paid ?? 0}/{funnel.signup_complete ?? 0})
+            <span className="font-medium text-foreground">{funnel.conversion_pct ?? 0}%</span> (
+            {funnel.deposit_paid ?? 0}/{funnel.signup_complete ?? 0})
           </p>
         </div>
       )}

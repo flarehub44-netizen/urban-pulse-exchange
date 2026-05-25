@@ -45,7 +45,9 @@ test.describe("C1b — Páginas de auth formal", () => {
     await expect(page.locator('input[type="email"]')).toBeVisible();
 
     await page.goto("/auth/signup");
-    await expect(page.getByRole("heading", { name: /criar conta|completar cadastro/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /criar conta|completar cadastro/i }),
+    ).toBeVisible();
     await expect(page.locator('input[type="password"]')).toBeVisible();
   });
 
@@ -90,8 +92,7 @@ test.describe("C6b — Carteira bloqueada sem cadastro formal", () => {
       await depositTab.click();
       await page.waitForTimeout(1000);
       const body = await page.locator("body").innerText();
-      const needsRegister =
-        /criar conta|cadastro formal|e-mail confirmado/i.test(body);
+      const needsRegister = /criar conta|cadastro formal|e-mail confirmado/i.test(body);
       expect(needsRegister).toBeTruthy();
     }
   });

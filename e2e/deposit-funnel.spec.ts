@@ -1,9 +1,5 @@
 import { test, expect } from "@playwright/test";
-import {
-  dismissOnboardingIfOpen,
-  openFirstLiveMarket,
-  primeAppStorage,
-} from "./helpers/markets";
+import { dismissOnboardingIfOpen, openFirstLiveMarket, primeAppStorage } from "./helpers/markets";
 
 test.describe("deposit funnel", () => {
   test.describe.configure({ timeout: 60_000 });

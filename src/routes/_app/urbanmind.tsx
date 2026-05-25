@@ -101,7 +101,7 @@ function UrbanMind() {
         </div>
         <h1 className="heading-page mt-2 text-3xl md:text-4xl">
           <span className="text-highlight">Previsão ativa</span>:{" "}
-          <span className="text-gradient">{top.aiPrediction.value.toLocaleString("pt-BR")}</span>{" "}
+          <span className="text-highlight">{top.aiPrediction.value.toLocaleString("pt-BR")}</span>{" "}
           carros na <span className="text-highlight">{top.region}</span>
         </h1>
         {coachLine && (
@@ -187,39 +187,39 @@ function UrbanMind() {
                 )
                 .slice(0, 5)
                 .map((m) => (
-                <li
-                  key={m.id}
-                  className="flex items-center justify-between gap-2 rounded-lg border bg-surface/50 p-2.5 text-sm"
-                >
-                  <Link
-                    to="/markets/$marketId"
-                    params={{ marketId: m.id }}
-                    className="min-w-0 flex-1 hover:text-primary"
+                  <li
+                    key={m.id}
+                    className="flex items-center justify-between gap-2 rounded-lg border bg-surface/50 p-2.5 text-sm"
                   >
-                    <div className="truncate">{m.region}</div>
-                    <div className="text-[11px] text-muted-foreground">
-                      Alvo {m.aiPrediction.value.toLocaleString("pt-BR")}
-                    </div>
-                  </Link>
-                  <div className="text-right shrink-0">
-                    <div
-                      className={`mono ${m.aiPrediction.side === "YES" ? "text-up" : "text-down"}`}
+                    <Link
+                      to="/markets/$marketId"
+                      params={{ marketId: m.id }}
+                      className="min-w-0 flex-1 hover:text-primary"
                     >
-                      {m.aiPrediction.side === "YES" ? "SIM" : "NÃO"}
+                      <div className="truncate">{m.region}</div>
+                      <div className="text-[11px] text-muted-foreground">
+                        Alvo {m.aiPrediction.value.toLocaleString("pt-BR")}
+                      </div>
+                    </Link>
+                    <div className="text-right shrink-0">
+                      <div
+                        className={`mono ${m.aiPrediction.side === "YES" ? "text-up" : "text-down"}`}
+                      >
+                        {m.aiPrediction.side === "YES" ? "SIM" : "NÃO"}
+                      </div>
+                      <div className="mono text-[11px] text-primary">
+                        {(m.aiPrediction.confidence * 100).toFixed(0)}%
+                      </div>
                     </div>
-                    <div className="mono text-[11px] text-primary">
-                      {(m.aiPrediction.confidence * 100).toFixed(0)}%
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setBetTarget({ market: m, side: m.aiPrediction.side })}
-                    className="flex shrink-0 items-center gap-1 rounded-lg border border-primary/40 bg-primary/10 px-2.5 py-1.5 text-[11px] font-medium text-primary transition hover:bg-primary/20"
-                  >
-                    <Zap className="size-3" /> {copy.urbanmind.betWithIa}
-                  </button>
-                </li>
-              ))}
+                    <button
+                      type="button"
+                      onClick={() => setBetTarget({ market: m, side: m.aiPrediction.side })}
+                      className="flex shrink-0 items-center gap-1 rounded-lg border border-primary/40 bg-primary/10 px-2.5 py-1.5 text-[11px] font-medium text-primary transition hover:bg-primary/20"
+                    >
+                      <Zap className="size-3" /> {copy.urbanmind.betWithIa}
+                    </button>
+                  </li>
+                ))}
             </ul>
           </SurfaceCard>
 

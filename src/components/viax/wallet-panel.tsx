@@ -249,9 +249,7 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
         />
       )}
 
-      {(tab === "Depositar" || tab === "Sacar") && !isRegistered && (
-        <RegisterRequiredCta />
-      )}
+      {(tab === "Depositar" || tab === "Sacar") && !isRegistered && <RegisterRequiredCta />}
 
       {(tab === "Depositar" || tab === "Sacar") && isRegistered && (
         <div className="surface-card mx-auto max-w-md space-y-4">

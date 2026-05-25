@@ -8,7 +8,10 @@ export function useFootballRealtime() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const patchFixture = (fixtureId: number, fixturePatch: Partial<FootballMarketRow["fixture"]>) => {
+    const patchFixture = (
+      fixtureId: number,
+      fixturePatch: Partial<FootballMarketRow["fixture"]>,
+    ) => {
       const applyPatch = (m: FootballMarketRow): FootballMarketRow =>
         m.fixture.api_fixture_id === fixtureId
           ? { ...m, fixture: { ...m.fixture, ...fixturePatch } }

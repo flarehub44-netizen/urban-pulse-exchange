@@ -23,6 +23,7 @@ dist-ssr
 # Environment secrets — never commit service role keys
 .env
 .env.*
+!.env.example
 
 # Local tooling / Supabase CLI cache
 .claude/

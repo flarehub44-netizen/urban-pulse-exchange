@@ -37,7 +37,11 @@ export function FootballMarketsList({ embedded = false }: FootballMarketsListPro
 
       {!embedded && (
         <p className="text-center text-xs text-muted-foreground">
-          <Link to="/markets" search={{ segment: "futebol" }} className="text-primary hover:underline">
+          <Link
+            to="/markets"
+            search={{ segment: "futebol" }}
+            className="text-primary hover:underline"
+          >
             {copy.football.backUrban}
           </Link>
         </p>

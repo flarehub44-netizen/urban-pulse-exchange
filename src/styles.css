@@ -335,12 +335,6 @@
       linear-gradient(90deg, oklch(1 0 0 / 0.03) 1px, transparent 1px);
     background-size: 36px 36px;
   }
-  .text-gradient {
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
@@ -438,9 +432,14 @@
     letter-spacing: 0.16em;
     color: var(--color-foreground);
   }
-  .text-highlight {
+  .text-highlight,
+  .text-gradient {
     font-weight: 600;
-    color: var(--color-primary);
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
   }
   .text-lead {
     font-size: 0.875rem;

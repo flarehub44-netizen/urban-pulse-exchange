@@ -26,6 +26,9 @@ export function PublicNav({ variant = "shell" }: PublicNavProps) {
           <Link to="/markets" className="hover:text-foreground">
             Mercados
           </Link>
+          <Link to="/markets" search={{ segment: "futebol" }} className="hover:text-foreground">
+            {copy.nav.football}
+          </Link>
           <Link to="/live" className="hover:text-foreground">
             Mapa
           </Link>

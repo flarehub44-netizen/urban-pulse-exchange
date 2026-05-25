@@ -109,11 +109,7 @@ export function QuickDepositSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side="bottom"
-        className="rounded-t-2xl pb-8"
-        data-testid="quick-deposit-sheet"
-      >
+      <SheetContent side="bottom" className="rounded-t-2xl pb-8" data-testid="quick-deposit-sheet">
         <SheetHeader className="mb-4">
           <SheetTitle className="flex items-center gap-2">
             <Wallet className="size-4 text-primary" />
@@ -204,7 +200,9 @@ export function QuickDepositSheet({
               onClick={handleGenerate}
               className="w-full rounded-xl bg-primary px-4 py-3 font-medium text-primary-foreground disabled:opacity-60 hover:opacity-90 transition"
             >
-              {depositMut.isPending ? "Gerando QR Code…" : `Gerar QR Code Pix · ${formatBRL(Number(amount) || 0)}`}
+              {depositMut.isPending
+                ? "Gerando QR Code…"
+                : `Gerar QR Code Pix · ${formatBRL(Number(amount) || 0)}`}
             </button>
 
             <p className="text-center text-[11px] text-muted-foreground">

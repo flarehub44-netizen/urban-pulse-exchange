@@ -42,9 +42,7 @@ function LiveScoreBadge({
     <div
       className={cn(
         "flex items-center justify-between rounded-2xl border px-5 py-4",
-        isLive
-          ? "border-up/30 bg-up/5"
-          : "border-border bg-surface/50",
+        isLive ? "border-up/30 bg-up/5" : "border-border bg-surface/50",
       )}
     >
       <div className="flex flex-col items-center gap-1 min-w-0 flex-1">

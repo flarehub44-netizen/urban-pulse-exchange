@@ -166,7 +166,9 @@ export function SettingsPanel() {
       <Section icon={<Shield className="size-4" />} title="Conta">
         <div className="rounded-xl border bg-card/40 p-4 space-y-3">
           {isRegistered ? (
-            <p className="text-sm text-muted-foreground">Conta formal ativa com e-mail confirmado.</p>
+            <p className="text-sm text-muted-foreground">
+              Conta formal ativa com e-mail confirmado.
+            </p>
           ) : (
             <>
               <div className="text-sm font-medium">Cadastro pendente</div>

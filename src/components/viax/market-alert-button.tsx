@@ -2,7 +2,11 @@ import { useState } from "react";
 import { Bell, BellOff, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { useMarketAlerts, useCreateMarketAlert, useDeleteMarketAlert } from "@/hooks/use-market-alerts";
+import {
+  useMarketAlerts,
+  useCreateMarketAlert,
+  useDeleteMarketAlert,
+} from "@/hooks/use-market-alerts";
 import { probability, formatPct } from "@/lib/parimutuel";
 import { cn } from "@/lib/utils";
 import type { Market, Side } from "@/store/viax-store";
@@ -59,7 +63,9 @@ export function MarketAlertButton({ m }: MarketAlertButtonProps) {
         )}
       >
         {hasAlerts ? <Bell className="size-3.5 fill-primary" /> : <Bell className="size-3.5" />}
-        {hasAlerts ? `${activeAlerts.length} alerta${activeAlerts.length > 1 ? "s" : ""}` : "Alerta"}
+        {hasAlerts
+          ? `${activeAlerts.length} alerta${activeAlerts.length > 1 ? "s" : ""}`
+          : "Alerta"}
       </button>
 
       <Sheet open={open} onOpenChange={setOpen}>
@@ -82,18 +88,14 @@ export function MarketAlertButton({ m }: MarketAlertButtonProps) {
                   className="flex items-center justify-between rounded-xl border bg-surface/60 px-3 py-2 text-sm"
                 >
                   <span>
-                    <span
-                      className={cn("font-medium", a.side === "YES" ? "text-up" : "text-down")}
-                    >
+                    <span className={cn("font-medium", a.side === "YES" ? "text-up" : "text-down")}>
                       {a.side === "YES" ? "SIM" : "NÃO"}
                     </span>{" "}
                     ≥ <span className="mono font-medium">{a.threshold}%</span>
                   </span>
                   <button
                     type="button"
-                    onClick={() =>
-                      deleteAlert(a.id).then(() => toast.message("Alerta removido"))
-                    }
+                    onClick={() => deleteAlert(a.id).then(() => toast.message("Alerta removido"))}
                     className="rounded-lg p-1 text-muted-foreground hover:text-down"
                   >
                     <Trash2 className="size-3.5" />
@@ -170,8 +172,7 @@ export function MarketAlertButton({ m }: MarketAlertButtonProps) {
                 className="mt-3 w-full accent-primary"
               />
               <div className="mt-1 text-center text-xs text-muted-foreground">
-                Alerta em{" "}
-                <span className="font-medium text-foreground">{threshold}%</span>
+                Alerta em <span className="font-medium text-foreground">{threshold}%</span>
               </div>
             </div>
 

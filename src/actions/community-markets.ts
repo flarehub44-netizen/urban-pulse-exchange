@@ -3,7 +3,9 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireRegisteredAuth } from "@/integrations/supabase/require-registered-middleware";
 
-async function adminRpc<T>(fn: () => Promise<{ data: T | null; error: { message: string } | null }>) {
+async function adminRpc<T>(
+  fn: () => Promise<{ data: T | null; error: { message: string } | null }>,
+) {
   const { data, error } = await fn();
   if (error) throw new Error(error.message);
   return data;
@@ -70,13 +72,12 @@ export const getCommunityMarketFn = createServerFn({ method: "GET" })
     };
   });
 
-export const listPublicCommunityMarketsFn = createServerFn({ method: "GET" })
-  .handler(async () => {
-    const { db } = await import("@/integrations/supabase/loose");
-    const { data, error } = await db.rpc("list_public_community_markets", { p_limit: 50 });
-    if (error) throw new Error(error.message);
-    return (data ?? []) as Record<string, unknown>[];
-  });
+export const listPublicCommunityMarketsFn = createServerFn({ method: "GET" }).handler(async () => {
+  const { db } = await import("@/integrations/supabase/loose");
+  const { data, error } = await db.rpc("list_public_community_markets", { p_limit: 50 });
+  if (error) throw new Error(error.message);
+  return (data ?? []) as Record<string, unknown>[];
+});
 
 export const listMyCommunityMarketsFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

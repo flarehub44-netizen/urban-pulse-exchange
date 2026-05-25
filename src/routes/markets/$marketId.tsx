@@ -32,10 +32,7 @@ import { MarketAuditPanel } from "@/components/viax/market-audit-panel";
 import { LiveCameraStrip } from "@/components/viax/live-camera-strip";
 import { MarketSocialProofLite } from "@/components/viax/market-social-proof-lite";
 import { MarketAlertButton } from "@/components/viax/market-alert-button";
-import {
-  useCommunityMarketDetail,
-  useJoinCommunityMarket,
-} from "@/hooks/use-community-markets";
+import { useCommunityMarketDetail, useJoinCommunityMarket } from "@/hooks/use-community-markets";
 import { CommunityMarketResolvePanel } from "@/components/viax/community-market-resolve-panel";
 import { CommunityReportButton } from "@/components/viax/community-report-button";
 import { useAuth } from "@/hooks/use-auth";
@@ -137,14 +134,12 @@ function MarketDetail() {
     void joinMarket(search.access).then(() => refetchCommunity());
   }, [search.access, userId, isCommunityId, joinMarket, refetchCommunity]);
 
-  const m: Market | undefined =
-    fromList ?? communityDetail?.market ?? undefined;
+  const m: Market | undefined = fromList ?? communityDetail?.market ?? undefined;
   const isCreator = Boolean(
     communityDetail?.isCreator || (userId && fromList?.createdBy === userId),
   );
   const isCommunity = m?.marketKind === "community" || isCommunityId;
-  const detailLoading =
-    marketsLoading || (isCommunityId && !fromList && communityLoading);
+  const detailLoading = marketsLoading || (isCommunityId && !fromList && communityLoading);
 
   const { data: dbHistory } = useMarketHistory(marketId, !isCommunity);
   const history = useMemo(() => {
@@ -184,7 +179,11 @@ function MarketDetail() {
     return (
       <div className="mx-auto max-w-md space-y-3 p-6 text-center">
         <p className="text-sm text-warn">{copy.community.accessDenied}</p>
-        <Link to="/markets" search={{ segment: "outros" }} className="text-sm text-primary underline">
+        <Link
+          to="/markets"
+          search={{ segment: "outros" }}
+          className="text-sm text-primary underline"
+        >
           {copy.community.backToList}
         </Link>
       </div>
@@ -203,9 +202,7 @@ function MarketDetail() {
     navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, tab }), replace: true });
   };
 
-  const visibleTabs = isCommunity
-    ? allTabs.filter((t) => t.key !== "audit")
-    : [...allTabs];
+  const visibleTabs = isCommunity ? allTabs.filter((t) => t.key !== "audit") : [...allTabs];
 
   return (
     <div className="space-y-5">

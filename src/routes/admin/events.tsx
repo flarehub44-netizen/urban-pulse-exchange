@@ -40,13 +40,24 @@ const emptyEventForm = () => ({
 
 function AdminEventsPage() {
   const [tab, setTab] = useState<Tab>("overview");
-  const { data: overview, isError: overviewError, refetch: refetchOverview } = useAdminEventsOverview();
-  const { data: seasonal, isError: seasonalError, refetch: refetchSeasonal } = useAdminPlatformEvents();
+  const {
+    data: overview,
+    isError: overviewError,
+    refetch: refetchOverview,
+  } = useAdminEventsOverview();
+  const {
+    data: seasonal,
+    isError: seasonalError,
+    refetch: refetchSeasonal,
+  } = useAdminPlatformEvents();
   const { data: polls, isError: pollsError, refetch: refetchPolls } = useAdminDailyPolls();
   const [partnerFilter, setPartnerFilter] = useState("");
   const [partnerFilterApplied, setPartnerFilterApplied] = useState<string | null>(null);
-  const { data: partnerEvents, isError: partnerError, refetch: refetchPartner } =
-    useAdminPartnerEventsFeed(partnerFilterApplied);
+  const {
+    data: partnerEvents,
+    isError: partnerError,
+    refetch: refetchPartner,
+  } = useAdminPartnerEventsFeed(partnerFilterApplied);
 
   const upsertEvent = useAdminUpsertPlatformEvent();
   const deleteEvent = useAdminDeletePlatformEvent();
@@ -196,7 +207,9 @@ function AdminEventsPage() {
             onClick={() => setTab(t.id)}
             className={cn(
               "rounded-lg px-3 py-1.5 text-xs",
-              tab === t.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-surface",
+              tab === t.id
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-surface",
             )}
           >
             {t.label}
@@ -207,14 +220,35 @@ function AdminEventsPage() {
       {tab === "overview" && overview && (
         <div className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <AdminStatCard label={copy.admin.events.seasonalActive} value={overview.platform_events.active} />
-            <AdminStatCard label={copy.admin.events.seasonalUpcoming} value={overview.platform_events.upcoming} />
-            <AdminStatCard label={copy.admin.events.pollsToday} value={overview.daily_polls.has_today ? 1 : 0} />
-            <AdminStatCard label={copy.admin.events.partnerEvents24h} value={overview.partner_events.last_24h} />
+            <AdminStatCard
+              label={copy.admin.events.seasonalActive}
+              value={overview.platform_events.active}
+            />
+            <AdminStatCard
+              label={copy.admin.events.seasonalUpcoming}
+              value={overview.platform_events.upcoming}
+            />
+            <AdminStatCard
+              label={copy.admin.events.pollsToday}
+              value={overview.daily_polls.has_today ? 1 : 0}
+            />
+            <AdminStatCard
+              label={copy.admin.events.partnerEvents24h}
+              value={overview.partner_events.last_24h}
+            />
             <AdminStatCard label={copy.admin.events.marketsLive} value={overview.markets.live} />
-            <AdminStatCard label={copy.admin.events.marketsDispute} value={overview.markets.dispute} />
-            <AdminStatCard label={copy.admin.events.footballPending} value={overview.football.pending_fixtures} />
-            <AdminStatCard label={copy.admin.events.communityReports} value={overview.community.pending_reports} />
+            <AdminStatCard
+              label={copy.admin.events.marketsDispute}
+              value={overview.markets.dispute}
+            />
+            <AdminStatCard
+              label={copy.admin.events.footballPending}
+              value={overview.football.pending_fixtures}
+            />
+            <AdminStatCard
+              label={copy.admin.events.communityReports}
+              value={overview.community.pending_reports}
+            />
           </div>
           <div className="flex flex-wrap gap-2">
             <Link
@@ -318,7 +352,11 @@ function AdminEventsPage() {
                 {copy.admin.events.save}
               </button>
               {editingEventId && (
-                <button type="button" onClick={resetEventForm} className="rounded-lg border px-3 py-1.5 text-xs">
+                <button
+                  type="button"
+                  onClick={resetEventForm}
+                  className="rounded-lg border px-3 py-1.5 text-xs"
+                >
                   Cancelar
                 </button>
               )}

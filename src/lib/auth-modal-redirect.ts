@@ -4,9 +4,7 @@ const PUBLIC_PREFIXES = ["/", "/markets", "/live", "/football"] as const;
 
 export function isPublicAuthPath(pathname: string): boolean {
   if (pathname === "/") return true;
-  return PUBLIC_PREFIXES.some(
-    (p) => p !== "/" && (pathname === p || pathname.startsWith(`${p}/`)),
-  );
+  return PUBLIC_PREFIXES.some((p) => p !== "/" && (pathname === p || pathname.startsWith(`${p}/`)));
 }
 
 export function authModalRedirectTarget(

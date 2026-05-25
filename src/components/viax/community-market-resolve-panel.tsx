@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import type { Market } from "@/store/viax-store";
-import {
-  useResolveCommunityMarket,
-  useVoidCommunityMarket,
-} from "@/hooks/use-community-markets";
+import { useResolveCommunityMarket, useVoidCommunityMarket } from "@/hooks/use-community-markets";
 import { copy } from "@/copy/pt-BR";
 import { cn } from "@/lib/utils";
 
@@ -24,7 +21,8 @@ export function CommunityMarketResolvePanel({
 
   const ended = market.endsAt <= Date.now();
   const canResolve =
-    ended && (market.status === "closed" || market.status === "live" || market.status === "closing");
+    ended &&
+    (market.status === "closed" || market.status === "live" || market.status === "closing");
 
   const onResolve = async (side: "YES" | "NO") => {
     try {
@@ -49,9 +47,7 @@ export function CommunityMarketResolvePanel({
   return (
     <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 space-y-3">
       <h3 className="text-sm font-semibold">{copy.community.creatorPanelTitle}</h3>
-      {!ended && (
-        <p className="text-xs text-muted-foreground">{copy.community.creatorWaitEnd}</p>
-      )}
+      {!ended && <p className="text-xs text-muted-foreground">{copy.community.creatorWaitEnd}</p>}
       {ended && canResolve && (
         <>
           <p className="text-xs text-muted-foreground">{copy.community.creatorResolveHint}</p>

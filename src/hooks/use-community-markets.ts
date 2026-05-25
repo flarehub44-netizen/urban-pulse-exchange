@@ -9,10 +9,7 @@ import {
   resolveCommunityMarketFn,
   voidCommunityMarketFn,
 } from "@/actions/community-markets";
-import {
-  mapCommunityMarketRow,
-  type CommunityMarketRow,
-} from "@/lib/community-market";
+import { mapCommunityMarketRow, type CommunityMarketRow } from "@/lib/community-market";
 import type { Market } from "@/store/viax-store";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -69,11 +66,7 @@ export function useCommunityMarketDetail(marketId: string, accessToken?: string,
 export function useCreateCommunityMarket() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: {
-      question: string;
-      endsAt: Date;
-      visibility: "public" | "unlisted";
-    }) =>
+    mutationFn: (input: { question: string; endsAt: Date; visibility: "public" | "unlisted" }) =>
       createCommunityMarketFn({
         data: {
           question: input.question,

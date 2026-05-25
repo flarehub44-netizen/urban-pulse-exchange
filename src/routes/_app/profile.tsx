@@ -37,7 +37,15 @@ import { cn } from "@/lib/utils";
 import { parseAuthModalSearch, type AuthModalSearch } from "@/lib/auth-modal-search";
 
 export type ProfileSearch = {
-  tab?: "visao" | "posicoes" | "carteira" | "favoritos" | "badges" | "atividade" | "mercados" | "config";
+  tab?:
+    | "visao"
+    | "posicoes"
+    | "carteira"
+    | "favoritos"
+    | "badges"
+    | "atividade"
+    | "mercados"
+    | "config";
 } & AuthModalSearch;
 
 export const Route = createFileRoute("/_app/profile")({
@@ -430,7 +438,6 @@ function Profile() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

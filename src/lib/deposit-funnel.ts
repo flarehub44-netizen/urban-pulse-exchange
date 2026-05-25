@@ -31,9 +31,7 @@ export function trackDepositFunnel(
   }
 
   const cleanProps = props
-    ? Object.fromEntries(
-        Object.entries(props).filter(([, v]) => v !== undefined),
-      )
+    ? Object.fromEntries(Object.entries(props).filter(([, v]) => v !== undefined))
     : {};
 
   void db

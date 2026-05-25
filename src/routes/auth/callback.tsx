@@ -42,9 +42,7 @@ function AuthCallbackPage() {
             session?.user.user_metadata?.display_name ??
             session?.user.user_metadata?.full_name ??
             null;
-          await runPostRegistrationFlow(
-            typeof displayName === "string" ? displayName : null,
-          );
+          await runPostRegistrationFlow(typeof displayName === "string" ? displayName : null);
         }
 
         if (cancelled) return;

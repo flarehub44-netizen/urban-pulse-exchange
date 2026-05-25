@@ -38,9 +38,7 @@ export function useAuth(): UseAuthResult {
             session?.user.user_metadata?.display_name ??
             session?.user.user_metadata?.full_name ??
             null;
-          void runPostRegistrationFlow(
-            typeof displayName === "string" ? displayName : null,
-          );
+          void runPostRegistrationFlow(typeof displayName === "string" ? displayName : null);
         }
         void tryBindPartnerRef();
       }

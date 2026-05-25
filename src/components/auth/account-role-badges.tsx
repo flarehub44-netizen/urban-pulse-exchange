@@ -10,13 +10,19 @@ export function AccountRoleBadges({ className }: { className?: string }) {
   const badges: { label: string; tone: string }[] = [];
 
   if (ctx?.admin?.is_admin) {
-    badges.push({ label: copy.auth.roleAdmin, tone: "border-primary/40 bg-primary/10 text-primary" });
+    badges.push({
+      label: copy.auth.roleAdmin,
+      tone: "border-primary/40 bg-primary/10 text-primary",
+    });
   }
   if (ctx?.partner?.role === "partner" && ctx.partner.status === "active") {
     badges.push({ label: copy.auth.rolePartner, tone: "border-warn/40 bg-warn/10 text-warn" });
   }
   if (isRegistered || (!isAnonymous && badges.length === 0)) {
-    badges.push({ label: copy.auth.roleTrader, tone: "border-border bg-surface text-muted-foreground" });
+    badges.push({
+      label: copy.auth.roleTrader,
+      tone: "border-border bg-surface text-muted-foreground",
+    });
   } else if (isAnonymous) {
     badges.push({ label: copy.auth.roleAnonymous, tone: "border-warn/30 bg-warn/5 text-warn" });
   }

@@ -233,309 +233,316 @@ function MarketsList() {
 
       {segment === "transito" && (
         <>
-      <div className="page-section flex flex-wrap items-end justify-between gap-4">
-        <p className="flex-1 min-w-[200px] text-sm text-muted-foreground">
-          <span className="font-medium text-foreground">{list.length} mercados</span> · pools
-          atualizando ao vivo
-        </p>
-        <div className="relative w-full max-w-xs">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            value={qInput}
-            onChange={(e) => setQInput(e.target.value)}
-            placeholder="Buscar mercado ou via..."
-            className="w-full rounded-xl border bg-card pl-9 pr-3 py-2 text-sm outline-none focus:border-primary/60"
-          />
-        </div>
-      </div>
+          <div className="page-section flex flex-wrap items-end justify-between gap-4">
+            <p className="flex-1 min-w-[200px] text-sm text-muted-foreground">
+              <span className="font-medium text-foreground">{list.length} mercados</span> · pools
+              atualizando ao vivo
+            </p>
+            <div className="relative w-full max-w-xs">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                value={qInput}
+                onChange={(e) => setQInput(e.target.value)}
+                placeholder="Buscar mercado ou via..."
+                className="w-full rounded-xl border bg-card pl-9 pr-3 py-2 text-sm outline-none focus:border-primary/60"
+              />
+            </div>
+          </div>
 
-      {regionFilter && (
-        <div className="flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
-          <span className="text-muted-foreground">Filtrando por região:</span>
-          <span className="font-medium text-primary">{regionFilter}</span>
-          <button
-            type="button"
-            onClick={() => patchSearch({ region: undefined })}
-            className="ml-auto flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-          >
-            <X className="size-3.5" /> Limpar
-          </button>
-        </div>
-      )}
-
-      <div className="flex flex-wrap gap-2">
-        {(() => {
-          const isHot =
-            statusKey === "live" &&
-            sortKey === "trend" &&
-            !category &&
-            !showFavorites &&
-            !hasPosition &&
-            !aiPicks &&
-            !regionFilter;
-          const isClosing =
-            statusKey === "closing" &&
-            sortKey === "closing" &&
-            !category &&
-            !showFavorites &&
-            !hasPosition &&
-            !aiPicks;
-          const isAi = aiPicks;
-          const isMyRegion = !!userRegion && regionFilter === userRegion;
-          const presets = [
-            {
-              key: "hot",
-              label: "Em Alta",
-              icon: <TrendingUp className="size-3" />,
-              active: isHot,
-              onClick: () =>
-                patchSearch({
-                  status: "live",
-                  sort: "trend",
-                  category: undefined,
-                  aiPicks: undefined,
-                  favorites: undefined,
-                  hasPosition: undefined,
-                  region: undefined,
-                }),
-            },
-            {
-              key: "closing",
-              label: "Encerrando",
-              icon: <Clock className="size-3" />,
-              active: isClosing,
-              onClick: () =>
-                patchSearch({
-                  status: "closing",
-                  sort: "closing",
-                  category: undefined,
-                  aiPicks: undefined,
-                  favorites: undefined,
-                  hasPosition: undefined,
-                }),
-            },
-            {
-              key: "ai",
-              label: "IA Indica",
-              icon: <Bot className="size-3" />,
-              active: isAi,
-              onClick: () =>
-                patchSearch({
-                  aiPicks: aiPicks ? undefined : "1",
-                  status: "live",
-                  sort: "edge",
-                  category: undefined,
-                  favorites: undefined,
-                  hasPosition: undefined,
-                }),
-            },
-            ...(userRegion
-              ? [
-                  {
-                    key: "region",
-                    label: userRegion,
-                    icon: <MapPin className="size-3" />,
-                    active: isMyRegion,
-                    onClick: () =>
-                      patchSearch({
-                        region: isMyRegion ? undefined : userRegion,
-                        aiPicks: undefined,
-                      }),
-                  },
-                ]
-              : []),
-          ];
-          return presets.map((p) => (
-            <button
-              key={p.key}
-              type="button"
-              onClick={p.onClick}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition",
-                p.active
-                  ? "border-primary bg-primary text-primary-foreground shadow-[var(--shadow-glow-primary)]"
-                  : "border-border bg-card text-muted-foreground hover:bg-surface-2 hover:text-foreground",
-              )}
-            >
-              {p.icon} {p.label}
-            </button>
-          ));
-        })()}
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={() =>
-            patchSearch({
-              favorites: showFavorites ? undefined : "1",
-              status: undefined,
-              category: undefined,
-              aiPicks: undefined,
-            })
-          }
-          className={cn(
-            "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition",
-            showFavorites
-              ? "border-warn/60 bg-warn/15 text-warn shadow-[0_0_8px_var(--color-warn,#f59e0b)]"
-              : "border-border bg-card text-muted-foreground hover:bg-surface-2",
+          {regionFilter && (
+            <div className="flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
+              <span className="text-muted-foreground">Filtrando por região:</span>
+              <span className="font-medium text-primary">{regionFilter}</span>
+              <button
+                type="button"
+                onClick={() => patchSearch({ region: undefined })}
+                className="ml-auto flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+              >
+                <X className="size-3.5" /> Limpar
+              </button>
+            </div>
           )}
-        >
-          <Star className={cn("size-3", showFavorites && "fill-warn")} />
-          Favoritos {watchlist.length > 0 && `(${watchlist.length})`}
-        </button>
-        {!showFavorites &&
-          statusFilters.map((f) => (
-            <button
-              key={f.key}
-              type="button"
-              onClick={() =>
-                patchSearch({
-                  status: f.key === "all" ? undefined : f.key,
-                  category: undefined,
-                  favorites: undefined,
-                })
-              }
-              className={cn(
-                "rounded-full border px-3 py-1.5 text-xs transition",
-                statusKey === f.key && !category
-                  ? "border-primary/60 bg-primary/15 text-primary shadow-[var(--shadow-glow-primary)]"
-                  : "border-border bg-card text-muted-foreground hover:bg-surface-2",
-              )}
-            >
-              {f.label}
-            </button>
-          ))}
-        {!showFavorites && userId && (
-          <button
-            type="button"
-            onClick={() =>
-              patchSearch({ hasPosition: hasPosition ? undefined : "1", favorites: undefined })
-            }
-            className={cn(
-              "rounded-full border px-3 py-1.5 text-xs transition",
-              hasPosition
-                ? "border-primary/60 bg-primary/15 text-primary"
-                : "border-border bg-card text-muted-foreground hover:bg-surface-2",
-            )}
-          >
-            Minhas posições {openMarketIds.size > 0 && `(${openMarketIds.size})`}
-          </button>
-        )}
-        {!showFavorites &&
-          (
-            [
-              { key: "trend" as const, label: copy.markets.sortTrend },
-              { key: "edge" as const, label: copy.markets.sortEdge },
-              { key: "closing" as const, label: "Encerrando" },
-            ] as const
-          ).map((s) => (
-            <button
-              key={s.key}
-              type="button"
-              onClick={() => patchSearch({ sort: sortKey === s.key ? undefined : s.key })}
-              className={cn(
-                "rounded-full border px-3 py-1.5 text-xs transition",
-                sortKey === s.key
-                  ? "border-primary/60 bg-primary/15 text-primary"
-                  : "border-border bg-card text-muted-foreground hover:bg-surface-2",
-              )}
-            >
-              {s.label}
-            </button>
-          ))}
-        {!showFavorites &&
-          MARKET_CATEGORY_FILTERS.map((f) => (
-            <button
-              key={f}
-              type="button"
-              onClick={() =>
-                patchSearch({ category: category === f ? undefined : f, favorites: undefined })
-              }
-              className={cn(
-                "rounded-full border px-3 py-1.5 text-xs transition",
-                category === f
-                  ? "border-primary/60 bg-primary/15 text-primary shadow-[var(--shadow-glow-primary)]"
-                  : "border-border bg-card text-muted-foreground hover:bg-surface-2",
-              )}
-            >
-              {f}
-            </button>
-          ))}
-      </div>
 
-      {showFavorites && watchlist.length === 0 && (
-        <EmptyState
-          icon={Star}
-          title={copy.empty.favorites.title}
-          description={copy.empty.favorites.description}
-          action={{ label: copy.empty.favorites.cta, to: "/markets", search: { status: "live" } }}
-        />
-      )}
+          <div className="flex flex-wrap gap-2">
+            {(() => {
+              const isHot =
+                statusKey === "live" &&
+                sortKey === "trend" &&
+                !category &&
+                !showFavorites &&
+                !hasPosition &&
+                !aiPicks &&
+                !regionFilter;
+              const isClosing =
+                statusKey === "closing" &&
+                sortKey === "closing" &&
+                !category &&
+                !showFavorites &&
+                !hasPosition &&
+                !aiPicks;
+              const isAi = aiPicks;
+              const isMyRegion = !!userRegion && regionFilter === userRegion;
+              const presets = [
+                {
+                  key: "hot",
+                  label: "Em Alta",
+                  icon: <TrendingUp className="size-3" />,
+                  active: isHot,
+                  onClick: () =>
+                    patchSearch({
+                      status: "live",
+                      sort: "trend",
+                      category: undefined,
+                      aiPicks: undefined,
+                      favorites: undefined,
+                      hasPosition: undefined,
+                      region: undefined,
+                    }),
+                },
+                {
+                  key: "closing",
+                  label: "Encerrando",
+                  icon: <Clock className="size-3" />,
+                  active: isClosing,
+                  onClick: () =>
+                    patchSearch({
+                      status: "closing",
+                      sort: "closing",
+                      category: undefined,
+                      aiPicks: undefined,
+                      favorites: undefined,
+                      hasPosition: undefined,
+                    }),
+                },
+                {
+                  key: "ai",
+                  label: "IA Indica",
+                  icon: <Bot className="size-3" />,
+                  active: isAi,
+                  onClick: () =>
+                    patchSearch({
+                      aiPicks: aiPicks ? undefined : "1",
+                      status: "live",
+                      sort: "edge",
+                      category: undefined,
+                      favorites: undefined,
+                      hasPosition: undefined,
+                    }),
+                },
+                ...(userRegion
+                  ? [
+                      {
+                        key: "region",
+                        label: userRegion,
+                        icon: <MapPin className="size-3" />,
+                        active: isMyRegion,
+                        onClick: () =>
+                          patchSearch({
+                            region: isMyRegion ? undefined : userRegion,
+                            aiPicks: undefined,
+                          }),
+                      },
+                    ]
+                  : []),
+              ];
+              return presets.map((p) => (
+                <button
+                  key={p.key}
+                  type="button"
+                  onClick={p.onClick}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition",
+                    p.active
+                      ? "border-primary bg-primary text-primary-foreground shadow-[var(--shadow-glow-primary)]"
+                      : "border-border bg-card text-muted-foreground hover:bg-surface-2 hover:text-foreground",
+                  )}
+                >
+                  {p.icon} {p.label}
+                </button>
+              ));
+            })()}
+          </div>
 
-      {!showFavorites && list.length === 0 && (
-        <div className="space-y-3">
-          <EmptyState
-            icon={Search}
-            title={copy.empty.markets.title}
-            description={copy.empty.markets.description}
-            action={{
-              label: copy.empty.markets.cta,
-              to: "/markets",
-              search: { status: "live" },
-            }}
-          />
-          <p className="text-center">
+          <div className="flex flex-wrap gap-2">
             <button
               type="button"
               onClick={() =>
                 patchSearch({
+                  favorites: showFavorites ? undefined : "1",
                   status: undefined,
                   category: undefined,
-                  hasPosition: undefined,
-                  sort: undefined,
-                  q: undefined,
-                  region: undefined,
                   aiPicks: undefined,
                 })
               }
-              className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition",
+                showFavorites
+                  ? "border-warn/60 bg-warn/15 text-warn shadow-[0_0_8px_var(--color-warn,#f59e0b)]"
+                  : "border-border bg-card text-muted-foreground hover:bg-surface-2",
+              )}
             >
-              Limpar filtros
+              <Star className={cn("size-3", showFavorites && "fill-warn")} />
+              Favoritos {watchlist.length > 0 && `(${watchlist.length})`}
             </button>
-          </p>
-        </div>
-      )}
-
-      {marketsError && (
-        <InlineError message="Não foi possível carregar os mercados." onRetry={() => refetch()} />
-      )}
-
-      {marketsLoading && !marketsError && (
-        <>
-          <div className="md:hidden space-y-3">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <MarketCardSkeleton key={i} />
-            ))}
+            {!showFavorites &&
+              statusFilters.map((f) => (
+                <button
+                  key={f.key}
+                  type="button"
+                  onClick={() =>
+                    patchSearch({
+                      status: f.key === "all" ? undefined : f.key,
+                      category: undefined,
+                      favorites: undefined,
+                    })
+                  }
+                  className={cn(
+                    "rounded-full border px-3 py-1.5 text-xs transition",
+                    statusKey === f.key && !category
+                      ? "border-primary/60 bg-primary/15 text-primary shadow-[var(--shadow-glow-primary)]"
+                      : "border-border bg-card text-muted-foreground hover:bg-surface-2",
+                  )}
+                >
+                  {f.label}
+                </button>
+              ))}
+            {!showFavorites && userId && (
+              <button
+                type="button"
+                onClick={() =>
+                  patchSearch({ hasPosition: hasPosition ? undefined : "1", favorites: undefined })
+                }
+                className={cn(
+                  "rounded-full border px-3 py-1.5 text-xs transition",
+                  hasPosition
+                    ? "border-primary/60 bg-primary/15 text-primary"
+                    : "border-border bg-card text-muted-foreground hover:bg-surface-2",
+                )}
+              >
+                Minhas posições {openMarketIds.size > 0 && `(${openMarketIds.size})`}
+              </button>
+            )}
+            {!showFavorites &&
+              (
+                [
+                  { key: "trend" as const, label: copy.markets.sortTrend },
+                  { key: "edge" as const, label: copy.markets.sortEdge },
+                  { key: "closing" as const, label: "Encerrando" },
+                ] as const
+              ).map((s) => (
+                <button
+                  key={s.key}
+                  type="button"
+                  onClick={() => patchSearch({ sort: sortKey === s.key ? undefined : s.key })}
+                  className={cn(
+                    "rounded-full border px-3 py-1.5 text-xs transition",
+                    sortKey === s.key
+                      ? "border-primary/60 bg-primary/15 text-primary"
+                      : "border-border bg-card text-muted-foreground hover:bg-surface-2",
+                  )}
+                >
+                  {s.label}
+                </button>
+              ))}
+            {!showFavorites &&
+              MARKET_CATEGORY_FILTERS.map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() =>
+                    patchSearch({ category: category === f ? undefined : f, favorites: undefined })
+                  }
+                  className={cn(
+                    "rounded-full border px-3 py-1.5 text-xs transition",
+                    category === f
+                      ? "border-primary/60 bg-primary/15 text-primary shadow-[var(--shadow-glow-primary)]"
+                      : "border-border bg-card text-muted-foreground hover:bg-surface-2",
+                  )}
+                >
+                  {f}
+                </button>
+              ))}
           </div>
-          <div className="hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <MarketCardSkeleton key={i} />
-            ))}
-          </div>
-        </>
-      )}
 
-      {!marketsLoading && !marketsError && (
-        <>
-          <MobileMarketsCarousel markets={list} className="md:hidden" />
-          <div className="hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-3">
-            {list.map((m) => (
-              <MarketCard key={m.id} m={m} />
-            ))}
-          </div>
-        </>
-      )}
+          {showFavorites && watchlist.length === 0 && (
+            <EmptyState
+              icon={Star}
+              title={copy.empty.favorites.title}
+              description={copy.empty.favorites.description}
+              action={{
+                label: copy.empty.favorites.cta,
+                to: "/markets",
+                search: { status: "live" },
+              }}
+            />
+          )}
+
+          {!showFavorites && list.length === 0 && (
+            <div className="space-y-3">
+              <EmptyState
+                icon={Search}
+                title={copy.empty.markets.title}
+                description={copy.empty.markets.description}
+                action={{
+                  label: copy.empty.markets.cta,
+                  to: "/markets",
+                  search: { status: "live" },
+                }}
+              />
+              <p className="text-center">
+                <button
+                  type="button"
+                  onClick={() =>
+                    patchSearch({
+                      status: undefined,
+                      category: undefined,
+                      hasPosition: undefined,
+                      sort: undefined,
+                      q: undefined,
+                      region: undefined,
+                      aiPicks: undefined,
+                    })
+                  }
+                  className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+                >
+                  Limpar filtros
+                </button>
+              </p>
+            </div>
+          )}
+
+          {marketsError && (
+            <InlineError
+              message="Não foi possível carregar os mercados."
+              onRetry={() => refetch()}
+            />
+          )}
+
+          {marketsLoading && !marketsError && (
+            <>
+              <div className="md:hidden space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <MarketCardSkeleton key={i} />
+                ))}
+              </div>
+              <div className="hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <MarketCardSkeleton key={i} />
+                ))}
+              </div>
+            </>
+          )}
+
+          {!marketsLoading && !marketsError && (
+            <>
+              <MobileMarketsCarousel markets={list} className="md:hidden" />
+              <div className="hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-3">
+                {list.map((m) => (
+                  <MarketCard key={m.id} m={m} />
+                ))}
+              </div>
+            </>
+          )}
         </>
       )}
     </div>

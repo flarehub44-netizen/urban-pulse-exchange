@@ -48,11 +48,17 @@ function AdminPartnersPage() {
   }, [active]);
 
   if (isError || activeError) {
-    return <InlineError onRetry={() => { void refetch(); void refetchActive(); }} />;
+    return (
+      <InlineError
+        onRetry={() => {
+          void refetch();
+          void refetchActive();
+        }}
+      />
+    );
   }
 
-  const getApproveTerms = (userId: string) =>
-    approveTerms[userId] ?? { share: "0.20", cpa: "" };
+  const getApproveTerms = (userId: string) => approveTerms[userId] ?? { share: "0.20", cpa: "" };
 
   const onApprove = async (userId: string, handle: string) => {
     const terms = getApproveTerms(userId);

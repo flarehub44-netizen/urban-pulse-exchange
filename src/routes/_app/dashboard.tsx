@@ -493,10 +493,7 @@ function Dashboard() {
                     <span className="font-medium text-foreground">{b.traderName}</span>
                     <span>previu</span>
                     <span
-                      className={cn(
-                        "font-bold mono",
-                        b.side === "YES" ? "text-up" : "text-down",
-                      )}
+                      className={cn("font-bold mono", b.side === "YES" ? "text-up" : "text-down")}
                     >
                       {b.side === "YES" ? "SIM" : "NÃO"}
                     </span>
