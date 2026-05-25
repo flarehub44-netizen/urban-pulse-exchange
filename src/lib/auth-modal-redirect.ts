@@ -15,7 +15,7 @@ export function authModalRedirectTarget(
   const search: AuthModalSearch =
     mode === "login"
       ? { auth: "login", redirect: intendedFullPath }
-      : { auth: "signup", redirect: intendedFullPath, upgrade: "1" };
+      : { auth: "signup", redirect: intendedFullPath };
 
   if (isPublicAuthPath(pathname)) {
     return { pathname, search };

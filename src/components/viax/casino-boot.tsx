@@ -1,6 +1,6 @@
 import { toast } from "sonner";
 import { copy } from "@/copy/pt-BR";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
 import { useCasinoQuickDeposit } from "@/hooks/use-casino-spin";
 import { useNearMissAlerts } from "@/hooks/use-near-miss-alerts";
@@ -9,7 +9,7 @@ import { setLastImpulseAmount } from "@/lib/impulse-deposit";
 import { formatBRL } from "@/lib/parimutuel";
 
 export function CasinoBoot() {
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
   const { enabled } = useCasinoEnabled();
   const { open, close, payload } = useNearMissAlerts(userId);
   const { mutateAsync: quickDeposit, isPending } = useCasinoQuickDeposit();

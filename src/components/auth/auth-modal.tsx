@@ -46,7 +46,6 @@ export function AuthModal() {
     open,
     mode,
     redirect,
-    upgrade,
     openDepositAfter,
     openLogin,
     openSignup,
@@ -64,7 +63,7 @@ export function AuthModal() {
       urlSynced.current = null;
       return;
     }
-    const key = `${urlAuth.auth}:${urlAuth.redirect ?? ""}:${urlAuth.upgrade ?? ""}:${urlAuth.deposit ?? ""}`;
+    const key = `${urlAuth.auth}:${urlAuth.redirect ?? ""}:${urlAuth.deposit ?? ""}`;
     if (urlSynced.current === key) return;
     urlSynced.current = key;
     const depositAfter = urlAuth.deposit === "1";
@@ -72,24 +71,12 @@ export function AuthModal() {
       openLogin({ redirect: urlAuth.redirect, depositAfter });
       trackDepositFunnel("auth_modal_open", { mode: "login" });
     } else if (urlAuth.auth === "signup") {
-      openSignup({
-        redirect: urlAuth.redirect,
-        upgrade: urlAuth.upgrade === "1",
-        depositAfter,
-      });
+      openSignup({ redirect: urlAuth.redirect, depositAfter });
       trackDepositFunnel("auth_modal_open", { mode: "signup" });
     } else if (urlAuth.auth === "forgot") {
       openForgot();
     }
-  }, [
-    urlAuth.auth,
-    urlAuth.redirect,
-    urlAuth.upgrade,
-    urlAuth.deposit,
-    openLogin,
-    openSignup,
-    openForgot,
-  ]);
+  }, [urlAuth.auth, urlAuth.redirect, urlAuth.deposit, openLogin, openSignup, openForgot]);
 
   useEffect(() => {
     if (open && mode !== "forgot") {
@@ -134,18 +121,14 @@ export function AuthModal() {
     mode === "login"
       ? copy.auth.loginTitle
       : mode === "signup"
-        ? upgrade
-          ? copy.auth.upgradeTitle
-          : copy.auth.signupTitle
+        ? copy.auth.signupTitle
         : copy.auth.forgotTitle;
 
   const subtitle =
     mode === "login"
       ? copy.auth.loginSubtitle
       : mode === "signup"
-        ? upgrade
-          ? copy.auth.upgradeSubtitle
-          : copy.auth.signupSubtitle
+        ? copy.auth.signupSubtitle
         : copy.auth.forgotSubtitle;
 
   return (
@@ -164,7 +147,6 @@ export function AuthModal() {
             )}
             {mode === "signup" && (
               <SignupForm
-                isUpgrade={upgrade}
                 onSuccess={() => {
                   trackDepositFunnel("signup_complete");
                   finishAuth();

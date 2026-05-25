@@ -3,7 +3,7 @@ import { useMemo, useEffect, useState, useRef, lazy, Suspense } from "react";
 import { findTopMarketForRegion } from "@/lib/region-market";
 import { toast } from "sonner";
 import { useViaX } from "@/store/viax-store";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { useBets } from "@/hooks/use-bets";
 import { isOpenBetStatus } from "@/lib/market-status";
 import {
@@ -47,8 +47,6 @@ const PrecisionReportCard = lazy(() =>
 function ChartFallback() {
   return <div className="h-[140px] animate-pulse rounded-xl bg-surface/60" />;
 }
-import { AnonAccountBanner } from "@/components/viax/anon-account-banner";
-import { useAuth } from "@/hooks/use-auth";
 import { TrendingUp, Users } from "lucide-react";
 import { PageHeader } from "@/components/viax/page-header";
 import { KpiTile } from "@/components/viax/kpi-tile";
@@ -99,7 +97,7 @@ function Dashboard() {
   const deferredReady = useDeferredMount(150);
   const { enabled: casinoEnabled } = useCasinoEnabled();
   const { from, highlight } = Route.useSearch();
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
   const { isRegistered } = useAuth();
   const { me, profile: dbProfile } = useResolvedProfile();
   const { data: weeklyReport, shouldShow: showWeeklyReport } = useWeeklyReport();
@@ -243,7 +241,6 @@ function Dashboard() {
       {/* Division-up celebration */}
       <DivisionUpModal newDivision={divisionUp} onClose={() => setDivisionUp(null)} />
 
-      <AnonAccountBanner />
       {isRegistered && (
         <Link
           to="/markets/create"

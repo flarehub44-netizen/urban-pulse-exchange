@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { db } from "@/integrations/supabase/loose";
 import { useEffect } from "react";
 import { recordMarketViewFn } from "@/actions/retention";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 
 export type RecentBet = {
   name: string;
@@ -19,7 +19,7 @@ export type MarketSocialProof = {
 };
 
 export function useMarketSocialProof(marketId: string | undefined) {
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
 
   // Registrar visualização ao montar
   useEffect(() => {

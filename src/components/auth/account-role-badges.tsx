@@ -4,7 +4,7 @@ import { copy } from "@/copy/pt-BR";
 import { cn } from "@/lib/utils";
 
 export function AccountRoleBadges({ className }: { className?: string }) {
-  const { isRegistered, isAnonymous } = useAuth();
+  const { isRegistered } = useAuth();
   const { data: ctx } = useAccountContext();
 
   const badges: { label: string; tone: string }[] = [];
@@ -18,13 +18,11 @@ export function AccountRoleBadges({ className }: { className?: string }) {
   if (ctx?.partner?.role === "partner" && ctx.partner.status === "active") {
     badges.push({ label: copy.auth.rolePartner, tone: "border-warn/40 bg-warn/10 text-warn" });
   }
-  if (isRegistered || (!isAnonymous && badges.length === 0)) {
+  if (isRegistered) {
     badges.push({
       label: copy.auth.roleTrader,
       tone: "border-border bg-surface text-muted-foreground",
     });
-  } else if (isAnonymous) {
-    badges.push({ label: copy.auth.roleAnonymous, tone: "border-warn/30 bg-warn/5 text-warn" });
   }
 
   if (badges.length === 0) return null;

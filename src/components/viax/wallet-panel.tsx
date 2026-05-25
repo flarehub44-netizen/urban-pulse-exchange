@@ -11,7 +11,6 @@ import { initiateDepositFn, initiateWithdrawFn, getDepositStatusFn } from "@/act
 import { Copy, QrCode, Clock } from "lucide-react";
 import { copy } from "@/copy/pt-BR";
 import { useBalanceSeries } from "@/hooks/use-balance-series";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
 import { useAuth } from "@/hooks/use-auth";
 import { RegisterRequiredCta } from "@/components/auth/register-required-cta";
 import { useBets } from "@/hooks/use-bets";
@@ -40,7 +39,6 @@ const tabs = ["Visão geral", "Histórico", "Depositar", "Sacar"] as const;
 type WalletTab = (typeof tabs)[number];
 
 export function WalletPanel({ embedded }: { embedded?: boolean }) {
-  useAnonAuth();
   const { isRegistered } = useAuth();
   const { me } = useResolvedProfile();
   const { transactions: tx } = useResolvedTransactions();

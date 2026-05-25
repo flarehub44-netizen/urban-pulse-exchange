@@ -86,7 +86,7 @@ export function CommunityMarketCreateForm() {
       {!isRegistered && (
         <p className="text-sm text-warn">
           {copy.auth.registerRequired}{" "}
-          <AuthModalTrigger mode="signup" upgrade className="text-primary underline">
+          <AuthModalTrigger mode="signup" className="text-primary underline">
             {copy.auth.registerCta}
           </AuthModalTrigger>
         </p>

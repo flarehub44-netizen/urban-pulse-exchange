@@ -2,14 +2,14 @@ import { useMemo } from "react";
 import { Flame, Snowflake, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { copy } from "@/copy/pt-BR";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { useTodayCheckIn } from "@/hooks/use-daily-check-in";
 import { useStreakFreezeFn as streakFreezeFn, buyStreakFreezeFn } from "@/actions/retention";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function StreakRiskBanner() {
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
   const { data: profile } = useProfile(userId);
   const { data: today } = useTodayCheckIn(userId);
   const queryClient = useQueryClient();

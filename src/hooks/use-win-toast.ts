@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { createFeedPostFn } from "@/actions/feed";
 import { useQueryClient } from "@tanstack/react-query";
 
 export function useWinToast() {
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
   const qc = useQueryClient();
 
   useEffect(() => {

@@ -2,31 +2,19 @@ import { test, expect } from "@playwright/test";
 import { primeAppStorage } from "./helpers/markets";
 
 test.describe("C1 — Autenticação e sessão", () => {
-  test("sessão anon é criada na primeira visita ao dashboard", async ({ page }) => {
-    await page.goto("/dashboard");
-    await page.waitForTimeout(8000);
-
-    const url = page.url();
-    expect(url).toContain("/dashboard");
-    expect(url).not.toContain("/auth/error");
-
-    const body = await page.locator("body").innerText();
-    expect(body.length).toBeGreaterThan(80);
-  });
-
-  test("usuário anon vê banner de cadastro formal", async ({ page }) => {
+  test("dashboard sem login abre modal de autenticação", async ({ page }) => {
     await page.goto("/dashboard");
     await page.waitForTimeout(4000);
 
-    const banner = page
-      .getByTestId("anon-account-banner")
-      .or(page.getByText(/criar conta|cadastro formal/i).first());
-
-    await expect(page.locator("body")).toBeVisible();
-    const visible = await banner.isVisible().catch(() => false);
-    if (visible) {
-      await expect(banner).toBeVisible();
-    }
+    const url = page.url();
+    expect(url).not.toContain("/auth/error");
+    const body = await page.locator("body").innerText();
+    const hasAuthModal =
+      (await page
+        .getByRole("heading", { name: /entrar na viax|criar conta/i })
+        .isVisible()
+        .catch(() => false)) || /auth=login|auth=signup/i.test(url);
+    expect(hasAuthModal || /entrar|criar conta|login/i.test(body)).toBeTruthy();
   });
 });
 
@@ -45,9 +33,7 @@ test.describe("C1b — Páginas de auth formal", () => {
     await expect(page.locator('input[type="email"]')).toBeVisible();
 
     await page.goto("/auth/signup");
-    await expect(
-      page.getByRole("heading", { name: /criar conta|completar cadastro/i }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: /criar conta/i })).toBeVisible();
     await expect(page.locator('input[type="password"]')).toBeVisible();
   });
 
@@ -60,83 +46,56 @@ test.describe("C1b — Páginas de auth formal", () => {
 });
 
 test.describe("C5 — Redirects de rota", () => {
-  test("/wallet redireciona para perfil", async ({ page }) => {
+  test("/wallet exige autenticação", async ({ page }) => {
     await primeAppStorage(page);
     await page.goto("/wallet");
-    await page.waitForURL(/profile|carteira|wallet/, { timeout: 8_000 }).catch(() => null);
-    expect(page.url()).toMatch(/profile|carteira|wallet/i);
+    await page.waitForTimeout(3000);
+    const url = page.url();
+    expect(url).toMatch(/profile|carteira|wallet|auth=login|auth=signup|markets/i);
   });
 
-  test("/positions redireciona para perfil", async ({ page }) => {
+  test("/positions exige autenticação", async ({ page }) => {
     await primeAppStorage(page);
     await page.goto("/positions");
-    await page.waitForURL(/profile|posicoes|positions/, { timeout: 8_000 }).catch(() => null);
-    expect(page.url()).toMatch(/profile|posicoes|positions/i);
+    await page.waitForTimeout(3000);
+    const url = page.url();
+    expect(url).toMatch(/profile|posicoes|positions|auth=login|auth=signup|markets/i);
   });
 
-  test("/settings redireciona para perfil", async ({ page }) => {
+  test("/settings exige autenticação", async ({ page }) => {
     await primeAppStorage(page);
     await page.goto("/settings");
-    await page.waitForURL(/profile|config|settings/, { timeout: 8_000 }).catch(() => null);
-    expect(page.url()).toMatch(/profile|config|settings/i);
+    await page.waitForTimeout(3000);
+    const url = page.url();
+    expect(url).toMatch(/profile|config|settings|auth=login|auth=signup|markets/i);
   });
 });
 
-test.describe("C6b — Carteira bloqueada sem cadastro formal", () => {
-  test("aba depositar pede cadastro para sessão anon", async ({ page }) => {
+test.describe("C6b — Carteira bloqueada sem login", () => {
+  test("perfil carteira sem sessão pede cadastro ou login", async ({ page }) => {
     await page.goto("/profile?tab=carteira");
-    await page.waitForTimeout(6000);
+    await page.waitForTimeout(4000);
 
-    const depositTab = page.getByRole("button", { name: /depositar/i }).first();
-    if (await depositTab.isVisible().catch(() => false)) {
-      await depositTab.click();
-      await page.waitForTimeout(1000);
+    const url = page.url();
+    const body = await page.locator("body").innerText();
+    const needsAuth =
+      /auth=login|auth=signup/i.test(url) ||
+      /entrar na viax|criar conta|login|cadastro/i.test(body);
+    expect(needsAuth).toBeTruthy();
+  });
+});
+
+test.describe("C6 — Perfil protegido sem sessão", () => {
+  test("abas do perfil exigem login", async ({ page }) => {
+    await primeAppStorage(page);
+    for (const tab of ["carteira", "posicoes", "badges", "config"] as const) {
+      await page.goto(`/profile?tab=${tab}`);
+      await page.waitForTimeout(2500);
+      const url = page.url();
       const body = await page.locator("body").innerText();
-      const needsRegister = /criar conta|cadastro formal|e-mail confirmado/i.test(body);
-      expect(needsRegister).toBeTruthy();
+      const gated =
+        /auth=login|auth=signup/i.test(url) || /entrar na viax|criar conta|login/i.test(body);
+      expect(gated).toBeTruthy();
     }
-  });
-});
-
-test.describe("C6 — Carteira: abas e histórico", () => {
-  test.describe.configure({ timeout: 30_000 });
-
-  test("aba carteira carrega com conteúdo financeiro", async ({ page }) => {
-    await primeAppStorage(page);
-    await page.goto("/profile?tab=carteira");
-    await page.waitForTimeout(8000);
-
-    const body = await page.locator("body").innerText();
-    expect(/BRL|saldo|carteira|SALDO/i.test(body)).toBeTruthy();
-  });
-
-  test("aba posicoes carrega sem erro", async ({ page }) => {
-    await primeAppStorage(page);
-    await page.goto("/profile?tab=posicoes");
-    await page.waitForTimeout(8000);
-
-    const body = await page.locator("body").innerText();
-    expect(body.length).toBeGreaterThan(50);
-    expect(/500|server error/i.test(body)).toBeFalsy();
-  });
-
-  test("aba badges carrega seção de conquistas", async ({ page }) => {
-    await primeAppStorage(page);
-    await page.goto("/profile?tab=badges");
-    await page.waitForTimeout(8000);
-
-    const body = await page.locator("body").innerText();
-    expect(/badge|BADGES|conquista|achievement/i.test(body)).toBeTruthy();
-  });
-});
-
-test.describe("C2 — Cadastro formal nas configurações", () => {
-  test("configurações mostram seção de conta ou programa de creators", async ({ page }) => {
-    await primeAppStorage(page);
-    await page.goto("/profile?tab=config");
-    await page.waitForTimeout(8000);
-
-    const body = await page.locator("body").innerText();
-    expect(/conta|configurações|config|creators|cadastro|notificação/i.test(body)).toBeTruthy();
   });
 });

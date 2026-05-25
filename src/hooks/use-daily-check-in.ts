@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { dailyCheckInFn } from "@/actions/retention";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { db } from "@/integrations/supabase/loose";
 
 export function useTodayCheckIn(userId?: string | null) {
@@ -24,7 +24,7 @@ export function useTodayCheckIn(userId?: string | null) {
 
 export function useDailyCheckIn() {
   const queryClient = useQueryClient();
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
 
   return useMutation({
     mutationFn: () => dailyCheckInFn(),

@@ -5,12 +5,11 @@ import { runPostRegistrationFlow } from "@/lib/post-registration";
 import { copy } from "@/copy/pt-BR";
 
 type SignupFormProps = {
-  isUpgrade?: boolean;
   onSuccess: () => void;
   onNeedsVerify: () => void;
 };
 
-export function SignupForm({ isUpgrade, onSuccess, onNeedsVerify }: SignupFormProps) {
+export function SignupForm({ onSuccess, onNeedsVerify }: SignupFormProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

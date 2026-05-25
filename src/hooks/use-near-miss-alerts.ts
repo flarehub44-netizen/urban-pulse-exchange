@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
 import {
   canShowNearMissToast,
@@ -12,7 +12,7 @@ import {
 import type { NearMissPayload } from "@/components/viax/near-miss-modal";
 
 export function useRecentNearMiss() {
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
   const { enabled } = useCasinoEnabled();
   return useQuery({
     queryKey: ["casino", "near-miss", userId],

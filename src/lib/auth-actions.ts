@@ -12,26 +12,6 @@ export async function signInWithEmail(email: string, password: string) {
 
 export async function signUpWithEmail(email: string, password: string, displayName: string) {
   const trimmedEmail = email.trim();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  const isAnonymous = session?.user?.is_anonymous;
-
-  if (isAnonymous && session?.user) {
-    const { data, error } = await supabase.auth.updateUser({
-      email: trimmedEmail,
-      password,
-      data: { display_name: displayName.trim() },
-    });
-    if (error) throw new Error(authErrorMessage(error));
-    if (displayName.trim().length >= 2) {
-      await supabase
-        .from("profiles")
-        .update({ name: displayName.trim() })
-        .eq("id", session.user.id);
-    }
-    return { data, needsEmailConfirmation: !data.user?.email_confirmed_at };
-  }
 
   const { data, error } = await supabase.auth.signUp({
     email: trimmedEmail,

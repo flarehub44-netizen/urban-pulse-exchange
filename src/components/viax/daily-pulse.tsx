@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Flame, Sparkles, Zap, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { copy } from "@/copy/pt-BR";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { useTodayCheckIn, useDailyCheckIn } from "@/hooks/use-daily-check-in";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,7 @@ function showAchievementToasts(items: AchievementUnlock[] | undefined) {
 }
 
 export function DailyPulse() {
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
   const { data: profile } = useProfile(userId);
   const { data: today } = useTodayCheckIn(userId);
   const { mutateAsync: checkIn, isPending } = useDailyCheckIn();

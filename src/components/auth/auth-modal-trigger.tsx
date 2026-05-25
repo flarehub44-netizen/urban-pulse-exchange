@@ -5,7 +5,6 @@ import { useAuthModal } from "@/hooks/use-auth-modal";
 type AuthModalTriggerProps = {
   mode: "login" | "signup";
   redirect?: string;
-  upgrade?: boolean;
   depositAfter?: boolean;
   className?: string;
   children: ReactNode;
@@ -16,7 +15,6 @@ type AuthModalTriggerProps = {
 export function AuthModalTrigger({
   mode,
   redirect,
-  upgrade,
   depositAfter,
   className,
   children,
@@ -32,7 +30,7 @@ export function AuthModalTrigger({
       onClick={() => {
         onClick?.();
         if (mode === "login") openLogin({ redirect, depositAfter });
-        else openSignup({ redirect, upgrade, depositAfter });
+        else openSignup({ redirect, depositAfter });
       }}
       className={cn(className)}
     >

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { db } from "@/integrations/supabase/loose";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 
 export type NotificationPrefs = {
   wins: boolean;
@@ -30,7 +30,7 @@ function loadLocal(): NotificationPrefs {
 }
 
 export function useNotificationPrefs() {
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
   const [prefs, setPrefs] = useState<NotificationPrefs>(loadLocal);
 
   useEffect(() => {

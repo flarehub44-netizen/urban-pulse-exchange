@@ -13,7 +13,6 @@ const MarketVolumeChart = lazy(() =>
 import { MarketCandles } from "@/components/viax/market-candles";
 import { SocialBook } from "@/components/viax/social-book";
 import { OrderBox } from "@/components/viax/order-box";
-import { AnonAccountBanner } from "@/components/viax/anon-account-banner";
 import { OpenPositionStrip } from "@/components/viax/open-position-strip";
 import { EdgeBadge } from "@/components/viax/edge-badge";
 import { ProbBar } from "@/components/viax/prob-bar";
@@ -231,8 +230,6 @@ function MarketDetail() {
           {questionShort}
         </span>
       </nav>
-
-      <AnonAccountBanner />
 
       <div className="flex flex-wrap items-center gap-2 text-sm">
         {isCommunity ? (

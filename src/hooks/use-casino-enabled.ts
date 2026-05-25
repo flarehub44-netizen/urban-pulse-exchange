@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 
 const envEnabled =
   typeof import.meta.env.VITE_CASINO_ENABLED === "string"
@@ -8,7 +8,7 @@ const envEnabled =
     : true;
 
 export function useCasinoEnabled() {
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
   const { data, isLoading } = useQuery({
     queryKey: ["casino", "status", userId],
     queryFn: async () => {

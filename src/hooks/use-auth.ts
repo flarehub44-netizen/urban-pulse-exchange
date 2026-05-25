@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { parseAuthSession, type AuthSessionState } from "@/lib/auth";
 import { ensureAuthSession } from "@/lib/auth-session";
 import { getStoredPartnerRef, clearStoredPartnerRef } from "@/lib/partner-attribution";
-import { getBoundReferralSlug, markReferralBound } from "@/lib/anon-account-storage";
+import { getBoundReferralSlug, markReferralBound } from "@/lib/referral-attribution-storage";
 import { runPostRegistrationFlow } from "@/lib/post-registration";
 
 export type UseAuthResult = AuthSessionState & {

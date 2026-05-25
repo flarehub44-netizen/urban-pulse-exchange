@@ -5,7 +5,6 @@ export type AuthSessionState = {
   user: User | null;
   session: Session | null;
   isGuest: boolean;
-  isAnonymous: boolean;
   isRegistered: boolean;
   email: string | null;
 };
@@ -14,7 +13,6 @@ export function parseAuthSession(session: Session | null): AuthSessionState {
   const user = session?.user ?? null;
   const userId = user?.id ?? null;
   const email = user?.email?.trim() || null;
-  const isAnonymous = Boolean(user?.is_anonymous);
   const isRegistered = Boolean(email && user?.email_confirmed_at);
   const isGuest = !userId;
 
@@ -23,7 +21,6 @@ export function parseAuthSession(session: Session | null): AuthSessionState {
     user,
     session,
     isGuest,
-    isAnonymous: isAnonymous && !isRegistered,
     isRegistered,
     email,
   };

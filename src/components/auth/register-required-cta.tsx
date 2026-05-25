@@ -8,7 +8,6 @@ export function RegisterRequiredCta({ className }: { className?: string }) {
       <p className="text-xs text-muted-foreground">{copy.auth.walletRegisterHint}</p>
       <AuthModalTrigger
         mode="signup"
-        upgrade
         className="inline-flex rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
       >
         {copy.auth.registerCta}

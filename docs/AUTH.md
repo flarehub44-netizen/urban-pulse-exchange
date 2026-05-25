@@ -12,17 +12,17 @@ Papéis são **acumulativos**: um partner continua sendo trader; admin pode coex
 
 ## Fluxos
 
-1. **Visitante** → `signInAnonymously()` no primeiro acesso à área `_app`.
-2. **Cadastro formal** → `/auth/signup` (e-mail + senha). Se já houver sessão anon, `updateUser` preserva o `user_id`.
-3. **Login** → `/auth/login` com `signInWithPassword`.
-4. **Upgrade** → `/auth/signup?upgrade=1` para contas anon.
+1. **Visitante** → navega em rotas públicas (`/markets`, `/live`, `/football/$id`) sem sessão.
+2. **Cadastro formal** → modal `?auth=signup` ou `/auth/signup` (e-mail + senha).
+3. **Login** → modal `?auth=login` ou `/auth/login` com `signInWithPassword`.
+4. **Rotas `_app`** (`/dashboard`, `/profile`, …) → `requireAuth()` redireciona para login se não houver sessão.
 5. **Partner** → candidatura em Configurações (exige e-mail confirmado) → aprovação em `/admin/partners`.
 6. **Admin** → `claim_admin_invite` ou `try_sync_admin_allowlist` (painel visível só para e-mails na allowlist).
 
 ## Supabase Dashboard
 
 - Habilitar **Email** provider e confirmação de e-mail.
-- Habilitar **Anonymous sign-ins** para o boot automático.
+- **Desabilitar Anonymous sign-ins** (modo anônimo removido do app).
 - **Site URL** e **Redirect URLs**: `{origin}/auth/callback`, `{origin}/auth/verify`, `{origin}/auth/login`.
 - Confirmação de e-mail e reset de senha devem apontar para `/auth/callback` (PKCE + `detectSessionInUrl` no client).
 

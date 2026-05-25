@@ -57,7 +57,6 @@ export function SettingsPanel() {
             <p className="text-sm text-warn">{copy.auth.registerRequired}</p>
             <AuthModalTrigger
               mode="signup"
-              upgrade
               className="inline-flex rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground"
             >
               {copy.auth.registerCta}
@@ -175,7 +174,6 @@ export function SettingsPanel() {
               <p className="text-xs text-muted-foreground">{copy.auth.registerRequired}</p>
               <AuthModalTrigger
                 mode="signup"
-                upgrade
                 className="inline-block rounded-lg border border-primary/30 bg-primary/15 px-4 py-2 text-xs text-primary hover:bg-primary/20"
               >
                 {copy.auth.registerCta}

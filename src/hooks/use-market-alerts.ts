@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { db } from "@/integrations/supabase/loose";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 
 export interface MarketAlert {
   id: string;
@@ -32,7 +32,7 @@ function mapAlert(row: Record<string, unknown>): MarketAlert {
 }
 
 export function useMarketAlerts(marketId?: string) {
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
 
   return useQuery({
     queryKey: ["market-alerts", userId, marketId],
@@ -55,7 +55,7 @@ export function useMarketAlerts(marketId?: string) {
 
 export function useCreateMarketAlert() {
   const qc = useQueryClient();
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
 
   return useMutation({
     mutationFn: async ({
@@ -84,7 +84,7 @@ export function useCreateMarketAlert() {
 
 export function useDeleteMarketAlert() {
   const qc = useQueryClient();
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
 
   return useMutation({
     mutationFn: async (alertId: string) => {

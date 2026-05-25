@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { db as supabase } from "@/integrations/supabase/loose";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { toggleTraderFollowFn } from "@/actions/follows";
 
 const STORAGE_KEY = "viax_followed_traders";
@@ -24,7 +24,7 @@ async function fetchFollowingIds(userId: string): Promise<string[]> {
 }
 
 export function useFollowedTraders() {
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
   const qc = useQueryClient();
   const migratedRef = useRef(false);
 

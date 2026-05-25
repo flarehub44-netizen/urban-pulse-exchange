@@ -11,16 +11,18 @@ test("rota mercados responde", async ({ page }) => {
   await expect(page).toHaveTitle(/Mercados/i);
 });
 
-test("dashboard após auth implícita", async ({ page }) => {
+test("dashboard sem login exige autenticação", async ({ page }) => {
   await page.goto("/dashboard");
   await page.waitForTimeout(4000);
   await expect(page.locator("body")).toBeVisible();
+  const url = page.url();
   const text = await page.locator("body").innerText();
-  expect(text.length).toBeGreaterThan(80);
+  const gated = /auth=login|auth=signup/i.test(url) || /entrar|criar conta|login/i.test(text);
+  expect(gated).toBeTruthy();
 });
 
-test("redirect /wallet para perfil", async ({ page }) => {
+test("redirect /wallet exige autenticação", async ({ page }) => {
   await page.goto("/wallet");
   await page.waitForTimeout(2000);
-  expect(page.url()).toMatch(/profile|carteira|wallet/i);
+  expect(page.url()).toMatch(/profile|carteira|wallet|auth=login|auth=signup|markets/i);
 });

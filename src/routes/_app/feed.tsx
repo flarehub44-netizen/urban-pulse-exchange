@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useFeed } from "@/hooks/use-feed";
 import { useFeedComments } from "@/hooks/use-feed-comments";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 import {
   createFeedPostFn,
   likeFeedPostFn,
@@ -70,7 +70,7 @@ function Feed() {
   useFeed();
   const { feed } = useResolvedFeed();
   const { markets } = useResolvedMarkets();
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
   const { me } = useResolvedProfile();
   const queryClient = useQueryClient();
   const [text, setText] = useState("");

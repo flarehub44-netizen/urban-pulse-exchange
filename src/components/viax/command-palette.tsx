@@ -6,7 +6,7 @@ export function openCommandPalette() {
 import { useNavigate } from "@tanstack/react-router";
 import { useMarketsList } from "@/hooks/use-markets";
 import { useResolvedTraders } from "@/hooks/use-resolved-data";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
 import {
   CommandDialog,
@@ -47,7 +47,7 @@ const navIcons: Record<string, typeof LayoutDashboard> = {
 export function CommandPalette() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
   const { data: profile } = useProfile(userId);
   const { markets } = useMarketsList();
   const { traders } = useResolvedTraders();

@@ -118,7 +118,6 @@ export function FootballOrderBox({ m }: { m: FootballMarketRow }) {
       {!isRegistered ? (
         <AuthModalTrigger
           mode="signup"
-          upgrade
           depositAfter
           redirect={redirect}
           className={cn(

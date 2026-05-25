@@ -15,12 +15,11 @@ import { AnimatedNumber } from "@/components/viax/animated-number";
 import { MarketCard } from "@/components/viax/market-card";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
-import { Lock, ShieldCheck, AlertTriangle, Star, MapPin } from "lucide-react";
+import { Lock, ShieldCheck, Star, MapPin } from "lucide-react";
 import { useBets } from "@/hooks/use-bets";
 import { useRegionPerformance } from "@/hooks/use-region-performance";
 import { TraderArchetypeCard } from "@/components/viax/trader-archetype-card";
 import { EmptyState } from "@/components/viax/empty-state";
-import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
 import { useMyCommunityMarkets } from "@/hooks/use-community-markets";
 import {
   Area,
@@ -88,7 +87,7 @@ function Profile() {
   const navigate = useNavigate({ from: "/profile" });
   const { tab = "visao" } = Route.useSearch();
   const zustandMe = useViaX((s) => s.me);
-  const { userId, isRegistered, isAnonymous, email } = useAuth();
+  const { userId, isRegistered, email } = useAuth();
   const { data: dbProfile } = useProfile(userId);
   const { data: achievements = [] } = useAchievements(userId);
   const me = dbProfile
@@ -124,25 +123,6 @@ function Profile() {
 
   return (
     <div className="space-y-6">
-      {isAnonymous && !isRegistered && (
-        <div className="flex items-start gap-3 rounded-2xl border border-warn/30 bg-warn/5 p-4">
-          <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warn" />
-          <div className="flex-1 text-sm">
-            <span className="font-medium text-warn">Conta sem cadastro formal</span>
-            <span className="ml-1 text-muted-foreground">
-              — crie e-mail e senha para não perder saldo e histórico.
-            </span>
-          </div>
-          <AuthModalTrigger
-            mode="signup"
-            upgrade
-            className="shrink-0 rounded-xl border border-warn/40 bg-warn/10 px-3 py-1.5 text-xs font-medium text-warn hover:bg-warn/20"
-          >
-            {copy.auth.registerCta}
-          </AuthModalTrigger>
-        </div>
-      )}
-
       {isRegistered && email && (
         <div className="flex items-center gap-2 rounded-xl border border-up/30 bg-up/5 px-4 py-2.5 text-sm">
           <ShieldCheck className="size-4 text-up" />

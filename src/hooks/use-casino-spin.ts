@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { db as supabase } from "@/integrations/supabase/loose";
 import { casinoDailySpinFn, type SpinResult } from "@/actions/casino";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 
 export function useCasinoSpinStatus() {
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
   return useQuery({
     queryKey: ["casino", "status", userId],
     queryFn: async () => {

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getWeeklyReportFn } from "@/actions/retention";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 
 const STORAGE_KEY = "viax_weekly_report_seen";
 
@@ -26,7 +26,7 @@ export function markWeeklyReportSeen() {
 }
 
 export function useWeeklyReport() {
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
   const isMonday = new Date().getDay() === 1;
   const alreadySeen = wasSeenThisWeek();
 

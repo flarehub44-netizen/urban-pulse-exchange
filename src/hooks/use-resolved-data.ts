@@ -2,7 +2,7 @@ import { useViaX } from "@/store/viax-store";
 import type { Market, Trader, Transaction, ViaXNotification, FeedPost } from "@/store/viax-store";
 import { pickDbOrEmptyArray, pickDbOrSeed } from "@/lib/data-source";
 import { useProfile } from "@/hooks/use-profile";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { useMarketsList } from "@/hooks/use-markets";
 import { useRegions } from "@/hooks/use-regions";
 import { useTransactions } from "@/hooks/use-transactions";
@@ -11,7 +11,7 @@ import { useNotifications } from "@/hooks/use-notifications";
 import { useFeed } from "@/hooks/use-feed";
 
 export function useResolvedProfile() {
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
   const { data: profile, isLoading, isError } = useProfile(userId);
   const seed = useViaX((s) => s.me);
   const me = pickDbOrSeed(profile, seed);

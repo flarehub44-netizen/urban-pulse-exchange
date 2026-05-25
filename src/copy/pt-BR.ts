@@ -218,18 +218,10 @@ export const copy = {
   },
 
   auth: {
-    anonFirstBetTitle: "Conta sem cadastro formal",
-    anonFirstBetDesc:
-      "Crie uma conta com e-mail e senha para não perder saldo, previsões e ranking ao trocar de dispositivo.",
-    anonFirstBetProtect: "Criar conta agora",
-    anonFirstBetContinue: "Entendi, continuar prevendo",
-    anonBannerDismiss: "Lembrar depois",
     loginTitle: "Entrar na ViaX",
     loginSubtitle: "Acesse sua conta de trader com e-mail e senha.",
     signupTitle: "Criar conta",
     signupSubtitle: "Cadastro formal para prever, depositar e participar do programa de creators.",
-    upgradeTitle: "Completar cadastro",
-    upgradeSubtitle: "Vincule e-mail e senha à sua conta atual sem perder saldo nem histórico.",
     forgotTitle: "Recuperar senha",
     forgotSubtitle: "Enviaremos um link de redefinição para seu e-mail.",
     callbackTitle: "Confirmando acesso",
@@ -262,7 +254,6 @@ export const copy = {
     roleTrader: "Trader",
     rolePartner: "Afiliado",
     roleAdmin: "Admin",
-    roleAnonymous: "Visitante",
   },
 
   wallet: {

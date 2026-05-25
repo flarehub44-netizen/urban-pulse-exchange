@@ -27,9 +27,6 @@ import { EdgeBadge } from "@/components/viax/edge-badge";
 import { ImpulseDepositBar } from "@/components/viax/impulse-deposit-bar";
 import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
 import { BetConfirmDialog } from "@/components/viax/bet-confirm-dialog";
-import { AnonFirstBetDialog } from "@/components/viax/anon-first-bet-dialog";
-import { AnonAccountBanner } from "@/components/viax/anon-account-banner";
-import { hasAnonBetAck, setAnonBetAck } from "@/lib/anon-account-storage";
 import { cn } from "@/lib/utils";
 import { ArrowDown, ArrowUp, BookOpen } from "lucide-react";
 import { saveBetNoteFn } from "@/actions/bets";
@@ -48,7 +45,7 @@ export function OrderBox({
   const navigate = useNavigate();
   const { openSignup } = useAuthModal();
   const { openDeposit } = useDepositSheet();
-  const { userId, isRegistered, isAnonymous } = useAuth();
+  const { userId, isRegistered } = useAuth();
   const { data: profile } = useProfile(userId);
   const zustandBalance = useViaX((s) => s.me.balance);
   const balance = profile?.balance ?? zustandBalance;
@@ -60,13 +57,10 @@ export function OrderBox({
   const [note, setNote] = useState("");
   const [showNote, setShowNote] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [anonAckOpen, setAnonAckOpen] = useState(false);
 
   useEffect(() => {
     setSide(initialSide);
   }, [initialSide, m.id]);
-
-  const isAnonUser = isAnonymous && !isRegistered;
 
   const settled = isSettledDisplay(m.status);
   const canBet = canPlaceBets(m.status, m.acceptBets ?? true, m.endsAt);
@@ -91,7 +85,7 @@ export function OrderBox({
       toast.error(copy.auth.registerRequired, {
         action: {
           label: copy.auth.registerCta,
-          onClick: () => openSignup({ upgrade: true, depositAfter: true }),
+          onClick: () => openSignup({ depositAfter: true }),
         },
       });
       return;
@@ -110,15 +104,6 @@ export function OrderBox({
       });
       return;
     }
-    if (isAnonUser && !hasAnonBetAck()) {
-      setAnonAckOpen(true);
-      return;
-    }
-    setConfirmOpen(true);
-  };
-
-  const proceedAfterAnonAck = () => {
-    setAnonBetAck();
     setConfirmOpen(true);
   };
 
@@ -275,8 +260,7 @@ export function OrderBox({
 
   return (
     <div data-testid="order-box" className={cn("surface-card-featured", className)}>
-      <AnonAccountBanner />
-      <div className="flex flex-wrap items-center justify-between gap-2 mt-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h4 className="heading-section">
           Prever neste <span className="text-highlight">mercado</span>
         </h4>
@@ -459,11 +443,6 @@ export function OrderBox({
         />
       </div>
 
-      <AnonFirstBetDialog
-        open={anonAckOpen}
-        onOpenChange={setAnonAckOpen}
-        onContinue={proceedAfterAnonAck}
-      />
       <BetConfirmDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}

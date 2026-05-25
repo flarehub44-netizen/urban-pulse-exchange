@@ -9,7 +9,6 @@ export const MARKET_CARD_LINK = '[data-testid="market-card-link"]';
 export async function primeAppStorage(page: Page) {
   await page.addInitScript(() => {
     localStorage.setItem("viax_onboarded", "1");
-    localStorage.setItem("viax_anon_banner_dismiss", String(Date.now() + 86_400_000));
     localStorage.removeItem("viax_markets_filters");
   });
 }

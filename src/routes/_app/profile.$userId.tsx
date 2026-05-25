@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useProfile } from "@/hooks/use-profile";
 import { useTraders } from "@/hooks/use-traders";
 import { useViaX } from "@/store/viax-store";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { DivisionBadge } from "@/components/viax/division-badge";
 import { AnimatedNumber } from "@/components/viax/animated-number";
 import { copy } from "@/copy/pt-BR";
@@ -52,7 +52,7 @@ const badges = [
 
 function PublicProfile() {
   const { userId: targetId } = Route.useParams();
-  const { userId: myId } = useAnonAuth();
+  const { userId: myId } = useAuth();
 
   const { data: profile } = useProfile(targetId);
   const { data: dbTraders } = useTraders();

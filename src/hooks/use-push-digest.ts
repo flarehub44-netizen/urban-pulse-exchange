@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNotificationPrefs } from "@/hooks/use-notification-prefs";
 import { useTodayCheckIn } from "@/hooks/use-daily-check-in";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { copy } from "@/copy/pt-BR";
 
 const DIGEST_KEY = "viax_digest_sent";
@@ -9,7 +9,7 @@ const DIGEST_KEY = "viax_digest_sent";
 /** Lembrete matinal local (opt-in) — sem servidor de push em v1. */
 export function usePushDigest() {
   const { prefs } = useNotificationPrefs();
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
   const { data: today } = useTodayCheckIn(userId);
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 import { useMarketAudit } from "@/hooks/use-market-audit";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
@@ -23,7 +23,7 @@ const GOOD_WHEN_TRUE = new Set(["consistency", "window_data", "snapshot_count"])
 const GOOD_WHEN_FALSE = new Set(["tie", "crowd_conflict"]);
 
 export function MarketAuditPanel({ marketId }: { marketId: string }) {
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
   const { data: profile } = useProfile(userId);
   const { data, isLoading, error } = useMarketAudit(marketId);
   const showLedger = profile?.isAdmin === true || data?.is_admin === true;

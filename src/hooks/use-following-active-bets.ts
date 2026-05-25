@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { db } from "@/integrations/supabase/loose";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 import type { Side } from "@/store/viax-store";
 
 export interface FollowingActiveBet {
@@ -18,7 +18,7 @@ export interface FollowingActiveBet {
 }
 
 export function useFollowingActiveBets() {
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
 
   return useQuery({
     queryKey: ["following-active-bets", userId],

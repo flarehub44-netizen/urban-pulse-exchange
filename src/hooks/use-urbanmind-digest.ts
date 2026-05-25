@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { db } from "@/integrations/supabase/loose";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
 
 export type UrbanMindDigest = {
   headline: string;
@@ -12,7 +12,7 @@ export type UrbanMindDigest = {
 };
 
 export function useUrbanMindDigest() {
-  const { userId } = useAnonAuth();
+  const { userId } = useAuth();
   return useQuery({
     queryKey: ["urbanmind-digest", userId],
     queryFn: async () => {
