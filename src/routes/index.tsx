@@ -29,8 +29,12 @@ import { DivisionBadge } from "@/components/viax/division-badge";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL, formatCompact, probability, prizePool } from "@/lib/parimutuel";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import type { AuthModalSearch } from "@/lib/auth-modal-search";
+import { parseAuthModalSearch } from "@/lib/auth-modal-search";
 
 export const Route = createFileRoute("/")({
+  validateSearch: (search: Record<string, unknown>): AuthModalSearch =>
+    parseAuthModalSearch(search),
   head: () => ({
     meta: [
       { title: copy.landing.metaTitle },

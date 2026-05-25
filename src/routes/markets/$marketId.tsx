@@ -40,12 +40,14 @@ import { CommunityMarketResolvePanel } from "@/components/viax/community-market-
 import { CommunityReportButton } from "@/components/viax/community-report-button";
 import { useAuth } from "@/hooks/use-auth";
 import type { Market } from "@/store/viax-store";
+import type { AuthModalSearch } from "@/lib/auth-modal-search";
+import { parseAuthModalSearch } from "@/lib/auth-modal-search";
 
 export type MarketDetailSearch = {
   tab?: "chart" | "book" | "comments" | "audit";
   side?: "YES" | "NO";
   access?: string;
-};
+} & AuthModalSearch;
 
 export const Route = createFileRoute("/markets/$marketId")({
   head: ({ params }) => ({
@@ -63,7 +65,7 @@ export const Route = createFileRoute("/markets/$marketId")({
       tab === "chart" || tab === "book" || tab === "comments" || tab === "audit" ? tab : undefined;
     const side = search.side === "YES" || search.side === "NO" ? search.side : undefined;
     const access = typeof search.access === "string" && search.access ? search.access : undefined;
-    return { tab: validTab, side, access };
+    return { tab: validTab, side, access, ...parseAuthModalSearch(search) };
   },
   component: MarketDetail,
 });

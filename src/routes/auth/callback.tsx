@@ -48,7 +48,7 @@ function AuthCallbackPage() {
         if (cancelled) return;
 
         if (type === "recovery") {
-          navigate({ to: "/auth/login", replace: true });
+          navigate({ to: "/markets", search: { auth: "login" }, replace: true });
           return;
         }
 

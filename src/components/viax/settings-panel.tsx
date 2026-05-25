@@ -1,4 +1,6 @@
 import { Link } from "@tanstack/react-router";
+import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
+import { useAuthModal } from "@/hooks/use-auth-modal";
 import { Bell, Moon, Sun, Shield, Info, Scale, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useMyPartnerStatus, useApplyPartner } from "@/hooks/use-partner";
@@ -16,6 +18,7 @@ import { toast } from "sonner";
 
 export function SettingsPanel() {
   const { prefs, update } = useNotificationPrefs();
+  const { openLogin } = useAuthModal();
   const { userId, isRegistered } = useAuth();
   const { data: profile } = useProfile(userId);
   const { data: accountCtx } = useAccountContext(!!userId);
@@ -52,13 +55,13 @@ export function SettingsPanel() {
         {!isRegistered ? (
           <div className="mt-2 space-y-2">
             <p className="text-sm text-warn">{copy.auth.registerRequired}</p>
-            <Link
-              to="/auth/signup"
-              search={{ upgrade: "1" }}
+            <AuthModalTrigger
+              mode="signup"
+              upgrade
               className="inline-flex rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground"
             >
               {copy.auth.registerCta}
-            </Link>
+            </AuthModalTrigger>
           </div>
         ) : partnerStatus?.role === "partner" && partnerStatus.status === "active" ? (
           <Link
@@ -168,13 +171,13 @@ export function SettingsPanel() {
             <>
               <div className="text-sm font-medium">Cadastro pendente</div>
               <p className="text-xs text-muted-foreground">{copy.auth.registerRequired}</p>
-              <Link
-                to="/auth/signup"
-                search={{ upgrade: "1" }}
+              <AuthModalTrigger
+                mode="signup"
+                upgrade
                 className="inline-block rounded-lg border border-primary/30 bg-primary/15 px-4 py-2 text-xs text-primary hover:bg-primary/20"
               >
                 {copy.auth.registerCta}
-              </Link>
+              </AuthModalTrigger>
             </>
           )}
           {isRegistered && (
@@ -183,7 +186,7 @@ export function SettingsPanel() {
               onClick={async () => {
                 const { signOut } = await import("@/lib/auth-actions");
                 await signOut();
-                window.location.href = "/auth/login";
+                openLogin();
               }}
               className="text-xs text-muted-foreground hover:text-foreground underline"
             >

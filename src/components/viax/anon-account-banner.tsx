@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
 import { AlertTriangle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { copy } from "@/copy/pt-BR";
@@ -35,13 +35,13 @@ export function AnonAccountBanner({ onProtect }: { onProtect?: () => void }) {
             Proteger conta
           </button>
         ) : (
-          <Link
-            to="/auth/signup"
-            search={{ upgrade: "1" }}
+          <AuthModalTrigger
+            mode="signup"
+            upgrade
             className="rounded-xl border border-warn/40 bg-warn/10 px-3 py-1.5 text-xs font-medium text-warn hover:bg-warn/20"
           >
             {copy.auth.registerCta}
-          </Link>
+          </AuthModalTrigger>
         )}
         <button
           type="button"

@@ -2,6 +2,7 @@ import { redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { ensureAuthSession } from "@/lib/auth-session";
 import { db } from "@/integrations/supabase/loose";
+import { authModalRedirectTarget } from "@/lib/auth-modal-redirect";
 
 export async function requireAuth() {
   const state = await ensureAuthSession();
@@ -10,7 +11,8 @@ export async function requireAuth() {
       typeof window !== "undefined"
         ? `${window.location.pathname}${window.location.search}`
         : "/dashboard";
-    throw redirect({ to: "/auth/login", search: { redirect: redirectTo } });
+    const { pathname, search } = authModalRedirectTarget(redirectTo, "login");
+    throw redirect({ to: pathname, search });
   }
 }
 
@@ -18,10 +20,12 @@ export async function requireRegistered() {
   await requireAuth();
   const state = await ensureAuthSession();
   if (!state.isRegistered) {
-    throw redirect({
-      to: "/auth/signup",
-      search: { upgrade: "1" },
-    });
+    const redirectTo =
+      typeof window !== "undefined"
+        ? `${window.location.pathname}${window.location.search}`
+        : "/dashboard";
+    const { pathname, search } = authModalRedirectTarget(redirectTo, "signup");
+    throw redirect({ to: pathname, search });
   }
 }
 
@@ -58,7 +62,10 @@ export async function requireAdminRoute() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) throw redirect({ to: "/auth/login" });
+  if (!user) {
+    const { pathname, search } = authModalRedirectTarget("/dashboard", "login");
+    throw redirect({ to: pathname, search });
+  }
 
   const { data: profile } = await supabase
     .from("profiles")

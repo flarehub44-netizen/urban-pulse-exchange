@@ -5,6 +5,7 @@ import { useCreateCommunityMarket } from "@/hooks/use-community-markets";
 import { communityShareUrl } from "@/lib/community-market";
 import { copy } from "@/copy/pt-BR";
 import { useAuth } from "@/hooks/use-auth";
+import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
 
 export function CommunityMarketCreateForm() {
   const navigate = useNavigate();
@@ -85,9 +86,9 @@ export function CommunityMarketCreateForm() {
       {!isRegistered && (
         <p className="text-sm text-warn">
           {copy.auth.registerRequired}{" "}
-          <Link to="/auth/signup" search={{ upgrade: "1" }} className="text-primary underline">
+          <AuthModalTrigger mode="signup" upgrade className="text-primary underline">
             {copy.auth.registerCta}
-          </Link>
+          </AuthModalTrigger>
         </p>
       )}
 

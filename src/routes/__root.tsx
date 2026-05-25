@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { copy } from "@/copy/pt-BR";
 import { ThemeToaster } from "@/components/viax/theme-toaster";
+import { AuthModal } from "@/components/auth/auth-modal";
 import { themeInitScript } from "@/lib/theme";
 
 import appCss from "../styles.css?url";
@@ -125,6 +126,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
+      <AuthModal />
       <ThemeToaster />
     </QueryClientProvider>
   );

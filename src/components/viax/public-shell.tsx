@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { Logo } from "@/components/viax/sidebar";
+import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
 import { copy } from "@/copy/pt-BR";
 
 type PublicShellProps = {
@@ -29,12 +30,12 @@ export function PublicShell({ children }: PublicShellProps) {
             </Link>
           </nav>
           <div className="flex items-center gap-2">
-            <Link
-              to="/auth/login"
+            <AuthModalTrigger
+              mode="login"
               className="rounded-lg border bg-card px-3 py-2 text-sm font-medium hover:bg-surface"
             >
               {copy.auth.loginCta}
-            </Link>
+            </AuthModalTrigger>
             <Link
               to="/dashboard"
               className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"

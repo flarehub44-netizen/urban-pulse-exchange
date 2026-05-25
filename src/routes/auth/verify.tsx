@@ -14,7 +14,7 @@ function VerifyPage() {
       title={copy.auth.verifyTitle}
       subtitle={copy.auth.verifySubtitle}
       footer={
-        <Link to="/auth/login" className="text-primary hover:underline">
+        <Link to="/markets" search={{ auth: "login" }} className="text-primary hover:underline">
           {copy.auth.backToLogin}
         </Link>
       }

@@ -1,6 +1,7 @@
 import { copy } from "@/copy/pt-BR";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import type { MarketsSearch } from "@/routes/markets";
+import { parseAuthModalSearch } from "@/lib/auth-modal-search";
 import { useMemo, useEffect, useState } from "react";
 import { useCatalogMarkets, useMarkets } from "@/hooks/use-markets";
 import { useBets } from "@/hooks/use-bets";
@@ -61,6 +62,7 @@ export const Route = createFileRoute("/markets/")({
           ? search.sort
           : undefined,
       aiPicks: search.aiPicks === "1" ? "1" : undefined,
+      ...parseAuthModalSearch(search),
     };
   },
   component: MarketsList,

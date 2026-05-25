@@ -20,6 +20,7 @@ import { useBets } from "@/hooks/use-bets";
 import { useRegionPerformance } from "@/hooks/use-region-performance";
 import { TraderArchetypeCard } from "@/components/viax/trader-archetype-card";
 import { EmptyState } from "@/components/viax/empty-state";
+import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
 import { useMyCommunityMarkets } from "@/hooks/use-community-markets";
 import {
   Area,
@@ -121,13 +122,13 @@ function Profile() {
               — crie e-mail e senha para não perder saldo e histórico.
             </span>
           </div>
-          <Link
-            to="/auth/signup"
-            search={{ upgrade: "1" }}
+          <AuthModalTrigger
+            mode="signup"
+            upgrade
             className="shrink-0 rounded-xl border border-warn/40 bg-warn/10 px-3 py-1.5 text-xs font-medium text-warn hover:bg-warn/20"
           >
             {copy.auth.registerCta}
-          </Link>
+          </AuthModalTrigger>
         </div>
       )}
 

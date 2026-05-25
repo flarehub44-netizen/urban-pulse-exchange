@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Link } from "@tanstack/react-router";
+import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
 import { AlertTriangle } from "lucide-react";
 import { copy } from "@/copy/pt-BR";
 
@@ -28,14 +28,14 @@ export function AnonFirstBetDialog({ open, onOpenChange, onContinue }: Props) {
           <DialogDescription className="text-left">{copy.auth.anonFirstBetDesc}</DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex-col gap-2 sm:flex-col">
-          <Link
-            to="/auth/signup"
-            search={{ upgrade: "1" }}
+          <AuthModalTrigger
+            mode="signup"
+            upgrade
             className="w-full rounded-lg border border-warn/40 bg-warn/10 px-4 py-2.5 text-center text-sm font-medium text-warn hover:bg-warn/20"
             onClick={() => onOpenChange(false)}
           >
             {copy.auth.anonFirstBetProtect}
-          </Link>
+          </AuthModalTrigger>
           <button
             type="button"
             onClick={() => {

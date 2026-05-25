@@ -5,6 +5,7 @@ import confetti from "canvas-confetti";
 import { toast } from "sonner";
 import type { Market, Side } from "@/store/viax-store";
 import { useAuth } from "@/hooks/use-auth";
+import { useAuthModal } from "@/hooks/use-auth-modal";
 import { useProfile } from "@/hooks/use-profile";
 import { useViaX } from "@/store/viax-store";
 import { usePlaceBet } from "@/hooks/use-place-bet";
@@ -44,6 +45,7 @@ export function OrderBox({
   className?: string;
 }) {
   const navigate = useNavigate();
+  const { openSignup } = useAuthModal();
   const { userId, isRegistered, isAnonymous } = useAuth();
   const { data: profile } = useProfile(userId);
   const zustandBalance = useViaX((s) => s.me.balance);
@@ -87,7 +89,7 @@ export function OrderBox({
       toast.error(copy.auth.registerRequired, {
         action: {
           label: copy.auth.registerCta,
-          onClick: () => navigate({ to: "/auth/signup", search: { upgrade: "1" } }),
+          onClick: () => openSignup({ upgrade: true }),
         },
       });
       return;
