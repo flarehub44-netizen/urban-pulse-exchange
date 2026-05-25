@@ -29,6 +29,9 @@ import { DivisionBadge } from "@/components/viax/division-badge";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL, formatCompact, probability, prizePool } from "@/lib/parimutuel";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
+import { PublicNav } from "@/components/viax/public-nav";
+import { PublicMobileNav } from "@/components/viax/public-mobile-nav";
 import type { AuthModalSearch } from "@/lib/auth-modal-search";
 import { parseAuthModalSearch } from "@/lib/auth-modal-search";
 
@@ -65,7 +68,7 @@ function Landing() {
   const totalPart = markets.reduce((a, m) => a + m.participants, 0);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Nav />
 
       {/* HERO */}
@@ -106,14 +109,14 @@ function Landing() {
                 transition={{ delay: 0.15 }}
                 className="mt-8 flex flex-wrap gap-3"
               >
-                <Link
-                  to="/dashboard"
-                  search={{ from: "landing" }}
+                <AuthModalTrigger
+                  mode="signup"
+                  depositAfter
                   className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary to-primary-glow px-5 py-3 font-medium text-primary-foreground shadow-[var(--shadow-glow-primary)] transition hover:brightness-110"
                 >
-                  {copy.landing.ctaEnter}{" "}
+                  {copy.auth.depositAndPlayCta}{" "}
                   <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
-                </Link>
+                </AuthModalTrigger>
                 <Link
                   to="/markets"
                   search={{ status: "live" }}
@@ -495,6 +498,8 @@ function Landing() {
         </div>
       </section>
 
+      <PublicMobileNav />
+
       <footer className="border-t border-border/60">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-8 text-xs text-muted-foreground md:flex-row">
           <div className="flex items-center gap-2">
@@ -516,39 +521,7 @@ function Landing() {
 }
 
 function Nav() {
-  return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-        <Link to="/" className="flex items-center gap-2">
-          <Logo />
-          <span className="font-semibold tracking-tight">ViaX</span>
-        </Link>
-        <nav className="hidden gap-6 text-sm text-muted-foreground md:flex">
-          <Link to="/markets" className="hover:text-foreground">
-            Mercados
-          </Link>
-          <Link to="/live" className="hover:text-foreground">
-            Mapa
-          </Link>
-          <Link to="/ranking" className="hover:text-foreground">
-            Ranking
-          </Link>
-          <Link to="/urbanmind" className="hover:text-foreground">
-            UrbanMind
-          </Link>
-          <Link to="/feed" className="hover:text-foreground">
-            Feed
-          </Link>
-        </nav>
-        <Link
-          to="/dashboard"
-          className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-        >
-          {copy.landing.ctaTerminal} <ArrowRight className="size-3.5" />
-        </Link>
-      </div>
-    </header>
-  );
+  return <PublicNav variant="landing" />;
 }
 
 function SectionHeader({

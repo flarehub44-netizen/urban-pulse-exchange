@@ -258,6 +258,7 @@ export const copy = {
     registerRequired: "Crie uma conta formal para continuar.",
     walletRegisterHint: "Depósitos e saques Pix exigem e-mail confirmado.",
     registerCta: "Criar conta",
+    depositAndPlayCta: "Depositar e jogar",
     roleTrader: "Trader",
     rolePartner: "Afiliado",
     roleAdmin: "Admin",
@@ -608,6 +609,16 @@ export const copy = {
   events: {
     xpBoost: (n: number) => `+${n} XP bônus`,
     endsIn: "Encerra",
+  },
+
+  depositFunnel: {
+    bannerTitle: "Deposite via Pix para apostar",
+    bannerBody: "Cadastro concluído — adicione saldo em segundos e entre nas previsões ao vivo.",
+    bannerCta: "Depositar agora",
+    insufficientCta: "Depositar via Pix",
+    postSignupToast: "Conta pronta! Deposite para começar a prever.",
+    rankingCta: "Cadastre-se para subir no ranking",
+    referredBy: "Indicado por",
   },
 
   casino: {

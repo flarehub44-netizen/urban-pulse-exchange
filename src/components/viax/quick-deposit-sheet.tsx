@@ -10,6 +10,10 @@ import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
 import { formatBRL } from "@/lib/parimutuel";
 import { useAuth } from "@/hooks/use-auth";
 import { RegisterRequiredCta } from "@/components/auth/register-required-cta";
+import { trackDepositFunnel } from "@/lib/deposit-funnel";
+import { getLastImpulseAmount, setLastImpulseAmount } from "@/lib/impulse-deposit";
+import { getStoredPartnerRef } from "@/lib/partner-attribution";
+import { copy } from "@/copy/pt-BR";
 
 interface QuickDepositSheetProps {
   open: boolean;
@@ -36,13 +40,15 @@ export function QuickDepositSheet({
 
   const depositMut = useMutation({
     mutationFn: (amt: number) => initiateDepositFn({ data: { amount: amt } }),
-    onSuccess: (res) =>
+    onSuccess: (res) => {
+      trackDepositFunnel("deposit_qr_shown");
       setQr({
         qrCode: res.qrCode,
         qrCodeImg: res.qrCodeImg,
         intentId: res.intentId,
         expiresAt: res.expiresAt,
-      }),
+      });
+    },
     onError: (err) => toast.error(err instanceof Error ? err.message : "Depósito falhou."),
   });
 
@@ -53,17 +59,26 @@ export function QuickDepositSheet({
       try {
         const status = await getDepositStatusFn({ data: { intentId: qr.intentId } });
         if (status.status === "paid") {
+          trackDepositFunnel("deposit_paid", { amount: status.amount });
           setDone(true);
           setQr(null);
           queryClient.invalidateQueries({ queryKey: ["me"] });
           queryClient.invalidateQueries({ queryKey: ["transactions"] });
+          queryClient.invalidateQueries({ queryKey: ["has-deposited"] });
           toast.success("Depósito confirmado!", {
             description: `${formatBRL(status.amount)} adicionado ao seu saldo.`,
           });
           onOpenChange(false);
         } else if (status.status === "failed" || status.status === "expired") {
+          const retryAmount = getLastImpulseAmount();
           setQr(null);
-          toast.error("QR Code expirado ou pagamento falhou. Tente novamente.");
+          setAmount(String(retryAmount));
+          toast.error("QR Code expirado. Gere um novo código com o mesmo valor.", {
+            action: {
+              label: "Tentar de novo",
+              onClick: () => depositMut.mutate(retryAmount),
+            },
+          });
         }
       } catch {
         /* silencioso */
@@ -86,12 +101,19 @@ export function QuickDepositSheet({
       toast.error("Informe um valor válido.");
       return;
     }
+    setLastImpulseAmount(amt);
     depositMut.mutate(amt);
   };
 
+  const partnerRef = getStoredPartnerRef();
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-2xl pb-8">
+      <SheetContent
+        side="bottom"
+        className="rounded-t-2xl pb-8"
+        data-testid="quick-deposit-sheet"
+      >
         <SheetHeader className="mb-4">
           <SheetTitle className="flex items-center gap-2">
             <Wallet className="size-4 text-primary" />
@@ -141,6 +163,12 @@ export function QuickDepositSheet({
           </div>
         ) : (
           <div className="space-y-4">
+            {partnerRef?.slug && (
+              <p className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-center text-[11px] text-muted-foreground">
+                {copy.depositFunnel.referredBy}{" "}
+                <span className="font-medium text-foreground">{partnerRef.slug}</span>
+              </p>
+            )}
             {casinoEnabled && (
               <div className="space-y-2">
                 <p className="text-xs font-medium text-muted-foreground">Valor sugerido</p>

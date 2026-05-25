@@ -34,9 +34,11 @@ import {
   YAxis,
 } from "recharts";
 import { cn } from "@/lib/utils";
+import { parseAuthModalSearch, type AuthModalSearch } from "@/lib/auth-modal-search";
+
 export type ProfileSearch = {
   tab?: "visao" | "posicoes" | "carteira" | "favoritos" | "badges" | "atividade" | "mercados" | "config";
-};
+} & AuthModalSearch;
 
 export const Route = createFileRoute("/_app/profile")({
   head: () => ({
@@ -47,7 +49,8 @@ export const Route = createFileRoute("/_app/profile")({
   }),
   validateSearch: (search: Record<string, unknown>): ProfileSearch => {
     const t = search.tab;
-    if (
+    const auth = parseAuthModalSearch(search);
+    const tab =
       t === "posicoes" ||
       t === "carteira" ||
       t === "favoritos" ||
@@ -55,9 +58,9 @@ export const Route = createFileRoute("/_app/profile")({
       t === "atividade" ||
       t === "mercados" ||
       t === "config"
-    )
-      return { tab: t };
-    return { tab: "visao" };
+        ? t
+        : "visao";
+    return { tab, ...auth };
   },
   component: Profile,
 });

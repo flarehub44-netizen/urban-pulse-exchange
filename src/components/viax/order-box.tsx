@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import type { Market, Side } from "@/store/viax-store";
 import { useAuth } from "@/hooks/use-auth";
 import { useAuthModal } from "@/hooks/use-auth-modal";
+import { useDepositSheet } from "@/hooks/use-deposit-sheet";
 import { useProfile } from "@/hooks/use-profile";
 import { useViaX } from "@/store/viax-store";
 import { usePlaceBet } from "@/hooks/use-place-bet";
@@ -46,6 +47,7 @@ export function OrderBox({
 }) {
   const navigate = useNavigate();
   const { openSignup } = useAuthModal();
+  const { openDeposit } = useDepositSheet();
   const { userId, isRegistered, isAnonymous } = useAuth();
   const { data: profile } = useProfile(userId);
   const zustandBalance = useViaX((s) => s.me.balance);
@@ -89,7 +91,7 @@ export function OrderBox({
       toast.error(copy.auth.registerRequired, {
         action: {
           label: copy.auth.registerCta,
-          onClick: () => openSignup({ upgrade: true }),
+          onClick: () => openSignup({ upgrade: true, depositAfter: true }),
         },
       });
       return;
@@ -102,8 +104,8 @@ export function OrderBox({
       toast.error("Saldo insuficiente", {
         description: `Disponível: ${formatBRL(balance)}`,
         action: {
-          label: "Carteira",
-          onClick: () => navigate({ to: "/profile", search: { tab: "carteira" } }),
+          label: copy.depositFunnel.insufficientCta,
+          onClick: () => openDeposit({ amount: Math.max(stake, 200) }),
         },
       });
       return;
@@ -392,13 +394,15 @@ export function OrderBox({
             >
               Usar {formatBRL(maxAffordable)}
             </button>
-            <Link
-              to="/profile"
-              search={{ tab: "carteira" }}
-              className="text-primary hover:underline"
-            >
-              Carteira →
-            </Link>
+            {isRegistered && (
+              <button
+                type="button"
+                onClick={() => openDeposit({ amount: Math.max(stake, 200), source: "order_box" })}
+                className="font-medium text-primary hover:underline"
+              >
+                {copy.depositFunnel.insufficientCta}
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -476,16 +480,26 @@ export function OrderBox({
         data-testid="order-box-operate"
         whileTap={{ scale: 0.98 }}
         type="button"
-        onClick={openConfirm}
-        disabled={isPending || insufficient || stake <= 0}
+        onClick={
+          insufficient && isRegistered
+            ? () => openDeposit({ amount: Math.max(stake, 200), source: "order_box" })
+            : openConfirm
+        }
+        disabled={isPending || stake <= 0 || (insufficient && !isRegistered)}
         className={cn(
           "mt-4 w-full rounded-xl px-4 py-3 font-medium transition disabled:opacity-60",
-          side === "YES"
-            ? "bg-gradient-to-r from-up to-up/80 text-up-foreground hover:shadow-[var(--shadow-glow-up)]"
-            : "bg-gradient-to-r from-down to-down/80 text-down-foreground hover:shadow-[var(--shadow-glow-down)]",
+          insufficient && isRegistered
+            ? "bg-gradient-to-r from-primary to-primary-glow text-primary-foreground"
+            : side === "YES"
+              ? "bg-gradient-to-r from-up to-up/80 text-up-foreground hover:shadow-[var(--shadow-glow-up)]"
+              : "bg-gradient-to-r from-down to-down/80 text-down-foreground hover:shadow-[var(--shadow-glow-down)]",
         )}
       >
-        {isPending ? copy.bet.processing : copy.bet.operateCta(side, formatBRL(stake))}
+        {isPending
+          ? copy.bet.processing
+          : insufficient && isRegistered
+            ? copy.depositFunnel.insufficientCta
+            : copy.bet.operateCta(side, formatBRL(stake))}
       </motion.button>
 
       <p className="mt-3 text-center text-[10px] text-muted-foreground">

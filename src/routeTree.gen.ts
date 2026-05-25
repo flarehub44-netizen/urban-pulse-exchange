@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RankingRouteImport } from './routes/ranking'
 import { Route as MarketsRouteImport } from './routes/markets'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as AppRouteImport } from './routes/_app'
@@ -52,7 +53,6 @@ import { Route as AdminEventsRouteImport } from './routes/admin/events'
 import { Route as AppWalletRouteImport } from './routes/_app/wallet'
 import { Route as AppUrbanmindRouteImport } from './routes/_app/urbanmind'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
-import { Route as AppRankingRouteImport } from './routes/_app/ranking'
 import { Route as AppProfileRouteImport } from './routes/_app/profile'
 import { Route as AppPositionsRouteImport } from './routes/_app/positions'
 import { Route as AppNotificationsRouteImport } from './routes/_app/notifications'
@@ -73,6 +73,11 @@ import { Route as ApiPublicHlsProxySplatRouteImport } from './routes/api/public/
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RankingRoute = RankingRouteImport.update({
+  id: '/ranking',
+  path: '/ranking',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketsRoute = MarketsRouteImport.update({
@@ -284,11 +289,6 @@ const AppSettingsRoute = AppSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AppRoute,
 } as any)
-const AppRankingRoute = AppRankingRouteImport.update({
-  id: '/ranking',
-  path: '/ranking',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppProfileRoute = AppProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -378,6 +378,7 @@ export interface FileRoutesByFullPath {
   '/partner': typeof PartnerRouteRouteWithChildren
   '/live': typeof LiveRoute
   '/markets': typeof MarketsRouteWithChildren
+  '/ranking': typeof RankingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRouteWithChildren
@@ -385,7 +386,6 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof AppNotificationsRoute
   '/positions': typeof AppPositionsRoute
   '/profile': typeof AppProfileRouteWithChildren
-  '/ranking': typeof AppRankingRoute
   '/settings': typeof AppSettingsRoute
   '/urbanmind': typeof AppUrbanmindRoute
   '/wallet': typeof AppWalletRoute
@@ -436,6 +436,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
   '/live': typeof LiveRoute
+  '/ranking': typeof RankingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRouteWithChildren
@@ -443,7 +444,6 @@ export interface FileRoutesByTo {
   '/notifications': typeof AppNotificationsRoute
   '/positions': typeof AppPositionsRoute
   '/profile': typeof AppProfileRouteWithChildren
-  '/ranking': typeof AppRankingRoute
   '/settings': typeof AppSettingsRoute
   '/urbanmind': typeof AppUrbanmindRoute
   '/wallet': typeof AppWalletRoute
@@ -499,6 +499,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/live': typeof LiveRoute
   '/markets': typeof MarketsRouteWithChildren
+  '/ranking': typeof RankingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/feed': typeof AppFeedRouteWithChildren
@@ -506,7 +507,6 @@ export interface FileRoutesById {
   '/_app/notifications': typeof AppNotificationsRoute
   '/_app/positions': typeof AppPositionsRoute
   '/_app/profile': typeof AppProfileRouteWithChildren
-  '/_app/ranking': typeof AppRankingRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/urbanmind': typeof AppUrbanmindRoute
   '/_app/wallet': typeof AppWalletRoute
@@ -562,6 +562,7 @@ export interface FileRouteTypes {
     | '/partner'
     | '/live'
     | '/markets'
+    | '/ranking'
     | '/sitemap.xml'
     | '/dashboard'
     | '/feed'
@@ -569,7 +570,6 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/positions'
     | '/profile'
-    | '/ranking'
     | '/settings'
     | '/urbanmind'
     | '/wallet'
@@ -620,6 +620,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/live'
+    | '/ranking'
     | '/sitemap.xml'
     | '/dashboard'
     | '/feed'
@@ -627,7 +628,6 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/positions'
     | '/profile'
-    | '/ranking'
     | '/settings'
     | '/urbanmind'
     | '/wallet'
@@ -682,6 +682,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/live'
     | '/markets'
+    | '/ranking'
     | '/sitemap.xml'
     | '/_app/dashboard'
     | '/_app/feed'
@@ -689,7 +690,6 @@ export interface FileRouteTypes {
     | '/_app/notifications'
     | '/_app/positions'
     | '/_app/profile'
-    | '/_app/ranking'
     | '/_app/settings'
     | '/_app/urbanmind'
     | '/_app/wallet'
@@ -745,6 +745,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   LiveRoute: typeof LiveRoute
   MarketsRoute: typeof MarketsRouteWithChildren
+  RankingRoute: typeof RankingRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   RSlugRoute: typeof RSlugRoute
   ApiCronFootballResolveRoute: typeof ApiCronFootballResolveRoute
@@ -761,6 +762,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ranking': {
+      id: '/ranking'
+      path: '/ranking'
+      fullPath: '/ranking'
+      preLoaderRoute: typeof RankingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/markets': {
@@ -1057,13 +1065,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/ranking': {
-      id: '/_app/ranking'
-      path: '/ranking'
-      fullPath: '/ranking'
-      preLoaderRoute: typeof AppRankingRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/profile': {
       id: '/_app/profile'
       path: '/profile'
@@ -1297,7 +1298,6 @@ interface AppRouteChildren {
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppPositionsRoute: typeof AppPositionsRoute
   AppProfileRoute: typeof AppProfileRouteWithChildren
-  AppRankingRoute: typeof AppRankingRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppUrbanmindRoute: typeof AppUrbanmindRoute
   AppWalletRoute: typeof AppWalletRoute
@@ -1313,7 +1313,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppNotificationsRoute: AppNotificationsRoute,
   AppPositionsRoute: AppPositionsRoute,
   AppProfileRoute: AppProfileRouteWithChildren,
-  AppRankingRoute: AppRankingRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppUrbanmindRoute: AppUrbanmindRoute,
   AppWalletRoute: AppWalletRoute,
@@ -1345,6 +1344,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   LiveRoute: LiveRoute,
   MarketsRoute: MarketsRouteWithChildren,
+  RankingRoute: RankingRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   RSlugRoute: RSlugRoute,
   ApiCronFootballResolveRoute: ApiCronFootballResolveRoute,

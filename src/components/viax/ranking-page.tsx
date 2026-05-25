@@ -1,6 +1,9 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Route } from "@/routes/ranking";
 import { useFollowedTraders } from "@/hooks/use-followed-traders";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuth } from "@/hooks/use-auth";
+import { useAuthPublic } from "@/hooks/use-auth-public";
+import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
 import { RankBar } from "@/components/viax/rank-bar";
 import { useResolvedTraders, useResolvedProfile } from "@/hooks/use-resolved-data";
 import { DivisionBadge } from "@/components/viax/division-badge";
@@ -11,25 +14,6 @@ import { EmptyState } from "@/components/viax/empty-state";
 import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/viax/page-header";
 
-export type RankingSearch = {
-  tab?: "global" | "cidade" | "bairro" | "amigos";
-};
-
-export const Route = createFileRoute("/_app/ranking")({
-  head: () => ({
-    meta: [
-      { title: "Ranking · ViaX" },
-      { name: "description", content: "Leaderboards globais, por cidade, bairro e amigos." },
-    ],
-  }),
-  validateSearch: (search: Record<string, unknown>): RankingSearch => {
-    const t = search.tab;
-    if (t === "cidade" || t === "bairro" || t === "amigos") return { tab: t };
-    return { tab: "global" };
-  },
-  component: Ranking,
-});
-
 const tabs = [
   { key: "global" as const, label: "Global" },
   { key: "cidade" as const, label: "Cidade" },
@@ -37,10 +21,12 @@ const tabs = [
   { key: "amigos" as const, label: "Destaques" },
 ];
 
-function Ranking() {
+export function RankingPage() {
   const navigate = useNavigate({ from: "/ranking" });
   const { tab = "global" } = Route.useSearch();
-  const { userId } = useAnonAuth();
+  const { isRegistered: isRegisteredApp, userId } = useAuth();
+  const { isRegistered: isRegisteredPublic } = useAuthPublic();
+  const isRegistered = isRegisteredApp || isRegisteredPublic;
   const { ids: followedIds } = useFollowedTraders();
   const { traders: traderList } = useResolvedTraders();
   const { profile } = useResolvedProfile();
@@ -81,6 +67,19 @@ function Ranking() {
         title={<span className="text-highlight">Ranking</span>}
         description={tab === "amigos" ? copy.ranking.followingSort : copy.ranking.defaultSort}
       />
+
+      {!isRegistered && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3">
+          <p className="text-sm text-muted-foreground">{copy.depositFunnel.rankingCta}</p>
+          <AuthModalTrigger
+            mode="signup"
+            depositAfter
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+          >
+            {copy.auth.registerCta}
+          </AuthModalTrigger>
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-2">
         {tabs.map((t) => (

@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useEffect, useState, useRef, lazy, Suspense, useCallback } from "react";
+import { useMemo, useEffect, useState, useRef, lazy, Suspense } from "react";
 import { findTopMarketForRegion } from "@/lib/region-market";
 import { toast } from "sonner";
 import { useViaX } from "@/store/viax-store";
@@ -74,7 +74,7 @@ import { TomorrowPreview } from "@/components/viax/tomorrow-preview";
 import { NeighborhoodWidget } from "@/components/viax/neighborhood-widget";
 import { DailyPoll } from "@/components/viax/daily-poll";
 import { DivisionUpModal } from "@/components/viax/division-up-modal";
-import { QuickDepositSheet } from "@/components/viax/quick-deposit-sheet";
+import { useDepositSheet } from "@/hooks/use-deposit-sheet";
 import { useFollowingActiveBets } from "@/hooks/use-following-active-bets";
 import { useWinToast } from "@/hooks/use-win-toast";
 
@@ -105,8 +105,7 @@ function Dashboard() {
   const { data: weeklyReport, shouldShow: showWeeklyReport } = useWeeklyReport();
   const [weeklyReportDismissed, setWeeklyReportDismissed] = useState(false);
   const [divisionUp, setDivisionUp] = useState<string | null>(null);
-  const [depositSheetOpen, setDepositSheetOpen] = useState(false);
-  const openDepositSheet = useCallback(() => setDepositSheetOpen(true), []);
+  const { openDeposit: openDepositSheet } = useDepositSheet();
   const prevDivisionRef = useRef<string | null>(null);
   const { markets } = useResolvedMarkets();
   const { regions } = useResolvedRegions();
@@ -279,8 +278,6 @@ function Dashboard() {
           </button>
         </div>
       )}
-
-      <QuickDepositSheet open={depositSheetOpen} onOpenChange={setDepositSheetOpen} />
 
       <div className="page-section">
         <PageHeader

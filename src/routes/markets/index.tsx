@@ -26,6 +26,8 @@ import { useAuthPublic } from "@/hooks/use-auth-public";
 import { useProfile } from "@/hooks/use-profile";
 import { PageHeader } from "@/components/viax/page-header";
 import { CommunityMarketsList } from "@/components/viax/community-markets-list";
+import { DepositPromptBanner } from "@/components/viax/deposit-prompt-banner";
+import { useHasDeposited } from "@/hooks/use-has-deposited";
 
 export const Route = createFileRoute("/markets/")({
   head: () => ({
@@ -80,8 +82,9 @@ const draftFilter = { key: "draft" as const, label: "Rascunhos" };
 function MarketsList() {
   const navigate = useNavigate({ from: "/markets/" });
   const search = Route.useSearch();
-  const { userId } = useAuthPublic();
+  const { userId, isRegistered } = useAuthPublic();
   const { data: profile } = useProfile(userId);
+  const { data: hasDeposited } = useHasDeposited(userId);
   const markets = useCatalogMarkets();
   const { isLoading: marketsLoading, error: marketsError, refetch } = useMarkets();
   const queryClient = useQueryClient();
@@ -228,6 +231,8 @@ function MarketsList() {
 
   return (
     <div className="space-y-5">
+      {isRegistered && hasDeposited === false && <DepositPromptBanner />}
+
       <div className="flex gap-2 border-b pb-2">
         <button
           type="button"

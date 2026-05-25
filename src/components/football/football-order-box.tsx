@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import type { FootballMarketRow } from "@/hooks/use-football-markets";
 import type { FootballOutcome } from "@/lib/football-parimutuel";
 import { usePlaceFootballBet } from "@/hooks/use-place-football-bet";
+import { useDepositSheet } from "@/hooks/use-deposit-sheet";
 import { useProfile } from "@/hooks/use-profile";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -23,6 +24,7 @@ export function FootballOrderBox({ m }: { m: FootballMarketRow }) {
   const [outcome, setOutcome] = useState<FootballOutcome>("HOME");
   const [stake, setStake] = useState(100);
   const { mutateAsync: placeBet, isPending } = usePlaceFootballBet();
+  const { openDeposit } = useDepositSheet();
 
   const pool: FootballPool = { HOME: m.pool_home, DRAW: m.pool_draw, AWAY: m.pool_away };
   const closesAt = new Date(m.betting_closes_at).getTime();
@@ -37,7 +39,12 @@ export function FootballOrderBox({ m }: { m: FootballMarketRow }) {
       return;
     }
     if (stake > balance) {
-      toast.error(copy.football.insufficientBalance);
+      toast.error(copy.football.insufficientBalance, {
+        action: {
+          label: copy.depositFunnel.insufficientCta,
+          onClick: () => openDeposit({ amount: Math.max(stake, 200), source: "football_order" }),
+        },
+      });
       return;
     }
     try {

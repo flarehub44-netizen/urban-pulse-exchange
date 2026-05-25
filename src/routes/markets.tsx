@@ -2,6 +2,8 @@ import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import type { MarketCategoryFilter } from "@/lib/markets-catalog";
 import type { AuthModalSearch } from "@/lib/auth-modal-search";
+
+export type { AuthModalSearch };
 import { AuthAwareShell } from "@/components/viax/auth-aware-shell";
 
 export type MarketsSearch = {

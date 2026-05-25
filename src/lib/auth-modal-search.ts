@@ -4,6 +4,7 @@ export type AuthModalSearch = {
   auth?: AuthModalMode;
   redirect?: string;
   upgrade?: "1";
+  deposit?: "1";
 };
 
 export function parseAuthModalSearch(search: Record<string, unknown>): AuthModalSearch {
@@ -14,10 +15,11 @@ export function parseAuthModalSearch(search: Record<string, unknown>): AuthModal
     auth: validAuth,
     redirect: typeof search.redirect === "string" && search.redirect ? search.redirect : undefined,
     upgrade: search.upgrade === "1" ? "1" : undefined,
+    deposit: search.deposit === "1" ? "1" : undefined,
   };
 }
 
-export const AUTH_MODAL_SEARCH_KEYS = ["auth", "redirect", "upgrade"] as const;
+export const AUTH_MODAL_SEARCH_KEYS = ["auth", "redirect", "upgrade", "deposit"] as const;
 
 export function stripAuthModalSearch<T extends Record<string, unknown>>(search: T): T {
   const next = { ...search };

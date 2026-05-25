@@ -10,6 +10,7 @@ import {
 import { copy } from "@/copy/pt-BR";
 import { ThemeToaster } from "@/components/viax/theme-toaster";
 import { AuthModal } from "@/components/auth/auth-modal";
+import { DepositSheetHost } from "@/components/viax/deposit-sheet-host";
 import { themeInitScript } from "@/lib/theme";
 
 import appCss from "../styles.css?url";
@@ -127,6 +128,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <Outlet />
       <AuthModal />
+      <DepositSheetHost />
       <ThemeToaster />
     </QueryClientProvider>
   );

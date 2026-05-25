@@ -6,6 +6,7 @@ import { ArrowUpCircle, ArrowDownCircle, Trophy, ChevronRight, X, Zap, Brain } f
 import { cn } from "@/lib/utils";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
+import { useDepositSheet } from "@/hooks/use-deposit-sheet";
 
 const STORAGE_KEY = "viax_onboarded";
 
@@ -107,10 +108,23 @@ const stepData = [
     ),
     finishTo: "/urbanmind",
   },
+  {
+    color: "from-primary/20 to-up/10",
+    title: "Deposite via Pix",
+    body: "Adicione saldo em segundos e comece a prever nos mercados ao vivo de São Paulo.",
+    visual: (
+      <div className="mt-4 rounded-xl border border-up/30 bg-background/50 p-3 text-sm text-center">
+        <div className="text-[10px] uppercase tracking-wider text-up">Pix instantâneo</div>
+        <div className="mt-2 text-lg font-semibold text-up">R$ 50 · R$ 100 · R$ 200</div>
+      </div>
+    ),
+    finishTo: "deposit",
+  },
 ];
 
 export function OnboardingModal() {
   const navigate = useNavigate();
+  const { openDeposit } = useDepositSheet();
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
 
@@ -130,6 +144,9 @@ export function OnboardingModal() {
     const target = stepData[step]?.finishTo;
     if (target === "/urbanmind") {
       navigate({ to: "/urbanmind" });
+    } else if (target === "deposit") {
+      navigate({ to: "/markets", search: { status: "live" } });
+      requestAnimationFrame(() => openDeposit({ amount: 200, source: "onboarding" }));
     } else {
       navigate({ to: "/markets", search: { status: "live" } });
     }

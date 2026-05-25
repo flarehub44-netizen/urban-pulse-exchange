@@ -4,6 +4,7 @@ import {
   useAdminVolumeByHour,
   useAdminLiveFeed,
 } from "@/hooks/use-admin-dashboard";
+import { useAdminDepositFunnelMetrics } from "@/hooks/use-admin-deposit-funnel";
 import { AdminStatCard } from "@/components/admin/admin-stat-card";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
@@ -21,6 +22,7 @@ function AdminOverviewPage() {
   const { data: metrics, isLoading, isError, refetch } = useAdminDashboardMetrics();
   const { data: volumeHour } = useAdminVolumeByHour();
   const { data: feed } = useAdminLiveFeed();
+  const { data: funnel } = useAdminDepositFunnelMetrics(7);
 
   if (isError) {
     return <InlineError onRetry={() => refetch()} />;
@@ -45,6 +47,37 @@ function AdminOverviewPage() {
         <h1 className="text-lg font-semibold">{copy.admin.nav.overview}</h1>
         <p className="text-xs text-muted-foreground">{copy.admin.subtitle}</p>
       </div>
+
+      {funnel && (
+        <div className="rounded-xl border bg-card/40 p-4">
+          <h2 className="text-sm font-semibold">Funil depósito Pix (7 dias)</h2>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5 text-xs">
+            {(
+              [
+                "auth_modal_open",
+                "signup_complete",
+                "deposit_sheet_open",
+                "deposit_qr_shown",
+                "deposit_paid",
+              ] as const
+            ).map((ev) => (
+              <div key={ev} className="rounded-lg border bg-surface/40 px-3 py-2">
+                <div className="text-muted-foreground">{ev}</div>
+                <div className="mono mt-1 text-lg font-semibold">
+                  {funnel.counts?.[ev] ?? 0}
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-[11px] text-muted-foreground">
+            Conversão cadastro → pago:{" "}
+            <span className="font-medium text-foreground">
+              {funnel.conversion_pct ?? 0}%
+            </span>{" "}
+            ({funnel.deposit_paid ?? 0}/{funnel.signup_complete ?? 0})
+          </p>
+        </div>
+      )}
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <AdminStatCard

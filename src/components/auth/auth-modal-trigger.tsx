@@ -6,6 +6,7 @@ type AuthModalTriggerProps = {
   mode: "login" | "signup";
   redirect?: string;
   upgrade?: boolean;
+  depositAfter?: boolean;
   className?: string;
   children: ReactNode;
   onClick?: () => void;
@@ -15,6 +16,7 @@ export function AuthModalTrigger({
   mode,
   redirect,
   upgrade,
+  depositAfter,
   className,
   children,
   onClick,
@@ -26,8 +28,8 @@ export function AuthModalTrigger({
       type="button"
       onClick={() => {
         onClick?.();
-        if (mode === "login") openLogin({ redirect });
-        else openSignup({ redirect, upgrade });
+        if (mode === "login") openLogin({ redirect, depositAfter });
+        else openSignup({ redirect, upgrade, depositAfter });
       }}
       className={cn(className)}
     >

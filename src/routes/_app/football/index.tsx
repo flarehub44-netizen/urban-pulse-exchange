@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/viax/page-header";
 import { InlineError } from "@/components/viax/inline-error";
 import { EmptyState } from "@/components/viax/empty-state";
 import { copy } from "@/copy/pt-BR";
+import { DepositFunnelBannerSlot } from "@/components/viax/deposit-funnel-banner-slot";
 
 export const Route = createFileRoute("/_app/football/")({
   head: () => ({
@@ -34,6 +35,7 @@ function FootballListPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
+      <DepositFunnelBannerSlot />
       <PageHeader title={copy.football.title} subtitle={copy.football.subtitle} />
 
       {isLoading && <p className="text-sm text-muted-foreground">{copy.common.loading}</p>}

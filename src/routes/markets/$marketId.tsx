@@ -30,7 +30,7 @@ import { cn } from "@/lib/utils";
 import { isSettledDisplay, statusLabel } from "@/lib/market-status";
 import { MarketAuditPanel } from "@/components/viax/market-audit-panel";
 import { LiveCameraStrip } from "@/components/viax/live-camera-strip";
-import { MarketSocialProof } from "@/components/viax/market-social-proof";
+import { MarketSocialProofLite } from "@/components/viax/market-social-proof-lite";
 import { MarketAlertButton } from "@/components/viax/market-alert-button";
 import {
   useCommunityMarketDetail,
@@ -365,7 +365,7 @@ function MarketDetail() {
 
             {(m.status === "live" || m.status === "closing") && (
               <div className="mt-4">
-                {/* MarketSocialProof disabled: framer-motion ticker caused update loop with realtime pool */}
+                <MarketSocialProofLite marketId={marketId} />
               </div>
             )}
 

@@ -6,8 +6,9 @@ type AuthModalState = {
   mode: AuthModalMode;
   redirect?: string;
   upgrade: boolean;
-  openLogin: (opts?: { redirect?: string }) => void;
-  openSignup: (opts?: { redirect?: string; upgrade?: boolean }) => void;
+  openDepositAfter: boolean;
+  openLogin: (opts?: { redirect?: string; depositAfter?: boolean }) => void;
+  openSignup: (opts?: { redirect?: string; upgrade?: boolean; depositAfter?: boolean }) => void;
   openForgot: () => void;
   setMode: (mode: AuthModalMode) => void;
   close: () => void;
@@ -18,16 +19,24 @@ export const useAuthModalStore = create<AuthModalState>((set) => ({
   mode: "login",
   redirect: undefined,
   upgrade: false,
+  openDepositAfter: false,
   openLogin: (opts) =>
-    set({ open: true, mode: "login", redirect: opts?.redirect, upgrade: false }),
+    set({
+      open: true,
+      mode: "login",
+      redirect: opts?.redirect,
+      upgrade: false,
+      openDepositAfter: opts?.depositAfter ?? false,
+    }),
   openSignup: (opts) =>
     set({
       open: true,
       mode: "signup",
       redirect: opts?.redirect,
       upgrade: opts?.upgrade ?? false,
+      openDepositAfter: opts?.depositAfter ?? false,
     }),
-  openForgot: () => set({ open: true, mode: "forgot" }),
+  openForgot: () => set({ open: true, mode: "forgot", openDepositAfter: false }),
   setMode: (mode) => set({ mode }),
-  close: () => set({ open: false }),
+  close: () => set({ open: false, openDepositAfter: false }),
 }));

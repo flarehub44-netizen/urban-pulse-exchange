@@ -9,6 +9,7 @@ import { useSupabaseRealtime } from "@/hooks/use-supabase-realtime";
 import { useResolveExpired } from "@/hooks/use-resolve-expired";
 import { useClosingMarketAlerts } from "@/hooks/use-closing-market-alerts";
 import { RetentionBoot } from "@/components/viax/retention-boot";
+import { DepositNudgeBoot } from "@/components/viax/deposit-nudge-boot";
 import { CasinoBoot } from "@/components/viax/casino-boot";
 import { usePushDigest } from "@/hooks/use-push-digest";
 
@@ -26,6 +27,7 @@ export function AppShell({ children }: AppShellProps) {
   return (
     <div className="min-h-screen w-full bg-background">
       <RetentionBoot />
+      <DepositNudgeBoot />
       <CasinoBoot />
       <div className="flex">
         <AppSidebar />

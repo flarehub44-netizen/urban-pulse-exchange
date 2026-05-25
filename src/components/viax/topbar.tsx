@@ -25,6 +25,7 @@ import { AnimatedNumber } from "./animated-number";
 import { DivisionBadge } from "./division-badge";
 import { MobileSidebarDrawer } from "./sidebar";
 import { openCommandPalette } from "./command-palette";
+import { useDepositSheet } from "@/hooks/use-deposit-sheet";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -42,6 +43,7 @@ export function Topbar() {
   const { data: bets } = useBets();
   const openPositions = (bets ?? []).filter((b) => isOpenBetStatus(b.marketStatus)).length;
 
+  const { openDeposit } = useDepositSheet();
   const queryClient = useQueryClient();
   const xpPct = (me.xp / ("xpToNext" in me ? me.xpToNext : 2000)) * 100;
   const unread = notifications.filter((n) => !n.read).length;
@@ -121,11 +123,16 @@ export function Topbar() {
           </Link>
         )}
 
-        <Link to="/profile" search={{ tab: "carteira" }} className="hidden sm:flex">
+        <button
+          type="button"
+          onClick={() => openDeposit({ amount: 200 })}
+          className="hidden sm:flex rounded-lg transition hover:bg-surface/60"
+          aria-label="Depositar via Pix"
+        >
           <Stat icon={<WalletIcon className="size-3.5" />} label="Saldo">
             <AnimatedNumber value={me.balance} format={formatBRL} className="text-foreground" />
           </Stat>
-        </Link>
+        </button>
         <Stat icon={<TrendingUp className="size-3.5" />} label="Volume 24h" hideSm>
           <AnimatedNumber
             value={"volume24h" in me ? me.volume24h : 0}

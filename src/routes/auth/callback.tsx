@@ -5,6 +5,8 @@ import { parseAuthSession } from "@/lib/auth";
 import { runPostRegistrationFlow } from "@/lib/post-registration";
 import { copy } from "@/copy/pt-BR";
 import { AuthShell } from "@/components/auth/auth-shell";
+import { db } from "@/integrations/supabase/loose";
+import { getDefaultPostAuthPath } from "@/lib/post-auth-redirect";
 
 export const Route = createFileRoute("/auth/callback")({
   component: AuthCallbackPage,
@@ -52,7 +54,29 @@ function AuthCallbackPage() {
           return;
         }
 
-        navigate({ to: "/dashboard", replace: true });
+        let hasDeposited = false;
+        if (auth.userId) {
+          const { data } = (await db
+            .from("transactions")
+            .select("id")
+            .eq("type", "deposit")
+            .gt("amount", 0)
+            .limit(1)) as { data: { id: string }[] | null };
+          hasDeposited = (data?.length ?? 0) > 0;
+        }
+
+        const dest = getDefaultPostAuthPath(hasDeposited);
+        if (dest.includes("?")) {
+          const [pathname, qs] = dest.split("?");
+          const params = new URLSearchParams(qs);
+          const search: Record<string, string> = {};
+          params.forEach((v, k) => {
+            search[k] = v;
+          });
+          navigate({ to: pathname, search, replace: true });
+        } else {
+          navigate({ to: dest, replace: true });
+        }
       } catch (err: unknown) {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : copy.errors.generic);

@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Radio, AlertTriangle, ExternalLink, MapPin } from "lucide-react";
 import { EmptyState } from "@/components/viax/empty-state";
 import { copy } from "@/copy/pt-BR";
+import { DepositFunnelBannerSlot } from "@/components/viax/deposit-funnel-banner-slot";
 
 type LivePageContentProps = {
   /** Poll regions more often on the public map (no Realtime subscription). */
@@ -24,6 +25,7 @@ export function LivePageContent({ refreshRegions = false }: LivePageContentProps
 
   return (
     <div className="space-y-5">
+      <DepositFunnelBannerSlot />
       <div className="flex items-end justify-between">
         <div>
           <h1 className="heading-page text-2xl">
