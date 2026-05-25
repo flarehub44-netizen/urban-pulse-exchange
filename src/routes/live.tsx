@@ -1,9 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { AppShell } from "@/components/viax/app-shell";
-import { PublicShell } from "@/components/viax/public-shell";
+import { AuthAwareShell } from "@/components/viax/auth-aware-shell";
 import { LivePageContent } from "@/components/viax/live-page-content";
-import { AppLoadingSkeleton } from "@/components/viax/app-loading-skeleton";
 import { useAuthPublic } from "@/hooks/use-auth-public";
 
 export const Route = createFileRoute("/live")({
@@ -24,16 +22,9 @@ export const Route = createFileRoute("/live")({
 
 function LivePage() {
   const { isRegistered, authReady } = useAuthPublic();
-
-  if (!authReady) {
-    return <AppLoadingSkeleton />;
-  }
-
-  const content = <LivePageContent refreshRegions={!isRegistered} />;
-
-  if (isRegistered) {
-    return <AppShell>{content}</AppShell>;
-  }
-
-  return <PublicShell>{content}</PublicShell>;
+  return (
+    <AuthAwareShell>
+      <LivePageContent refreshRegions={authReady && !isRegistered} />
+    </AuthAwareShell>
+  );
 }

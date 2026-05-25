@@ -47,7 +47,7 @@ export type MarketDetailSearch = {
   access?: string;
 };
 
-export const Route = createFileRoute("/_app/markets/$marketId")({
+export const Route = createFileRoute("/markets/$marketId")({
   head: ({ params }) => ({
     meta: [
       { title: `${params.marketId} · ViaX` },

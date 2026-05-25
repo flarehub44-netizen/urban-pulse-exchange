@@ -1,5 +1,7 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 import type { MarketCategoryFilter } from "@/lib/markets-catalog";
+import { AuthAwareShell } from "@/components/viax/auth-aware-shell";
 
 export type MarketsSearch = {
   view?: "urban" | "community";
@@ -13,10 +15,17 @@ export type MarketsSearch = {
   aiPicks?: "1";
 };
 
-export const Route = createFileRoute("/_app/markets")({
+export const Route = createFileRoute("/markets")({
+  beforeLoad: async () => {
+    await supabase.auth.getSession();
+  },
   component: MarketsLayout,
 });
 
 function MarketsLayout() {
-  return <Outlet />;
+  return (
+    <AuthAwareShell>
+      <Outlet />
+    </AuthAwareShell>
+  );
 }

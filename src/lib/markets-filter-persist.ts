@@ -1,4 +1,4 @@
-import type { MarketsSearch } from "@/routes/_app/markets";
+import type { MarketsSearch } from "@/routes/markets";
 
 const KEY = "viax_markets_filters";
 

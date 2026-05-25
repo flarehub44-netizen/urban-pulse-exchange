@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as MarketsRouteImport } from './routes/markets'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as PartnerRouteRouteImport } from './routes/partner/route'
@@ -17,6 +18,7 @@ import { Route as AuthRouteRouteImport } from './routes/auth/route'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PartnerIndexRouteImport } from './routes/partner/index'
+import { Route as MarketsIndexRouteImport } from './routes/markets/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as RSlugRouteImport } from './routes/r.$slug'
 import { Route as PartnerSubAffiliatesRouteImport } from './routes/partner/sub-affiliates'
@@ -29,6 +31,7 @@ import { Route as PartnerInvitesRouteImport } from './routes/partner/invites'
 import { Route as PartnerCreativesRouteImport } from './routes/partner/creatives'
 import { Route as PartnerCampaignsRouteImport } from './routes/partner/campaigns'
 import { Route as PartnerAnalyticsRouteImport } from './routes/partner/analytics'
+import { Route as MarketsMarketIdRouteImport } from './routes/markets/$marketId'
 import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
@@ -53,18 +56,15 @@ import { Route as AppRankingRouteImport } from './routes/_app/ranking'
 import { Route as AppProfileRouteImport } from './routes/_app/profile'
 import { Route as AppPositionsRouteImport } from './routes/_app/positions'
 import { Route as AppNotificationsRouteImport } from './routes/_app/notifications'
-import { Route as AppMarketsRouteImport } from './routes/_app/markets'
 import { Route as AppLeaguesRouteImport } from './routes/_app/leagues'
 import { Route as AppFeedRouteImport } from './routes/_app/feed'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
-import { Route as AppMarketsIndexRouteImport } from './routes/_app/markets.index'
 import { Route as AppFootballIndexRouteImport } from './routes/_app/football/index'
 import { Route as ApiWebhooksSyncpayRouteImport } from './routes/api/webhooks/syncpay'
 import { Route as ApiCronFootballSyncRouteImport } from './routes/api/cron/football-sync'
 import { Route as ApiCronFootballResolveRouteImport } from './routes/api/cron/football-resolve'
 import { Route as AppProfileUserIdRouteImport } from './routes/_app/profile.$userId'
-import { Route as AppMarketsCreateRouteImport } from './routes/_app/markets/create'
-import { Route as AppMarketsMarketIdRouteImport } from './routes/_app/markets.$marketId'
+import { Route as AppMarketsCreateRouteImport } from './routes/_app/markets.create'
 import { Route as AppFootballMarketIdRouteImport } from './routes/_app/football/$marketId'
 import { Route as AppFeedPostIdRouteImport } from './routes/_app/feed.$postId'
 import { Route as ApiPublicSnapshotProxySplatRouteImport } from './routes/api/public/snapshot-proxy/$'
@@ -73,6 +73,11 @@ import { Route as ApiPublicHlsProxySplatRouteImport } from './routes/api/public/
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketsRoute = MarketsRouteImport.update({
+  id: '/markets',
+  path: '/markets',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LiveRoute = LiveRouteImport.update({
@@ -108,6 +113,11 @@ const PartnerIndexRoute = PartnerIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => PartnerRouteRoute,
+} as any)
+const MarketsIndexRoute = MarketsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MarketsRoute,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
@@ -168,6 +178,11 @@ const PartnerAnalyticsRoute = PartnerAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
   getParentRoute: () => PartnerRouteRoute,
+} as any)
+const MarketsMarketIdRoute = MarketsMarketIdRouteImport.update({
+  id: '/$marketId',
+  path: '/$marketId',
+  getParentRoute: () => MarketsRoute,
 } as any)
 const AuthVerifyRoute = AuthVerifyRouteImport.update({
   id: '/verify',
@@ -289,11 +304,6 @@ const AppNotificationsRoute = AppNotificationsRouteImport.update({
   path: '/notifications',
   getParentRoute: () => AppRoute,
 } as any)
-const AppMarketsRoute = AppMarketsRouteImport.update({
-  id: '/markets',
-  path: '/markets',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppLeaguesRoute = AppLeaguesRouteImport.update({
   id: '/leagues',
   path: '/leagues',
@@ -308,11 +318,6 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AppRoute,
-} as any)
-const AppMarketsIndexRoute = AppMarketsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AppMarketsRoute,
 } as any)
 const AppFootballIndexRoute = AppFootballIndexRouteImport.update({
   id: '/football/',
@@ -340,14 +345,9 @@ const AppProfileUserIdRoute = AppProfileUserIdRouteImport.update({
   getParentRoute: () => AppProfileRoute,
 } as any)
 const AppMarketsCreateRoute = AppMarketsCreateRouteImport.update({
-  id: '/create',
-  path: '/create',
-  getParentRoute: () => AppMarketsRoute,
-} as any)
-const AppMarketsMarketIdRoute = AppMarketsMarketIdRouteImport.update({
-  id: '/$marketId',
-  path: '/$marketId',
-  getParentRoute: () => AppMarketsRoute,
+  id: '/markets/create',
+  path: '/markets/create',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppFootballMarketIdRoute = AppFootballMarketIdRouteImport.update({
   id: '/football/$marketId',
@@ -377,11 +377,11 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteRouteWithChildren
   '/partner': typeof PartnerRouteRouteWithChildren
   '/live': typeof LiveRoute
+  '/markets': typeof MarketsRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRouteWithChildren
   '/leagues': typeof AppLeaguesRoute
-  '/markets': typeof AppMarketsRouteWithChildren
   '/notifications': typeof AppNotificationsRoute
   '/positions': typeof AppPositionsRoute
   '/profile': typeof AppProfileRouteWithChildren
@@ -406,6 +406,7 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify': typeof AuthVerifyRoute
+  '/markets/$marketId': typeof MarketsMarketIdRoute
   '/partner/analytics': typeof PartnerAnalyticsRoute
   '/partner/campaigns': typeof PartnerCampaignsRoute
   '/partner/creatives': typeof PartnerCreativesRoute
@@ -418,17 +419,16 @@ export interface FileRoutesByFullPath {
   '/partner/sub-affiliates': typeof PartnerSubAffiliatesRoute
   '/r/$slug': typeof RSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/markets/': typeof MarketsIndexRoute
   '/partner/': typeof PartnerIndexRoute
   '/feed/$postId': typeof AppFeedPostIdRoute
   '/football/$marketId': typeof AppFootballMarketIdRoute
-  '/markets/$marketId': typeof AppMarketsMarketIdRoute
   '/markets/create': typeof AppMarketsCreateRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
   '/api/cron/football-resolve': typeof ApiCronFootballResolveRoute
   '/api/cron/football-sync': typeof ApiCronFootballSyncRoute
   '/api/webhooks/syncpay': typeof ApiWebhooksSyncpayRoute
   '/football/': typeof AppFootballIndexRoute
-  '/markets/': typeof AppMarketsIndexRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
   '/api/public/snapshot-proxy/$': typeof ApiPublicSnapshotProxySplatRoute
 }
@@ -464,6 +464,7 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify': typeof AuthVerifyRoute
+  '/markets/$marketId': typeof MarketsMarketIdRoute
   '/partner/analytics': typeof PartnerAnalyticsRoute
   '/partner/campaigns': typeof PartnerCampaignsRoute
   '/partner/creatives': typeof PartnerCreativesRoute
@@ -476,17 +477,16 @@ export interface FileRoutesByTo {
   '/partner/sub-affiliates': typeof PartnerSubAffiliatesRoute
   '/r/$slug': typeof RSlugRoute
   '/admin': typeof AdminIndexRoute
+  '/markets': typeof MarketsIndexRoute
   '/partner': typeof PartnerIndexRoute
   '/feed/$postId': typeof AppFeedPostIdRoute
   '/football/$marketId': typeof AppFootballMarketIdRoute
-  '/markets/$marketId': typeof AppMarketsMarketIdRoute
   '/markets/create': typeof AppMarketsCreateRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
   '/api/cron/football-resolve': typeof ApiCronFootballResolveRoute
   '/api/cron/football-sync': typeof ApiCronFootballSyncRoute
   '/api/webhooks/syncpay': typeof ApiWebhooksSyncpayRoute
   '/football': typeof AppFootballIndexRoute
-  '/markets': typeof AppMarketsIndexRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
   '/api/public/snapshot-proxy/$': typeof ApiPublicSnapshotProxySplatRoute
 }
@@ -498,11 +498,11 @@ export interface FileRoutesById {
   '/partner': typeof PartnerRouteRouteWithChildren
   '/_app': typeof AppRouteWithChildren
   '/live': typeof LiveRoute
+  '/markets': typeof MarketsRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/feed': typeof AppFeedRouteWithChildren
   '/_app/leagues': typeof AppLeaguesRoute
-  '/_app/markets': typeof AppMarketsRouteWithChildren
   '/_app/notifications': typeof AppNotificationsRoute
   '/_app/positions': typeof AppPositionsRoute
   '/_app/profile': typeof AppProfileRouteWithChildren
@@ -527,6 +527,7 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify': typeof AuthVerifyRoute
+  '/markets/$marketId': typeof MarketsMarketIdRoute
   '/partner/analytics': typeof PartnerAnalyticsRoute
   '/partner/campaigns': typeof PartnerCampaignsRoute
   '/partner/creatives': typeof PartnerCreativesRoute
@@ -539,17 +540,16 @@ export interface FileRoutesById {
   '/partner/sub-affiliates': typeof PartnerSubAffiliatesRoute
   '/r/$slug': typeof RSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/markets/': typeof MarketsIndexRoute
   '/partner/': typeof PartnerIndexRoute
   '/_app/feed/$postId': typeof AppFeedPostIdRoute
   '/_app/football/$marketId': typeof AppFootballMarketIdRoute
-  '/_app/markets/$marketId': typeof AppMarketsMarketIdRoute
   '/_app/markets/create': typeof AppMarketsCreateRoute
   '/_app/profile/$userId': typeof AppProfileUserIdRoute
   '/api/cron/football-resolve': typeof ApiCronFootballResolveRoute
   '/api/cron/football-sync': typeof ApiCronFootballSyncRoute
   '/api/webhooks/syncpay': typeof ApiWebhooksSyncpayRoute
   '/_app/football/': typeof AppFootballIndexRoute
-  '/_app/markets/': typeof AppMarketsIndexRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
   '/api/public/snapshot-proxy/$': typeof ApiPublicSnapshotProxySplatRoute
 }
@@ -561,11 +561,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/partner'
     | '/live'
+    | '/markets'
     | '/sitemap.xml'
     | '/dashboard'
     | '/feed'
     | '/leagues'
-    | '/markets'
     | '/notifications'
     | '/positions'
     | '/profile'
@@ -590,6 +590,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/auth/verify'
+    | '/markets/$marketId'
     | '/partner/analytics'
     | '/partner/campaigns'
     | '/partner/creatives'
@@ -602,17 +603,16 @@ export interface FileRouteTypes {
     | '/partner/sub-affiliates'
     | '/r/$slug'
     | '/admin/'
+    | '/markets/'
     | '/partner/'
     | '/feed/$postId'
     | '/football/$marketId'
-    | '/markets/$marketId'
     | '/markets/create'
     | '/profile/$userId'
     | '/api/cron/football-resolve'
     | '/api/cron/football-sync'
     | '/api/webhooks/syncpay'
     | '/football/'
-    | '/markets/'
     | '/api/public/hls-proxy/$'
     | '/api/public/snapshot-proxy/$'
   fileRoutesByTo: FileRoutesByTo
@@ -648,6 +648,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/auth/verify'
+    | '/markets/$marketId'
     | '/partner/analytics'
     | '/partner/campaigns'
     | '/partner/creatives'
@@ -660,17 +661,16 @@ export interface FileRouteTypes {
     | '/partner/sub-affiliates'
     | '/r/$slug'
     | '/admin'
+    | '/markets'
     | '/partner'
     | '/feed/$postId'
     | '/football/$marketId'
-    | '/markets/$marketId'
     | '/markets/create'
     | '/profile/$userId'
     | '/api/cron/football-resolve'
     | '/api/cron/football-sync'
     | '/api/webhooks/syncpay'
     | '/football'
-    | '/markets'
     | '/api/public/hls-proxy/$'
     | '/api/public/snapshot-proxy/$'
   id:
@@ -681,11 +681,11 @@ export interface FileRouteTypes {
     | '/partner'
     | '/_app'
     | '/live'
+    | '/markets'
     | '/sitemap.xml'
     | '/_app/dashboard'
     | '/_app/feed'
     | '/_app/leagues'
-    | '/_app/markets'
     | '/_app/notifications'
     | '/_app/positions'
     | '/_app/profile'
@@ -710,6 +710,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/auth/verify'
+    | '/markets/$marketId'
     | '/partner/analytics'
     | '/partner/campaigns'
     | '/partner/creatives'
@@ -722,17 +723,16 @@ export interface FileRouteTypes {
     | '/partner/sub-affiliates'
     | '/r/$slug'
     | '/admin/'
+    | '/markets/'
     | '/partner/'
     | '/_app/feed/$postId'
     | '/_app/football/$marketId'
-    | '/_app/markets/$marketId'
     | '/_app/markets/create'
     | '/_app/profile/$userId'
     | '/api/cron/football-resolve'
     | '/api/cron/football-sync'
     | '/api/webhooks/syncpay'
     | '/_app/football/'
-    | '/_app/markets/'
     | '/api/public/hls-proxy/$'
     | '/api/public/snapshot-proxy/$'
   fileRoutesById: FileRoutesById
@@ -744,6 +744,7 @@ export interface RootRouteChildren {
   PartnerRouteRoute: typeof PartnerRouteRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
   LiveRoute: typeof LiveRoute
+  MarketsRoute: typeof MarketsRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   RSlugRoute: typeof RSlugRoute
   ApiCronFootballResolveRoute: typeof ApiCronFootballResolveRoute
@@ -760,6 +761,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/markets': {
+      id: '/markets'
+      path: '/markets'
+      fullPath: '/markets'
+      preLoaderRoute: typeof MarketsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/live': {
@@ -810,6 +818,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/partner/'
       preLoaderRoute: typeof PartnerIndexRouteImport
       parentRoute: typeof PartnerRouteRoute
+    }
+    '/markets/': {
+      id: '/markets/'
+      path: '/'
+      fullPath: '/markets/'
+      preLoaderRoute: typeof MarketsIndexRouteImport
+      parentRoute: typeof MarketsRoute
     }
     '/admin/': {
       id: '/admin/'
@@ -894,6 +909,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/partner/analytics'
       preLoaderRoute: typeof PartnerAnalyticsRouteImport
       parentRoute: typeof PartnerRouteRoute
+    }
+    '/markets/$marketId': {
+      id: '/markets/$marketId'
+      path: '/$marketId'
+      fullPath: '/markets/$marketId'
+      preLoaderRoute: typeof MarketsMarketIdRouteImport
+      parentRoute: typeof MarketsRoute
     }
     '/auth/verify': {
       id: '/auth/verify'
@@ -1063,13 +1085,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppNotificationsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/markets': {
-      id: '/_app/markets'
-      path: '/markets'
-      fullPath: '/markets'
-      preLoaderRoute: typeof AppMarketsRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/leagues': {
       id: '/_app/leagues'
       path: '/leagues'
@@ -1090,13 +1105,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard'
       preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
-    }
-    '/_app/markets/': {
-      id: '/_app/markets/'
-      path: '/'
-      fullPath: '/markets/'
-      preLoaderRoute: typeof AppMarketsIndexRouteImport
-      parentRoute: typeof AppMarketsRoute
     }
     '/_app/football/': {
       id: '/_app/football/'
@@ -1135,17 +1143,10 @@ declare module '@tanstack/react-router' {
     }
     '/_app/markets/create': {
       id: '/_app/markets/create'
-      path: '/create'
+      path: '/markets/create'
       fullPath: '/markets/create'
       preLoaderRoute: typeof AppMarketsCreateRouteImport
-      parentRoute: typeof AppMarketsRoute
-    }
-    '/_app/markets/$marketId': {
-      id: '/_app/markets/$marketId'
-      path: '/$marketId'
-      fullPath: '/markets/$marketId'
-      preLoaderRoute: typeof AppMarketsMarketIdRouteImport
-      parentRoute: typeof AppMarketsRoute
+      parentRoute: typeof AppRoute
     }
     '/_app/football/$marketId': {
       id: '/_app/football/$marketId'
@@ -1277,22 +1278,6 @@ const AppFeedRouteChildren: AppFeedRouteChildren = {
 const AppFeedRouteWithChildren =
   AppFeedRoute._addFileChildren(AppFeedRouteChildren)
 
-interface AppMarketsRouteChildren {
-  AppMarketsMarketIdRoute: typeof AppMarketsMarketIdRoute
-  AppMarketsCreateRoute: typeof AppMarketsCreateRoute
-  AppMarketsIndexRoute: typeof AppMarketsIndexRoute
-}
-
-const AppMarketsRouteChildren: AppMarketsRouteChildren = {
-  AppMarketsMarketIdRoute: AppMarketsMarketIdRoute,
-  AppMarketsCreateRoute: AppMarketsCreateRoute,
-  AppMarketsIndexRoute: AppMarketsIndexRoute,
-}
-
-const AppMarketsRouteWithChildren = AppMarketsRoute._addFileChildren(
-  AppMarketsRouteChildren,
-)
-
 interface AppProfileRouteChildren {
   AppProfileUserIdRoute: typeof AppProfileUserIdRoute
 }
@@ -1309,7 +1294,6 @@ interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppFeedRoute: typeof AppFeedRouteWithChildren
   AppLeaguesRoute: typeof AppLeaguesRoute
-  AppMarketsRoute: typeof AppMarketsRouteWithChildren
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppPositionsRoute: typeof AppPositionsRoute
   AppProfileRoute: typeof AppProfileRouteWithChildren
@@ -1318,6 +1302,7 @@ interface AppRouteChildren {
   AppUrbanmindRoute: typeof AppUrbanmindRoute
   AppWalletRoute: typeof AppWalletRoute
   AppFootballMarketIdRoute: typeof AppFootballMarketIdRoute
+  AppMarketsCreateRoute: typeof AppMarketsCreateRoute
   AppFootballIndexRoute: typeof AppFootballIndexRoute
 }
 
@@ -1325,7 +1310,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppFeedRoute: AppFeedRouteWithChildren,
   AppLeaguesRoute: AppLeaguesRoute,
-  AppMarketsRoute: AppMarketsRouteWithChildren,
   AppNotificationsRoute: AppNotificationsRoute,
   AppPositionsRoute: AppPositionsRoute,
   AppProfileRoute: AppProfileRouteWithChildren,
@@ -1334,10 +1318,24 @@ const AppRouteChildren: AppRouteChildren = {
   AppUrbanmindRoute: AppUrbanmindRoute,
   AppWalletRoute: AppWalletRoute,
   AppFootballMarketIdRoute: AppFootballMarketIdRoute,
+  AppMarketsCreateRoute: AppMarketsCreateRoute,
   AppFootballIndexRoute: AppFootballIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
+interface MarketsRouteChildren {
+  MarketsMarketIdRoute: typeof MarketsMarketIdRoute
+  MarketsIndexRoute: typeof MarketsIndexRoute
+}
+
+const MarketsRouteChildren: MarketsRouteChildren = {
+  MarketsMarketIdRoute: MarketsMarketIdRoute,
+  MarketsIndexRoute: MarketsIndexRoute,
+}
+
+const MarketsRouteWithChildren =
+  MarketsRoute._addFileChildren(MarketsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -1346,6 +1344,7 @@ const rootRouteChildren: RootRouteChildren = {
   PartnerRouteRoute: PartnerRouteRouteWithChildren,
   AppRoute: AppRouteWithChildren,
   LiveRoute: LiveRoute,
+  MarketsRoute: MarketsRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   RSlugRoute: RSlugRoute,
   ApiCronFootballResolveRoute: ApiCronFootballResolveRoute,

@@ -40,9 +40,10 @@ function mapBet(row: Record<string, unknown>): OpenBet {
   };
 }
 
-export function useBets() {
+export function useBets(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ["bets"],
+    enabled: options?.enabled ?? true,
     queryFn: async () => {
       const { data, error } = (await db
         .from("bets")

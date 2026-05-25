@@ -1,6 +1,6 @@
 import { copy } from "@/copy/pt-BR";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import type { MarketsSearch } from "@/routes/_app/markets";
+import type { MarketsSearch } from "@/routes/markets";
 import { useMemo, useEffect, useState } from "react";
 import { useCatalogMarkets, useMarkets } from "@/hooks/use-markets";
 import { useBets } from "@/hooks/use-bets";
@@ -21,12 +21,12 @@ import {
   matchesStatusFilter,
   type MarketCategoryFilter,
 } from "@/lib/markets-catalog";
-import { useAnonAuth } from "@/hooks/use-anon-auth";
+import { useAuthPublic } from "@/hooks/use-auth-public";
 import { useProfile } from "@/hooks/use-profile";
 import { PageHeader } from "@/components/viax/page-header";
 import { CommunityMarketsList } from "@/components/viax/community-markets-list";
 
-export const Route = createFileRoute("/_app/markets/")({
+export const Route = createFileRoute("/markets/")({
   head: () => ({
     meta: [
       { title: "Mercados · ViaX" },
@@ -78,14 +78,14 @@ const draftFilter = { key: "draft" as const, label: "Rascunhos" };
 function MarketsList() {
   const navigate = useNavigate({ from: "/markets/" });
   const search = Route.useSearch();
-  const { userId } = useAnonAuth();
+  const { userId } = useAuthPublic();
   const { data: profile } = useProfile(userId);
   const markets = useCatalogMarkets();
   const { isLoading: marketsLoading, error: marketsError, refetch } = useMarkets();
   const queryClient = useQueryClient();
   const statusFilters = profile?.isAdmin ? [...baseStatusFilters, draftFilter] : baseStatusFilters;
   const { ids: watchlist } = useWatchlist();
-  const { data: bets } = useBets();
+  const { data: bets } = useBets({ enabled: Boolean(userId) });
   const openMarketIds = useMemo(
     () =>
       new Set((bets ?? []).filter((b) => isOpenBetStatus(b.marketStatus)).map((b) => b.marketId)),
@@ -420,7 +420,7 @@ function MarketsList() {
               {f.label}
             </button>
           ))}
-        {!showFavorites && (
+        {!showFavorites && userId && (
           <button
             type="button"
             onClick={() =>
