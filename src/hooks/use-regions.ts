@@ -15,7 +15,7 @@ function mapRegion(row: Record<string, unknown>): RegionData {
   };
 }
 
-export function useRegions() {
+export function useRegions(options?: { refetchInterval?: number }) {
   return useQuery({
     queryKey: ["regions"],
     queryFn: async () => {
@@ -27,5 +27,6 @@ export function useRegions() {
       return (data ?? []).map(mapRegion);
     },
     staleTime: 10_000,
+    refetchInterval: options?.refetchInterval,
   });
 }

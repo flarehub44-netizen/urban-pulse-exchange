@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useResolvedMarkets, useResolvedRegions } from "@/hooks/use-resolved-data";
 import { LIVE_EVENTS } from "@/store/viax-store";
 import { CityHeatmap } from "@/components/viax/city-heatmap";
@@ -9,24 +9,17 @@ import { Radio, AlertTriangle, ExternalLink, MapPin } from "lucide-react";
 import { EmptyState } from "@/components/viax/empty-state";
 import { copy } from "@/copy/pt-BR";
 
-export const Route = createFileRoute("/_app/live")({
-  head: () => ({
-    meta: [
-      { title: "Mapa ao vivo · ViaX" },
-      {
-        name: "description",
-        content: "Heatmap em tempo real do trânsito urbano e eventos ativos.",
-      },
-    ],
-  }),
-  component: Live,
-});
+type LivePageContentProps = {
+  /** Poll regions more often on the public map (no Realtime subscription). */
+  refreshRegions?: boolean;
+};
 
-function Live() {
+export function LivePageContent({ refreshRegions = false }: LivePageContentProps) {
   const { markets } = useResolvedMarkets();
-  const { regions } = useResolvedRegions();
+  const { regions } = useResolvedRegions(
+    refreshRegions ? { refetchInterval: 15_000 } : undefined,
+  );
   const navigate = useNavigate();
-
   const events = LIVE_EVENTS;
 
   return (
@@ -93,6 +86,7 @@ function Live() {
                 return (
                   <li key={r.id}>
                     <button
+                      type="button"
                       onClick={() => navigate({ to: "/markets", search: { region: r.name } })}
                       className="group flex w-full items-center justify-between rounded-lg border bg-surface/40 p-2.5 text-sm transition hover:bg-surface hover:border-primary/30"
                     >

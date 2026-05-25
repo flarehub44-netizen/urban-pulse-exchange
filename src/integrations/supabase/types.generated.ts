@@ -1197,6 +1197,55 @@ export type Database = {
           },
         ]
       }
+      market_reports: {
+        Row: {
+          created_at: string
+          id: string
+          market_id: string
+          reason: string
+          reporter_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          market_id: string
+          reason: string
+          reporter_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          market_id?: string
+          reason?: string
+          reporter_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_reports_market_id_fkey"
+            columns: ["market_id"]
+            isOneToOne: false
+            referencedRelation: "markets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "market_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "market_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       market_resolutions: {
         Row: {
           confidence: number | null
@@ -1525,6 +1574,7 @@ export type Database = {
           balance: number
           commission_boost_pct: number
           commission_boost_until: string | null
+          cpa_amount: number | null
           created_at: string
           parent_partner_id: string | null
           pending_balance: number
@@ -1541,6 +1591,7 @@ export type Database = {
           balance?: number
           commission_boost_pct?: number
           commission_boost_until?: string | null
+          cpa_amount?: number | null
           created_at?: string
           parent_partner_id?: string | null
           pending_balance?: number
@@ -1557,6 +1608,7 @@ export type Database = {
           balance?: number
           commission_boost_pct?: number
           commission_boost_until?: string | null
+          cpa_amount?: number | null
           created_at?: string
           parent_partner_id?: string | null
           pending_balance?: number
@@ -2625,28 +2677,34 @@ export type Database = {
       user_referrals: {
         Row: {
           campaign_id: string | null
+          cpa_paid_at: string | null
           created_at: string
           first_bet_at: string | null
           first_deposit_at: string | null
           partner_id: string
+          qualified_deposit_total: number
           sub_partner_id: string | null
           user_id: string
         }
         Insert: {
           campaign_id?: string | null
+          cpa_paid_at?: string | null
           created_at?: string
           first_bet_at?: string | null
           first_deposit_at?: string | null
           partner_id: string
+          qualified_deposit_total?: number
           sub_partner_id?: string | null
           user_id: string
         }
         Update: {
           campaign_id?: string | null
+          cpa_paid_at?: string | null
           created_at?: string
           first_bet_at?: string | null
           first_deposit_at?: string | null
           partner_id?: string
+          qualified_deposit_total?: number
           sub_partner_id?: string | null
           user_id?: string
         }
@@ -2824,7 +2882,13 @@ export type Database = {
         Returns: Json
       }
       admin_approve_partner: {
-        Args: { p_slug?: string; p_tier?: string; p_user_id: string }
+        Args: {
+          p_cpa_amount?: number
+          p_revenue_share_pct?: number
+          p_slug?: string
+          p_tier?: string
+          p_user_id: string
+        }
         Returns: Json
       }
       admin_create_camera_upstream: {
@@ -2836,6 +2900,9 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_delete_daily_poll: { Args: { p_id: string }; Returns: Json }
+      admin_delete_partner_event: { Args: { p_id: number }; Returns: Json }
+      admin_delete_platform_event: { Args: { p_id: string }; Returns: Json }
       admin_extend_market: {
         Args: { p_extra_hours?: number; p_market_id: string }
         Returns: Json
@@ -2848,7 +2915,10 @@ export type Database = {
         Args: { p_frozen: boolean; p_user_id: string }
         Returns: Json
       }
+      admin_get_events_hub_overview: { Args: never; Returns: Json }
+      admin_list_active_partners: { Args: never; Returns: Json }
       admin_list_cameras: { Args: never; Returns: Json }
+      admin_list_daily_polls: { Args: { p_limit?: number }; Returns: Json }
       admin_list_football_drafts: {
         Args: { p_limit?: number }
         Returns: Json[]
@@ -2859,6 +2929,15 @@ export type Database = {
         Returns: Json[]
       }
       admin_list_partner_applications: { Args: never; Returns: Json }
+      admin_list_partner_events: {
+        Args: {
+          p_limit?: number
+          p_partner_id?: string
+          p_partner_query?: string
+        }
+        Returns: Json
+      }
+      admin_list_platform_events: { Args: never; Returns: Json }
       admin_pause_bets: {
         Args: { p_market_id: string; p_paused?: boolean }
         Returns: Json
@@ -2901,6 +2980,14 @@ export type Database = {
         Args: { p_notes?: string; p_status: string; p_user_id: string }
         Returns: Json
       }
+      admin_update_partner_terms: {
+        Args: {
+          p_cpa_amount?: number
+          p_revenue_share_pct: number
+          p_user_id: string
+        }
+        Returns: Json
+      }
       admin_update_setting: {
         Args: { p_key: string; p_value: Json }
         Returns: Json
@@ -2914,6 +3001,23 @@ export type Database = {
           p_region_id: string
           p_status?: string
           p_stream_url?: string
+        }
+        Returns: Json
+      }
+      admin_upsert_daily_poll: {
+        Args: { p_id: string; p_poll_date: string; p_question: string }
+        Returns: Json
+      }
+      admin_upsert_platform_event: {
+        Args: {
+          p_badge_icon?: string
+          p_description: string
+          p_ends_at: string
+          p_id: string
+          p_name: string
+          p_slug: string
+          p_starts_at: string
+          p_xp_boost?: number
         }
         Returns: Json
       }
@@ -3030,6 +3134,8 @@ export type Database = {
       }
       get_active_events: { Args: never; Returns: Json }
       get_admin_actions_log: { Args: { p_limit?: number }; Returns: Json }
+      get_admin_community_markets_list: { Args: never; Returns: Json }
+      get_admin_community_reports: { Args: { p_limit?: number }; Returns: Json }
       get_admin_dashboard_metrics: { Args: never; Returns: Json }
       get_admin_finance_breakdown: { Args: never; Returns: Json }
       get_admin_live_feed: { Args: { p_limit?: number }; Returns: Json }
@@ -3180,6 +3286,10 @@ export type Database = {
         Args: { p_limit?: number }
         Returns: Json
       }
+      maybe_pay_partner_cpa: {
+        Args: { p_amount: number; p_user_id: string }
+        Returns: undefined
+      }
       min_minority_ratio: { Args: never; Returns: number }
       min_oracle_confidence: { Args: never; Returns: number }
       open_market: {
@@ -3254,6 +3364,10 @@ export type Database = {
       }
       refund_market: {
         Args: { p_market_id: string; p_reason?: string }
+        Returns: Json
+      }
+      report_community_market: {
+        Args: { p_market_id: string; p_reason: string }
         Returns: Json
       }
       repost_feed_post: { Args: { p_post_id: string }; Returns: number }

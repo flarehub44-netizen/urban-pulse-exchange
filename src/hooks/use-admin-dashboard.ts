@@ -284,20 +284,77 @@ export function useAdminApprovePartner() {
       userId,
       tier,
       slug,
+      revenueSharePct,
+      cpaAmount,
     }: {
       userId: string;
       tier?: string;
       slug?: string;
+      revenueSharePct?: number;
+      cpaAmount?: number | null;
     }) => {
       const { data, error } = await supabase.rpc("admin_approve_partner", {
         p_user_id: userId,
         p_tier: tier ?? "Bronze",
         p_slug: slug ?? null,
+        p_revenue_share_pct: revenueSharePct ?? null,
+        p_cpa_amount: cpaAmount ?? null,
       });
       if (error) throw error;
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "partner-applications"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "partner-applications"] });
+      qc.invalidateQueries({ queryKey: ["admin", "active-partners"] });
+    },
+  });
+}
+
+export type AdminActivePartner = {
+  user_id: string;
+  handle: string;
+  name: string;
+  slug: string;
+  tier: string;
+  revenue_share_pct: number;
+  cpa_amount: number | null;
+  balance: number;
+  referrals_count: number;
+};
+
+export function useAdminActivePartners(enabled = true) {
+  return useQuery({
+    queryKey: ["admin", "active-partners"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_list_active_partners");
+      if (error) throw error;
+      return (data ?? []) as AdminActivePartner[];
+    },
+    enabled,
+  });
+}
+
+export function useAdminUpdatePartnerTerms() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      revenueSharePct,
+      cpaAmount,
+    }: {
+      userId: string;
+      revenueSharePct: number;
+      cpaAmount: number | null;
+    }) => {
+      const { data, error } = await supabase.rpc("admin_update_partner_terms", {
+        p_user_id: userId,
+        p_revenue_share_pct: revenueSharePct,
+        p_cpa_amount: cpaAmount,
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "active-partners"] }),
   });
 }
 

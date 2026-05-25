@@ -19,6 +19,8 @@ function AdminSystemPage() {
   const [impulseMax, setImpulseMax] = useState("3");
   const [partnerEnabled, setPartnerEnabled] = useState(true);
   const [partnerShare, setPartnerShare] = useState("0.20");
+  const [defaultCpa, setDefaultCpa] = useState("25");
+  const [cpaMinDeposit, setCpaMinDeposit] = useState("50");
   const [cameraOracleEnabled, setCameraOracleEnabled] = useState(false);
   const [regionsSimulatorEnabled, setRegionsSimulatorEnabled] = useState(true);
 
@@ -35,6 +37,12 @@ function AdminSystemPage() {
     }
     if (settings.default_revenue_share_pct != null) {
       setPartnerShare(String(settings.default_revenue_share_pct));
+    }
+    if (settings.default_cpa_amount != null) {
+      setDefaultCpa(String(settings.default_cpa_amount));
+    }
+    if (settings.cpa_min_deposit_threshold != null) {
+      setCpaMinDeposit(String(settings.cpa_min_deposit_threshold));
     }
     if (settings.camera_oracle_enabled != null) {
       setCameraOracleEnabled(Boolean(settings.camera_oracle_enabled));
@@ -54,6 +62,8 @@ function AdminSystemPage() {
       await update({ key: "casino_impulse_max_per_hour", value: Number(impulseMax) });
       await update({ key: "partner_program_enabled", value: partnerEnabled });
       await update({ key: "default_revenue_share_pct", value: Number(partnerShare) });
+      await update({ key: "default_cpa_amount", value: Number(defaultCpa) });
+      await update({ key: "cpa_min_deposit_threshold", value: Number(cpaMinDeposit) });
       await update({ key: "camera_oracle_enabled", value: cameraOracleEnabled });
       await update({ key: "regions_simulator_enabled", value: regionsSimulatorEnabled });
       toast.success("Configurações salvas.");
@@ -115,6 +125,28 @@ function AdminSystemPage() {
             max={1}
             value={partnerShare}
             onChange={(e) => setPartnerShare(e.target.value)}
+            className="mt-1 w-full rounded-lg border bg-surface px-3 py-2 mono"
+          />
+        </label>
+        <label className="block">
+          <span className="text-xs text-muted-foreground">{copy.admin.system.defaultCpa}</span>
+          <input
+            type="number"
+            min={0}
+            step="1"
+            value={defaultCpa}
+            onChange={(e) => setDefaultCpa(e.target.value)}
+            className="mt-1 w-full rounded-lg border bg-surface px-3 py-2 mono"
+          />
+        </label>
+        <label className="block">
+          <span className="text-xs text-muted-foreground">{copy.admin.system.cpaMinDeposit}</span>
+          <input
+            type="number"
+            min={0}
+            step="1"
+            value={cpaMinDeposit}
+            onChange={(e) => setCpaMinDeposit(e.target.value)}
             className="mt-1 w-full rounded-lg border bg-surface px-3 py-2 mono"
           />
         </label>

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as LiveRouteImport } from './routes/live'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as PartnerRouteRouteImport } from './routes/partner/route'
 import { Route as AuthRouteRouteImport } from './routes/auth/route'
@@ -44,6 +45,7 @@ import { Route as AdminMarketsRouteImport } from './routes/admin/markets'
 import { Route as AdminIntelligenceRouteImport } from './routes/admin/intelligence'
 import { Route as AdminFootballRouteImport } from './routes/admin/football'
 import { Route as AdminFinanceRouteImport } from './routes/admin/finance'
+import { Route as AdminEventsRouteImport } from './routes/admin/events'
 import { Route as AppWalletRouteImport } from './routes/_app/wallet'
 import { Route as AppUrbanmindRouteImport } from './routes/_app/urbanmind'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
@@ -52,7 +54,6 @@ import { Route as AppProfileRouteImport } from './routes/_app/profile'
 import { Route as AppPositionsRouteImport } from './routes/_app/positions'
 import { Route as AppNotificationsRouteImport } from './routes/_app/notifications'
 import { Route as AppMarketsRouteImport } from './routes/_app/markets'
-import { Route as AppLiveRouteImport } from './routes/_app/live'
 import { Route as AppLeaguesRouteImport } from './routes/_app/leagues'
 import { Route as AppFeedRouteImport } from './routes/_app/feed'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
@@ -72,6 +73,11 @@ import { Route as ApiPublicHlsProxySplatRouteImport } from './routes/api/public/
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveRoute = LiveRouteImport.update({
+  id: '/live',
+  path: '/live',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -243,6 +249,11 @@ const AdminFinanceRoute = AdminFinanceRouteImport.update({
   path: '/finance',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminEventsRoute = AdminEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AppWalletRoute = AppWalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
@@ -281,11 +292,6 @@ const AppNotificationsRoute = AppNotificationsRouteImport.update({
 const AppMarketsRoute = AppMarketsRouteImport.update({
   id: '/markets',
   path: '/markets',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppLiveRoute = AppLiveRouteImport.update({
-  id: '/live',
-  path: '/live',
   getParentRoute: () => AppRoute,
 } as any)
 const AppLeaguesRoute = AppLeaguesRouteImport.update({
@@ -370,11 +376,11 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
   '/partner': typeof PartnerRouteRouteWithChildren
+  '/live': typeof LiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRouteWithChildren
   '/leagues': typeof AppLeaguesRoute
-  '/live': typeof AppLiveRoute
   '/markets': typeof AppMarketsRouteWithChildren
   '/notifications': typeof AppNotificationsRoute
   '/positions': typeof AppPositionsRoute
@@ -383,6 +389,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AppSettingsRoute
   '/urbanmind': typeof AppUrbanmindRoute
   '/wallet': typeof AppWalletRoute
+  '/admin/events': typeof AdminEventsRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/football': typeof AdminFootballRoute
   '/admin/intelligence': typeof AdminIntelligenceRoute
@@ -428,11 +435,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/live': typeof LiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRouteWithChildren
   '/leagues': typeof AppLeaguesRoute
-  '/live': typeof AppLiveRoute
   '/notifications': typeof AppNotificationsRoute
   '/positions': typeof AppPositionsRoute
   '/profile': typeof AppProfileRouteWithChildren
@@ -440,6 +447,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRoute
   '/urbanmind': typeof AppUrbanmindRoute
   '/wallet': typeof AppWalletRoute
+  '/admin/events': typeof AdminEventsRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/football': typeof AdminFootballRoute
   '/admin/intelligence': typeof AdminIntelligenceRoute
@@ -489,11 +497,11 @@ export interface FileRoutesById {
   '/auth': typeof AuthRouteRouteWithChildren
   '/partner': typeof PartnerRouteRouteWithChildren
   '/_app': typeof AppRouteWithChildren
+  '/live': typeof LiveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/feed': typeof AppFeedRouteWithChildren
   '/_app/leagues': typeof AppLeaguesRoute
-  '/_app/live': typeof AppLiveRoute
   '/_app/markets': typeof AppMarketsRouteWithChildren
   '/_app/notifications': typeof AppNotificationsRoute
   '/_app/positions': typeof AppPositionsRoute
@@ -502,6 +510,7 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRoute
   '/_app/urbanmind': typeof AppUrbanmindRoute
   '/_app/wallet': typeof AppWalletRoute
+  '/admin/events': typeof AdminEventsRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/football': typeof AdminFootballRoute
   '/admin/intelligence': typeof AdminIntelligenceRoute
@@ -551,11 +560,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/partner'
+    | '/live'
     | '/sitemap.xml'
     | '/dashboard'
     | '/feed'
     | '/leagues'
-    | '/live'
     | '/markets'
     | '/notifications'
     | '/positions'
@@ -564,6 +573,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/urbanmind'
     | '/wallet'
+    | '/admin/events'
     | '/admin/finance'
     | '/admin/football'
     | '/admin/intelligence'
@@ -609,11 +619,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/live'
     | '/sitemap.xml'
     | '/dashboard'
     | '/feed'
     | '/leagues'
-    | '/live'
     | '/notifications'
     | '/positions'
     | '/profile'
@@ -621,6 +631,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/urbanmind'
     | '/wallet'
+    | '/admin/events'
     | '/admin/finance'
     | '/admin/football'
     | '/admin/intelligence'
@@ -669,11 +680,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/partner'
     | '/_app'
+    | '/live'
     | '/sitemap.xml'
     | '/_app/dashboard'
     | '/_app/feed'
     | '/_app/leagues'
-    | '/_app/live'
     | '/_app/markets'
     | '/_app/notifications'
     | '/_app/positions'
@@ -682,6 +693,7 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/_app/urbanmind'
     | '/_app/wallet'
+    | '/admin/events'
     | '/admin/finance'
     | '/admin/football'
     | '/admin/intelligence'
@@ -731,6 +743,7 @@ export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   PartnerRouteRoute: typeof PartnerRouteRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
+  LiveRoute: typeof LiveRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   RSlugRoute: typeof RSlugRoute
   ApiCronFootballResolveRoute: typeof ApiCronFootballResolveRoute
@@ -747,6 +760,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live': {
+      id: '/live'
+      path: '/live'
+      fullPath: '/live'
+      preLoaderRoute: typeof LiveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app': {
@@ -987,6 +1007,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminFinanceRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/events': {
+      id: '/admin/events'
+      path: '/events'
+      fullPath: '/admin/events'
+      preLoaderRoute: typeof AdminEventsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/_app/wallet': {
       id: '/_app/wallet'
       path: '/wallet'
@@ -1041,13 +1068,6 @@ declare module '@tanstack/react-router' {
       path: '/markets'
       fullPath: '/markets'
       preLoaderRoute: typeof AppMarketsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/live': {
-      id: '/_app/live'
-      path: '/live'
-      fullPath: '/live'
-      preLoaderRoute: typeof AppLiveRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/leagues': {
@@ -1159,6 +1179,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteRouteChildren {
+  AdminEventsRoute: typeof AdminEventsRoute
   AdminFinanceRoute: typeof AdminFinanceRoute
   AdminFootballRoute: typeof AdminFootballRoute
   AdminIntelligenceRoute: typeof AdminIntelligenceRoute
@@ -1174,6 +1195,7 @@ interface AdminRouteRouteChildren {
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminEventsRoute: AdminEventsRoute,
   AdminFinanceRoute: AdminFinanceRoute,
   AdminFootballRoute: AdminFootballRoute,
   AdminIntelligenceRoute: AdminIntelligenceRoute,
@@ -1287,7 +1309,6 @@ interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppFeedRoute: typeof AppFeedRouteWithChildren
   AppLeaguesRoute: typeof AppLeaguesRoute
-  AppLiveRoute: typeof AppLiveRoute
   AppMarketsRoute: typeof AppMarketsRouteWithChildren
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppPositionsRoute: typeof AppPositionsRoute
@@ -1304,7 +1325,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppFeedRoute: AppFeedRouteWithChildren,
   AppLeaguesRoute: AppLeaguesRoute,
-  AppLiveRoute: AppLiveRoute,
   AppMarketsRoute: AppMarketsRouteWithChildren,
   AppNotificationsRoute: AppNotificationsRoute,
   AppPositionsRoute: AppPositionsRoute,
@@ -1325,6 +1345,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
   PartnerRouteRoute: PartnerRouteRouteWithChildren,
   AppRoute: AppRouteWithChildren,
+  LiveRoute: LiveRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   RSlugRoute: RSlugRoute,
   ApiCronFootballResolveRoute: ApiCronFootballResolveRoute,

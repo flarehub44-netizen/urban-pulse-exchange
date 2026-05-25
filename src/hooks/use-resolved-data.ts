@@ -23,8 +23,8 @@ export function useResolvedMarkets() {
   return { markets, isLoading, isError, error };
 }
 
-export function useResolvedRegions() {
-  const { data: db, isLoading, isError } = useRegions();
+export function useResolvedRegions(options?: { refetchInterval?: number }) {
+  const { data: db, isLoading, isError } = useRegions(options);
   const seed = useViaX((s) => s.regions);
   const regions = pickDbOrEmptyArray(db, seed);
   return { regions, isLoading, isError };

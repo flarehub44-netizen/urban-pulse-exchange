@@ -32,6 +32,11 @@ function PartnerOverviewPage() {
           {o.tier} · @{o.slug} · {(o.revenue_share_pct * 100).toFixed(0)}%{" "}
           {copy.partner.stats.commissionHint}
         </p>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          CPA {formatBRL(Number(o.cpa_amount))}
+          {o.cpa_uses_custom ? "" : " (padrão)"} · {copy.partner.stats.cpaHint}{" "}
+          {formatBRL(Number(o.cpa_min_deposit_threshold))}
+        </p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <PartnerStatCard label={copy.partner.stats.revenue} value={o.revenue} format={formatBRL} />

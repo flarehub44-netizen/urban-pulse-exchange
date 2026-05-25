@@ -13,6 +13,7 @@ import {
   FlaskConical,
   Sparkles,
   Flag,
+  Calendar,
 } from "lucide-react";
 
 export type AdminNavItem = {
@@ -32,6 +33,7 @@ export const adminNav: AdminNavItem[] = [
   { to: "/admin/finance", label: copy.admin.nav.finance, icon: Coins },
   { to: "/admin/users", label: copy.admin.nav.users, icon: Users },
   { to: "/admin/partners", label: copy.admin.nav.partners, icon: Sparkles },
+  { to: "/admin/events", label: copy.admin.nav.events, icon: Calendar },
   { to: "/admin/risk", label: copy.admin.nav.risk, icon: ShieldAlert },
   { to: "/admin/system", label: copy.admin.nav.system, icon: Settings },
   { to: "/admin/simulator", label: copy.admin.nav.simulator, icon: FlaskConical },

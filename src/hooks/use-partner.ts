@@ -36,6 +36,9 @@ export function usePartnerOverview(enabled = true) {
         conversions: number;
         conversion_rate: number;
         revenue_share_pct: number;
+        cpa_amount: number;
+        cpa_uses_custom: boolean;
+        cpa_min_deposit_threshold: number;
       };
     },
     enabled,
