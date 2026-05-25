@@ -1,6 +1,6 @@
 import type { AuthModalSearch } from "@/lib/auth-modal-search";
 
-const PUBLIC_PREFIXES = ["/", "/markets", "/live"] as const;
+const PUBLIC_PREFIXES = ["/", "/markets", "/live", "/football"] as const;
 
 export function isPublicAuthPath(pathname: string): boolean {
   if (pathname === "/") return true;

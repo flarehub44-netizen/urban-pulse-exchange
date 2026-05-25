@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useRouterState } from "@tanstack/react-router";
 import { toast } from "sonner";
 import type { FootballMarketRow } from "@/hooks/use-football-markets";
 import type { FootballOutcome } from "@/lib/football-parimutuel";
@@ -6,6 +7,7 @@ import { usePlaceFootballBet } from "@/hooks/use-place-football-bet";
 import { useDepositSheet } from "@/hooks/use-deposit-sheet";
 import { useProfile } from "@/hooks/use-profile";
 import { useAuth } from "@/hooks/use-auth";
+import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
 import {
   estimatePayout3,
   poolImbalanceWarning3,
@@ -19,6 +21,9 @@ import { cn } from "@/lib/utils";
 
 export function FootballOrderBox({ m }: { m: FootballMarketRow }) {
   const { userId, isRegistered } = useAuth();
+  const redirect = useRouterState({
+    select: (s) => `${s.location.pathname}${s.location.searchStr}`,
+  });
   const { data: profile } = useProfile(userId);
   const balance = profile?.balance ?? 0;
   const [outcome, setOutcome] = useState<FootballOutcome>("HOME");
@@ -34,10 +39,6 @@ export function FootballOrderBox({ m }: { m: FootballMarketRow }) {
   const warn = poolImbalanceWarning3(pool);
 
   const onSubmit = async () => {
-    if (!userId || !isRegistered) {
-      toast.error(isRegistered ? copy.football.loginRequired : copy.auth.registerRequired);
-      return;
-    }
     if (stake > balance) {
       toast.error(copy.football.insufficientBalance, {
         action: {
@@ -114,15 +115,31 @@ export function FootballOrderBox({ m }: { m: FootballMarketRow }) {
       </p>
       {warn && <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">{warn}</p>}
 
-      <button
-        type="button"
-        disabled={isPending || stake < 10}
-        onClick={() => void onSubmit()}
-        data-testid="football-order-submit"
-        className="mt-4 w-full rounded-md bg-primary py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-      >
-        {isPending ? copy.football.placing : copy.football.confirmBet}
-      </button>
+      {!isRegistered ? (
+        <AuthModalTrigger
+          mode="signup"
+          upgrade
+          depositAfter
+          redirect={redirect}
+          className={cn(
+            "mt-4 w-full rounded-md bg-primary py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90",
+            (isPending || stake < 10) && "pointer-events-none opacity-50",
+          )}
+          data-testid="football-order-submit"
+        >
+          {copy.football.confirmBet}
+        </AuthModalTrigger>
+      ) : (
+        <button
+          type="button"
+          disabled={isPending || stake < 10}
+          onClick={() => void onSubmit()}
+          data-testid="football-order-submit"
+          className="mt-4 w-full rounded-md bg-primary py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+        >
+          {isPending ? copy.football.placing : copy.football.confirmBet}
+        </button>
+      )}
     </div>
   );
 }

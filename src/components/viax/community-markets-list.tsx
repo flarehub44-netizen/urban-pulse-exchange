@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+﻿import { Link } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { usePublicCommunityMarkets, useMyCommunityMarkets } from "@/hooks/use-community-markets";
 import { MarketCard } from "@/components/viax/market-card";
@@ -9,27 +9,39 @@ import { PageHeader } from "@/components/viax/page-header";
 import { copy } from "@/copy/pt-BR";
 import { useAuth } from "@/hooks/use-auth";
 
-export function CommunityMarketsList() {
+export function CommunityMarketsList({ embedded = false }: { embedded?: boolean }) {
   const { isRegistered } = useAuth();
   const { data: publicMarkets = [], isLoading, isError, refetch } = usePublicCommunityMarkets();
   const { data: myMarkets = [] } = useMyCommunityMarkets(isRegistered);
 
   return (
     <div className="space-y-5">
-      <div className="page-section flex flex-wrap items-end justify-between gap-4">
-        <PageHeader
-          title={<span className="text-highlight">{copy.community.listTitle}</span>}
-          description={copy.community.listSubtitle}
-          className="flex-1 min-w-[200px]"
-        />
-        <Link
-          to="/markets/create"
-          className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-        >
-          <Plus className="size-4" />
-          {copy.community.createLink}
-        </Link>
-      </div>
+      {embedded ? (
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <Link
+            to="/markets/create"
+            className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+          >
+            <Plus className="size-4" />
+            {copy.community.createLink}
+          </Link>
+        </div>
+      ) : (
+        <div className="page-section flex flex-wrap items-end justify-between gap-4">
+          <PageHeader
+            title={<span className="text-highlight">{copy.community.listTitle}</span>}
+            description={copy.community.listSubtitle}
+            className="flex-1 min-w-[200px]"
+          />
+          <Link
+            to="/markets/create"
+            className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+          >
+            <Plus className="size-4" />
+            {copy.community.createLink}
+          </Link>
+        </div>
+      )}
 
       {isRegistered && myMarkets.length > 0 && (
         <section className="space-y-3">

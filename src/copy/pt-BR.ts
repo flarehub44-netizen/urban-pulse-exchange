@@ -375,6 +375,12 @@ export const copy = {
     closingSoon: (mins: number) => `Últimos ${Math.ceil(mins)} min — previsões encerram em breve!`,
     communityTab: "Comunidade",
     urbanTab: "Urbanos",
+    transitoTab: "Trânsito",
+    futebolTab: "Futebol",
+    outrosTab: "Outros",
+    segmentTransito: "Previsões sobre trânsito, fluxo e mobilidade urbana em tempo real.",
+    segmentFutebol: "Mercados 1X2 aprovados pela equipe ViaX — vitória, empate ou visitante.",
+    segmentOutros: "Mercados criados pela comunidade — publique ou participe de previsões Sim/Não.",
   },
 
   community: {
@@ -384,7 +390,7 @@ export const copy = {
     questionPlaceholder: "Ex.: O time X vence o clássico no domingo?",
     endsLabel: "Encerra em",
     visibilityLabel: "Quem pode participar",
-    visibilityPublic: "Público — aparece na aba Comunidade",
+    visibilityPublic: "Público — aparece na aba Outros",
     visibilityPrivate: "Privado — só quem tiver o link",
     creatorNote:
       "Você define o resultado após o prazo. Não é possível apostar no próprio mercado. Exige cadastro formal.",

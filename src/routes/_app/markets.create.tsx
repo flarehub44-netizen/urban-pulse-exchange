@@ -20,7 +20,7 @@ function CreateCommunityMarketPage() {
     <div className="space-y-4 p-4 md:p-6">
       <Link
         to="/markets"
-        search={{ view: "community" }}
+        search={{ segment: "outros" }}
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="size-4" />

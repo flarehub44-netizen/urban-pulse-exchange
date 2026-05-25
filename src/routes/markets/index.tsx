@@ -28,6 +28,11 @@ import { PageHeader } from "@/components/viax/page-header";
 import { CommunityMarketsList } from "@/components/viax/community-markets-list";
 import { DepositPromptBanner } from "@/components/viax/deposit-prompt-banner";
 import { useHasDeposited } from "@/hooks/use-has-deposited";
+import { MarketsSegmentTabs } from "@/components/viax/markets-segment-tabs";
+import { FootballMarketsList } from "@/components/football/football-markets-list";
+import { DepositFunnelBannerSlot } from "@/components/viax/deposit-funnel-banner-slot";
+import { parseMarketSegment, segmentDescription } from "@/lib/markets-segment";
+import type { MarketSegment } from "@/routes/markets";
 
 export const Route = createFileRoute("/markets/")({
   head: () => ({
@@ -50,9 +55,8 @@ export const Route = createFileRoute("/markets/")({
     const validCat = MARKET_CATEGORY_FILTERS.includes(cat as MarketCategoryFilter)
       ? (cat as MarketCategoryFilter)
       : undefined;
-    const view = search.view === "community" ? "community" : "urban";
     return {
-      view,
+      segment: parseMarketSegment(search),
       region: typeof search.region === "string" && search.region ? search.region : undefined,
       status: validStatus,
       category: validCat,
@@ -97,7 +101,7 @@ function MarketsList() {
     [bets],
   );
 
-  const view = search.view ?? "urban";
+  const segment: MarketSegment = search.segment ?? "transito";
   const statusKey = search.status ?? "all";
   const category = search.category ?? null;
   const showFavorites = search.favorites === "1";
@@ -203,62 +207,37 @@ function MarketsList() {
     aiPicks,
   ]);
 
-  if (view === "community") {
-    return (
-      <div className="space-y-4">
-        <div className="flex gap-2 border-b pb-2">
-          <button
-            type="button"
-            onClick={() => patchSearch({ view: "urban" })}
-            className="rounded-lg px-3 py-1.5 text-sm text-muted-foreground hover:bg-surface"
-          >
-            {copy.markets.urbanTab}
-          </button>
-          <button
-            type="button"
-            className={cn(
-              "rounded-lg px-3 py-1.5 text-sm font-medium",
-              "bg-primary/15 text-primary",
-            )}
-          >
-            {copy.markets.communityTab}
-          </button>
-        </div>
-        <CommunityMarketsList />
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-5">
-      {isRegistered && hasDeposited === false && <DepositPromptBanner />}
+      {isRegistered && hasDeposited === false && segment === "transito" && <DepositPromptBanner />}
 
-      <div className="flex gap-2 border-b pb-2">
-        <button
-          type="button"
-          className={cn("rounded-lg px-3 py-1.5 text-sm font-medium", "bg-primary/15 text-primary")}
-        >
-          {copy.markets.urbanTab}
-        </button>
-        <button
-          type="button"
-          onClick={() => patchSearch({ view: "community" })}
-          className="rounded-lg px-3 py-1.5 text-sm text-muted-foreground hover:bg-surface"
-        >
-          {copy.markets.communityTab}
-        </button>
-      </div>
+      <PageHeader
+        title={<span className="text-highlight">Mercados</span>}
+        description={segmentDescription(segment)}
+        className="page-section"
+      />
+
+      <MarketsSegmentTabs
+        segment={segment}
+        onChange={(s) => patchSearch({ segment: s === "transito" ? undefined : s })}
+      />
+
+      {segment === "futebol" && (
+        <>
+          <DepositFunnelBannerSlot />
+          <FootballMarketsList embedded />
+        </>
+      )}
+
+      {segment === "outros" && <CommunityMarketsList embedded />}
+
+      {segment === "transito" && (
+        <>
       <div className="page-section flex flex-wrap items-end justify-between gap-4">
-        <PageHeader
-          title={<span className="text-highlight">Mercados</span>}
-          description={
-            <>
-              <span className="text-emphasis">{list.length} mercados</span> · pools atualizando ao
-              vivo
-            </>
-          }
-          className="flex-1 min-w-[200px]"
-        />
+        <p className="flex-1 min-w-[200px] text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">{list.length} mercados</span> · pools
+          atualizando ao vivo
+        </p>
         <div className="relative w-full max-w-xs">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -555,6 +534,8 @@ function MarketsList() {
               <MarketCard key={m.id} m={m} />
             ))}
           </div>
+        </>
+      )}
         </>
       )}
     </div>

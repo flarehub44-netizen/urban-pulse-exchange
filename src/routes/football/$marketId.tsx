@@ -8,7 +8,7 @@ import { InlineError } from "@/components/viax/inline-error";
 import { copy } from "@/copy/pt-BR";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_app/football/$marketId")({
+export const Route = createFileRoute("/football/$marketId")({
   component: FootballMarketPage,
 });
 
@@ -91,7 +91,11 @@ function FootballMarketPage() {
     return (
       <div className="text-center">
         <p className="text-sm text-muted-foreground">{copy.football.notFound}</p>
-        <Link to="/football" className="mt-4 inline-block text-sm text-primary hover:underline">
+        <Link
+          to="/markets"
+          search={{ segment: "futebol" }}
+          className="mt-4 inline-block text-sm text-primary hover:underline"
+        >
           {copy.football.backList}
         </Link>
       </div>
@@ -104,7 +108,11 @@ function FootballMarketPage() {
 
   return (
     <div className="mx-auto max-w-lg space-y-6">
-      <Link to="/football" className="text-xs text-primary hover:underline">
+      <Link
+        to="/markets"
+        search={{ segment: "futebol" }}
+        className="text-xs text-primary hover:underline"
+      >
         ← {copy.football.backList}
       </Link>
 

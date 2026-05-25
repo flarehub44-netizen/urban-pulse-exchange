@@ -34,7 +34,7 @@ export const sidebarNav: NavItem[] = [
   { to: "/dashboard", label: copy.nav.home, icon: LayoutDashboard },
   { to: "/markets", label: copy.nav.markets, icon: Radio, matchPrefix: true },
   { to: "/markets/create", label: copy.community.createLink, icon: PlusCircle },
-  { to: "/football", label: copy.nav.football, icon: Flag, matchPrefix: true },
+  { to: "/markets", label: copy.nav.football, icon: Flag, search: { segment: "futebol" } },
   { to: "/live", label: copy.nav.live, icon: Map },
   { to: "/ranking", label: copy.nav.ranking, icon: Trophy },
   { to: "/feed", label: copy.nav.feed, icon: MessageSquare },
@@ -59,7 +59,7 @@ export const notificationsNav: NavItem = {
 export const bottomNavPrimary: NavItem[] = [
   { to: "/dashboard", label: copy.nav.home, icon: LayoutDashboard },
   { to: "/markets", label: copy.nav.markets, icon: Radio, matchPrefix: true },
-  { to: "/football", label: copy.nav.football, icon: Flag, matchPrefix: true },
+  { to: "/markets", label: copy.nav.football, icon: Flag, search: { segment: "futebol" } },
   { to: "/live", label: copy.nav.live, icon: Map },
   { to: "/profile", label: copy.nav.account, icon: User, matchPrefix: true },
 ];
@@ -100,11 +100,20 @@ export function isNavActive(
   item: NavItem,
   search?: Record<string, unknown>,
 ): boolean {
+  if (item.search?.segment) {
+    if (item.search.segment === "futebol" && path.startsWith("/football")) return true;
+    if (path !== item.to) return false;
+    return search?.segment === item.search.segment;
+  }
   if (item.search?.tab) {
     if (path !== item.to) return false;
     return search?.tab === item.search.tab;
   }
   if (path === item.to) {
+    if (item.to === "/markets" && !item.search?.segment) {
+      const seg = search?.segment;
+      if (seg === "futebol" || seg === "outros") return false;
+    }
     if (item.to === "/profile" && !item.matchPrefix) return false;
     if (item.to === "/profile" && item.matchPrefix) {
       const tab = search?.tab;

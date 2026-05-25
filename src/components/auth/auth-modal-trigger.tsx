@@ -10,6 +10,7 @@ type AuthModalTriggerProps = {
   className?: string;
   children: ReactNode;
   onClick?: () => void;
+  "data-testid"?: string;
 };
 
 export function AuthModalTrigger({
@@ -20,12 +21,14 @@ export function AuthModalTrigger({
   className,
   children,
   onClick,
+  "data-testid": dataTestId,
 }: AuthModalTriggerProps) {
   const { openLogin, openSignup } = useAuthModal();
 
   return (
     <button
       type="button"
+      data-testid={dataTestId}
       onClick={() => {
         onClick?.();
         if (mode === "login") openLogin({ redirect, depositAfter });

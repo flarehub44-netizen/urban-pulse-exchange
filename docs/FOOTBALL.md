@@ -4,7 +4,7 @@
 
 1. **Sync** (`runFootballSync`) busca jogos na [API-Football v3](https://www.api-football.io/) e grava em `football_fixtures` com `review_status = pending_review`.
 2. **Admin** em `/admin/football` aprova o jogo → mercado em `draft` → publica → `live`.
-3. **Usuários** apostam em `/football` (Casa / Empate / Fora).
+3. **Usuários** veem jogos em `/markets?segment=futebol` e apostam no detalhe `/football/{marketId}` (Casa / Empate / Fora).
 4. **Resolve** (`runFootballResolve`) liquida mercados quando o jogo termina (`FT`, `AET`, `PEN`).
 
 ## Variáveis de ambiente (servidor / Cloudflare)
@@ -39,7 +39,7 @@ Use este roteiro após `npm run build` e deploy do Worker (`npx wrangler deploy`
 ### 3. Publicação
 
 - [ ] **Aprovar** um jogo → aparece em **Rascunhos**
-- [ ] **Publicar** → mercado em **Publicados** e visível em `/football`
+- [ ] **Publicar** → mercado em **Publicados** e visível em `/markets?segment=futebol` (redirect de `/football`)
 
 ### 4. Aposta
 

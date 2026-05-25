@@ -7,14 +7,22 @@ import { primeAppStorage } from "./helpers/markets";
 test.describe("football bet flow", () => {
   test.describe.configure({ timeout: 60_000 });
 
-  test("lists football markets page", async ({ page }) => {
+  test("redirects /football to markets futebol segment", async ({ page }) => {
     await page.goto("/football");
-    await expect(page.getByRole("heading", { name: /Futebol/i })).toBeVisible({
+    await expect(page).toHaveURL(/\/markets(\?.*segment=futebol|\/\?segment=futebol)/, {
       timeout: 15_000,
     });
   });
 
-  test("opens seeded market detail", async ({ page }) => {
+  test("lists football markets in hub without login", async ({ page }) => {
+    await page.goto("/markets?segment=futebol");
+    await expect(page.getByRole("heading", { name: /Mercados/i })).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByRole("button", { name: /Futebol/i })).toBeVisible();
+  });
+
+  test("opens seeded market detail without login", async ({ page }) => {
     await page.goto("/football/fb-999999001");
     await expect(page.getByText(/São Paulo/i)).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText(/Corinthians/i)).toBeVisible();

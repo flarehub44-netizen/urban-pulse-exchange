@@ -1,5 +1,4 @@
 import { test, expect } from "@playwright/test";
-import { primeAppStorage } from "./helpers/markets";
 
 test.describe("football admin", () => {
   test("redirects non-admin from admin football", async ({ page }) => {
@@ -9,9 +8,8 @@ test.describe("football admin", () => {
     expect(url.includes("/admin/football")).toBeFalsy();
   });
 
-  test("seed market visible on public football list", async ({ page }) => {
-    await primeAppStorage(page);
-    await page.goto("/football");
+  test("seed market visible on public football hub without login", async ({ page }) => {
+    await page.goto("/markets?segment=futebol");
     await expect(page.getByText(/São Paulo/i).first()).toBeVisible({ timeout: 20_000 });
     await expect(page.getByText(/Corinthians/i).first()).toBeVisible();
   });

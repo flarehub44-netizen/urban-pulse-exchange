@@ -6,7 +6,11 @@ import type { AuthModalSearch } from "@/lib/auth-modal-search";
 export type { AuthModalSearch };
 import { AuthAwareShell } from "@/components/viax/auth-aware-shell";
 
+export type MarketSegment = "transito" | "futebol" | "outros";
+
 export type MarketsSearch = {
+  segment?: MarketSegment;
+  /** @deprecated use segment=outros */
   view?: "urban" | "community";
   region?: string;
   status?: "all" | "live" | "closing" | "dispute" | "resolved" | "draft";

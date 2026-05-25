@@ -2,8 +2,8 @@ import { test, expect } from "@playwright/test";
 import { primeAppStorage } from "./helpers/markets";
 
 test.describe("Mercados da comunidade", () => {
-  test("aba comunidade e formulário de criar carregam", async ({ page }) => {
-    await page.goto("/markets?view=community");
+  test("aba outros e formulário de criar carregam", async ({ page }) => {
+    await page.goto("/markets?segment=outros");
     await page.waitForTimeout(5000);
 
     const body = await page.locator("body").innerText();
@@ -14,6 +14,14 @@ test.describe("Mercados da comunidade", () => {
     await page.waitForTimeout(3000);
     const createBody = await page.locator("body").innerText();
     expect(/criar previsão|pergunta/i.test(createBody)).toBeTruthy();
+  });
+
+  test("URL legada view=community abre aba Outros", async ({ page }) => {
+    await page.goto("/markets?view=community");
+    await page.waitForTimeout(3000);
+    await expect(page.getByRole("button", { name: /Outros/i })).toBeVisible({ timeout: 15_000 });
+    const body = await page.locator("body").innerText();
+    expect(/criar previsão|comunidade/i.test(body)).toBeTruthy();
   });
 
   test("mercado privado sem token mostra acesso negado ou login", async ({ page }) => {
@@ -29,7 +37,7 @@ test.describe("Mercados da comunidade", () => {
 
   test("detalhe de mercado community exibe badge comunidade quando listado", async ({ page }) => {
     await primeAppStorage(page);
-    await page.goto("/markets?view=community");
+    await page.goto("/markets?segment=outros");
     await page.waitForTimeout(6000);
 
     const card = page.locator('[data-testid="market-card"]').first();

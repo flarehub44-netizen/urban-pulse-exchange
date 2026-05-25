@@ -184,7 +184,7 @@ function MarketDetail() {
     return (
       <div className="mx-auto max-w-md space-y-3 p-6 text-center">
         <p className="text-sm text-warn">{copy.community.accessDenied}</p>
-        <Link to="/markets" search={{ view: "community" }} className="text-sm text-primary underline">
+        <Link to="/markets" search={{ segment: "outros" }} className="text-sm text-primary underline">
           {copy.community.backToList}
         </Link>
       </div>
@@ -212,7 +212,7 @@ function MarketDetail() {
       <nav className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
         <Link
           to="/markets"
-          search={isCommunity ? { view: "community" } : undefined}
+          search={isCommunity ? { segment: "outros" } : undefined}
           className="inline-flex items-center gap-1 hover:text-foreground"
         >
           <ArrowLeft className="size-4" /> Mercados
