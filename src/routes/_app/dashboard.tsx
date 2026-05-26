@@ -268,7 +268,7 @@ function Dashboard() {
           </span>
           <button
             type="button"
-            onClick={openDepositSheet}
+            onClick={() => openDepositSheet()}
             className="shrink-0 rounded-lg bg-warn px-4 py-2 text-sm font-semibold text-warn-foreground hover:opacity-90 transition"
           >
             Depositar agora
@@ -300,7 +300,7 @@ function Dashboard() {
         />
 
         <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
-          <button type="button" onClick={openDepositSheet} className="text-left">
+          <button type="button" onClick={() => openDepositSheet()} className="text-left">
             <KpiTile
               label="Saldo"
               icon={TrendingUp}
