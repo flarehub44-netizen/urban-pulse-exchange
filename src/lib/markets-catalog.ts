@@ -1,17 +1,6 @@
 import type { Market } from "@/store/viax-store";
 import type { MarketStatus } from "@/lib/market-status";
-
-/** Legacy seed slugs superseded by *-live markets. */
-const LEGACY_SEED_IDS = new Set([
-  "paulista-rush",
-  "marginal-tietê",
-  "faria-lima",
-  "23-maio",
-  "rebouças",
-  "anhangabaú",
-  "imigrantes",
-  "brigadeiro",
-]);
+import { LEGACY_MARKET_IDS } from "@/lib/market-slug-aliases";
 
 /** Client-side filter when `archived` column is not on cached rows yet. */
 export function isCatalogMarket(
@@ -19,7 +8,7 @@ export function isCatalogMarket(
 ): boolean {
   if (m.archived === true) return false;
   if (m.marketKind === "community") return false;
-  if (LEGACY_SEED_IDS.has(m.id)) return false;
+  if (LEGACY_MARKET_IDS.has(m.id)) return false;
   return true;
 }
 

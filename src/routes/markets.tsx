@@ -20,6 +20,7 @@ export type MarketsSearch = {
   sort?: "edge" | "closing" | "trend";
   q?: string;
   aiPicks?: "1";
+  marketMissing?: "1";
 } & AuthModalSearch;
 
 export const Route = createFileRoute("/markets")({

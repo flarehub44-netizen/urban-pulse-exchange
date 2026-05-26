@@ -397,6 +397,8 @@ export const copy = {
     segmentTransito: "Previsões sobre trânsito, fluxo e mobilidade urbana em tempo real.",
     segmentFutebol: "Mercados 1X2 aprovados pela equipe ViaX — vitória, empate ou visitante.",
     segmentOutros: "Mercados criados pela comunidade — publique ou participe de previsões Sim/Não.",
+    marketNotFoundBanner:
+      "Este mercado não está mais disponível. Confira os mercados ao vivo abaixo.",
   },
 
   community: {

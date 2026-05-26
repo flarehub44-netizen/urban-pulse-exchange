@@ -68,6 +68,7 @@ export const Route = createFileRoute("/markets/")({
           ? search.sort
           : undefined,
       aiPicks: search.aiPicks === "1" ? "1" : undefined,
+      marketMissing: search.marketMissing === "1" ? "1" : undefined,
       ...parseAuthModalSearch(search),
     };
   },
@@ -226,6 +227,15 @@ function MarketsList() {
         segment={segment}
         onChange={(s) => patchSearch({ segment: s === "transito" ? undefined : s })}
       />
+
+      {search.marketMissing === "1" && (
+        <div
+          className="rounded-xl border border-warn/30 bg-warn/10 px-4 py-3 text-sm text-warn"
+          role="status"
+        >
+          {copy.markets.marketNotFoundBanner}
+        </div>
+      )}
 
       {!mounted && (
         <div className="space-y-4">

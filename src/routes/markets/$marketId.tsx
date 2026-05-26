@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect, useNavigate } from "@tanstack/react-router";
 import { lazy, Suspense, useMemo, useEffect, useState } from "react";
 import { useClientOnly } from "@/lib/use-client-only";
 import { useMarketHistory } from "@/hooks/use-market-history";
@@ -44,6 +44,8 @@ import { useAuth } from "@/hooks/use-auth";
 import type { Market } from "@/store/viax-store";
 import type { AuthModalSearch } from "@/lib/auth-modal-search";
 import { parseAuthModalSearch } from "@/lib/auth-modal-search";
+import { isKnownLegacyMarketId, resolveMarketRouteId } from "@/lib/market-slug-aliases";
+import { useMarketById } from "@/hooks/use-market-by-id";
 
 export type MarketDetailSearch = {
   tab?: "chart" | "book" | "comments" | "audit";
@@ -69,6 +71,17 @@ export const Route = createFileRoute("/markets/$marketId")({
     const access = typeof search.access === "string" && search.access ? search.access : undefined;
     return { tab: validTab, side, access, ...parseAuthModalSearch(search) };
   },
+  beforeLoad: ({ params, search }) => {
+    const canonical = resolveMarketRouteId(params.marketId);
+    if (canonical !== params.marketId) {
+      throw redirect({
+        to: "/markets/$marketId",
+        params: { marketId: canonical },
+        search,
+        replace: true,
+      });
+    }
+  },
   component: MarketDetail,
 });
 
@@ -80,7 +93,13 @@ const allTabs = [
 ] as const;
 
 function MarketCommentsPanel({ marketId }: { marketId: string }) {
+  const clientReady = useClientOnly();
   const { feed } = useResolvedFeedForMarket(marketId);
+
+  if (!clientReady) {
+    return <div className="h-40 animate-pulse rounded-2xl bg-surface-2" />;
+  }
+
   return (
     <div className="rounded-2xl border bg-card/60 p-5 backdrop-blur">
       <div className="flex items-center justify-between">
@@ -138,13 +157,26 @@ function MarketDetail() {
   } = useCommunityMarketDetail(marketId, search.access);
   const { mutateAsync: joinMarket } = useJoinCommunityMarket();
 
+  const needsDirectFetch =
+    !isCommunityId &&
+    !fromList &&
+    !fromPublicList &&
+    !communityDetail?.market &&
+    authReady &&
+    !marketsLoading;
+  const {
+    data: directMarket,
+    isFetched: directFetched,
+    isLoading: directLoading,
+  } = useMarketById(marketId, needsDirectFetch);
+
   useEffect(() => {
     if (!search.access || !userId || !isCommunityId) return;
     void joinMarket(search.access).then(() => refetchCommunity());
   }, [search.access, userId, isCommunityId, joinMarket, refetchCommunity]);
 
   const m: Market | undefined =
-    fromList ?? fromPublicList ?? communityDetail?.market ?? undefined;
+    fromList ?? fromPublicList ?? communityDetail?.market ?? directMarket ?? undefined;
   const isCreator = Boolean(
     communityDetail?.isCreator ||
       (userId && (fromList?.createdBy === userId || fromPublicList?.createdBy === userId)),
@@ -156,7 +188,9 @@ function MarketDetail() {
     hasMarket: !!m,
   });
   const detailLoading =
-    (marketsLoading && !isCommunityId) || (isCommunityId && deferCommunityNotFound && !m);
+    (marketsLoading && !isCommunityId && !m) ||
+    (needsDirectFetch && directLoading) ||
+    (isCommunityId && deferCommunityNotFound && !m);
 
   const { data: dbHistory } = useMarketHistory(marketId, !isCommunity);
   const history = useMemo(() => {
@@ -181,6 +215,36 @@ function MarketDetail() {
       setShowSocialBook(false);
     };
   }, [activeTab, marketId]);
+
+  const resolutionDone =
+    isCommunityId
+      ? communityFetched
+      : !marketsLoading && (!needsDirectFetch || directFetched);
+
+  useEffect(() => {
+    if (!clientReady || !resolutionDone || m) return;
+    if (isCommunityId && communityError) return;
+    if (isCommunityId && deferCommunityNotFound) return;
+    if (!isCommunityId && communityDetail?.reason === "access_denied") return;
+
+    if (isKnownLegacyMarketId(marketId)) {
+      navigate({
+        to: "/markets",
+        search: { segment: "transito", marketMissing: "1" },
+        replace: true,
+      });
+    }
+  }, [
+    clientReady,
+    resolutionDone,
+    m,
+    marketId,
+    isCommunityId,
+    communityError,
+    deferCommunityNotFound,
+    communityDetail?.reason,
+    navigate,
+  ]);
 
   if (!clientReady || detailLoading) {
     return (
@@ -242,7 +306,16 @@ function MarketDetail() {
     );
   }
 
-  if (!m) throw notFound();
+  if (!m) {
+    if (resolutionDone && isKnownLegacyMarketId(marketId)) {
+      return (
+        <div className="space-y-4 animate-pulse">
+          <div className="h-8 w-48 rounded-lg bg-surface-2" />
+        </div>
+      );
+    }
+    throw notFound();
+  }
 
   const pY = probability(m.pool, "YES");
   const marketEdge = getMarketEdge(m);
@@ -349,7 +422,7 @@ function MarketDetail() {
         </div>
       )}
 
-      <OpenPositionStrip marketId={marketId} />
+      {clientReady && <OpenPositionStrip marketId={marketId} />}
 
       {!isCommunity && (m.status === "live" || m.status === "closing") && (
         <LiveCameraStrip regionId={m.regionId} />
@@ -552,7 +625,7 @@ function MarketDetail() {
             </>
           )}
 
-          {activeTab === "comments" && <MarketCommentsPanel marketId={marketId} />}
+          {clientReady && activeTab === "comments" && <MarketCommentsPanel marketId={marketId} />}
 
           {activeTab === "audit" && (
             <div className="rounded-2xl border bg-card/60 p-5 backdrop-blur">

@@ -3,13 +3,30 @@ import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useActiveEvents } from "@/hooks/use-active-events";
+import { InlineError } from "@/components/viax/inline-error";
 import { cn } from "@/lib/utils";
 
 export function EventsBanner() {
-  const { data: events } = useActiveEvents();
+  const { data: events, isError, error, refetch, isFetched } = useActiveEvents();
   const [dismissed, setDismissed] = useState<string[]>([]);
 
+  if (isError) {
+    return (
+      <InlineError
+        message={error instanceof Error ? error.message : "Não foi possível carregar os eventos."}
+        onRetry={() => void refetch()}
+      />
+    );
+  }
+
   const visible = (events ?? []).filter((e) => !dismissed.includes(e.id));
+
+  if (isFetched && visible.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground">Nenhum evento ativo no momento.</p>
+    );
+  }
+
   if (!visible.length) return null;
 
   return (

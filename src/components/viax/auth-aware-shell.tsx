@@ -10,7 +10,7 @@ type AuthAwareShellProps = {
 
 export function AuthAwareShell({ children }: AuthAwareShellProps) {
   const [mounted, setMounted] = useState(false);
-  const { isRegistered, authReady } = useAuthPublic();
+  const { userId, authReady } = useAuthPublic();
 
   useEffect(() => {
     setMounted(true);
@@ -25,7 +25,7 @@ export function AuthAwareShell({ children }: AuthAwareShellProps) {
     return <AppLoadingSkeleton />;
   }
 
-  if (isRegistered) {
+  if (userId) {
     return <AppShell>{children}</AppShell>;
   }
 

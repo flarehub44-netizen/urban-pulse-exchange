@@ -11,27 +11,17 @@ export type PlatformEvent = {
   ends_at: string;
 };
 
+function parseActiveEventsPayload(data: unknown): PlatformEvent[] {
+  if (!data) return [];
+  const rows = Array.isArray(data) ? data : typeof data === "string" ? JSON.parse(data) : [];
+  if (!Array.isArray(rows)) return [];
+  return rows as PlatformEvent[];
+}
+
 export const getActiveEventsFn = createServerFn({ method: "GET" }).handler(async () => {
-  try {
-    const now = new Date().toISOString();
-    const { data, error } = (await supabase
-      .from("platform_events")
-      .select("id, name, slug, description, badge_icon, xp_boost, ends_at")
-      .lte("starts_at", now)
-      .gte("ends_at", now)
-      .order("ends_at", { ascending: true })) as {
-      data: PlatformEvent[] | null;
-      error: Error | null;
-    };
-
-    if (error) {
-      console.warn("[events] Failed to load active events:", error.message);
-      return [];
-    }
-
-    return data ?? [];
-  } catch (error) {
-    console.warn("[events] Active events unavailable:", error);
-    return [];
+  const { data, error } = await supabase.rpc("get_active_events");
+  if (error) {
+    throw new Error(error.message);
   }
+  return parseActiveEventsPayload(data);
 });
