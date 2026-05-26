@@ -23,7 +23,7 @@ async function handleFootballSync(request: Request) {
   }
 }
 
-export const Route = createFileRoute("/api/cron/football-sync")({
+export const Route = createFileRoute("/api/public/cron/football-sync")({
   server: {
     handlers: {
       GET: ({ request }) => handleFootballSync(request),
