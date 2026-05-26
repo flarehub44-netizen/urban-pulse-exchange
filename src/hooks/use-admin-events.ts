@@ -80,7 +80,7 @@ export function useAdminUpsertPlatformEvent() {
       xpBoost: number;
     }) => {
       const { data, error } = await supabase.rpc("admin_upsert_platform_event", {
-        p_id: input.id ?? null,
+        p_id: input.id ?? undefined,
         p_name: input.name,
         p_slug: input.slug,
         p_description: input.description,
@@ -133,7 +133,7 @@ export function useAdminUpsertDailyPoll() {
   return useMutation({
     mutationFn: async (input: { id?: string | null; question: string; pollDate: string }) => {
       const { data, error } = await supabase.rpc("admin_upsert_daily_poll", {
-        p_id: input.id ?? null,
+        p_id: input.id ?? undefined,
         p_question: input.question,
         p_poll_date: input.pollDate,
       });
@@ -169,7 +169,7 @@ export function useAdminPartnerEventsFeed(partnerId?: string | null, enabled = t
       const { data, error } = await supabase.rpc("admin_list_partner_events", {
         p_limit: 50,
         p_partner_id: null,
-        p_partner_query: partnerId ?? null,
+        p_partner_query: partnerId ?? undefined,
       });
       if (error) throw error;
       return (data ?? []) as AdminPartnerEventRow[];

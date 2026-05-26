@@ -29,7 +29,7 @@ export const createCommunityMarketFn = createServerFn({ method: "POST" })
       p_question: data.question,
       p_ends_at: data.endsAt,
       p_visibility: data.visibility,
-      p_cover_url: data.coverUrl ?? null,
+      p_cover_url: data.coverUrl ?? undefined,
     });
     if (error) throw new Error(error.message);
     return result as {
@@ -64,7 +64,7 @@ export const getCommunityMarketFn = createServerFn({ method: "GET" })
     const { supabase } = context as unknown as SupabaseFnContext;
     const { data: result, error } = await supabase.rpc("get_community_market", {
       p_market_id: data.marketId,
-      p_access_token: data.accessToken ?? null,
+      p_access_token: data.accessToken ?? undefined,
     });
     if (error) throw new Error(error.message);
     return result as {

@@ -18,7 +18,7 @@ export function useAdminResolveMarket() {
       const { data, error } = await supabase.rpc("admin_resolve_market", {
         p_market_id: marketId,
         p_winning_side: side,
-        p_note: note ?? null,
+        p_note: note ?? undefined,
       });
       if (error) throw error;
       return data;

@@ -179,7 +179,7 @@ export function useApplyPartner() {
     mutationFn: async (input: { bio: string; focusCity?: string }) => {
       const { data, error } = await supabase.rpc("apply_partner_program", {
         p_bio: input.bio,
-        p_focus_city: input.focusCity ?? null,
+        p_focus_city: input.focusCity ?? undefined,
         p_social: {},
       });
       if (error) throw error;
@@ -199,7 +199,7 @@ export function useCreatePartnerCampaign() {
     }) => {
       const { data, error } = await supabase.rpc("create_partner_campaign", {
         p_name: input.name,
-        p_slug_suffix: input.slugSuffix ?? null,
+        p_slug_suffix: input.slugSuffix ?? undefined,
         p_target: input.target ?? { path: "/dashboard" },
       });
       if (error) throw error;

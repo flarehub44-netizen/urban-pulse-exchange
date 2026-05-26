@@ -17,7 +17,7 @@ export function useAdminFreezeMarket() {
       const { data, error } = await supabase.rpc("admin_set_market_frozen", {
         p_market_id: marketId,
         p_frozen: frozen,
-        p_note: note ?? null,
+        p_note: note ?? undefined,
       });
       if (error) throw error;
       return data;

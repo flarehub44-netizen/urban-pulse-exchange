@@ -231,7 +231,7 @@ export function useAdminForceClose() {
     mutationFn: async ({ marketId, note }: { marketId: string; note?: string }) => {
       const { data, error } = await supabase.rpc("admin_force_close", {
         p_market_id: marketId,
-        p_note: note ?? null,
+        p_note: note ?? undefined,
       });
       if (error) throw error;
       return data;
@@ -296,9 +296,9 @@ export function useAdminApprovePartner() {
       const { data, error } = await supabase.rpc("admin_approve_partner", {
         p_user_id: userId,
         p_tier: tier ?? "Bronze",
-        p_slug: slug ?? null,
-        p_revenue_share_pct: revenueSharePct ?? null,
-        p_cpa_amount: cpaAmount ?? null,
+        p_slug: slug ?? undefined,
+        p_revenue_share_pct: revenueSharePct ?? undefined,
+        p_cpa_amount: cpaAmount ?? undefined,
       });
       if (error) throw error;
       return data;
@@ -364,7 +364,7 @@ export function useAdminRejectPartner() {
     mutationFn: async ({ userId, note }: { userId: string; note?: string }) => {
       const { data, error } = await supabase.rpc("admin_reject_partner", {
         p_user_id: userId,
-        p_note: note ?? null,
+        p_note: note ?? undefined,
       });
       if (error) throw error;
       return data;
@@ -541,7 +541,7 @@ export function useAdminUpdateKyc() {
       const { data, error } = await supabase.rpc("admin_update_kyc_status", {
         p_user_id: userId,
         p_status: status,
-        p_notes: notes ?? null,
+        p_notes: notes ?? undefined,
       });
       if (error) throw error;
       return data;
@@ -581,10 +581,10 @@ export function useAdminUpsertCamera() {
         p_id: args.p_id,
         p_region_id: args.p_region_id,
         p_name: args.p_name,
-        p_location: args.p_location ?? null,
+        p_location: args.p_location ?? undefined,
         p_status: args.p_status ?? "offline",
-        p_stream_url: args.p_stream_url ?? null,
-        p_count_line: args.p_count_line ?? null,
+        p_stream_url: args.p_stream_url ?? undefined,
+        p_count_line: args.p_count_line ?? undefined,
       });
       if (error) throw error;
       return data;
@@ -604,7 +604,7 @@ export function useAdminCreateCameraUpstream() {
       const { data, error } = await supabase.rpc("admin_create_camera_upstream", {
         p_provider: args.provider,
         p_upstream_url: args.upstreamUrl,
-        p_label: args.label ?? null,
+        p_label: args.label ?? undefined,
         p_kind: args.kind ?? "hls",
       });
       if (error) throw error;

@@ -60,7 +60,7 @@ async function tryBindPartnerRef() {
   }
   const { data, error } = await supabase.rpc("bind_referral_attribution", {
     p_slug: ref.slug,
-    p_campaign_id: ref.campaignId ?? null,
+    p_campaign_id: ref.campaignId ?? undefined,
   });
   if (!error) {
     const payload = data as { ok?: boolean; reason?: string };

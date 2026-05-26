@@ -11,7 +11,7 @@ function mapMarket(row: Record<string, unknown>): Market {
     id: row.id as string,
     question: row.question as string,
     region: row.region as string,
-    regionId: (row.region_id as string | null) ?? null,
+    regionId: (row.region_id as string | null) ?? undefined,
     target: Number(row.target),
     category: row.category as Market["category"],
     endsAt: new Date(row.ends_at as string).getTime(),
@@ -31,7 +31,7 @@ function mapMarket(row: Record<string, unknown>): Market {
     archived: Boolean(row.archived),
     marketKind: (row.market_kind as Market["marketKind"]) ?? "platform",
     visibility: row.visibility as Market["visibility"],
-    createdBy: (row.created_by as string | null) ?? null,
+    createdBy: (row.created_by as string | null) ?? undefined,
   };
 }
 

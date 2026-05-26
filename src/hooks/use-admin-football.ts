@@ -102,7 +102,7 @@ export function useAdminRejectFootballFixture() {
     mutationFn: async ({ fixtureId, reason }: { fixtureId: number; reason?: string }) => {
       const { data, error } = await supabase.rpc("admin_reject_football_fixture", {
         p_fixture_id: fixtureId,
-        p_reason: reason ?? null,
+        p_reason: reason ?? undefined,
       });
       if (error) throw error;
       return data;
