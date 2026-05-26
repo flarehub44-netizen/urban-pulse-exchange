@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createCommunityMarketFn,
   getCommunityMarketFn,
+  getCommunityMarketPublicFn,
   joinCommunityMarketFn,
   listMyCommunityMarketsFn,
   listPublicCommunityMarketsFn,
@@ -23,21 +24,24 @@ export type CommunityMarketDetailResult = {
   reason?: string;
 };
 
+export const PUBLIC_COMMUNITY_MARKETS_QUERY_KEY = ["markets", "community", "public"] as const;
+
 export function communityMarketDetailQueryKey(
   marketId: string,
   accessToken?: string,
   userId?: string | null,
 ) {
-  return ["markets", "community", marketId, accessToken ?? "", userId ?? ""] as const;
+  return ["markets", "community", marketId, accessToken ?? "", userId ?? "anon"] as const;
 }
 
-export async function fetchCommunityMarketDetail(
-  marketId: string,
-  accessToken?: string,
-): Promise<CommunityMarketDetailResult> {
-  const res = await getCommunityMarketFn({
-    data: { marketId, accessToken },
-  });
+type RpcCommunityMarketResult = {
+  ok?: boolean;
+  market?: Record<string, unknown>;
+  is_creator?: boolean;
+  reason?: string;
+};
+
+function mapRpcCommunityMarketDetail(res: RpcCommunityMarketResult): CommunityMarketDetailResult {
   if (!res.ok || !res.market) {
     return { market: null, isCreator: false, reason: res.reason };
   }
@@ -48,22 +52,32 @@ export async function fetchCommunityMarketDetail(
   };
 }
 
+export async function fetchCommunityMarketDetail(
+  marketId: string,
+  accessToken?: string,
+  options?: { authenticated?: boolean },
+): Promise<CommunityMarketDetailResult> {
+  const res =
+    options?.authenticated === true
+      ? await getCommunityMarketFn({ data: { marketId, accessToken } })
+      : await getCommunityMarketPublicFn({ data: { marketId, accessToken } });
+  return mapRpcCommunityMarketDetail(res);
+}
+
 /** True while community detail must not 404 yet (auth or fetch pending). */
 export function shouldDeferCommunityNotFound(opts: {
   authReady: boolean;
-  userId: string | null | undefined;
   communityFetched: boolean;
   hasMarket: boolean;
 }): boolean {
   if (opts.hasMarket) return false;
   if (!opts.authReady) return true;
-  if (!opts.userId) return true;
   return !opts.communityFetched;
 }
 
 export function usePublicCommunityMarkets() {
   return useQuery({
-    queryKey: ["markets", "community", "public"],
+    queryKey: PUBLIC_COMMUNITY_MARKETS_QUERY_KEY,
     queryFn: async () => {
       const rows = await listPublicCommunityMarketsFn();
       return mapRows(rows);
@@ -87,10 +101,12 @@ export function useMyCommunityMarkets(enabled = true) {
 
 export function useCommunityMarketDetail(marketId: string, accessToken?: string) {
   const { userId, authReady } = useAuth();
+  const authenticated = !!userId;
   return useQuery({
     queryKey: communityMarketDetailQueryKey(marketId, accessToken, userId),
-    queryFn: () => fetchCommunityMarketDetail(marketId, accessToken),
-    enabled: authReady && !!userId && marketId.startsWith("cm-"),
+    queryFn: () =>
+      fetchCommunityMarketDetail(marketId, accessToken, { authenticated }),
+    enabled: authReady && marketId.startsWith("cm-"),
     retry: false,
   });
 }
@@ -118,7 +134,7 @@ export function useCreateCommunityMarket() {
       if (userId && marketId?.startsWith("cm-")) {
         void qc.prefetchQuery({
           queryKey: communityMarketDetailQueryKey(marketId, undefined, userId),
-          queryFn: () => fetchCommunityMarketDetail(marketId),
+          queryFn: () => fetchCommunityMarketDetail(marketId, undefined, { authenticated: true }),
         });
       }
       void qc.invalidateQueries({ queryKey: ["markets"] });

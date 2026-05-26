@@ -52,14 +52,31 @@ export const joinCommunityMarketFn = createServerFn({ method: "POST" })
     return result as { ok: boolean; reason?: string; market_id?: string; question?: string };
   });
 
+const communityMarketDetailSchema = z.object({
+  marketId: z.string(),
+  accessToken: z.string().optional(),
+});
+
+export const getCommunityMarketPublicFn = createServerFn({ method: "GET" })
+  .inputValidator(communityMarketDetailSchema)
+  .handler(async ({ data }) => {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data: result, error } = await supabase.rpc("get_community_market", {
+      p_market_id: data.marketId,
+      p_access_token: data.accessToken ?? undefined,
+    });
+    if (error) throw new Error(error.message);
+    return result as {
+      ok?: boolean;
+      market?: Record<string, unknown>;
+      is_creator?: boolean;
+      reason?: string;
+    };
+  });
+
 export const getCommunityMarketFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    z.object({
-      marketId: z.string(),
-      accessToken: z.string().optional(),
-    }),
-  )
+  .inputValidator(communityMarketDetailSchema)
   .handler(async ({ data, context }) => {
     const { supabase } = context as unknown as SupabaseFnContext;
     const { data: result, error } = await supabase.rpc("get_community_market", {
@@ -67,7 +84,12 @@ export const getCommunityMarketFn = createServerFn({ method: "GET" })
       p_access_token: data.accessToken ?? undefined,
     });
     if (error) throw new Error(error.message);
-    return result as any;
+    return result as {
+      ok?: boolean;
+      market?: Record<string, unknown>;
+      is_creator?: boolean;
+      reason?: string;
+    };
   });
 
 export const listPublicCommunityMarketsFn = createServerFn({ method: "GET" }).handler(async () => {

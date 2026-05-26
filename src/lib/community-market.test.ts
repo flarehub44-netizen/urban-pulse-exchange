@@ -22,7 +22,6 @@ describe("shouldDeferCommunityNotFound", () => {
     expect(
       shouldDeferCommunityNotFound({
         authReady: false,
-        userId: "u1",
         communityFetched: false,
         hasMarket: false,
       }),
@@ -33,7 +32,6 @@ describe("shouldDeferCommunityNotFound", () => {
     expect(
       shouldDeferCommunityNotFound({
         authReady: true,
-        userId: "u1",
         communityFetched: false,
         hasMarket: false,
       }),
@@ -41,7 +39,6 @@ describe("shouldDeferCommunityNotFound", () => {
     expect(
       shouldDeferCommunityNotFound({
         authReady: true,
-        userId: "u1",
         communityFetched: true,
         hasMarket: false,
       }),
@@ -52,7 +49,6 @@ describe("shouldDeferCommunityNotFound", () => {
     expect(
       shouldDeferCommunityNotFound({
         authReady: true,
-        userId: "u1",
         communityFetched: false,
         hasMarket: true,
       }),

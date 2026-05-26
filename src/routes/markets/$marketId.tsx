@@ -35,6 +35,7 @@ import {
   shouldDeferCommunityNotFound,
   useCommunityMarketDetail,
   useJoinCommunityMarket,
+  usePublicCommunityMarkets,
 } from "@/hooks/use-community-markets";
 import { CommunityMarketResolvePanel } from "@/components/viax/community-market-resolve-panel";
 import { CommunityReportButton } from "@/components/viax/community-report-button";
@@ -124,7 +125,9 @@ function MarketDetail() {
   const isCommunityId = marketId.startsWith("cm-");
 
   const { markets, isLoading: marketsLoading } = useMarketsList();
+  const { data: publicCommunityMarkets = [] } = usePublicCommunityMarkets();
   const fromList = markets.find((x) => x.id === marketId);
+  const fromPublicList = publicCommunityMarkets.find((x) => x.id === marketId);
   const {
     data: communityDetail,
     isFetched: communityFetched,
@@ -138,18 +141,20 @@ function MarketDetail() {
     void joinMarket(search.access).then(() => refetchCommunity());
   }, [search.access, userId, isCommunityId, joinMarket, refetchCommunity]);
 
-  const m: Market | undefined = fromList ?? communityDetail?.market ?? undefined;
+  const m: Market | undefined =
+    fromList ?? fromPublicList ?? communityDetail?.market ?? undefined;
   const isCreator = Boolean(
-    communityDetail?.isCreator || (userId && fromList?.createdBy === userId),
+    communityDetail?.isCreator ||
+      (userId && (fromList?.createdBy === userId || fromPublicList?.createdBy === userId)),
   );
   const isCommunity = m?.marketKind === "community" || isCommunityId;
   const deferCommunityNotFound = shouldDeferCommunityNotFound({
     authReady,
-    userId,
     communityFetched: !isCommunityId || communityFetched,
     hasMarket: !!m,
   });
-  const detailLoading = marketsLoading || (isCommunityId && deferCommunityNotFound);
+  const detailLoading =
+    (marketsLoading && !isCommunityId) || (isCommunityId && deferCommunityNotFound && !m);
 
   const { data: dbHistory } = useMarketHistory(marketId, !isCommunity);
   const history = useMemo(() => {
@@ -200,10 +205,19 @@ function MarketDetail() {
     );
   }
 
-  if (isCommunityId && authReady && !userId) {
+  if (
+    isCommunityId &&
+    authReady &&
+    !userId &&
+    (communityDetail?.reason === "access_denied" || m?.visibility === "unlisted")
+  ) {
     return (
       <div className="mx-auto max-w-md space-y-3 p-6 text-center">
-        <p className="text-sm text-warn">{copy.auth.registerRequired}</p>
+        <p className="text-sm text-warn">
+          {communityDetail?.reason === "access_denied"
+            ? copy.community.accessDenied
+            : copy.auth.registerRequired}
+        </p>
         <Link to="/auth/login" className="text-sm text-primary underline">
           {copy.auth.loginCta}
         </Link>
