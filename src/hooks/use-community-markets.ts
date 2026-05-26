@@ -14,8 +14,8 @@ import { mapCommunityMarketRow, type CommunityMarketRow } from "@/lib/community-
 import type { Market } from "@/store/viax-store";
 import { useAuth } from "@/hooks/use-auth";
 
-function mapRows(rows: Record<string, unknown>[]): Market[] {
-  return rows.map((r) => mapCommunityMarketRow(r as unknown as CommunityMarketRow));
+function mapRows(rows: unknown[]): Market[] {
+  return rows.map((r) => mapCommunityMarketRow(r as CommunityMarketRow));
 }
 
 export type CommunityMarketDetailResult = {
@@ -46,7 +46,7 @@ function mapRpcCommunityMarketDetail(res: RpcCommunityMarketResult): CommunityMa
     return { market: null, isCreator: false, reason: res.reason };
   }
   return {
-    market: mapCommunityMarketRow(res.market as unknown as CommunityMarketRow),
+    market: mapCommunityMarketRow(res.market as CommunityMarketRow),
     isCreator: Boolean(res.is_creator),
     reason: undefined,
   };
@@ -61,7 +61,7 @@ export async function fetchCommunityMarketDetail(
     options?.authenticated === true
       ? await getCommunityMarketFn({ data: { marketId, accessToken } })
       : await getCommunityMarketPublicFn({ data: { marketId, accessToken } });
-  return mapRpcCommunityMarketDetail(res);
+  return mapRpcCommunityMarketDetail(res as RpcCommunityMarketResult);
 }
 
 /** True while community detail must not 404 yet (auth or fetch pending). */
@@ -92,7 +92,7 @@ export function useMyCommunityMarkets(enabled = true) {
     queryKey: ["markets", "community", "mine", userId],
     queryFn: async () => {
       const rows = await listMyCommunityMarketsFn({ data: undefined });
-      return mapRows(rows);
+      return mapRows(rows as unknown[]);
     },
     enabled: enabled && !!userId,
     staleTime: 20_000,

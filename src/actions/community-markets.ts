@@ -11,7 +11,7 @@ async function adminRpc<T>(
   return data as T;
 }
 
-import type { SupabaseFnContext } from "@/integrations/supabase/context";
+import { getSupabaseCtx } from "@/integrations/supabase/context";
 
 const createSchema = z.object({
   question: z.string().min(10).max(280),
@@ -24,7 +24,7 @@ export const createCommunityMarketFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth, requireRegisteredAuth])
   .inputValidator(createSchema)
   .handler(async ({ data, context }) => {
-    const { supabase } = context as unknown as SupabaseFnContext;
+    const { supabase } = getSupabaseCtx(context);
     const { data: result, error } = await supabase.rpc("create_community_market", {
       p_question: data.question,
       p_ends_at: data.endsAt,
@@ -44,7 +44,7 @@ export const joinCommunityMarketFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth, requireRegisteredAuth])
   .inputValidator(z.object({ accessToken: z.string().min(8) }))
   .handler(async ({ data, context }) => {
-    const { supabase } = context as unknown as SupabaseFnContext;
+    const { supabase } = getSupabaseCtx(context);
     const { data: result, error } = await supabase.rpc("join_community_market", {
       p_access_token: data.accessToken,
     });
@@ -82,7 +82,7 @@ export const getCommunityMarketFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator(communityMarketDetailSchema)
   .handler(async ({ data, context }) => {
-    const { supabase } = context as unknown as SupabaseFnContext;
+    const { supabase } = getSupabaseCtx(context);
     const { data: result, error } = await supabase.rpc("get_community_market", {
       p_market_id: data.marketId,
       p_access_token: data.accessToken ?? undefined,
@@ -110,7 +110,7 @@ export const listPublicCommunityMarketsFn = createServerFn({ method: "GET" }).ha
 export const listMyCommunityMarketsFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabase } = context as unknown as SupabaseFnContext;
+    const { supabase } = getSupabaseCtx(context);
     const { data, error } = await supabase.rpc("list_my_community_markets");
     if (error) throw new Error(error.message);
     return (data ?? []) as unknown[];
@@ -125,7 +125,7 @@ export const resolveCommunityMarketFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth, requireRegisteredAuth])
   .inputValidator(resolveSchema)
   .handler(async ({ data, context }) => {
-    const { supabase } = context as unknown as SupabaseFnContext;
+    const { supabase } = getSupabaseCtx(context);
     const { data: result, error } = await supabase.rpc("resolve_community_market", {
       p_market_id: data.marketId,
       p_winning_side: data.winningSide,
@@ -138,7 +138,7 @@ export const reportCommunityMarketFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth, requireRegisteredAuth])
   .inputValidator(z.object({ marketId: z.string(), reason: z.string().min(5).max(500) }))
   .handler(async ({ data, context }) => {
-    const { supabase } = context as unknown as SupabaseFnContext;
+    const { supabase } = getSupabaseCtx(context);
     const { data: result, error } = await supabase.rpc("report_community_market", {
       p_market_id: data.marketId,
       p_reason: data.reason,
@@ -151,7 +151,7 @@ export const voidCommunityMarketFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth, requireRegisteredAuth])
   .inputValidator(z.object({ marketId: z.string(), reason: z.string().optional() }))
   .handler(async ({ data, context }) => {
-    const { supabase } = context as unknown as SupabaseFnContext;
+    const { supabase } = getSupabaseCtx(context);
     const { data: result, error } = await supabase.rpc("void_community_market", {
       p_market_id: data.marketId,
       p_reason: data.reason ?? "voided_by_creator",
@@ -163,13 +163,13 @@ export const voidCommunityMarketFn = createServerFn({ method: "POST" })
 export const getAdminCommunityMarketsFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabase } = context as unknown as SupabaseFnContext;
+    const { supabase } = getSupabaseCtx(context);
     return adminRpc(() => supabase.rpc("get_admin_community_markets_list"));
   });
 
 export const getAdminCommunityReportsFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabase } = context as unknown as SupabaseFnContext;
+    const { supabase } = getSupabaseCtx(context);
     return adminRpc(() => supabase.rpc("get_admin_community_reports", { p_limit: 50 }));
   });

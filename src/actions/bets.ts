@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { SupabaseFnContext } from "@/integrations/supabase/context";
+import { getSupabaseCtx } from "@/integrations/supabase/context";
 import { supabase } from "@/integrations/supabase/client";
 import { mapSupabaseBusinessError } from "@/lib/server-errors";
 import { logApiMetric } from "@/lib/structured-log.server";
@@ -17,7 +17,7 @@ export const placeBetFn = createServerFn({ method: "POST" })
   .inputValidator(placeBetSchema)
   .handler(async ({ data, context }) => {
     const started = Date.now();
-    const { supabase } = context as unknown as SupabaseFnContext;
+    const { supabase } = getSupabaseCtx(context);
     const { data: result, error } = await supabase.rpc("place_bet", {
       p_market_id: data.marketId,
       p_side: data.side,

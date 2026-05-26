@@ -16,9 +16,9 @@ export interface LedgerSummary {
 }
 
 export function useLifecycleHealth(enabled: boolean) {
-  return useQuery({
+  return useQuery<LifecycleHealth, Error>({
     queryKey: ["lifecycle-health"],
-    queryFn: async () => {
+    queryFn: async (): Promise<LifecycleHealth> => {
       const { data, error } = await supabase.rpc("get_lifecycle_health");
       if (error) throw error;
       return data as unknown as LifecycleHealth;
@@ -29,9 +29,9 @@ export function useLifecycleHealth(enabled: boolean) {
 }
 
 export function usePlatformLedgerSummary(enabled: boolean) {
-  return useQuery({
+  return useQuery<LedgerSummary, Error>({
     queryKey: ["platform-ledger-summary"],
-    queryFn: async () => {
+    queryFn: async (): Promise<LedgerSummary> => {
       const { data, error } = await supabase.rpc("get_platform_ledger_summary");
       if (error) throw error;
       return data as unknown as LedgerSummary;

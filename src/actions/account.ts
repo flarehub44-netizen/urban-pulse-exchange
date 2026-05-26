@@ -1,7 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { SupabaseFnContext } from "@/integrations/supabase/context";
+import { getSupabaseCtx, type SupabaseFnContext } from "@/integrations/supabase/context";
+import { callUntypedRpc } from "@/integrations/supabase/untyped-rpc";
 import type { Division, FeedPost, Side, Transaction, ViaXNotification } from "@/store/viax-store";
 import { AppError } from "@/lib/server-errors";
 import { logApiMetric } from "@/lib/structured-log.server";
@@ -268,7 +269,7 @@ export const getOwnProfileFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const started = Date.now();
-    const { supabase, userId } = context as unknown as SupabaseFnContext;
+    const { supabase, userId } = getSupabaseCtx(context);
     const profile = await loadOwnProfile(supabase, userId);
     logApiMetric("bff.get_own_profile", { ok: true, durationMs: Date.now() - started });
     return ownProfileSnapshotSchema.parse(profile);
@@ -278,7 +279,7 @@ export const getAccountContextFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const started = Date.now();
-    const { supabase } = context as unknown as SupabaseFnContext;
+    const { supabase } = getSupabaseCtx(context);
     const { data, error } = await supabase.rpc("get_my_account_context");
     if (error) throw error;
     logApiMetric("bff.get_account_context", { ok: true, durationMs: Date.now() - started });
@@ -290,7 +291,7 @@ export const getWalletOverviewFn = createServerFn({ method: "GET" })
   .inputValidator(walletOverviewInput)
   .handler(async ({ context, data }) => {
     const started = Date.now();
-    const { supabase, userId } = context as unknown as SupabaseFnContext;
+    const { supabase, userId } = getSupabaseCtx(context);
     const profile = await loadOwnProfile(supabase, userId);
     const transactions = await loadTransactions(supabase);
     const limit = data?.limit ?? 100;
@@ -307,7 +308,7 @@ export const getDashboardSnapshotFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const started = Date.now();
-    const { supabase, userId } = context as unknown as SupabaseFnContext;
+    const { supabase, userId } = getSupabaseCtx(context);
     const [profile, transactions, accountContextRes] = await Promise.all([
       loadOwnProfile(supabase, userId),
       loadTransactions(supabase),
@@ -346,15 +347,17 @@ export const updateProfileFn = createServerFn({ method: "POST" })
   .inputValidator(updateProfileSchema)
   .handler(async ({ data, context }) => {
     const started = Date.now();
-    const { supabase } = context as unknown as SupabaseFnContext;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase.rpc as any)("update_profile", {
-      p_name: data.name ?? null,
-      p_handle: data.handle ?? null,
-      p_city: data.city ?? null,
-      p_neighborhood: data.neighborhood ?? null,
-    });
-    if (error) throw new AppError(error.message, error.message, 400);
+    const { supabase } = getSupabaseCtx(context);
+    await callUntypedRpc<void>(
+      "update_profile",
+      {
+        p_name: data.name ?? null,
+        p_handle: data.handle ?? null,
+        p_city: data.city ?? null,
+        p_neighborhood: data.neighborhood ?? null,
+      },
+      supabase,
+    );
     logApiMetric("bff.update_profile", { ok: true, durationMs: Date.now() - started });
     return { ok: true };
   });
@@ -364,7 +367,7 @@ export const getEngagementSnapshotFn = createServerFn({ method: "GET" })
   .inputValidator(engagementSnapshotInput)
   .handler(async ({ context, data }) => {
     const started = Date.now();
-    const { supabase } = context as unknown as SupabaseFnContext;
+    const { supabase } = getSupabaseCtx(context);
     const [bets, feed, notifications] = await Promise.all([
       loadOpenBets(supabase),
       loadFeed(supabase, { marketId: data?.marketId, limit: data?.feedLimit ?? 40 }),

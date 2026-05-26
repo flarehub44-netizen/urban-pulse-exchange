@@ -1,8 +1,7 @@
+type LogPayload = { ok?: boolean; durationMs?: number; [key: string]: unknown };
+
 /** Structured JSON logs for Worker cron jobs (Cloudflare Logpush). */
-export function logJob(
-  job: string,
-  payload: Record<string, unknown> & { ok?: boolean; durationMs?: number },
-): void {
+export function logJob(job: string, payload: LogPayload): void {
   console.log(
     JSON.stringify({
       job,
@@ -13,10 +12,7 @@ export function logJob(
 }
 
 /** Structured API/BFF metrics for p50/p95 analysis in logs. */
-export function logApiMetric(
-  endpoint: string,
-  payload: Record<string, unknown> & { ok?: boolean; durationMs?: number },
-): void {
+export function logApiMetric(endpoint: string, payload: LogPayload): void {
   console.log(
     JSON.stringify({
       kind: "api_metric",
@@ -27,7 +23,7 @@ export function logApiMetric(
   );
 }
 
-export async function withJobLog<T extends Record<string, unknown>>(
+export async function withJobLog<T extends LogPayload>(
   job: string,
   fn: () => Promise<T>,
 ): Promise<T & { durationMs: number }> {

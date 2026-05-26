@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { SupabaseFnContext } from "@/integrations/supabase/context";
+import { getSupabaseCtx } from "@/integrations/supabase/context";
 
 const placeFootballBetSchema = z.object({
   marketId: z.string(),
@@ -13,7 +13,7 @@ export const placeFootballBetFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(placeFootballBetSchema)
   .handler(async ({ data, context }) => {
-    const { supabase } = context as unknown as SupabaseFnContext;
+    const { supabase } = getSupabaseCtx(context);
     const { data: result, error } = await supabase.rpc("place_football_bet", {
       p_market_id: data.marketId,
       p_outcome: data.outcome,

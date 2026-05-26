@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireRegisteredAuth } from "@/integrations/supabase/require-registered-middleware";
-import type { SupabaseFnContext } from "@/integrations/supabase/context";
+import { getSupabaseCtx } from "@/integrations/supabase/context";
 import { createClient } from "@supabase/supabase-js";
 import { createPixCharge, createPixPayout } from "@/lib/syncpay";
 import { formatBRL } from "@/lib/parimutuel";
@@ -34,7 +34,7 @@ export const initiateDepositFn = createServerFn({ method: "POST" })
   .inputValidator(depositSchema)
   .handler(async ({ data, context }) => {
     const started = Date.now();
-    const { userId } = context as unknown as SupabaseFnContext;
+    const { userId } = getSupabaseCtx(context);
     const service = getServiceClient();
 
     try {
@@ -99,7 +99,7 @@ export const initiateWithdrawFn = createServerFn({ method: "POST" })
   .inputValidator(withdrawSchema)
   .handler(async ({ data, context }) => {
     const started = Date.now();
-    const { supabase, userId } = context as unknown as SupabaseFnContext;
+    const { supabase, userId } = getSupabaseCtx(context);
     const service = getServiceClient();
 
     try {
@@ -177,7 +177,7 @@ export const getDepositStatusFn = createServerFn({ method: "GET" })
   .inputValidator(z.object({ intentId: z.string().uuid() }))
   .handler(async ({ data, context }) => {
     const started = Date.now();
-    const { userId } = context as unknown as SupabaseFnContext;
+    const { userId } = getSupabaseCtx(context);
     const service = getServiceClient();
 
     try {

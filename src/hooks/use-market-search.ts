@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useDebounce } from "@/hooks/use-debounce";
+import { callUntypedRpc } from "@/integrations/supabase/untyped-rpc";
 
 export type MarketSearchResult = {
   id: string;
@@ -12,28 +12,35 @@ export type MarketSearchResult = {
   endsAt: number;
 };
 
+type SearchMarketsRow = {
+  id: string;
+  question: string;
+  region: string;
+  status: string;
+  pool_yes: number;
+  pool_no: number;
+  ends_at: string | null;
+};
+
 export function useMarketSearch(query: string) {
   const debounced = useDebounce(query.trim(), 300);
 
-  return useQuery({
+  return useQuery<MarketSearchResult[], Error>({
     queryKey: ["market-search", debounced],
     queryFn: async (): Promise<MarketSearchResult[]> => {
       if (!debounced || debounced.length < 2) return [];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase.rpc as any)("search_markets", {
+      const rows = await callUntypedRpc<SearchMarketsRow[]>("search_markets", {
         p_query: debounced,
         p_limit: 8,
       });
-      if (error) throw error;
-      const rows = Array.isArray(data) ? data : [];
-      return rows.map((r: Record<string, unknown>) => ({
-        id: r.id as string,
-        question: r.question as string,
-        region: r.region as string,
-        status: r.status as string,
+      return (Array.isArray(rows) ? rows : []).map((r) => ({
+        id: r.id,
+        question: r.question,
+        region: r.region,
+        status: r.status,
         poolYes: Number(r.pool_yes),
         poolNo: Number(r.pool_no),
-        endsAt: r.ends_at ? new Date(r.ends_at as string).getTime() : 0,
+        endsAt: r.ends_at ? new Date(r.ends_at).getTime() : 0,
       }));
     },
     enabled: debounced.length >= 2,

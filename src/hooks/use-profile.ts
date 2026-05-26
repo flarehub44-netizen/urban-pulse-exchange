@@ -52,26 +52,26 @@ function mapPublicProfile(row: Record<string, unknown>): Profile {
 }
 
 export function useProfile(userId?: string | null) {
-  return useQuery({
+  return useQuery<Profile, Error>({
     queryKey: ["me", userId],
-    queryFn: async () => {
+    queryFn: async (): Promise<Profile> => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
       const isOwn = !!user?.id && user.id === userId;
 
       if (isOwn) {
-        return (await getOwnProfileFn()) as Profile;
+        return getOwnProfileFn() as Promise<Profile>;
       }
 
-      const { data, error } = (await supabase
+      const { data, error } = await supabase
         .from("leaderboard")
         .select("*")
         .eq("id", userId!)
-        .maybeSingle()) as { data: Record<string, unknown> | null; error: Error | null };
+        .maybeSingle();
       if (error) throw error;
       if (!data) throw new Error("Perfil não encontrado");
-      return mapPublicProfile(data);
+      return mapPublicProfile(data as unknown as Record<string, unknown>);
     },
     enabled: !!userId,
     staleTime: 15_000,

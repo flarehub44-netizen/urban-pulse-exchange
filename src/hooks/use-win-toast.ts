@@ -27,11 +27,12 @@ export function useWinToast() {
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
-          const row = payload.new as Record<string, unknown>;
+          type NotificationRow = { kind: string; text: string; market_id: string | null };
+          const row = payload.new as NotificationRow;
           if (row.kind !== "win") return;
 
-          const text = row.text as string;
-          const marketId = (row.market_id as string | null) ?? undefined;
+          const text = row.text;
+          const marketId = row.market_id ?? undefined;
 
           invalidateEngagementQueries(qc);
 
