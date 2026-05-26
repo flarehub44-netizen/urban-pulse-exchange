@@ -35,7 +35,7 @@ function mapBet(row: Record<string, unknown>): OpenBet {
     stake: Number(row.stake),
     share: row.share != null ? Number(row.share) : null,
     payout: row.payout != null ? Number(row.payout) : null,
-    note: (row.note as string | null) ?? undefined,
+    note: (row.note as string | null) ?? null,
     createdAt: new Date(row.created_at as string).getTime(),
   };
 }
