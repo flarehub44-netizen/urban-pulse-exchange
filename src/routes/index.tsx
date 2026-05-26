@@ -119,8 +119,14 @@ function Landing() {
                   depositAfter
                   className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary to-primary-glow px-5 py-3 font-medium text-primary-foreground shadow-[var(--shadow-glow-primary)] transition hover:brightness-110"
                 >
-                  {copy.auth.depositAndPlayCta}{" "}
+                  {copy.auth.registerCta}{" "}
                   <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
+                </AuthModalTrigger>
+                <AuthModalTrigger
+                  mode="login"
+                  className="inline-flex items-center gap-2 rounded-xl border bg-card px-4 py-3 text-sm font-medium hover:bg-surface-2"
+                >
+                  {copy.auth.loginCta}
                 </AuthModalTrigger>
                 <Link
                   to="/markets"

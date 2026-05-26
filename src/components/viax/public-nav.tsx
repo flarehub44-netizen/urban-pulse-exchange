@@ -52,7 +52,7 @@ export function PublicNav({ variant = "shell" }: PublicNavProps) {
           )}
         </nav>
         <div className="flex items-center gap-2">
-          {variant === "shell" && (
+          {!isRegistered && (
             <AuthModalTrigger
               mode="login"
               className="rounded-lg border bg-card px-3 py-2 text-sm font-medium hover:bg-surface"
@@ -60,31 +60,30 @@ export function PublicNav({ variant = "shell" }: PublicNavProps) {
               {copy.auth.loginCta}
             </AuthModalTrigger>
           )}
-          {variant === "shell" ? (
-            isRegistered ? (
-              <button
-                type="button"
-                onClick={() => openDeposit({ amount: 200, source: "public_nav" })}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-              >
-                {copy.auth.depositAndPlayCta} <ArrowRight className="size-3.5" />
-              </button>
-            ) : (
-              <AuthModalTrigger
-                mode="signup"
-                depositAfter
-                className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-              >
-                {copy.auth.depositAndPlayCta} <ArrowRight className="size-3.5" />
-              </AuthModalTrigger>
-            )
-          ) : (
-            <Link
-              to="/dashboard"
+          {isRegistered ? (
+            <button
+              type="button"
+              onClick={() => openDeposit({ amount: 200, source: "public_nav" })}
               className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
             >
-              {copy.landing.ctaTerminal} <ArrowRight className="size-3.5" />
-            </Link>
+              {copy.auth.depositAndPlayCta} <ArrowRight className="size-3.5" />
+            </button>
+          ) : variant === "landing" ? (
+            <AuthModalTrigger
+              mode="signup"
+              depositAfter
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            >
+              {copy.auth.registerCta} <ArrowRight className="size-3.5" />
+            </AuthModalTrigger>
+          ) : (
+            <AuthModalTrigger
+              mode="signup"
+              depositAfter
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            >
+              {copy.auth.depositAndPlayCta} <ArrowRight className="size-3.5" />
+            </AuthModalTrigger>
           )}
         </div>
       </div>

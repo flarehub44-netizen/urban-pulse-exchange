@@ -1,8 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { Flag, Map, Sparkles, Wallet } from "lucide-react";
+import { Flag, LogIn, Map, Sparkles, UserPlus } from "lucide-react";
 import { copy } from "@/copy/pt-BR";
 import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
-import { useDepositSheet } from "@/hooks/use-deposit-sheet";
 import { useAuthPublic } from "@/hooks/use-auth-public";
 import { cn } from "@/lib/utils";
 
@@ -11,7 +10,6 @@ const linkClass =
 
 export function PublicMobileNav() {
   const { isRegistered } = useAuthPublic();
-  const { openDeposit } = useDepositSheet();
 
   return (
     <nav
@@ -31,31 +29,29 @@ export function PublicMobileNav() {
           <Sparkles className="size-4" />
           {copy.markets.outrosTab}
         </Link>
-        {isRegistered ? (
-          <button
-            type="button"
-            onClick={() => openDeposit({ amount: 200, source: "public_mobile_nav" })}
-            className={cn(linkClass, "font-medium text-primary hover:bg-primary/10")}
-          >
-            <Wallet className="size-4" />
-            Depositar
-          </button>
+        {!isRegistered ? (
+          <>
+            <AuthModalTrigger mode="login" className={cn(linkClass)}>
+              <LogIn className="size-4" />
+              {copy.auth.loginCta}
+            </AuthModalTrigger>
+            <AuthModalTrigger
+              mode="signup"
+              depositAfter
+              className={cn(linkClass, "font-medium text-primary hover:bg-primary/10")}
+            >
+              <UserPlus className="size-4" />
+              {copy.auth.registerCta}
+            </AuthModalTrigger>
+          </>
         ) : (
-          <AuthModalTrigger
-            mode="signup"
-            depositAfter
-            className={cn(linkClass, "font-medium text-primary hover:bg-primary/10")}
-          >
-            <Wallet className="size-4" />
-            Depositar
-          </AuthModalTrigger>
+          <Link to="/dashboard" className={cn(linkClass, "col-span-2 font-medium text-primary")}>
+            <span className="flex size-4 items-center justify-center rounded bg-primary/20 text-[9px] font-bold text-primary">
+              V
+            </span>
+            {copy.landing.ctaTerminal}
+          </Link>
         )}
-        <Link to="/dashboard" className={cn(linkClass)}>
-          <span className="flex size-4 items-center justify-center rounded bg-primary/20 text-[9px] font-bold text-primary">
-            V
-          </span>
-          App
-        </Link>
       </div>
     </nav>
   );

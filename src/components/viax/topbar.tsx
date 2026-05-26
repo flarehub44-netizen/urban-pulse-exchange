@@ -8,6 +8,7 @@ import {
   Search,
   Shield,
 } from "lucide-react";
+import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
 import { useAuth } from "@/hooks/use-auth";
 import { useAccountContext } from "@/hooks/use-account-context";
 import { AccountRoleBadges } from "@/components/auth/account-role-badges";
@@ -32,7 +33,7 @@ import { ptBR } from "date-fns/locale";
 
 export function Topbar() {
   const navigate = useNavigate();
-  const { userId } = useAuth();
+  const { userId, isRegistered } = useAuth();
   const { me } = useResolvedProfile();
   const { data: profile } = useProfile(userId);
   const { data: accountCtx } = useAccountContext(!!userId);
@@ -82,6 +83,23 @@ export function Topbar() {
       </div>
 
       <div className="ml-auto flex items-center gap-2 md:gap-4">
+        {!isRegistered && (
+          <>
+            <AuthModalTrigger
+              mode="login"
+              className="rounded-lg border bg-card px-3 py-1.5 text-xs font-medium hover:bg-surface sm:text-sm sm:px-3 sm:py-2"
+            >
+              {copy.auth.loginCta}
+            </AuthModalTrigger>
+            <AuthModalTrigger
+              mode="signup"
+              depositAfter
+              className="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 sm:text-sm sm:px-3 sm:py-2"
+            >
+              {copy.auth.registerCta}
+            </AuthModalTrigger>
+          </>
+        )}
         {isAdmin && (
           <Link
             to="/admin"
