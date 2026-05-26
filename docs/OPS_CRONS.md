@@ -8,10 +8,12 @@ As rotas HTTP abaixo existem apenas para **debug/manual** com `Authorization: Be
 
 | Rota | Método |
 |------|--------|
-| `/api/cron/football-sync` | GET, POST |
-| `/api/cron/football-resolve` | GET, POST |
+| `/api/public/cron/football-sync` | GET, POST |
+| `/api/public/cron/football-resolve` | GET, POST |
 
 Não configure um segundo Cron Trigger HTTP apontando para as mesmas rotas em paralelo ao `scheduled`, para evitar dupla execução.
+
+**Não use `pg_cron` + `pg_net` no Supabase** para chamar `/api/public/cron/football-*` (ex.: SQL do Lovable com URL `*.lovable.app`). Futebol roda só no Worker; jobs Lovable foram removidos em `20260716000000_remove_lovable_football_pg_cron.sql`.
 
 ## Inventário
 
@@ -26,8 +28,8 @@ Não configure um segundo Cron Trigger HTTP apontando para as mesmas rotas em pa
 ## Futebol — manual
 
 ```bash
-curl -H "Authorization: Bearer $CRON_SECRET" https://<worker-host>/api/cron/football-sync
-curl -H "Authorization: Bearer $CRON_SECRET" https://<worker-host>/api/cron/football-resolve
+curl -H "Authorization: Bearer $CRON_SECRET" https://<worker-host>/api/public/cron/football-sync
+curl -H "Authorization: Bearer $CRON_SECRET" https://<worker-host>/api/public/cron/football-resolve
 ```
 
 ## Mercados urbanos — manual
