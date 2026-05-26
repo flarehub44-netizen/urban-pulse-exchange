@@ -1,22 +1,51 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useCreateCommunityMarket } from "@/hooks/use-community-markets";
-import { communityShareUrl } from "@/lib/community-market";
+import {
+  communityShareUrl,
+  communityEndsAtMs,
+  defaultCommunityEndDate,
+  defaultCommunityEndTime,
+  validateCommunityEndsAt,
+} from "@/lib/community-market";
+import { uploadCommunityCover } from "@/lib/community-cover-upload";
 import { copy } from "@/copy/pt-BR";
 import { useAuth } from "@/hooks/use-auth";
 import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
 
+function mapCreateError(err: unknown): string {
+  const msg = err instanceof Error ? err.message : "";
+  if (msg.includes("ends_at_too_soon")) return copy.community.endsTooSoon;
+  if (msg.includes("ends_at_too_far")) return copy.community.endsTooFar;
+  if (msg.includes("invalid_cover")) return copy.community.coverUploadError;
+  return copy.errors.generic;
+}
+
 export function CommunityMarketCreateForm() {
   const navigate = useNavigate();
-  const { isRegistered } = useAuth();
+  const { userId, isRegistered } = useAuth();
   const { mutateAsync: create, isPending } = useCreateCommunityMarket();
   const [question, setQuestion] = useState("");
-  const [hours, setHours] = useState("24");
+  const [endDate, setEndDate] = useState(defaultCommunityEndDate);
+  const [endTime, setEndTime] = useState(defaultCommunityEndTime);
   const [visibility, setVisibility] = useState<"public" | "unlisted">("public");
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [createdMarketId, setCreatedMarketId] = useState<string | null>(null);
   const [createdAccessToken, setCreatedAccessToken] = useState<string | null>(null);
+
+  const coverPreviewUrl = useMemo(() => {
+    if (coverPreview) return coverPreview;
+    return null;
+  }, [coverPreview]);
+
+  const onCoverChange = (file: File | null) => {
+    if (coverPreview) URL.revokeObjectURL(coverPreview);
+    setCoverFile(file);
+    setCoverPreview(file ? URL.createObjectURL(file) : null);
+  };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,9 +53,38 @@ export function CommunityMarketCreateForm() {
       toast.error(copy.auth.registerRequired);
       return;
     }
-    const endsAt = new Date(Date.now() + Number(hours) * 60 * 60 * 1000);
+
+    const endsValidation = validateCommunityEndsAt(endDate, endTime);
+    if (endsValidation === "too_soon") {
+      toast.error(copy.community.endsTooSoon);
+      return;
+    }
+    if (endsValidation === "too_far") {
+      toast.error(copy.community.endsTooFar);
+      return;
+    }
+    if (endsValidation) {
+      toast.error(copy.community.endsInvalid);
+      return;
+    }
+
+    const endsAt = new Date(communityEndsAtMs(endDate, endTime));
+
+    let coverUrl: string | undefined;
+    if (coverFile && userId) {
+      try {
+        coverUrl = await uploadCommunityCover(coverFile, userId);
+      } catch (err: unknown) {
+        const code = err instanceof Error ? err.message : "";
+        if (code === "invalid_cover_type") toast.error(copy.community.coverTypeError);
+        else if (code === "invalid_cover_size") toast.error(copy.community.coverSizeError);
+        else toast.error(copy.community.coverUploadError);
+        return;
+      }
+    }
+
     try {
-      const res = await create({ question, endsAt, visibility });
+      const res = await create({ question, endsAt, visibility, coverUrl });
       if (visibility === "unlisted" && res.access_token) {
         const url = communityShareUrl(res.market_id, res.access_token);
         setCreatedMarketId(res.market_id);
@@ -38,7 +96,7 @@ export function CommunityMarketCreateForm() {
         navigate({ to: "/markets/$marketId", params: { marketId: res.market_id } });
       }
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : copy.errors.generic);
+      toast.error(mapCreateError(err));
     }
   };
 
@@ -106,18 +164,50 @@ export function CommunityMarketCreateForm() {
       </label>
 
       <label className="block text-sm">
-        <span className="text-muted-foreground">{copy.community.endsLabel}</span>
-        <select
-          value={hours}
-          onChange={(e) => setHours(e.target.value)}
-          className="mt-1 w-full rounded-lg border bg-surface px-3 py-2"
-        >
-          <option value="6">6 horas</option>
-          <option value="24">24 horas</option>
-          <option value="72">3 dias</option>
-          <option value="168">7 dias</option>
-        </select>
+        <span className="text-muted-foreground">{copy.community.coverLabel}</span>
+        <p className="text-xs text-muted-foreground/80">{copy.community.coverHint}</p>
+        {coverPreviewUrl && (
+          <img
+            src={coverPreviewUrl}
+            alt=""
+            className="mt-2 h-32 w-full rounded-lg border object-cover"
+          />
+        )}
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="mt-2 w-full text-xs file:mr-2 file:rounded-md file:border-0 file:bg-primary/15 file:px-3 file:py-1.5 file:text-primary"
+          onChange={(e) => onCoverChange(e.target.files?.[0] ?? null)}
+        />
       </label>
+
+      <fieldset className="space-y-2">
+        <legend className="text-sm text-muted-foreground">{copy.community.endsLabel}</legend>
+        <p className="text-xs text-muted-foreground/80">{copy.community.endsTimezoneHint}</p>
+        <div className="grid grid-cols-2 gap-3">
+          <label className="block text-sm">
+            <span className="text-muted-foreground">{copy.community.endsDateLabel}</span>
+            <input
+              type="date"
+              required
+              value={endDate}
+              min={defaultCommunityEndDate()}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="mt-1 w-full rounded-lg border bg-surface px-3 py-2"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="text-muted-foreground">{copy.community.endsTimeLabel}</span>
+            <input
+              type="time"
+              required
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+              className="mt-1 w-full rounded-lg border bg-surface px-3 py-2"
+            />
+          </label>
+        </div>
+      </fieldset>
 
       <fieldset className="space-y-2">
         <legend className="text-sm text-muted-foreground">{copy.community.visibilityLabel}</legend>

@@ -66,12 +66,18 @@ export function useCommunityMarketDetail(marketId: string, accessToken?: string,
 export function useCreateCommunityMarket() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: { question: string; endsAt: Date; visibility: "public" | "unlisted" }) =>
+    mutationFn: (input: {
+      question: string;
+      endsAt: Date;
+      visibility: "public" | "unlisted";
+      coverUrl?: string;
+    }) =>
       createCommunityMarketFn({
         data: {
           question: input.question,
           endsAt: input.endsAt.toISOString(),
           visibility: input.visibility,
+          coverUrl: input.coverUrl,
         },
       }),
     onSuccess: () => {

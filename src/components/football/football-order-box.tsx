@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { toast } from "sonner";
 import type { FootballMarketRow } from "@/hooks/use-football-markets";
@@ -19,14 +19,26 @@ import { canPlaceBets, isSettledDisplay } from "@/lib/market-status";
 import { copy } from "@/copy/pt-BR";
 import { cn } from "@/lib/utils";
 
-export function FootballOrderBox({ m }: { m: FootballMarketRow }) {
+export function FootballOrderBox({
+  m,
+  initialOutcome = "HOME",
+  onSuccess,
+}: {
+  m: FootballMarketRow;
+  initialOutcome?: FootballOutcome;
+  onSuccess?: () => void;
+}) {
   const { userId, isRegistered } = useAuth();
   const redirect = useRouterState({
     select: (s) => `${s.location.pathname}${s.location.searchStr}`,
   });
   const { data: profile } = useProfile(userId);
   const balance = profile?.balance ?? 0;
-  const [outcome, setOutcome] = useState<FootballOutcome>("HOME");
+  const [outcome, setOutcome] = useState<FootballOutcome>(initialOutcome);
+
+  useEffect(() => {
+    setOutcome(initialOutcome);
+  }, [initialOutcome, m.id]);
   const [stake, setStake] = useState(100);
   const { mutateAsync: placeBet, isPending } = usePlaceFootballBet();
   const { openDeposit } = useDepositSheet();
@@ -51,6 +63,7 @@ export function FootballOrderBox({ m }: { m: FootballMarketRow }) {
     try {
       await placeBet({ marketId: m.id, outcome, stake });
       toast.success(copy.football.betSuccess);
+      onSuccess?.();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : copy.football.errorGeneric);
     }

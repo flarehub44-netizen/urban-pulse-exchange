@@ -2562,7 +2562,12 @@ export type Database = {
       is_user_registered: { Args: { p_user_id?: string }; Returns: boolean };
       complete_registration: { Args: { p_display_name?: string }; Returns: Json };
       create_community_market: {
-        Args: { p_question: string; p_ends_at: string; p_visibility?: string };
+        Args: {
+          p_question: string;
+          p_ends_at: string;
+          p_visibility?: string;
+          p_cover_url?: string;
+        };
         Returns: Json;
       };
       join_community_market: { Args: { p_access_token: string }; Returns: Json };

@@ -57,22 +57,34 @@ export async function requirePartnerRoute() {
   throw redirect({ to: "/profile", search: { tab: "config" } });
 }
 
-export async function requireAdminRoute() {
-  await requireRegistered();
+async function resolveIsAdmin(): Promise<boolean> {
+  const { data: syncData, error: syncError } = await db.rpc("try_sync_admin_allowlist");
+  if (!syncError && (syncData as { is_admin?: boolean } | null)?.is_admin === true) {
+    return true;
+  }
+
+  const { data: ctx, error: ctxError } = await db.rpc("get_my_account_context");
+  if (!ctxError && (ctx as { admin?: { is_admin?: boolean } } | null)?.admin?.is_admin === true) {
+    return true;
+  }
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) {
-    const { pathname, search } = authModalRedirectTarget("/dashboard", "login");
-    throw redirect({ to: pathname, search });
-  }
+  if (!user) return false;
 
   const { data: profile } = await supabase
     .from("profiles")
     .select("is_admin")
     .eq("id", user.id)
     .maybeSingle();
-  if (!profile?.is_admin) {
+  return profile?.is_admin === true;
+}
+
+export async function requireAdminRoute() {
+  await requireRegistered();
+  const isAdmin = await resolveIsAdmin();
+  if (!isAdmin) {
     throw redirect({ to: "/dashboard" });
   }
 }

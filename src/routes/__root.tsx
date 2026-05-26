@@ -11,6 +11,7 @@ import { copy } from "@/copy/pt-BR";
 import { ThemeToaster } from "@/components/viax/theme-toaster";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { DepositSheetHost } from "@/components/viax/deposit-sheet-host";
+import { AdminAllowlistSync } from "@/components/auth/admin-allowlist-sync";
 import { themeInitScript } from "@/lib/theme";
 
 import appCss from "../styles.css?url";
@@ -126,6 +127,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
+      <AdminAllowlistSync />
       <Outlet />
       <AuthModal />
       <DepositSheetHost />

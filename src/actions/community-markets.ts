@@ -16,6 +16,7 @@ const createSchema = z.object({
   question: z.string().min(10).max(280),
   endsAt: z.string().datetime(),
   visibility: z.enum(["public", "unlisted"]),
+  coverUrl: z.string().url().optional(),
 });
 
 export const createCommunityMarketFn = createServerFn({ method: "POST" })
@@ -27,6 +28,7 @@ export const createCommunityMarketFn = createServerFn({ method: "POST" })
       p_question: data.question,
       p_ends_at: data.endsAt,
       p_visibility: data.visibility,
+      p_cover_url: data.coverUrl ?? null,
     });
     if (error) throw new Error(error.message);
     return result as {

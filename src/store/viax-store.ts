@@ -25,6 +25,7 @@ export interface Market {
   marketKind?: "platform" | "community";
   visibility?: "public" | "unlisted";
   createdBy?: string | null;
+  coverUrl?: string | null;
 }
 
 export interface FeedPost {

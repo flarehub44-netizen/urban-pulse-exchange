@@ -45,7 +45,7 @@ export function SettingsPanel() {
 
   return (
     <div className="space-y-6">
-      {accountCtx?.admin?.can_claim_invite && !profile?.isAdmin && (
+      {accountCtx?.admin?.can_claim_invite && !profile?.isAdmin && !accountCtx?.admin?.is_admin && (
         <Section icon={<Shield className="size-4" />} title={copy.settings.adminClaimTitle}>
           <AdminClaimPanel />
         </Section>
@@ -111,7 +111,7 @@ export function SettingsPanel() {
         )}
       </Section>
 
-      {profile?.isAdmin && (
+      {(profile?.isAdmin || accountCtx?.admin?.is_admin) && (
         <Section icon={<Scale className="size-4" />} title={copy.admin.title}>
           <p className="text-xs text-muted-foreground">
             Operações, liquidação e métricas no Control Center.

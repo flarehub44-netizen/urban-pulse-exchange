@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import {
   TrendingUp,
   TrendingDown,
@@ -53,6 +55,9 @@ export function MarketCard({ m, compact }: { m: Market; compact?: boolean }) {
         transition={{ type: "spring", stiffness: 260, damping: 22 }}
         className={cn("surface-card-interactive group", isUrgent && "border-warn/40")}
       >
+        {m.marketKind === "community" && m.coverUrl && (
+          <img src={m.coverUrl} alt="" className="mb-3 h-28 w-full rounded-lg object-cover" />
+        )}
         {isUrgent && (
           <div className="absolute inset-x-0 top-0 flex items-center justify-center gap-1.5 bg-warn/10 py-1.5 text-[11px] font-medium text-warn">
             <Zap className="size-3 animate-pulse" />
@@ -99,7 +104,10 @@ export function MarketCard({ m, compact }: { m: Market; compact?: boolean }) {
             )}
           </div>
           <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <span className="flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground">
+              {m.marketKind === "community" && (
+                <span>{format(m.endsAt, "dd MMM · HH:mm", { locale: ptBR })}</span>
+              )}
               <Clock className="size-3" /> <Countdown to={m.endsAt} />
             </span>
             <button

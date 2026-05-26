@@ -80,7 +80,7 @@ export function Topbar() {
       </div>
 
       <div className="ml-auto flex items-center gap-2 md:gap-4">
-        {profile?.isAdmin && (
+        {(profile?.isAdmin || accountCtx?.admin?.is_admin) && (
           <Link
             to="/admin"
             className="hidden sm:flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[10px] text-primary hover:bg-primary/20"

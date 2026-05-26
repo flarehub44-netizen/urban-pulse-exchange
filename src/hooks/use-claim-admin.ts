@@ -12,7 +12,8 @@ export function useClaimAdminInvite() {
       return data as { ok: boolean; user_id: string };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["me"] });
+      void queryClient.invalidateQueries({ queryKey: ["me"] });
+      void queryClient.invalidateQueries({ queryKey: ["account", "context"] });
     },
   });
 }
@@ -26,7 +27,8 @@ export function useSyncAdminAllowlist() {
       return data as { is_admin: boolean };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["me"] });
+      void queryClient.invalidateQueries({ queryKey: ["me"] });
+      void queryClient.invalidateQueries({ queryKey: ["account", "context"] });
     },
   });
 }

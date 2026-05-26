@@ -20,6 +20,9 @@ test.describe("football bet flow", () => {
       timeout: 15_000,
     });
     await expect(page.getByRole("button", { name: /Futebol/i })).toBeVisible();
+    await expect(page.getByTestId("football-market-card").first()).toBeVisible({
+      timeout: 15_000,
+    });
   });
 
   test("opens seeded market detail without login", async ({ page }) => {

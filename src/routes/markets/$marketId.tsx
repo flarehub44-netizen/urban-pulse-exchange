@@ -23,7 +23,7 @@ import { Countdown } from "@/components/viax/countdown";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL, formatCompact, poolTotal, prizePool, probability } from "@/lib/parimutuel";
 import { ArrowLeft, Brain, Users, MapPin, Activity, BarChart2, Scale } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { isSettledDisplay, statusLabel } from "@/lib/market-status";
@@ -231,6 +231,14 @@ function MarketDetail() {
         </span>
       </nav>
 
+      {isCommunity && m.coverUrl && (
+        <img
+          src={m.coverUrl}
+          alt=""
+          className="h-40 w-full rounded-xl border object-cover md:h-52"
+        />
+      )}
+
       <div className="flex flex-wrap items-center gap-2 text-sm">
         {isCommunity ? (
           <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-primary">
@@ -310,6 +318,12 @@ function MarketDetail() {
             </h1>
             <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
               <span>
+                {isCommunity && (
+                  <span className="mr-1 text-foreground">
+                    {format(m.endsAt, "dd MMM · HH:mm", { locale: ptBR })}
+                    {" · "}
+                  </span>
+                )}
                 Encerra em <Countdown to={m.endsAt} className="text-foreground" />
               </span>
               <span className="inline-flex items-center gap-1">

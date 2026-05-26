@@ -8,6 +8,7 @@ import { useMarketsList } from "@/hooks/use-markets";
 import { useResolvedTraders } from "@/hooks/use-resolved-data";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
+import { useAccountContext } from "@/hooks/use-account-context";
 import {
   CommandDialog,
   CommandEmpty,
@@ -49,6 +50,8 @@ export function CommandPalette() {
   const navigate = useNavigate();
   const { userId } = useAuth();
   const { data: profile } = useProfile(userId);
+  const { data: accountCtx } = useAccountContext(!!userId);
+  const isAdmin = profile?.isAdmin || accountCtx?.admin?.is_admin;
   const { markets } = useMarketsList();
   const { traders } = useResolvedTraders();
 
@@ -89,7 +92,7 @@ export function CommandPalette() {
               </CommandItem>
             );
           })}
-          {profile?.isAdmin && (
+          {isAdmin && (
             <CommandItem
               value={`${copy.admin.title} admin ops`}
               onSelect={() => {

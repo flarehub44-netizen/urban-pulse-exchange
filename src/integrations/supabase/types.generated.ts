@@ -434,6 +434,33 @@ export type Database = {
         };
         Relationships: [];
       };
+      deposit_funnel_events: {
+        Row: {
+          created_at: string;
+          event: string;
+          id: string;
+          props: Json;
+          session_id: string | null;
+          user_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          event: string;
+          id?: string;
+          props?: Json;
+          session_id?: string | null;
+          user_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          event?: string;
+          id?: string;
+          props?: Json;
+          session_id?: string | null;
+          user_id?: string | null;
+        };
+        Relationships: [];
+      };
       deposit_impulse_log: {
         Row: {
           amount: number;
@@ -1331,6 +1358,7 @@ export type Database = {
           archived: boolean;
           category: Database["public"]["Enums"]["market_category"];
           comparison_op: string | null;
+          cover_url: string | null;
           created_at: string;
           created_by: string | null;
           data_source: string;
@@ -1367,6 +1395,7 @@ export type Database = {
           archived?: boolean;
           category: Database["public"]["Enums"]["market_category"];
           comparison_op?: string | null;
+          cover_url?: string | null;
           created_at?: string;
           created_by?: string | null;
           data_source?: string;
@@ -1403,6 +1432,7 @@ export type Database = {
           archived?: boolean;
           category?: Database["public"]["Enums"]["market_category"];
           comparison_op?: string | null;
+          cover_url?: string | null;
           created_at?: string;
           created_by?: string | null;
           data_source?: string;
@@ -2168,8 +2198,10 @@ export type Database = {
           casino_opt_out: boolean;
           city: string;
           created_at: string;
+          deposit_nudge_sent_at: string | null;
           division: Database["public"]["Enums"]["division_tier"];
           email_bonus_claimed: boolean;
+          first_deposit_at: string | null;
           handle: string;
           id: string;
           is_admin: boolean;
@@ -2200,8 +2232,10 @@ export type Database = {
           casino_opt_out?: boolean;
           city?: string;
           created_at?: string;
+          deposit_nudge_sent_at?: string | null;
           division?: Database["public"]["Enums"]["division_tier"];
           email_bonus_claimed?: boolean;
+          first_deposit_at?: string | null;
           handle: string;
           id: string;
           is_admin?: boolean;
@@ -2232,8 +2266,10 @@ export type Database = {
           casino_opt_out?: boolean;
           city?: string;
           created_at?: string;
+          deposit_nudge_sent_at?: string | null;
           division?: Database["public"]["Enums"]["division_tier"];
           email_bonus_claimed?: boolean;
+          first_deposit_at?: string | null;
           handle?: string;
           id?: string;
           is_admin?: boolean;
@@ -2897,6 +2933,10 @@ export type Database = {
         Args: { p_frozen: boolean; p_user_id: string };
         Returns: Json;
       };
+      admin_get_deposit_funnel_metrics: {
+        Args: { p_days?: number };
+        Returns: Json;
+      };
       admin_get_events_hub_overview: { Args: never; Returns: Json };
       admin_list_active_partners: { Args: never; Returns: Json };
       admin_list_cameras: { Args: never; Returns: Json };
@@ -3058,7 +3098,12 @@ export type Database = {
         Returns: Json;
       };
       create_community_market: {
-        Args: { p_ends_at: string; p_question: string; p_visibility?: string };
+        Args: {
+          p_cover_url?: string;
+          p_ends_at: string;
+          p_question: string;
+          p_visibility?: string;
+        };
         Returns: Json;
       };
       create_league: { Args: { p_name: string }; Returns: Json };
@@ -3252,6 +3297,7 @@ export type Database = {
       is_admin: { Args: { _user_id: string }; Returns: boolean };
       is_allowed_stream_url: { Args: { p_url: string }; Returns: boolean };
       is_casino_enabled: { Args: never; Returns: boolean };
+      is_current_user_admin: { Args: never; Returns: boolean };
       is_football_enabled: { Args: never; Returns: boolean };
       is_partner_program_enabled: { Args: never; Returns: boolean };
       is_user_anonymous: { Args: { p_user_id?: string }; Returns: boolean };
@@ -3272,6 +3318,7 @@ export type Database = {
         Args: { p_amount: number; p_user_id: string };
         Returns: undefined;
       };
+      maybe_send_deposit_nudge: { Args: never; Returns: Json };
       min_minority_ratio: { Args: never; Returns: number };
       min_oracle_confidence: { Args: never; Returns: number };
       open_market: {
@@ -3422,6 +3469,10 @@ export type Database = {
         Args: { p_following_id: string };
         Returns: boolean;
       };
+      track_deposit_funnel_event: {
+        Args: { p_event: string; p_props?: Json; p_session_id?: string };
+        Returns: undefined;
+      };
       track_partner_click: {
         Args: { p_campaign_id?: string; p_ip_hash?: string; p_slug: string };
         Returns: Json;
@@ -3478,6 +3529,7 @@ export type Database = {
             Returns: Json;
           };
       use_streak_freeze: { Args: never; Returns: Json };
+      user_has_deposited: { Args: never; Returns: boolean };
       validate_football_pools: {
         Args: {
           p_pool_away: number;
