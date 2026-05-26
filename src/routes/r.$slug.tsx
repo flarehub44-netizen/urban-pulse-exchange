@@ -25,8 +25,8 @@ function PartnerRedirectPage() {
     (async () => {
       const { data, error: rpcErr } = await supabase.rpc("track_partner_click", {
         p_slug: slug,
-        p_campaign_id: null,
-        p_ip_hash: null,
+        p_campaign_id: undefined,
+        p_ip_hash: undefined,
       });
       if (cancelled) return;
       if (rpcErr) {

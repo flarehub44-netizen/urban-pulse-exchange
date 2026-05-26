@@ -28,7 +28,7 @@ export function DepositSheetHost() {
       close();
       if (urlDeposit) {
         navigate({
-          search: (prev) => stripAuthModalSearch(prev as Record<string, unknown>),
+          search: ((prev: any) => stripAuthModalSearch(prev as Record<string, unknown>)) as any,
           replace: true,
         });
       }

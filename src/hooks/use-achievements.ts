@@ -7,7 +7,7 @@ export function useAchievements(userId?: string | null) {
     queryKey: ["achievements", userId],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("get_user_achievements", {
-        p_user_id: userId,
+        p_user_id: userId ?? undefined,
       });
       if (error) throw error;
       const rows = Array.isArray(data) ? data : [];
