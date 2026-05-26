@@ -13,7 +13,7 @@ export function useWinToast() {
     if (!userId) return;
 
     const ch = supabase
-      .channel(`win-toast-${userId}`)
+      .channel(`win-toast-${userId}`, { config: { private: true } })
       .on(
         "postgres_changes",
         {

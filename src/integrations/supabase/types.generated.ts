@@ -2230,7 +2230,6 @@ export type Database = {
           name: string
           neighborhood: string
           notification_prefs: Json
-          pix_key: string | null
           pnl: number
           recovery_days_left: number
           recovery_mode: boolean
@@ -2264,7 +2263,6 @@ export type Database = {
           name?: string
           neighborhood?: string
           notification_prefs?: Json
-          pix_key?: string | null
           pnl?: number
           recovery_days_left?: number
           recovery_mode?: boolean
@@ -2298,7 +2296,6 @@ export type Database = {
           name?: string
           neighborhood?: string
           notification_prefs?: Json
-          pix_key?: string | null
           pnl?: number
           recovery_days_left?: number
           recovery_mode?: boolean

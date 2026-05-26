@@ -2,6 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Division } from "@/store/viax-store";
 
+/** Explicit columns — avoids SELECT * leaking future sensitive columns. */
+const OWN_PROFILE_COLUMNS =
+  "id,name,handle,avatar,division,balance,xp,xp_to_next,streak,streak_multiplier,streak_freezes_left,recovery_mode,recovery_days_left,accuracy,roi,pnl,volume_24h,city,neighborhood,is_admin" as const;
+
 export interface Profile {
   id: string;
   name: string;
@@ -87,7 +91,7 @@ export function useProfile(userId?: string | null) {
       if (isOwn) {
         const { data, error } = (await supabase
           .from("profiles")
-          .select("*")
+          .select(OWN_PROFILE_COLUMNS)
           .eq("id", userId!)
           .single()) as { data: Record<string, unknown> | null; error: Error | null };
         if (error) throw error;

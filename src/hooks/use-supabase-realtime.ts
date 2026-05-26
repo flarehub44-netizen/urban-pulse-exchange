@@ -12,7 +12,7 @@ export function useSupabaseRealtime() {
   useEffect(() => {
     // Channel 1 — market pool updates (real bets from any session)
     const marketsCh = supabase
-      .channel("markets-pool")
+      .channel("markets-pool", { config: { private: true } })
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "markets" },
@@ -35,7 +35,7 @@ export function useSupabaseRealtime() {
 
     // Channel 2 — new feed posts
     const feedCh = supabase
-      .channel("feed-live")
+      .channel("feed-live", { config: { private: true } })
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "feed_posts" }, () => {
         queryClient.invalidateQueries({ queryKey: ["feed"] });
       })
@@ -52,7 +52,7 @@ export function useSupabaseRealtime() {
       if (!userId) return;
 
       notifCh = supabase
-        .channel(`notifications:${userId}`)
+        .channel(`notifications:${userId}`, { config: { private: true } })
         .on(
           "postgres_changes",
           {

@@ -22,6 +22,7 @@
     "db:sync-remote": "npx supabase start && npx supabase db pull remote_sync --linked --yes && npx supabase db reset && npm run db:types",
     "db:tick": "npx supabase db query --linked",
     "db:types": "node scripts/gen-supabase-types.mjs",
+    "check:realtime": "node scripts/check-realtime-private-channels.mjs",
     "db:test-sql": "echo Run: psql $DATABASE_URL -f supabase/tests/resolution_engine_acceptance.sql"
   },
   "dependencies": {

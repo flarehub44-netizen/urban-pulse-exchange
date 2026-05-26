@@ -44,7 +44,7 @@ export function useNearMissAlerts(userId: string | null) {
     if (!userId || !enabled) return;
 
     const channel = supabase
-      .channel(`near-miss-${userId}`)
+      .channel(`near-miss-${userId}`, { config: { private: true } })
       .on(
         "postgres_changes",
         {

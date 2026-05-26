@@ -21,7 +21,7 @@ export function useResolveExpired() {
     };
 
     const channel = supabase
-      .channel("markets-lifecycle")
+      .channel("markets-lifecycle", { config: { private: true } })
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "markets" }, () => {
         if (!cancelled) invalidate();
       })

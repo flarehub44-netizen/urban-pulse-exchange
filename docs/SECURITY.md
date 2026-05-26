@@ -24,7 +24,7 @@ Operações sensíveis (apostas, carteira, depósito) devem usar **RPC** ou **se
 | `market_history` | anon + authenticated | — | — | — | leitura pública |
 | `regions` | anon + authenticated | — | — | — | |
 | `bets` | own (+ público limitado via views/RPC) | via `place_bet` RPC | own note | — | não confiar em insert direto |
-| `profiles` | own; admin all | signup trigger | own campos não sensíveis | — | trigger bloqueia `balance`, `is_admin` |
+| `profiles` | own only | signup trigger | own campos não sensíveis | — | admin via RPC; sem `pix_key` na tabela |
 | `transactions` | own | service/RPC | — | — | callback auth |
 | `notifications` | own | sistema | own read | — | |
 | `feed_posts` | público | authenticated | — | — | |
@@ -35,10 +35,38 @@ Operações sensíveis (apostas, carteira, depósito) devem usar **RPC** ou **se
 | `trader_follows` | own/rede | own | — | own | |
 | `football_markets` | público (regras status) | admin | admin | admin | apostas via RPC |
 | `football_bets` | own | RPC | — | — | |
-| `payment_intents` | own | service | service | — | webhook SyncPay |
+| `payment_intents` | own | service | service | — | `pix_key` = chave saque (RPC) ou metadata depósito; webhook SyncPay |
 | `platform_settings` | leitura flags | admin | admin | — | preferir RPC `is_*_enabled` |
 | `daily_polls` / `poll_votes` | público | own vote | — | — | |
 | `platform_events` | público | admin | — | — | |
+
+## Realtime (`realtime.messages` RLS)
+
+Canais privados (`config: { private: true }`) em `src/hooks/*`. Políticas em `20260717000000_realtime_messages_rls.sql`.
+
+| Tópico | Uso |
+|--------|-----|
+| `markets-pool` | pool mercados urbanos |
+| `feed-live` | feed |
+| `football-realtime` | futebol |
+| `markets-lifecycle` | lifecycle UI |
+| `notifications:{userId}` | notificações (só dono) |
+| `win-toast-{userId}` | toast vitória |
+| `near-miss-{userId}` | near-miss casino |
+
+**Regra:** novo `.channel(...)` → adicionar policy + `private: true`. Rodar `node scripts/check-realtime-private-channels.mjs`.
+
+## Admin e dados financeiros
+
+- Painel admin: RPCs (`get_admin_users_list`, etc.), não `SELECT` direto em `profiles`.
+- `balance` visível a admin só via RPC; risco de conta admin comprometida mitigado com allowlist + rotação de invites.
+- Pix de saque: `payment_intents.pix_key` + `request_withdrawal` RPC; nunca coluna em `profiles`.
+
+## Funções `SECURITY DEFINER`
+
+- `REVOKE` de `PUBLIC` em todas as funções `public` (`20260717000002_revoke_public_function_execute.sql`).
+- Grants explícitos `anon` / `authenticated` / `service_role` nas migrations de feature.
+- Inventário anon: `supabase/tests/security_anon_functions_inventory.sql`.
 
 ## Checklist pós-alteração de schema
 

@@ -23,7 +23,7 @@ export function useFootballRealtime() {
     };
 
     const ch = supabase
-      .channel("football-realtime")
+      .channel("football-realtime", { config: { private: true } })
       // Pool / status changes on football_markets
       .on(
         "postgres_changes",
