@@ -59,7 +59,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 /**
  * Cria uma cobrança Pix (depósito).
  * O usuário escaneia o QR Code no app do banco e paga.
- * O webhook `/api/webhooks/syncpay` confirma o pagamento e credita o saldo.
+ * O webhook `/api/public/webhooks/syncpay` confirma o pagamento e credita o saldo.
  */
 export async function createPixCharge(opts: {
   amount: number;
