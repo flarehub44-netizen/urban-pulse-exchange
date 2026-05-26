@@ -19,7 +19,7 @@ export function useAdminResolveMarket() {
         p_market_id: marketId,
         p_winning_side: side,
         p_note: note ?? undefined,
-      });
+      } as any);
       if (error) throw error;
       return data;
     },
