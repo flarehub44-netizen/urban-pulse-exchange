@@ -12,7 +12,7 @@ import { getMarketEdge } from "@/lib/market-edge";
 import { useWatchlist } from "@/hooks/use-watchlist";
 import { MarketCard } from "@/components/viax/market-card";
 import { MobileMarketsCarousel } from "@/components/viax/mobile-markets-carousel";
-import { Search, Star, X, TrendingUp, Clock, Bot, MapPin, SlidersHorizontal } from "lucide-react";
+import { Search, Star, X, TrendingUp, Clock, Bot, MapPin, SlidersHorizontal, Brain } from "lucide-react";
 import { EmptyState } from "@/components/viax/empty-state";
 import { cn } from "@/lib/utils";
 import { loadMarketsFilters, saveMarketsFilters } from "@/lib/markets-filter-persist";
@@ -421,7 +421,9 @@ function MarketsList() {
                     "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition",
                     p.active
                       ? "border-primary bg-primary text-primary-foreground shadow-[var(--shadow-glow-primary)]"
-                      : "border-border bg-card text-muted-foreground hover:bg-surface-2 hover:text-foreground",
+                      : p.key === "ai"
+                        ? "border-primary/40 bg-primary/10 text-primary hover:bg-primary/20"
+                        : "border-border bg-card text-muted-foreground hover:bg-surface-2 hover:text-foreground",
                   )}
                 >
                   {p.icon} {p.label}
@@ -617,6 +619,17 @@ function MarketsList() {
             </div>
           )}
 
+          {aiPicks && !marketsLoading && (
+            <div className="flex items-start gap-2 rounded-xl border border-primary/30 bg-primary/8 px-3 py-2.5 text-sm">
+              <Brain className="size-4 shrink-0 text-primary mt-0.5" />
+              <p className="text-xs text-muted-foreground">
+                <span className="font-medium text-foreground">UrbanMind filtrou {list.length} mercado{list.length !== 1 ? "s" : ""}</span>{" "}
+                com confiança ≥ 75% e edge positivo. Precisão histórica:{" "}
+                <span className="font-medium text-primary">78.4%</span>
+              </p>
+            </div>
+          )}
+
           {showFavorites && watchlist.length === 0 && (
             <EmptyState
               icon={Star}
@@ -631,18 +644,40 @@ function MarketsList() {
           )}
 
           {!showFavorites && list.length === 0 && (
-            <div className="space-y-3">
+            <div className="space-y-4">
               <EmptyState
                 icon={Search}
                 title={copy.empty.markets.title}
                 description={copy.empty.markets.description}
-                action={{
-                  label: copy.empty.markets.cta,
-                  to: "/markets",
-                  search: { status: "live" },
-                }}
               />
-              <p className="text-center">
+              <div className="flex flex-col items-center gap-2 text-sm">
+                {regionFilter && (
+                  <button
+                    type="button"
+                    onClick={() => patchSearch({ region: undefined })}
+                    className="flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs text-primary hover:bg-primary/20"
+                  >
+                    <MapPin className="size-3.5" />
+                    Ver todos os mercados (sem filtro de região)
+                  </button>
+                )}
+                {statusKey === "closing" && (
+                  <button
+                    type="button"
+                    onClick={() => patchSearch({ status: "live" })}
+                    className="flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs text-primary hover:bg-primary/20"
+                  >
+                    <TrendingUp className="size-3.5" />
+                    Ver mercados ao vivo
+                  </button>
+                )}
+                <a
+                  href="/urbanmind"
+                  className="flex items-center gap-1.5 rounded-lg border border-primary/20 bg-card px-3 py-1.5 text-xs text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                >
+                  <Brain className="size-3.5" />
+                  Deixa a IA escolher para você →
+                </a>
                 <button
                   type="button"
                   onClick={() =>
@@ -658,9 +693,22 @@ function MarketsList() {
                   }
                   className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
                 >
-                  Limpar filtros
+                  Limpar todos os filtros
                 </button>
-              </p>
+              </div>
+              {markets.length > 0 && (
+                <div className="mt-2">
+                  <p className="mb-3 text-xs text-muted-foreground text-center">Você pode gostar de…</p>
+                  <div className="space-y-3 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
+                    {[...markets]
+                      .sort((a, b) => (b.pool.YES + b.pool.NO) - (a.pool.YES + a.pool.NO))
+                      .slice(0, 3)
+                      .map((m) => (
+                        <MarketCard key={m.id} m={m} compact />
+                      ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

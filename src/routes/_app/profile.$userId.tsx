@@ -20,11 +20,13 @@ import {
   BarChart2,
   Activity,
   History,
+  Trophy,
 } from "lucide-react";
 import { EmptyState } from "@/components/viax/empty-state";
 import { usePublicTraderBets } from "@/hooks/use-public-trader-bets";
 import { usePublicActiveBets } from "@/hooks/use-public-active-bets";
 import { usePublicExpertProfile } from "@/hooks/use-partner";
+import { useAchievements } from "@/hooks/use-achievements";
 import { buildPartnerUrl } from "@/lib/share-url";
 import { copyShareUrl } from "@/lib/share-url";
 import { cn } from "@/lib/utils";
@@ -39,16 +41,13 @@ export const Route = createFileRoute("/_app/profile/$userId")({
   component: PublicProfile,
 });
 
-const badges = [
-  { name: "Mestre da Paulista", desc: "10 wins na Av. Paulista" },
-  { name: "Rei do Rush", desc: "5 wins entre 18h–19h" },
-  { name: "Alpha Predictor", desc: "Acertou contra IA 3x seguidas" },
-  { name: "Traffic Sniper", desc: copy.profile.badgeRoi },
-  { name: "Urban Oracle", desc: "Top 100 global" },
-  { name: "Maratonista", desc: "30 mercados em 1 dia" },
-  { name: "Marginal Master", desc: "10 wins na Marginal" },
-  { name: "Volume Beast", desc: "50k BRL movimentados" },
-];
+// Client-side progress hints for known achievement IDs
+const PROGRESS_HINTS: Record<string, { label: string; max: number; statKey: "streak" | "wins" | "bets" }> = {
+  streak_3: { label: "dias de sequência", max: 3, statKey: "streak" },
+  streak_7: { label: "dias de sequência", max: 7, statKey: "streak" },
+  wins_5: { label: "vitórias", max: 5, statKey: "wins" },
+  first_bet: { label: "apostas", max: 1, statKey: "bets" },
+};
 
 function PublicProfile() {
   const { userId: targetId } = Route.useParams();
@@ -89,6 +88,16 @@ function PublicProfile() {
   const { data: publicBets } = usePublicTraderBets(targetId);
   const { data: activeBets } = usePublicActiveBets(targetId);
   const { data: expert } = usePublicExpertProfile(targetId);
+  const { data: achievements } = useAchievements(targetId);
+
+  // Client-side progress stats
+  const wins = (publicBets ?? []).filter((b) => b.payout > 0).length;
+  const totalBets = (publicBets ?? []).length;
+  const progressStat = (statKey: "streak" | "wins" | "bets"): number => {
+    if (statKey === "streak") return streak;
+    if (statKey === "wins") return wins;
+    return totalBets;
+  };
 
   useEffect(() => {
     document.title = `@${handle} · ViaX`;
@@ -353,34 +362,61 @@ function PublicProfile() {
         <h2 className="heading-subsection mb-3">
           <span className="text-highlight">Badges</span>
         </h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {badges.map((b, i) => {
-            const unlocked = i < 4;
-            return (
-              <div
-                key={b.name}
-                className={cn(
-                  "rounded-2xl border p-4",
-                  unlocked
-                    ? "border-primary/40 bg-primary/10"
-                    : "border-border bg-card/40 opacity-60",
-                )}
-              >
-                <div className="flex items-center justify-between">
-                  <div
-                    className={cn(
-                      "size-9 rounded-xl bg-gradient-to-br from-primary to-primary-glow",
-                      !unlocked && "grayscale",
-                    )}
-                  />
-                  {!unlocked && <Lock className="size-3.5 text-muted-foreground" />}
+        {(achievements ?? []).length === 0 ? (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="animate-pulse rounded-2xl border border-border bg-card/40 p-4 h-24" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {(achievements ?? []).map((b) => {
+              const hint = PROGRESS_HINTS[b.id];
+              const current = hint ? Math.min(progressStat(hint.statKey), hint.max) : 0;
+              const pct = hint ? (current / hint.max) * 100 : 0;
+              return (
+                <div
+                  key={b.id}
+                  className={cn(
+                    "rounded-2xl border p-4",
+                    b.unlocked
+                      ? "border-primary/40 bg-primary/10"
+                      : "border-border bg-card/40",
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    <div
+                      className={cn(
+                        "flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-glow",
+                        !b.unlocked && "grayscale opacity-50",
+                      )}
+                    >
+                      <Trophy className="size-4 text-white" />
+                    </div>
+                    {!b.unlocked && <Lock className="size-3.5 text-muted-foreground" />}
+                  </div>
+                  <div className={cn("mt-3 text-sm font-medium", !b.unlocked && "text-muted-foreground")}>
+                    {b.name}
+                  </div>
+                  <div className="text-[11px] text-muted-foreground">{b.description}</div>
+                  {!b.unlocked && hint && (
+                    <div className="mt-2">
+                      <div className="h-1 w-full overflow-hidden rounded-full bg-surface-2">
+                        <div
+                          className="h-full bg-primary/60 transition-all"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <p className="mt-1 text-[10px] text-muted-foreground">
+                        {current}/{hint.max} {hint.label}
+                      </p>
+                    </div>
+                  )}
                 </div>
-                <div className="mt-3 text-sm font-medium">{b.name}</div>
-                <div className="text-[11px] text-muted-foreground">{b.desc}</div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

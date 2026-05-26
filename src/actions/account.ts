@@ -329,6 +329,36 @@ export const getDashboardSnapshotFn = createServerFn({ method: "GET" })
     return dashboardSnapshotSchema.parse(payload);
   });
 
+const updateProfileSchema = z.object({
+  name: z.string().min(1).max(60).optional(),
+  handle: z
+    .string()
+    .min(3)
+    .max(30)
+    .regex(/^[a-z0-9_]+$/, "Apenas letras minúsculas, números e _")
+    .optional(),
+  city: z.string().max(80).optional(),
+  neighborhood: z.string().max(80).optional(),
+});
+
+export const updateProfileFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(updateProfileSchema)
+  .handler(async ({ data, context }) => {
+    const started = Date.now();
+    const { supabase } = context as unknown as SupabaseFnContext;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.rpc as any)("update_profile", {
+      p_name: data.name ?? null,
+      p_handle: data.handle ?? null,
+      p_city: data.city ?? null,
+      p_neighborhood: data.neighborhood ?? null,
+    });
+    if (error) throw new AppError(error.message, error.message, 400);
+    logApiMetric("bff.update_profile", { ok: true, durationMs: Date.now() - started });
+    return { ok: true };
+  });
+
 export const getEngagementSnapshotFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator(engagementSnapshotInput)

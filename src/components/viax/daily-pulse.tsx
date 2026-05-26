@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
-import { Flame, Sparkles, Zap, ShieldCheck } from "lucide-react";
+import { Flame, Sparkles, Zap, ShieldCheck, Timer } from "lucide-react";
 import { toast } from "sonner";
 import { copy } from "@/copy/pt-BR";
 import { useAuth } from "@/hooks/use-auth";
@@ -35,6 +35,13 @@ export function DailyPulse() {
     if (streak >= 7) return "text-primary";
     if (streak >= 3) return "text-primary/70";
     return "text-muted-foreground";
+  }, [streak]);
+
+  const { daysToNext, nextMultiplierLabel } = useMemo(() => {
+    if (streak < 7) return { daysToNext: 7 - streak, nextMultiplierLabel: "1.5x" };
+    if (streak < 14) return { daysToNext: 14 - streak, nextMultiplierLabel: "2x" };
+    if (streak < 30) return { daysToNext: 30 - streak, nextMultiplierLabel: "3x" };
+    return { daysToNext: 0, nextMultiplierLabel: null };
   }, [streak]);
 
   const onCheckIn = async () => {
@@ -101,6 +108,24 @@ export function DailyPulse() {
                 </span>
               )}
             </div>
+            {daysToNext > 0 && nextMultiplierLabel && (
+              <p
+                className={cn(
+                  "mt-1 flex items-center gap-1 text-[10px]",
+                  daysToNext === 1
+                    ? "font-semibold text-warn"
+                    : "text-muted-foreground",
+                )}
+              >
+                {daysToNext === 1 ? (
+                  <Flame className="size-3 shrink-0" />
+                ) : (
+                  <Timer className="size-3 shrink-0" />
+                )}
+                Faltam {daysToNext} dia{daysToNext !== 1 ? "s" : ""} para multiplicador{" "}
+                {nextMultiplierLabel}
+              </p>
+            )}
           </div>
         </div>
         {!done ? (

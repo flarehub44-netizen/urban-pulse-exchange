@@ -5,6 +5,7 @@ export function openCommandPalette() {
 }
 import { useNavigate } from "@tanstack/react-router";
 import { useMarketsList } from "@/hooks/use-markets";
+import { useMarketSearch } from "@/hooks/use-market-search";
 import { useResolvedTraders } from "@/hooks/use-resolved-data";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
@@ -47,6 +48,7 @@ const navIcons: Record<string, typeof LayoutDashboard> = {
 
 export function CommandPalette() {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const navigate = useNavigate();
   const { userId } = useAuth();
   const { data: profile } = useProfile(userId);
@@ -54,6 +56,9 @@ export function CommandPalette() {
   const isAdmin = profile?.isAdmin || accountCtx?.admin?.is_admin;
   const { markets } = useMarketsList();
   const { traders } = useResolvedTraders();
+  const { data: searchResults = [] } = useMarketSearch(query);
+
+  const hasQuery = query.trim().length >= 2;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -67,8 +72,18 @@ export function CommandPalette() {
   }, []);
 
   return (
-    <CommandDialog open={open} onOpenChange={setOpen}>
-      <CommandInput placeholder={copy.command.placeholder} />
+    <CommandDialog
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v);
+        if (!v) setQuery("");
+      }}
+    >
+      <CommandInput
+        placeholder={copy.command.placeholder}
+        value={query}
+        onValueChange={setQuery}
+      />
       <CommandList>
         <CommandEmpty>{copy.command.empty}</CommandEmpty>
         <CommandGroup heading={copy.command.routes}>
@@ -124,12 +139,13 @@ export function CommandPalette() {
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading={copy.command.markets}>
-          {markets.slice(0, 12).map((m) => (
+          {(hasQuery ? searchResults : markets.slice(0, 12)).map((m) => (
             <CommandItem
               key={m.id}
               value={`${m.question} ${m.region} ${m.id}`}
               onSelect={() => {
                 setOpen(false);
+                setQuery("");
                 navigate({ to: "/markets/$marketId", params: { marketId: m.id } });
               }}
             >
@@ -138,22 +154,26 @@ export function CommandPalette() {
             </CommandItem>
           ))}
         </CommandGroup>
-        <CommandSeparator />
-        <CommandGroup heading="Traders">
-          {traders.slice(0, 8).map((t) => (
-            <CommandItem
-              key={t.id}
-              value={`${t.name} ${t.handle}`}
-              onSelect={() => {
-                setOpen(false);
-                navigate({ to: "/profile/$userId", params: { userId: t.id } });
-              }}
-            >
-              <img src={t.avatar} alt={t.name} className="mr-2 size-6 rounded-full" />
-              {t.name} <span className="text-muted-foreground">@{t.handle}</span>
-            </CommandItem>
-          ))}
-        </CommandGroup>
+        {!hasQuery && (
+          <>
+            <CommandSeparator />
+            <CommandGroup heading="Traders">
+              {traders.slice(0, 8).map((t) => (
+                <CommandItem
+                  key={t.id}
+                  value={`${t.name} ${t.handle}`}
+                  onSelect={() => {
+                    setOpen(false);
+                    navigate({ to: "/profile/$userId", params: { userId: t.id } });
+                  }}
+                >
+                  <img src={t.avatar} alt={t.name} className="mr-2 size-6 rounded-full" />
+                  {t.name} <span className="text-muted-foreground">@{t.handle}</span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </>
+        )}
       </CommandList>
     </CommandDialog>
   );

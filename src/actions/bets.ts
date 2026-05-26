@@ -4,6 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { SupabaseFnContext } from "@/integrations/supabase/context";
 import { supabase } from "@/integrations/supabase/client";
 import { mapSupabaseBusinessError } from "@/lib/server-errors";
+import { logApiMetric } from "@/lib/structured-log.server";
 
 const placeBetSchema = z.object({
   marketId: z.string(),
@@ -15,13 +16,18 @@ export const placeBetFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(placeBetSchema)
   .handler(async ({ data, context }) => {
+    const started = Date.now();
     const { supabase } = context as unknown as SupabaseFnContext;
     const { data: result, error } = await supabase.rpc("place_bet", {
       p_market_id: data.marketId,
       p_side: data.side,
       p_stake: data.stake,
     });
-    if (error) throw mapSupabaseBusinessError(error.message);
+    if (error) {
+      logApiMetric("bff.place_bet", { ok: false, durationMs: Date.now() - started });
+      throw mapSupabaseBusinessError(error.message);
+    }
+    logApiMetric("bff.place_bet", { ok: true, durationMs: Date.now() - started });
     return result as {
       bet_id: string;
       tx_id: string;

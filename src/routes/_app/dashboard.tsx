@@ -62,6 +62,11 @@ import { buildDailyMission } from "@/lib/urbanmind-coach";
 import { DEFAULT_FEATURED_MARKET_ID } from "@/config/markets";
 import { DailyPulse } from "@/components/viax/daily-pulse";
 import { StreakRiskBanner } from "@/components/viax/streak-risk-banner";
+import { ComebackBanner } from "@/components/viax/comeback-banner";
+import { InviteFriendsCard } from "@/components/viax/invite-friends-card";
+import { useRecommendedMarkets } from "@/hooks/use-recommended-markets";
+import { useMyLeagues } from "@/hooks/use-leagues";
+import { useTrendingTraders } from "@/hooks/use-trending-traders";
 import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
 import { DailyMissions } from "@/components/viax/daily-missions";
 import { WeeklyReportModal } from "@/components/viax/weekly-report-modal";
@@ -101,8 +106,9 @@ function Dashboard() {
   const { userId } = useAuth();
   const { isRegistered } = useAuth();
   const { me, profile: dbProfile } = useResolvedProfile();
-  const { data: weeklyReport, shouldShow: showWeeklyReport } = useWeeklyReport();
+  const { data: weeklyReport, shouldShow: showWeeklyReport, shouldShowMidweek } = useWeeklyReport();
   const [weeklyReportDismissed, setWeeklyReportDismissed] = useState(false);
+  const [midweekReportDismissed, setMidweekReportDismissed] = useState(false);
   const [divisionUp, setDivisionUp] = useState<string | null>(null);
   const { openDeposit: openDepositSheet } = useDepositSheet();
   const prevDivisionRef = useRef<string | null>(null);
@@ -170,6 +176,8 @@ function Dashboard() {
 
   const { ids: followedIds } = useFollowedTraders();
   const { data: followingBets } = useFollowingActiveBets();
+  const { data: myLeagues = [] } = useMyLeagues();
+  const { data: trendingTraders = [] } = useTrendingTraders(3);
   useWinToast();
 
   useEffect(() => {
@@ -198,7 +206,11 @@ function Dashboard() {
   }, [topOpen.length]);
 
   const liveCount = markets.filter((m) => m.status === "live" || m.status === "closing").length;
-  const top = [...markets].sort((a, b) => Math.abs(b.trend) - Math.abs(a.trend)).slice(0, 4);
+  const { markets: recommended, label: recommendedLabel } = useRecommendedMarkets(
+    markets,
+    dbProfile,
+    openBets,
+  );
   const urbanMindMarket = markets.find((m) => m.id === DEFAULT_FEATURED_MARKET_ID) ?? markets[0];
   const dailyMission = buildDailyMission(
     markets,
@@ -303,6 +315,14 @@ function Dashboard() {
       {deferredReady && showWeeklyReport && !weeklyReportDismissed && weeklyReport && (
         <WeeklyReportModal report={weeklyReport} onClose={() => setWeeklyReportDismissed(true)} />
       )}
+      {/* Mid-week flash — quinta-feira */}
+      {deferredReady && shouldShowMidweek && !midweekReportDismissed && weeklyReport && (
+        <WeeklyReportModal
+          report={weeklyReport}
+          compact
+          onClose={() => setMidweekReportDismissed(true)}
+        />
+      )}
 
       {/* Division-up celebration */}
       <DivisionUpModal newDivision={divisionUp} onClose={() => setDivisionUp(null)} />
@@ -323,6 +343,7 @@ function Dashboard() {
           </span>
         </Link>
       )}
+      <ComebackBanner newMarketsCount={markets.length} />
       <EventsBanner />
       <StreakRiskBanner />
 
@@ -647,11 +668,11 @@ function Dashboard() {
         </div>
       )}
 
-      {/* Core — mercados em alta */}
+      {/* Core — mercados recomendados / em alta */}
       <div>
         <div className="mb-3 flex items-center justify-between">
           <h2 className="heading-subsection">
-            Mercados em <span className="text-highlight">alta</span>
+            Mercados <span className="text-highlight">{recommendedLabel}</span>
           </h2>
           <Link
             to="/markets"
@@ -662,12 +683,12 @@ function Dashboard() {
           </Link>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {top.map((m) => (
+          {recommended.map((m) => (
             <div
               key={m.id}
               onClick={() =>
                 trackProductEvent("market_opened_from_dashboard", {
-                  source: "top_markets",
+                  source: recommendedLabel === "Para você" ? "recommended_markets" : "top_markets",
                   marketId: m.id,
                 })
               }
@@ -679,6 +700,55 @@ function Dashboard() {
       </div>
 
       <DailyPulse />
+      {isRegistered && dbProfile?.handle && (
+        <InviteFriendsCard handle={dbProfile.handle} />
+      )}
+
+      {isRegistered && (
+        myLeagues.length > 0 ? (
+          <div className="rounded-2xl border border-primary/25 bg-card/60 p-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold">
+                Sua <span className="text-highlight">liga</span>
+              </h3>
+              <Link to="/leagues" className="text-xs text-primary hover:underline">
+                Ver liga completa →
+              </Link>
+            </div>
+            <div className="mt-3 space-y-2">
+              {myLeagues.slice(0, 2).map((league) => (
+                <Link
+                  key={league.id}
+                  to="/leagues"
+                  className="flex items-center justify-between gap-3 rounded-xl border bg-surface/50 px-3 py-2 text-sm hover:border-primary/30 transition"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate font-medium">{league.name}</div>
+                    <div className="text-[11px] text-muted-foreground">
+                      {league.member_count} membro{league.member_count !== 1 ? "s" : ""}
+                    </div>
+                  </div>
+                  <span className="shrink-0 text-xs text-primary">→</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <Link
+            to="/leagues"
+            className="flex items-center justify-between gap-3 rounded-xl border border-dashed border-primary/30 px-4 py-3 text-sm hover:border-primary/50 hover:bg-primary/5 transition"
+          >
+            <span>
+              <span className="font-medium">Crie uma liga com amigos</span>
+              <span className="mt-0.5 block text-xs text-muted-foreground">Compete, sobe de divisão, ganha XP em grupo</span>
+            </span>
+            <span className="shrink-0 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground">
+              Criar
+            </span>
+          </Link>
+        )
+      )}
+
       <DailyMissions />
 
       {/* Fold 3 — performance + posições abertas */}
@@ -820,6 +890,38 @@ function Dashboard() {
             onDepositBonusCta={() => navigate({ to: "/wallet" })}
           />
         </Suspense>
+      )}
+
+      {/* Traders em Alta — momentum semanal */}
+      {deferredReady && trendingTraders.length > 0 && (
+        <div>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="heading-subsection">
+              Traders <span className="text-highlight">em Alta</span> esta semana
+            </h2>
+            <Link to="/ranking" className="text-xs text-primary hover:underline">
+              Ver ranking →
+            </Link>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {trendingTraders.map((t) => (
+              <Link
+                key={t.user_id}
+                to="/profile/$userId"
+                params={{ userId: t.user_id }}
+                className="flex items-center gap-3 rounded-xl border bg-card/60 px-3 py-3 backdrop-blur hover:border-primary/30 transition"
+              >
+                <img src={t.avatar} alt={t.name} className="size-9 rounded-full border shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-sm font-medium">{t.name}</div>
+                  <div className="text-[10px] text-muted-foreground">
+                    🔥 {t.wins_7d}/{t.bets_7d} acertos · {t.accuracy_7d}% esta semana
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* Mapa + feed (menor prioridade) */}

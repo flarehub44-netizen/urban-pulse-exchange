@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Copy, QrCode, Clock, Wallet } from "lucide-react";
+import { Copy, QrCode, Clock, Wallet, Gift } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { initiateDepositFn, getDepositStatusFn } from "@/actions/payments";
 import { ImpulseDepositChips } from "@/components/viax/impulse-deposit-bar";
@@ -9,6 +9,7 @@ import { ImpulseDepositChips } from "@/components/viax/impulse-deposit-bar";
 import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
 import { formatBRL } from "@/lib/parimutuel";
 import { useAuth } from "@/hooks/use-auth";
+import { useHasDeposited } from "@/hooks/use-has-deposited";
 import { RegisterRequiredCta } from "@/components/auth/register-required-cta";
 import { trackDepositFunnel } from "@/lib/deposit-funnel";
 import { getLastImpulseAmount, setLastImpulseAmount } from "@/lib/impulse-deposit";
@@ -28,7 +29,8 @@ export function QuickDepositSheet({
   suggestedAmount = 200,
 }: QuickDepositSheetProps) {
   const queryClient = useQueryClient();
-  const { isRegistered } = useAuth();
+  const { isRegistered, userId } = useAuth();
+  const { data: hasDeposited } = useHasDeposited(userId);
   const { enabled: casinoEnabled } = useCasinoEnabled();
   const [amount, setAmount] = useState(String(suggestedAmount));
   const [qr, setQr] = useState<{
@@ -159,6 +161,17 @@ export function QuickDepositSheet({
           </div>
         ) : (
           <div className="space-y-4">
+            {hasDeposited === false && (
+              <div className="flex items-start gap-2 rounded-xl border border-up/30 bg-up/8 px-3 py-2.5">
+                <Gift className="size-4 shrink-0 text-up mt-0.5" />
+                <div>
+                  <p className="text-xs font-semibold text-up">Bônus de primeiro depósito</p>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">
+                    Deposite R$ 200 ou mais e ganhe <span className="font-medium text-foreground">+10% de bônus</span> (até R$ 50).
+                  </p>
+                </div>
+              </div>
+            )}
             {partnerRef?.slug && (
               <p className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-center text-[11px] text-muted-foreground">
                 {copy.depositFunnel.referredBy}{" "}

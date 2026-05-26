@@ -2,12 +2,15 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useProfile } from "@/hooks/use-profile";
 import { createFeedPostFn } from "@/actions/feed";
 import { useQueryClient } from "@tanstack/react-query";
 import { invalidateEngagementQueries } from "@/lib/query-invalidation";
+import { shareWin } from "@/lib/share";
 
 export function useWinToast() {
   const { userId } = useAuth();
+  const { data: profile } = useProfile(userId);
   const qc = useQueryClient();
 
   useEffect(() => {
@@ -32,26 +35,25 @@ export function useWinToast() {
 
           invalidateEngagementQueries(qc);
 
+          const origin = typeof window !== "undefined" ? window.location.origin : "https://viax.com.br";
+          const handle = profile?.handle ?? "";
+          const shareUrl = handle ? `${origin}/r/${handle}` : origin;
+          const shareText = `${text} 🎯 Entre no ViaX:`;
+
           toast.success(text, {
             duration: 8000,
             action: {
-              label: "Compartilhar no Feed",
+              label: "📤 Compartilhar",
               onClick: () => {
-                const postText = `${text} 🎯`;
-                createFeedPostFn({
-                  data: {
-                    text: postText.slice(0, 280),
-                    marketId,
-                    tag: "Previsão",
-                  },
-                })
-                  .then(() => {
-                    invalidateEngagementQueries(qc);
-                    toast.success("Post publicado no feed!");
+                void shareWin({ text: shareText, url: shareUrl }).then((result) => {
+                  if (result === "copied") toast.success("Link copiado!");
+                  const postText = `${text} 🎯`;
+                  createFeedPostFn({
+                    data: { text: postText.slice(0, 280), marketId, tag: "Previsão" },
                   })
-                  .catch((e: unknown) => {
-                    console.error("[WinToast] share failed", e);
-                  });
+                    .then(() => invalidateEngagementQueries(qc))
+                    .catch((e: unknown) => console.error("[WinToast] feed post failed", e));
+                });
               },
             },
           });

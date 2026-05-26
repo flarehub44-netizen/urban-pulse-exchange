@@ -6,6 +6,7 @@ import type { SupabaseFnContext } from "@/integrations/supabase/context";
 import { createClient } from "@supabase/supabase-js";
 import { createPixCharge, createPixPayout } from "@/lib/syncpay";
 import { formatBRL } from "@/lib/parimutuel";
+import { logApiMetric } from "@/lib/structured-log.server";
 
 // Service-role client para escrita nas tabelas de pagamento
 function getServiceClient() {
@@ -32,6 +33,7 @@ export const initiateDepositFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth, requireRegisteredAuth])
   .inputValidator(depositSchema)
   .handler(async ({ data, context }) => {
+    const started = Date.now();
     const { userId } = context as unknown as SupabaseFnContext;
     const service = getServiceClient();
 
@@ -73,6 +75,7 @@ export const initiateDepositFn = createServerFn({ method: "POST" })
       })
       .eq("id", intent.id);
 
+    logApiMetric("bff.initiate_deposit", { ok: true, durationMs: Date.now() - started });
     return {
       intentId: intent.id,
       qrCode: charge.qr_code,
@@ -90,6 +93,7 @@ export const initiateWithdrawFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth, requireRegisteredAuth])
   .inputValidator(withdrawSchema)
   .handler(async ({ data, context }) => {
+    const started = Date.now();
     const { supabase, userId } = context as unknown as SupabaseFnContext;
     const service = getServiceClient();
 
@@ -150,6 +154,7 @@ export const initiateWithdrawFn = createServerFn({ method: "POST" })
       );
     }
 
+    logApiMetric("bff.initiate_withdraw", { ok: true, durationMs: Date.now() - started });
     return parsed;
   });
 

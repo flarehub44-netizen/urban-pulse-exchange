@@ -12,6 +12,8 @@ import {
   ArrowUp,
   ArrowDown,
   Zap,
+  Brain,
+  Flame,
 } from "lucide-react";
 import { copy } from "@/copy/pt-BR";
 import { EdgeBadge } from "@/components/viax/edge-badge";
@@ -200,6 +202,11 @@ export function MarketCard({
         <div className="mt-4 flex items-center justify-between text-[11px] text-muted-foreground">
           <span className="flex items-center gap-1">
             <Users className="size-3" /> {formatCompact(m.participants)} {copy.marketCard.traders}
+            {m.participants > 50 && (
+              <span className="ml-1 flex items-center gap-0.5 rounded-full bg-warn/15 px-1.5 py-0.5 text-[9px] font-semibold text-warn">
+                <Flame className="size-2.5" /> Em alta
+              </span>
+            )}
           </span>
           <span>
             {copy.marketCard.prizeTotal}{" "}
@@ -210,6 +217,15 @@ export function MarketCard({
             {formatPct(Math.abs(m.trend) * 0.05, 2)}
           </span>
         </div>
+        {m.aiPrediction.confidence >= 0.70 && (
+          <div className="mt-2 flex items-center gap-1 text-[10px] text-primary/80">
+            <Brain className="size-3 shrink-0" />
+            <span>
+              IA: <span className="font-semibold">{(m.aiPrediction.confidence * 100).toFixed(0)}%</span>{" "}
+              de confiança · lado {m.aiPrediction.side === "YES" ? "SIM" : "NÃO"}
+            </span>
+          </div>
+        )}
 
         {!compact && (
           <div className="mt-4 grid grid-cols-2 gap-2">

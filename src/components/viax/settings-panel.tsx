@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
 import { useAuthModal } from "@/hooks/use-auth-modal";
-import { Bell, Moon, Sun, Shield, Info, Scale, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { Bell, Moon, Sun, Shield, Info, Scale, Sparkles, UserPen } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useMyPartnerStatus, useApplyPartner } from "@/hooks/use-partner";
 import { useTheme } from "@/hooks/use-theme";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,8 @@ import { useProfile } from "@/hooks/use-profile";
 import { AdminClaimPanel } from "@/components/viax/admin-claim-panel";
 import { useCasinoSpinStatus } from "@/hooks/use-casino-spin";
 import { setCasinoOptOutFn } from "@/actions/casino";
+import { updateProfileFn } from "@/actions/account";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export function SettingsPanel() {
@@ -27,6 +29,24 @@ export function SettingsPanel() {
   const [bio, setBio] = useState("");
   const { theme, setTheme, isDark } = useTheme();
   const { data: casinoStatus, refetch: refetchCasino } = useCasinoSpinStatus();
+  const qc = useQueryClient();
+
+  // Profile edit state
+  const [profileName, setProfileName] = useState("");
+  const [profileHandle, setProfileHandle] = useState("");
+  const [profileCity, setProfileCity] = useState("");
+  const [profileNeighborhood, setProfileNeighborhood] = useState("");
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  useEffect(() => {
+    if (profile) {
+      setProfileName(profile.name ?? "");
+      setProfileHandle(profile.handle ?? "");
+      setProfileCity(profile.city ?? "");
+      setProfileNeighborhood(profile.neighborhood ?? "");
+    }
+  }, [profile]);
+
   const showCasinoSettings =
     !!userId &&
     (typeof import.meta.env.VITE_CASINO_ENABLED !== "string" ||
@@ -43,8 +63,90 @@ export function SettingsPanel() {
     }
   };
 
+  const onSaveProfile = async () => {
+    setSavingProfile(true);
+    try {
+      await updateProfileFn({
+        data: {
+          name: profileName.trim() || undefined,
+          handle: profileHandle.trim().toLowerCase() || undefined,
+          city: profileCity.trim() || undefined,
+          neighborhood: profileNeighborhood.trim() || undefined,
+        },
+      });
+      await qc.invalidateQueries({ queryKey: ["me", userId] });
+      toast.success(copy.settings.profileSaved);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : copy.errors.generic;
+      if (msg.includes("HANDLE_TAKEN")) {
+        toast.error(copy.settings.profileHandleTaken);
+      } else if (msg.includes("HANDLE_INVALID")) {
+        toast.error(copy.settings.profileHandleInvalid);
+      } else {
+        toast.error(msg);
+      }
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {isRegistered && (
+        <Section icon={<UserPen className="size-4" />} title={copy.settings.profileTitle}>
+          <div className="space-y-3">
+            <FieldRow label={copy.settings.profileName}>
+              <input
+                value={profileName}
+                onChange={(e) => setProfileName(e.target.value)}
+                maxLength={60}
+                className="w-full rounded-lg border bg-surface px-3 py-2 text-sm"
+              />
+            </FieldRow>
+            <FieldRow label={copy.settings.profileHandle}>
+              <div className="relative">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  @
+                </span>
+                <input
+                  value={profileHandle}
+                  onChange={(e) => setProfileHandle(e.target.value.toLowerCase())}
+                  maxLength={30}
+                  className="w-full rounded-lg border bg-surface py-2 pl-7 pr-3 text-sm"
+                />
+              </div>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                {copy.settings.profileHandleHint}
+              </p>
+            </FieldRow>
+            <FieldRow label={copy.settings.profileCity}>
+              <input
+                value={profileCity}
+                onChange={(e) => setProfileCity(e.target.value)}
+                maxLength={80}
+                className="w-full rounded-lg border bg-surface px-3 py-2 text-sm"
+              />
+            </FieldRow>
+            <FieldRow label={copy.settings.profileNeighborhood}>
+              <input
+                value={profileNeighborhood}
+                onChange={(e) => setProfileNeighborhood(e.target.value)}
+                maxLength={80}
+                className="w-full rounded-lg border bg-surface px-3 py-2 text-sm"
+              />
+            </FieldRow>
+            <button
+              type="button"
+              disabled={savingProfile}
+              onClick={() => void onSaveProfile()}
+              className="rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
+            >
+              {savingProfile ? copy.common.loading : copy.settings.profileSave}
+            </button>
+          </div>
+        </Section>
+      )}
+
       {accountCtx?.admin?.can_claim_invite && !profile?.isAdmin && !accountCtx?.admin?.is_admin && (
         <Section icon={<Shield className="size-4" />} title={copy.settings.adminClaimTitle}>
           <AdminClaimPanel />
@@ -335,6 +437,15 @@ function InfoRow({ label, value }: { label: string; value: string }) {
     <div className="flex items-center justify-between rounded-lg px-3 py-2 hover:bg-surface/40">
       <span className="text-sm text-muted-foreground">{label}</span>
       <span className="mono text-xs text-foreground">{value}</span>
+    </div>
+  );
+}
+
+function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1">
+      <label className="text-xs font-medium text-muted-foreground">{label}</label>
+      {children}
     </div>
   );
 }

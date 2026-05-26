@@ -3,26 +3,29 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, TrendingUp, TrendingDown, Flame, MapPin, Star, Trophy } from "lucide-react";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
-import { markWeeklyReportSeen } from "@/hooks/use-weekly-report";
+import { markWeeklyReportSeen, markMidweekReportSeen } from "@/hooks/use-weekly-report";
 import type { WeeklyReport } from "@/actions/retention";
 
 interface WeeklyReportModalProps {
   report: WeeklyReport;
   onClose: () => void;
+  compact?: boolean;
 }
 
 const slides = ["summary", "region", "streak", "ranking"] as const;
 
 type Slide = (typeof slides)[number];
 
-export function WeeklyReportModal({ report, onClose }: WeeklyReportModalProps) {
+export function WeeklyReportModal({ report, onClose, compact = false }: WeeklyReportModalProps) {
   const [idx, setIdx] = useState(0);
 
-  const current = slides[idx];
-  const isLast = idx === slides.length - 1;
+  const activeSlides = compact ? (["summary"] as Slide[]) : [...slides];
+  const current = activeSlides[idx] as Slide;
+  const isLast = idx === activeSlides.length - 1;
 
   const handleClose = () => {
-    markWeeklyReportSeen();
+    if (compact) markMidweekReportSeen();
+    else markWeeklyReportSeen();
     onClose();
   };
 
@@ -57,7 +60,7 @@ export function WeeklyReportModal({ report, onClose }: WeeklyReportModalProps) {
 
         <div className="px-6 pt-6 pb-2">
           <p className="text-xs font-medium uppercase tracking-widest text-primary">
-            Sua Semana em SP
+            {compact ? "Relatório de meio de semana" : "Sua Semana em SP"}
           </p>
           <p className="text-xs text-muted-foreground">{report.report_week}</p>
         </div>
@@ -164,7 +167,7 @@ export function WeeklyReportModal({ report, onClose }: WeeklyReportModalProps) {
 
         {/* dots */}
         <div className="flex justify-center gap-1.5 pb-2">
-          {slides.map((_, i) => (
+          {activeSlides.map((_, i) => (
             <div
               key={i}
               className={`h-1.5 rounded-full transition-all ${
