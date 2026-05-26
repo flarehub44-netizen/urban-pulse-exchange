@@ -75,6 +75,7 @@ import { DivisionUpModal } from "@/components/viax/division-up-modal";
 import { useDepositSheet } from "@/hooks/use-deposit-sheet";
 import { useFollowingActiveBets } from "@/hooks/use-following-active-bets";
 import { useWinToast } from "@/hooks/use-win-toast";
+import { getOrAssignVariant, trackProductEvent } from "@/lib/product-analytics";
 
 export type DashboardSearch = { from?: string; highlight?: "position" };
 
@@ -155,6 +156,7 @@ function Dashboard() {
   const { data: bets } = useBets();
   const openBets = (bets ?? []).filter((b) => isOpenBetStatus(b.marketStatus));
   const topOpen = openBets.slice(0, 3);
+  const [ctaVariant, setCtaVariant] = useState<"deposit_first" | "market_first">("deposit_first");
 
   const { transactions } = useResolvedTransactions();
   const pnlSeries = usePnlSeries(transactions);
@@ -169,6 +171,31 @@ function Dashboard() {
   const { ids: followedIds } = useFollowedTraders();
   const { data: followingBets } = useFollowingActiveBets();
   useWinToast();
+
+  useEffect(() => {
+    const assigned = getOrAssignVariant(
+      "dashboard_primary_cta",
+      ["deposit_first", "market_first"] as const,
+      userId ?? "anon",
+    ) as "deposit_first" | "market_first";
+    setCtaVariant(assigned);
+    trackProductEvent("dashboard_cta_variant_assigned", { variant: assigned, userId: userId ?? "anon" });
+  }, [userId]);
+
+  useEffect(() => {
+    trackProductEvent("view_dashboard", {
+      variant: ctaVariant,
+      balance: me.balance,
+      openPositions: openBets.length,
+      liveMarkets: markets.length,
+    });
+  }, [ctaVariant, me.balance, openBets.length, markets.length]);
+
+  useEffect(() => {
+    if (topOpen.length > 0) {
+      trackProductEvent("open_positions_viewed", { count: topOpen.length, source: "dashboard" });
+    }
+  }, [topOpen.length]);
 
   const liveCount = markets.filter((m) => m.status === "live" || m.status === "closing").length;
   const top = [...markets].sort((a, b) => Math.abs(b.trend) - Math.abs(a.trend)).slice(0, 4);
@@ -186,6 +213,45 @@ function Dashboard() {
     traders,
     dailyMission,
   );
+
+  const primaryCta = useMemo(() => {
+    if (me.balance < 80) {
+      return {
+        title: "Saldo baixo para operar",
+        description: "Adicione saldo e volte para os mercados ao vivo.",
+        actionLabel: "Depositar agora",
+        onAction: () => {
+          trackProductEvent("click_deposit", { source: "dashboard_primary", variant: ctaVariant });
+          navigate({ to: "/wallet", search: { tab: "deposit" } });
+        },
+      };
+    }
+    if (openBets.length > 0) {
+      return {
+        title: "Você tem posições em aberto",
+        description: "Gerencie risco e acompanhe fechamento das suas posições.",
+        actionLabel: "Gerir posições",
+        onAction: () => navigate({ to: "/positions" }),
+      };
+    }
+    if (ctaVariant === "deposit_first") {
+      return {
+        title: "Pronto para aumentar sua exposição?",
+        description: "Reforce banca antes da próxima entrada.",
+        actionLabel: "Depositar agora",
+        onAction: () => {
+          trackProductEvent("click_deposit", { source: "dashboard_primary", variant: ctaVariant });
+          navigate({ to: "/wallet", search: { tab: "deposit" } });
+        },
+      };
+    }
+    return {
+      title: "Mercados quentes esperando sua leitura",
+      description: "Entre agora e capture os movimentos do dia.",
+      actionLabel: "Apostar agora",
+      onAction: () => navigate({ to: "/markets", search: { status: "live" } }),
+    };
+  }, [ctaVariant, me.balance, navigate, openBets.length]);
 
   const todayStart = useMemo(() => {
     const d = new Date();
@@ -260,6 +326,22 @@ function Dashboard() {
       <EventsBanner />
       <StreakRiskBanner />
 
+      <div className="rounded-2xl border border-primary/25 bg-primary/5 p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-sm font-semibold">{primaryCta.title}</h2>
+            <p className="text-xs text-muted-foreground">{primaryCta.description}</p>
+          </div>
+          <button
+            type="button"
+            onClick={primaryCta.onAction}
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition"
+          >
+            {primaryCta.actionLabel}
+          </button>
+        </div>
+      </div>
+
       {/* Banner de saldo baixo — abre sheet de depósito sem navegar */}
       {me.balance < 80 && me.balance >= 0 && (
         <div className="flex items-center justify-between gap-3 rounded-xl border border-warn/35 bg-warn/10 px-4 py-3 text-sm">
@@ -268,7 +350,10 @@ function Dashboard() {
           </span>
           <button
             type="button"
-            onClick={() => openDepositSheet()}
+            onClick={() => {
+              trackProductEvent("click_deposit", { source: "dashboard_low_balance_banner" });
+              openDepositSheet();
+            }}
             className="shrink-0 rounded-lg bg-warn px-4 py-2 text-sm font-semibold text-warn-foreground hover:opacity-90 transition"
           >
             Depositar agora
@@ -300,7 +385,14 @@ function Dashboard() {
         />
 
         <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
-          <button type="button" onClick={() => openDepositSheet()} className="text-left">
+          <button
+            type="button"
+            onClick={() => {
+              trackProductEvent("click_deposit", { source: "dashboard_kpi_balance" });
+              openDepositSheet();
+            }}
+            className="text-left"
+          >
             <KpiTile
               label="Saldo"
               icon={TrendingUp}
@@ -308,7 +400,7 @@ function Dashboard() {
               interactive
             />
           </button>
-          <Link to="/profile" search={{ tab: "carteira" }}>
+          <Link to="/wallet">
             <KpiTile
               label={copy.dashboard.profit24h}
               icon={TrendingUp}
@@ -533,6 +625,12 @@ function Dashboard() {
                   key={m.id}
                   to="/markets/$marketId"
                   params={{ marketId: m.id }}
+                  onClick={() =>
+                    trackProductEvent("market_opened_from_dashboard", {
+                      source: "closing_soon",
+                      marketId: m.id,
+                    })
+                  }
                   className="flex items-center justify-between gap-3 rounded-xl border border-warn/20 bg-warn/5 px-4 py-3 text-sm hover:border-warn/40 transition"
                 >
                   <div className="min-w-0 flex-1">
@@ -565,7 +663,17 @@ function Dashboard() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {top.map((m) => (
-            <MarketCard key={m.id} m={m} compact />
+            <div
+              key={m.id}
+              onClick={() =>
+                trackProductEvent("market_opened_from_dashboard", {
+                  source: "top_markets",
+                  marketId: m.id,
+                })
+              }
+            >
+              <MarketCard m={m} compact />
+            </div>
           ))}
         </div>
       </div>
@@ -612,8 +720,7 @@ function Dashboard() {
               Suas <span className="text-highlight">posições</span> abertas
             </h2>
             <Link
-              to="/profile"
-              search={{ tab: "posicoes" }}
+              to="/positions"
               className="text-xs text-primary hover:underline"
             >
               Ver todas →
@@ -646,6 +753,12 @@ function Dashboard() {
                   key={bet.id}
                   to="/markets/$marketId"
                   params={{ marketId: bet.marketId }}
+                  onClick={() =>
+                    trackProductEvent("market_opened_from_dashboard", {
+                      source: "open_positions",
+                      marketId: bet.marketId,
+                    })
+                  }
                   className="block rounded-xl border bg-card/60 p-3 backdrop-blur transition hover:bg-surface/40"
                 >
                   <div className="flex items-center justify-between">
@@ -704,7 +817,7 @@ function Dashboard() {
       {casinoEnabled && deferredReady && (
         <Suspense fallback={<ChartFallback />}>
           <SpinWheel
-            onDepositBonusCta={() => navigate({ to: "/profile", search: { tab: "carteira" } })}
+            onDepositBonusCta={() => navigate({ to: "/wallet" })}
           />
         </Suspense>
       )}

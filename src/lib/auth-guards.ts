@@ -53,7 +53,7 @@ export async function requirePartnerRoute() {
     throw redirect({ to: "/partner/pending" });
   }
 
-  throw redirect({ to: "/profile", search: { tab: "config" } });
+  throw redirect({ to: "/settings" });
 }
 
 async function resolveIsAdmin(): Promise<boolean> {

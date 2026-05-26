@@ -1,8 +1,8 @@
 import type { ViaXNotification } from "@/store/viax-store";
 
 export type NotificationLink =
-  | { to: "/profile"; search: { tab: "carteira" } }
-  | { to: "/profile"; search: { tab: "posicoes" } }
+  | { to: "/wallet" }
+  | { to: "/positions" }
   | { to: "/ranking" }
   | {
       to: "/markets";
@@ -25,7 +25,7 @@ export function getNotificationLink(n: ViaXNotification): NotificationLink {
     case "win":
     case "refund":
     case "void":
-      return { to: "/profile", search: { tab: "carteira" } };
+      return { to: "/wallet" };
     case "rank":
       return { to: "/ranking" };
     case "market":
@@ -39,6 +39,6 @@ export function getNotificationLink(n: ViaXNotification): NotificationLink {
         ? { to: "/markets/$marketId", params: { marketId: n.marketId } }
         : { to: "/live" };
     default:
-      return { to: "/profile", search: { tab: "posicoes" } };
+      return { to: "/positions" };
   }
 }

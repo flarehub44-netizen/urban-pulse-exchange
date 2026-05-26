@@ -1,8 +1,16 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { SettingsPanel } from "@/components/viax/settings-panel";
 
-/** Settings moved into profile tab; keep route for bookmarks. */
 export const Route = createFileRoute("/_app/settings")({
-  beforeLoad: () => {
-    throw redirect({ to: "/profile", search: { tab: "config" } });
-  },
+  head: () => ({
+    meta: [
+      { title: "Configurações · ViaX" },
+      { name: "description", content: "Gerencie conta, notificações e preferências da plataforma." },
+    ],
+  }),
+  component: SettingsPage,
 });
+
+function SettingsPage() {
+  return <SettingsPanel />;
+}

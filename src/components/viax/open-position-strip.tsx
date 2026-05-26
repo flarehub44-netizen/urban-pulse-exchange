@@ -30,8 +30,7 @@ export function OpenPositionStrip({ marketId }: { marketId: string }) {
           <Briefcase className="size-3.5" /> Sua posição neste mercado
         </span>
         <Link
-          to="/profile"
-          search={{ tab: "posicoes" }}
+          to="/positions"
           className="text-[11px] text-primary hover:underline"
         >
           Ver todas

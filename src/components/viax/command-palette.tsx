@@ -107,7 +107,7 @@ export function CommandPalette() {
             value={copy.nav.settings}
             onSelect={() => {
               setOpen(false);
-              navigate({ to: "/profile", search: { tab: "config" } });
+              navigate({ to: "/settings" });
             }}
           >
             <User className="mr-2 size-4" /> {copy.nav.settings}

@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { dismissOnboardingIfOpen, openFirstLiveMarket, primeAppStorage } from "./helpers/markets";
+import { expectProtectedRoute, hasPlaywrightCredentials, loginWithTestUser } from "./helpers/auth";
 
 test.describe("deposit funnel", () => {
   test.describe.configure({ timeout: 60_000 });
@@ -45,5 +46,57 @@ test.describe("deposit funnel", () => {
     await page.waitForTimeout(4000);
     const body = await page.locator("body").innerText();
     expect(body.length).toBeGreaterThan(100);
+  });
+
+  test("/wallet canônica exige auth sem sessão", async ({ page }) => {
+    await expectProtectedRoute(page, "/wallet");
+  });
+
+  test("order-box saldo insuficiente oferece link para /wallet", async ({ page }) => {
+    await primeAppStorage(page);
+    await openFirstLiveMarket(page);
+    await dismissOnboardingIfOpen(page);
+
+    const stakeInput = page.getByTestId("order-box-stake");
+    await stakeInput.fill("999999999", { force: true });
+    await page.getByTestId("order-box-operate").click({ force: true });
+
+    const pixCta = page.getByText(/Depositar via Pix/i).first();
+    const walletLink = page.getByRole("link", { name: /carteira/i }).first();
+    const hasDepositPath =
+      (await pixCta.isVisible({ timeout: 8_000 }).catch(() => false)) ||
+      (await walletLink.isVisible({ timeout: 3_000 }).catch(() => false));
+    expect(hasDepositPath).toBeTruthy();
+  });
+});
+
+test.describe("deposit funnel — pós-login", () => {
+  test.skip(!hasPlaywrightCredentials(), "Defina PLAYWRIGHT_TEST_EMAIL e PLAYWRIGHT_TEST_PASSWORD");
+  test.describe.configure({ timeout: 90_000 });
+
+  test("dashboard KPI saldo navega para depósito ou abre fluxo Pix", async ({ page }) => {
+    await loginWithTestUser(page);
+    await page.goto("/dashboard");
+    await page.waitForTimeout(3000);
+
+    const lowBalanceBanner = page.getByRole("button", { name: /depositar agora/i }).first();
+    const balanceKpi = page.locator("button").filter({ hasText: /saldo/i }).first();
+
+    if (await lowBalanceBanner.isVisible({ timeout: 3_000 }).catch(() => false)) {
+      await lowBalanceBanner.click();
+    } else if (await balanceKpi.isVisible({ timeout: 3_000 }).catch(() => false)) {
+      await balanceKpi.click();
+    } else {
+      test.skip(true, "Sem CTA de depósito visível no dashboard para este usuário");
+      return;
+    }
+
+    await page.waitForTimeout(2000);
+    const onWallet = /\/wallet/.test(page.url());
+    const sheetOpen = await page
+      .getByTestId("quick-deposit-sheet")
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    expect(onWallet || sheetOpen).toBeTruthy();
   });
 });

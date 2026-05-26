@@ -52,13 +52,12 @@ export function BottomNav() {
   const visitMore = (it: NavItem) => {
     let navSearch = it.search as Record<string, string> | undefined;
     if (
-      it.to === "/profile" &&
-      it.search?.tab === "carteira" &&
+      it.to === "/wallet" &&
       typeof window !== "undefined" &&
       !localStorage.getItem("viax_wallet_deposit_intro")
     ) {
       localStorage.setItem("viax_wallet_deposit_intro", "1");
-      navSearch = { ...navSearch, tab: "carteira", deposit: "1" };
+      navSearch = { ...navSearch, deposit: "1" };
     }
     const entry: LastMoreNav = { to: it.to, search: it.search };
     setLastMoreNav(entry);

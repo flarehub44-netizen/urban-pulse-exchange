@@ -30,6 +30,7 @@ import { BetConfirmDialog } from "@/components/viax/bet-confirm-dialog";
 import { cn } from "@/lib/utils";
 import { ArrowDown, ArrowUp, BookOpen } from "lucide-react";
 import { saveBetNoteFn } from "@/actions/bets";
+import { trackProductEvent } from "@/lib/product-analytics";
 
 export function OrderBox({
   m,
@@ -99,7 +100,10 @@ export function OrderBox({
         description: `Disponível: ${formatBRL(balance)}`,
         action: {
           label: copy.depositFunnel.insufficientCta,
-          onClick: () => openDeposit({ amount: Math.max(stake, 200) }),
+          onClick: () => {
+            trackProductEvent("click_deposit", { source: "order_box_insufficient_toast" });
+            openDeposit({ amount: Math.max(stake, 200) });
+          },
         },
       });
       return;
@@ -118,13 +122,22 @@ export function OrderBox({
         description: `Disponível: ${formatBRL(balance)}`,
         action: {
           label: "Carteira",
-          onClick: () => navigate({ to: "/profile", search: { tab: "carteira" } }),
+          onClick: () => navigate({ to: "/wallet" }),
         },
       });
       return;
     }
     try {
       const result = await placeBet({ marketId: m.id, side, stake });
+      const depositAt = Number(sessionStorage.getItem("viax_last_deposit_confirmed_at") ?? "0");
+      if (depositAt > 0) {
+        trackProductEvent("first_bet_after_deposit", {
+          marketId: m.id,
+          stake,
+          minutesAfterDeposit: Math.round((Date.now() - depositAt) / 60000),
+        });
+        sessionStorage.removeItem("viax_last_deposit_confirmed_at");
+      }
       const betId = (result as { bet_id?: string }).bet_id;
       if (betId && note.trim()) {
         saveBetNoteFn({ data: { bet_id: betId, note: note.trim() } }).catch(() => {});
@@ -147,7 +160,7 @@ export function OrderBox({
         description: toastCopy.description,
         action: {
           label: copy.nav.positions,
-          onClick: () => navigate({ to: "/profile", search: { tab: "posicoes" } }),
+          onClick: () => navigate({ to: "/positions" }),
         },
         cancel: {
           label: copy.dashboard.viewPanel,
@@ -217,8 +230,7 @@ export function OrderBox({
         <h4 className="text-sm font-medium">{copy.bet.voidTitle}</h4>
         <p className="mt-2 text-sm text-muted-foreground">{copy.bet.voidDesc}</p>
         <Link
-          to="/profile"
-          search={{ tab: "carteira" }}
+          to="/wallet"
           className="mt-4 inline-block rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs text-primary hover:bg-primary/15"
         >
           {copy.bet.viewWallet}
@@ -240,15 +252,13 @@ export function OrderBox({
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Link
-            to="/profile"
-            search={{ tab: "carteira" }}
+            to="/wallet"
             className="rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs text-primary hover:bg-primary/15"
           >
             {copy.bet.viewWallet}
           </Link>
           <Link
-            to="/profile"
-            search={{ tab: "posicoes" }}
+            to="/positions"
             className="rounded-lg border px-3 py-1.5 text-xs text-muted-foreground hover:bg-surface-2"
           >
             {copy.bet.viewHistory}
@@ -381,7 +391,10 @@ export function OrderBox({
             {isRegistered && (
               <button
                 type="button"
-                onClick={() => openDeposit({ amount: Math.max(stake, 200), source: "order_box" })}
+                onClick={() => {
+                  trackProductEvent("click_deposit", { source: "order_box_inline_insufficient" });
+                  openDeposit({ amount: Math.max(stake, 200), source: "order_box" });
+                }}
                 className="font-medium text-primary hover:underline"
               >
                 {copy.depositFunnel.insufficientCta}
@@ -461,7 +474,10 @@ export function OrderBox({
         type="button"
         onClick={
           insufficient && isRegistered
-            ? () => openDeposit({ amount: Math.max(stake, 200), source: "order_box" })
+            ? () => {
+                trackProductEvent("click_deposit", { source: "order_box_primary" });
+                openDeposit({ amount: Math.max(stake, 200), source: "order_box" });
+              }
             : openConfirm
         }
         disabled={isPending || stake <= 0 || (insufficient && !isRegistered)}

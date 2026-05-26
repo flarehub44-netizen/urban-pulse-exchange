@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useViaX } from "@/store/viax-store";
@@ -25,6 +25,8 @@ import { formatBRL } from "@/lib/parimutuel";
 import { ArrowDownLeft, ArrowUpRight, Plus, Minus, Trophy } from "lucide-react";
 import { EmptyState } from "@/components/viax/empty-state";
 import { cn } from "@/lib/utils";
+import { trackDepositFunnel } from "@/lib/deposit-funnel";
+import { trackProductEvent } from "@/lib/product-analytics";
 
 const WalletBalanceChart = lazy(() =>
   import("@/components/viax/wallet-balance-chart").then((m) => ({
@@ -35,16 +37,28 @@ import { isOpenBetStatus } from "@/lib/market-status";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-const tabs = ["Visão geral", "Histórico", "Depositar", "Sacar"] as const;
-type WalletTab = (typeof tabs)[number];
+const walletTabs = [
+  { key: "overview", label: "Visão geral" },
+  { key: "history", label: "Histórico" },
+  { key: "deposit", label: "Depositar" },
+  { key: "withdraw", label: "Sacar" },
+] as const;
+type WalletTab = (typeof walletTabs)[number]["key"];
 
-export function WalletPanel({ embedded }: { embedded?: boolean }) {
+export function WalletPanel({
+  embedded,
+  initialTab,
+}: {
+  embedded?: boolean;
+  initialTab?: WalletTab;
+}) {
+  const navigate = useNavigate();
   const { isRegistered } = useAuth();
   const { me } = useResolvedProfile();
   const { transactions: tx } = useResolvedTransactions();
   const { data: bets } = useBets();
   const { markets: allMarkets } = useResolvedMarkets();
-  const [tab, setTab] = useState<WalletTab>("Visão geral");
+  const [tab, setTab] = useState<WalletTab>(initialTab ?? "overview");
   const [betFilter, setBetFilter] = useState<"todos" | "wins" | "losses">("todos");
   const [walletAmount, setWalletAmount] = useState("200");
   const [pixKey, setPixKey] = useState("");
@@ -58,9 +72,24 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
   const { enabled: casinoEnabled } = useCasinoEnabled();
   const queryClient = useQueryClient();
 
+  useEffect(() => {
+    if (!initialTab) return;
+    setTab(initialTab);
+  }, [initialTab]);
+
+  const updateTab = (nextTab: WalletTab) => {
+    setTab(nextTab);
+    if (!embedded) {
+      navigate({ to: "/wallet", search: nextTab === "overview" ? {} : { tab: nextTab }, replace: true });
+    }
+    trackProductEvent("wallet_tab_changed", { tab: nextTab, embedded: !!embedded });
+  };
+
   const depositMut = useMutation({
     mutationFn: (amount: number) => initiateDepositFn({ data: { amount } }),
     onSuccess: (res) => {
+      trackDepositFunnel("deposit_qr_shown", { amount: Number(walletAmount) || 0 });
+      trackProductEvent("deposit_qr_generated", { amount: Number(walletAmount) || 0, source: "wallet" });
       setDepositQr({
         qrCode: res.qrCode,
         qrCodeImg: res.qrCodeImg,
@@ -98,6 +127,9 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
       try {
         const status = await getDepositStatusFn({ data: { intentId: depositQr.intentId } });
         if (status.status === "paid") {
+          sessionStorage.setItem("viax_last_deposit_confirmed_at", String(Date.now()));
+          trackDepositFunnel("deposit_paid", { amount: status.amount });
+          trackProductEvent("deposit_confirmed", { amount: status.amount, source: "wallet" });
           setDepositDone(true);
           setDepositQr(null);
           queryClient.invalidateQueries({ queryKey: ["me"] });
@@ -193,24 +225,24 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {tabs.map((t) => (
+        {walletTabs.map((t) => (
           <button
-            key={t}
+            key={t.key}
             type="button"
-            onClick={() => setTab(t)}
+            onClick={() => updateTab(t.key)}
             className={cn(
               "rounded-full border px-3 py-1.5 text-xs",
-              tab === t
+              tab === t.key
                 ? "border-primary/60 bg-primary/15 text-primary"
                 : "border-border bg-card text-muted-foreground hover:bg-surface-2",
             )}
           >
-            {t}
+            {t.label}
           </button>
         ))}
       </div>
 
-      {tab === "Visão geral" && (
+      {tab === "overview" && (
         <div className="grid gap-3 md:grid-cols-2">
           <div className="surface-card p-4">
             <h3 className="heading-section">
@@ -219,14 +251,14 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
             <div className="mt-3 grid grid-cols-2 gap-2">
               <button
                 type="button"
-                onClick={() => setTab("Depositar")}
+                onClick={() => updateTab("deposit")}
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-up/40 bg-up/10 px-3 py-2.5 text-sm font-medium text-up hover:bg-up/20"
               >
                 <Plus className="size-4" /> Depositar
               </button>
               <button
                 type="button"
-                onClick={() => setTab("Sacar")}
+                onClick={() => updateTab("withdraw")}
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-down/40 bg-down/10 px-3 py-2.5 text-sm font-medium text-down hover:bg-down/20"
               >
                 <Minus className="size-4" /> Sacar
@@ -237,7 +269,7 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
         </div>
       )}
 
-      {tab === "Histórico" && (
+      {tab === "history" && (
         <EnrichedHistory
           bets={bets ?? []}
           tx={tx}
@@ -247,12 +279,12 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
         />
       )}
 
-      {(tab === "Depositar" || tab === "Sacar") && !isRegistered && <RegisterRequiredCta />}
+      {(tab === "deposit" || tab === "withdraw") && !isRegistered && <RegisterRequiredCta />}
 
-      {(tab === "Depositar" || tab === "Sacar") && isRegistered && (
+      {(tab === "deposit" || tab === "withdraw") && isRegistered && (
         <div className="surface-card mx-auto max-w-md space-y-4">
           <h3 className="heading-section">
-            {tab === "Depositar" ? (
+            {tab === "deposit" ? (
               <>
                 Adicionar <span className="text-highlight">saldo</span>
               </>
@@ -264,7 +296,7 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
           </h3>
 
           {/* QR Code exibido após gerar o depósito */}
-          {depositQr && tab === "Depositar" ? (
+          {depositQr && tab === "deposit" ? (
             <div className="space-y-4 text-center">
               <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                 <Clock className="size-3" />
@@ -304,7 +336,7 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
             </div>
           ) : (
             <>
-              {tab === "Depositar" && casinoEnabled && (
+              {tab === "deposit" && casinoEnabled && (
                 <div className="space-y-2">
                   <p className="text-xs font-medium">{copy.casino.impulseDepositTitle}</p>
                   <ImpulseDepositChips
@@ -333,7 +365,7 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
                 </div>
               </div>
 
-              {tab === "Sacar" && (
+              {tab === "withdraw" && (
                 <div>
                   <label className="block text-xs uppercase tracking-wider text-muted-foreground">
                     Chave Pix (CPF, e-mail, celular ou chave aleatória)
@@ -362,7 +394,7 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
                     toast.error("Informe um valor válido.");
                     return;
                   }
-                  if (tab === "Depositar") {
+                  if (tab === "deposit") {
                     depositMut.mutate(amount);
                   } else {
                     if (!pixKey.trim()) {
@@ -379,7 +411,7 @@ export function WalletPanel({ embedded }: { embedded?: boolean }) {
               >
                 {depositMut.isPending || withdrawMut.isPending
                   ? "Processando…"
-                  : tab === "Depositar"
+                  : tab === "deposit"
                     ? "Gerar QR Code Pix"
                     : "Solicitar Saque"}
               </button>

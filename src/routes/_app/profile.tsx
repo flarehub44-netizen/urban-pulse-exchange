@@ -1,7 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { SettingsPanel } from "@/components/viax/settings-panel";
-import { PositionsPanel } from "@/components/viax/positions-panel";
-import { WalletPanel } from "@/components/viax/wallet-panel";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useViaX } from "@/store/viax-store";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
@@ -36,18 +33,16 @@ import { cn } from "@/lib/utils";
 import { parseAuthModalSearch, type AuthModalSearch } from "@/lib/auth-modal-search";
 
 export type ProfileSearch = {
-  tab?:
-    | "visao"
-    | "posicoes"
-    | "carteira"
-    | "favoritos"
-    | "badges"
-    | "atividade"
-    | "mercados"
-    | "config";
+  tab?: "visao" | "favoritos" | "badges" | "atividade" | "mercados";
 } & AuthModalSearch;
 
 export const Route = createFileRoute("/_app/profile")({
+  beforeLoad: ({ search }) => {
+    const tab = typeof search.tab === "string" ? search.tab : undefined;
+    if (tab === "posicoes") throw redirect({ to: "/positions" });
+    if (tab === "carteira") throw redirect({ to: "/wallet" });
+    if (tab === "config") throw redirect({ to: "/settings" });
+  },
   head: () => ({
     meta: [
       { title: "Perfil · ViaX" },
@@ -58,13 +53,10 @@ export const Route = createFileRoute("/_app/profile")({
     const t = search.tab;
     const auth = parseAuthModalSearch(search);
     const tab =
-      t === "posicoes" ||
-      t === "carteira" ||
       t === "favoritos" ||
       t === "badges" ||
       t === "atividade" ||
-      t === "mercados" ||
-      t === "config"
+      t === "mercados"
         ? t
         : "visao";
     return { tab, ...auth };
@@ -74,13 +66,10 @@ export const Route = createFileRoute("/_app/profile")({
 
 const profileTabs = [
   { key: "visao" as const, label: "Visão geral" },
-  { key: "posicoes" as const, label: "Posições" },
-  { key: "carteira" as const, label: "Carteira" },
   { key: "favoritos" as const, label: "Favoritos" },
   { key: "badges" as const, label: "Badges" },
   { key: "atividade" as const, label: "Atividade" },
   { key: "mercados" as const, label: "Meus mercados" },
-  { key: "config" as const, label: "Configurações" },
 ];
 
 function Profile() {
@@ -184,6 +173,24 @@ function Profile() {
       </div>
 
       <div className="flex flex-wrap gap-2">
+        <Link
+          to="/positions"
+          className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground hover:bg-surface-2"
+        >
+          Posições
+        </Link>
+        <Link
+          to="/wallet"
+          className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground hover:bg-surface-2"
+        >
+          Carteira
+        </Link>
+        <Link
+          to="/settings"
+          className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground hover:bg-surface-2"
+        >
+          Configurações
+        </Link>
         {profileTabs.map((t) => (
           <button
             key={t.key}
@@ -204,10 +211,6 @@ function Profile() {
       </div>
 
       {tab === "mercados" && <ProfileMyMarketsTab isRegistered={isRegistered} />}
-
-      {tab === "config" && <SettingsPanel />}
-      {tab === "posicoes" && <PositionsPanel embedded />}
-      {tab === "carteira" && <WalletPanel embedded />}
 
       {tab === "visao" && <TraderArchetypeCard />}
 

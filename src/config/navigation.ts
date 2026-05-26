@@ -66,11 +66,11 @@ export const bottomNavPrimary: NavItem[] = [
 
 /** Secondary routes in mobile "Mais" sheet */
 export const bottomNavMore: NavItem[] = [
-  { to: "/profile", label: copy.nav.positions, icon: Briefcase, search: { tab: "posicoes" } },
+  { to: "/positions", label: copy.nav.positions, icon: Briefcase },
   { to: "/ranking", label: copy.nav.ranking, icon: Trophy },
   { to: "/feed", label: copy.nav.feed, icon: MessageSquare },
   { to: "/notifications", label: copy.nav.notifications, icon: Bell },
-  { to: "/profile", label: copy.nav.wallet, icon: Wallet, search: { tab: "carteira" } },
+  { to: "/wallet", label: copy.nav.wallet, icon: Wallet },
   { to: "/urbanmind", label: copy.nav.urbanmind, icon: Brain },
 ];
 

@@ -202,8 +202,7 @@ export function PositionsPanel({ embedded }: { embedded?: boolean }) {
             ))}
           </div>
           <Link
-            to="/profile"
-            search={{ tab: "carteira" }}
+            to="/wallet"
             className="mt-3 inline-flex items-center gap-1 text-xs text-primary hover:underline"
           >
             Ver histórico completo na Carteira <ArrowUpRight className="size-3" />

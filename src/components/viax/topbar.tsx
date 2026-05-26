@@ -113,8 +113,7 @@ export function Topbar() {
         </button>
         {openPositions > 0 && (
           <Link
-            to="/profile"
-            search={{ tab: "posicoes" }}
+            to="/positions"
             className="hidden sm:flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs text-primary hover:bg-primary/15"
           >
             <Briefcase className="size-3.5" />

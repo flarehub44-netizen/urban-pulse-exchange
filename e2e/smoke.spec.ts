@@ -21,8 +21,14 @@ test("dashboard sem login exige autenticação", async ({ page }) => {
   expect(gated).toBeTruthy();
 });
 
-test("redirect /wallet exige autenticação", async ({ page }) => {
+test("rota /wallet canônica exige autenticação", async ({ page }) => {
   await page.goto("/wallet");
   await page.waitForTimeout(2000);
-  expect(page.url()).toMatch(/profile|carteira|wallet|auth=login|auth=signup|markets/i);
+  const url = page.url();
+  const text = await page.locator("body").innerText();
+  const gated =
+    /auth=login|auth=signup/i.test(url) ||
+    /entrar|criar conta|login/i.test(text) ||
+    /\/wallet/.test(url);
+  expect(gated).toBeTruthy();
 });

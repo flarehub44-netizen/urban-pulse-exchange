@@ -80,11 +80,10 @@ function SidebarNav({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate
           {!collapsed && <NavBadge count={unreadNotifications} />}
         </Link>
         <Link
-          to="/profile"
-          search={{ tab: "config" }}
+          to="/settings"
           onClick={onNavigate}
           title={collapsed ? settingsNav.label : undefined}
-          aria-current={path === "/profile" ? "page" : undefined}
+          aria-current={path === "/settings" ? "page" : undefined}
           className={cn(
             "flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
             collapsed && "justify-center px-2",

@@ -9,13 +9,13 @@ export const Route = createFileRoute("/partner/pending")({
   beforeLoad: async () => {
     await requireAuth();
     const { data, error } = await supabase.rpc("get_my_account_context");
-    if (error) throw redirect({ to: "/profile", search: { tab: "config" } });
+    if (error) throw redirect({ to: "/settings" });
     const ctx = data as AccountContext;
     if (ctx.partner?.role === "partner" && ctx.partner?.status === "active") {
       throw redirect({ to: "/partner" });
     }
     if (ctx.partner?.role !== "applicant") {
-      throw redirect({ to: "/profile", search: { tab: "config" } });
+      throw redirect({ to: "/settings" });
     }
   },
   component: PartnerPendingPage,
@@ -27,11 +27,7 @@ function PartnerPendingPage() {
       <h1 className="text-lg font-semibold">{copy.partner.pendingPageTitle}</h1>
       <p className="text-sm text-muted-foreground">{copy.partner.pendingPageDesc}</p>
       <p className="text-sm text-warn">{copy.partner.applyPending}</p>
-      <Link
-        to="/profile"
-        search={{ tab: "config" }}
-        className="inline-flex rounded-lg border px-4 py-2 text-sm hover:bg-surface"
-      >
+      <Link to="/settings" className="inline-flex rounded-lg border px-4 py-2 text-sm hover:bg-surface">
         {copy.partner.pendingBackToSettings}
       </Link>
     </div>
