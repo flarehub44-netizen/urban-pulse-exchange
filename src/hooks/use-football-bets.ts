@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 import type { FootballOutcome } from "@/lib/football-parimutuel";
 import { normalizeMarketStatus, type MarketStatus } from "@/lib/market-status";
 
@@ -47,7 +47,7 @@ export function useFootballBets() {
   return useQuery({
     queryKey: ["football-bets"],
     queryFn: async () => {
-      const { data, error } = (await db
+      const { data, error } = (await supabase
         .from("football_bets")
         .select(
           `*,

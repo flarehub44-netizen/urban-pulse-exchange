@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 import type { RegionData } from "@/store/viax-store";
 
 function mapRegion(row: Record<string, unknown>): RegionData {
@@ -19,7 +19,7 @@ export function useRegions(options?: { refetchInterval?: number }) {
   return useQuery({
     queryKey: ["regions"],
     queryFn: async () => {
-      const { data, error } = (await db.from("regions").select("*")) as {
+      const { data, error } = (await supabase.from("regions").select("*")) as {
         data: Record<string, unknown>[] | null;
         error: Error | null;
       };

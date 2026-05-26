@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 import type { Division } from "@/store/viax-store";
 
 export interface FeedComment {
@@ -33,7 +33,7 @@ export function useFeedComments(postId: string | null) {
   return useQuery({
     queryKey: ["feed-comments", postId],
     queryFn: async () => {
-      const { data, error } = (await db
+      const { data, error } = (await supabase
         .from("feed_comments")
         .select("id, text, created_at, profiles(name, handle, avatar, division)")
         .eq("post_id", postId!)

@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { db } from "@/integrations/supabase/loose";
 import type { Division } from "@/store/viax-store";
 
 export interface Profile {
@@ -86,7 +85,7 @@ export function useProfile(userId?: string | null) {
       const isOwn = !!user?.id && user.id === userId;
 
       if (isOwn) {
-        const { data, error } = (await db
+        const { data, error } = (await supabase
           .from("profiles")
           .select("*")
           .eq("id", userId!)
@@ -95,7 +94,7 @@ export function useProfile(userId?: string | null) {
         return mapProfile(data as Record<string, unknown>);
       }
 
-      const { data, error } = (await db
+      const { data, error } = (await supabase
         .from("leaderboard")
         .select("*")
         .eq("id", userId!)

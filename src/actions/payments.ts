@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireRegisteredAuth } from "@/integrations/supabase/require-registered-middleware";
-import type { SupabaseFnContext } from "@/integrations/supabase/loose";
+import type { SupabaseFnContext } from "@/integrations/supabase/context";
 import { createClient } from "@supabase/supabase-js";
 import { createPixCharge } from "@/lib/syncpay";
 import { formatBRL } from "@/lib/parimutuel";

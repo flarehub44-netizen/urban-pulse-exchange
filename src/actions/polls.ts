@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { SupabaseFnContext } from "@/integrations/supabase/loose";
-import { db } from "@/integrations/supabase/loose";
+import type { SupabaseFnContext } from "@/integrations/supabase/context";
+import { supabase } from "@/integrations/supabase/client";
 
 export type DailyPoll = {
   id: string;
@@ -15,7 +15,7 @@ export type DailyPoll = {
 export const getTodayPollFn = createServerFn({ method: "GET" }).handler(async () => {
   try {
     const today = new Date().toISOString().slice(0, 10);
-    const { data, error } = (await db
+    const { data, error } = (await supabase
       .from("daily_polls")
       .select("id, question, yes_count, no_count")
       .eq("poll_date", today)

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 import type { FootballOutcome } from "@/lib/football-parimutuel";
 import type { MarketStatus } from "@/lib/market-status";
 
@@ -88,7 +88,7 @@ export function useFootballMarkets() {
   return useQuery({
     queryKey: ["football-markets"],
     queryFn: async () => {
-      const { data, error } = await db
+      const { data, error } = await supabase
         .from("football_markets")
         .select(FOOTBALL_MARKET_SELECT)
         .in("status", ["live", "closing", "closed", "resolving", "dispute", "settled", "void"])
@@ -105,7 +105,7 @@ export function useFootballMarket(marketId: string) {
     queryKey: ["football-markets", marketId],
     enabled: Boolean(marketId),
     queryFn: async () => {
-      const { data, error } = await db
+      const { data, error } = await supabase
         .from("football_markets")
         .select(FOOTBALL_MARKET_SELECT)
         .eq("id", marketId)

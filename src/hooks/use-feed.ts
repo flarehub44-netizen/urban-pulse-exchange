@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 import type { FeedPost } from "@/store/viax-store";
 
 function mapPost(row: Record<string, unknown>): FeedPost {

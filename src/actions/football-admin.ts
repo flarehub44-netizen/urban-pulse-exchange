@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { SupabaseFnContext } from "@/integrations/supabase/loose";
+import type { SupabaseFnContext } from "@/integrations/supabase/context";
 import { runFootballResolve, runFootballSync } from "@/lib/football-cron.server";
 
 async function assertAdmin(supabase: SupabaseFnContext["supabase"], userId: string) {

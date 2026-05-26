@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 import type { Side } from "@/store/viax-store";
 
 export interface PublicActiveBet {
@@ -17,7 +17,7 @@ export function usePublicActiveBets(userId: string | undefined) {
     queryKey: ["public-active-bets", userId],
     queryFn: async () => {
       if (!userId) return [];
-      const { data, error } = await db.rpc("get_public_active_bets", { p_user_id: userId });
+      const { data, error } = await supabase.rpc("get_public_active_bets", { p_user_id: userId });
       if (error) throw error;
       return ((data as Record<string, unknown>[]) ?? []).map((row) => ({
         id: row.id as string,

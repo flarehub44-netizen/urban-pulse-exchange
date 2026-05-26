@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
-import { useViaX } from "@/store/viax-store";
+import { useCatalogMarkets } from "@/hooks/use-markets";
 import { probability } from "@/lib/parimutuel";
 
 export function Ticker() {
-  const markets = useViaX((s) => s.markets);
+  const markets = useCatalogMarkets();
   const items = markets.map((m) => {
     const p = probability(m.pool, "YES");
     return { id: m.id, label: m.region, prob: p, trend: m.trend };

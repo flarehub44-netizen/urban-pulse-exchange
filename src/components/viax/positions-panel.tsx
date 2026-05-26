@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useBets } from "@/hooks/use-bets";
 import { useFootballBets, type FootballOpenBet } from "@/hooks/use-football-bets";
-import { useViaX } from "@/store/viax-store";
+import { useCatalogMarkets } from "@/hooks/use-markets";
 import { AnimatedNumber } from "@/components/viax/animated-number";
 import { Countdown } from "@/components/viax/countdown";
 import { copy } from "@/copy/pt-BR";
@@ -24,7 +24,7 @@ import { isOpenBetStatus, statusLabel, type MarketStatus } from "@/lib/market-st
 export function PositionsPanel({ embedded }: { embedded?: boolean }) {
   const { data: bets, isLoading } = useBets();
   const { data: fbBets, isLoading: fbLoading } = useFootballBets();
-  const markets = useViaX((s) => s.markets);
+  const markets = useCatalogMarkets();
 
   const open = (bets ?? []).filter((b) => isOpenBetStatus(b.marketStatus));
   const resolved = (bets ?? []).filter((b) => !isOpenBetStatus(b.marketStatus));

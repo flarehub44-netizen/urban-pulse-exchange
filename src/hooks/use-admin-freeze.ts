@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { db as supabase } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 
 export function useAdminFreezeMarket() {
   const queryClient = useQueryClient();

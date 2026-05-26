@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
 export type NotificationPrefs = {
@@ -36,7 +36,7 @@ export function useNotificationPrefs() {
   useEffect(() => {
     if (!userId) return;
     (async () => {
-      const { data } = await db
+      const { data } = await supabase
         .from("profiles")
         .select("notification_prefs")
         .eq("id", userId)
@@ -55,7 +55,7 @@ export function useNotificationPrefs() {
       setPrefs(next);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
       if (userId) {
-        await db.from("profiles").update({ notification_prefs: next }).eq("id", userId);
+        await supabase.from("profiles").update({ notification_prefs: next }).eq("id", userId);
       }
     },
     [prefs, userId],

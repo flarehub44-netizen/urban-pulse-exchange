@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 import type { ViaXNotification } from "@/store/viax-store";
 
 function mapNotification(row: Record<string, unknown>): ViaXNotification {
@@ -17,7 +17,7 @@ export function useNotifications() {
   return useQuery({
     queryKey: ["notifications"],
     queryFn: async () => {
-      const { data, error } = (await db
+      const { data, error } = (await supabase
         .from("notifications")
         .select("*")
         .order("created_at", { ascending: false })

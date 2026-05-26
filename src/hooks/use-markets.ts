@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { db } from "@/integrations/supabase/loose";
-import { useViaX } from "@/store/viax-store";
+import { supabase } from "@/integrations/supabase/client";
 import type { Market } from "@/store/viax-store";
+import { SEED_MARKETS } from "@/store/viax-store";
 import { normalizeMarketStatus } from "@/lib/market-status";
 import { filterCatalogMarkets } from "@/lib/markets-catalog";
-import { pickDbOrEmptyArray } from "@/lib/data-source";
+import { USE_SEED_FALLBACK } from "@/lib/data-source";
 
 function mapMarket(row: Record<string, unknown>): Market {
   return {
@@ -39,20 +39,18 @@ export function useMarkets() {
   return useQuery({
     queryKey: ["markets"],
     queryFn: async () => {
-      const { data, error } = (await db
+      const { data, error } = await supabase
         .from("markets")
         .select("*")
         .eq("archived", false)
-        .order("created_at")) as {
-        data: Record<string, unknown>[] | null;
-        error: Error | null;
-      };
+        .order("created_at");
       if (error) throw error;
-      return filterCatalogMarkets((data ?? []).map(mapMarket));
+      return filterCatalogMarkets((data ?? []).map((row) => mapMarket(row as Record<string, unknown>)));
     },
     staleTime: 60_000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
+    placeholderData: USE_SEED_FALLBACK ? filterCatalogMarkets(SEED_MARKETS) : undefined,
   });
 }
 
@@ -61,17 +59,15 @@ export function useMarket(id: string) {
   return markets?.find((m) => m.id === id);
 }
 
-/** DB markets; seed só em dev. */
+/** Markets from TanStack Query (seed placeholder in dev until fetch completes). */
 export function useCatalogMarkets(): Market[] {
-  const { data: dbMarkets } = useMarkets();
-  const zustandMarkets = useViaX((s) => s.markets);
-  return pickDbOrEmptyArray(dbMarkets, filterCatalogMarkets(zustandMarkets));
+  const { data } = useMarkets();
+  return data ?? [];
 }
 
 export function useMarketsList() {
   const query = useMarkets();
-  const zustandMarkets = useViaX((s) => s.markets);
-  const markets = pickDbOrEmptyArray(query.data, filterCatalogMarkets(zustandMarkets));
+  const markets = query.data ?? [];
   return { ...query, markets };
 }
 

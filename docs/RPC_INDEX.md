@@ -1,0 +1,568 @@
+# RPC Index
+
+Gerado por `scripts/gen-rpc-index.mjs`.
+
+## Functions em migrations
+
+- `check_market_alerts` � supabase/migrations/20260703000000_market_alerts.sql
+- `create_league` � supabase/migrations/20260601000000_remaining_sprints.sql
+- `get_active_events` � supabase/migrations/20260601000000_remaining_sprints.sql
+- `get_league_leaderboard` � supabase/migrations/20260601000000_remaining_sprints.sql
+- `get_my_leagues` � supabase/migrations/20260601000000_remaining_sprints.sql
+- `get_today_poll` � supabase/migrations/20260601000000_remaining_sprints.sql
+- `join_league` � supabase/migrations/20260601000000_remaining_sprints.sql
+- `leave_league` � supabase/migrations/20260601000000_remaining_sprints.sql
+- `public._casino_execute_spin` � supabase/migrations/20260529000000_casino_mechanics.sql
+- `public._casino_execute_spin` � supabase/migrations/20260626000000_currency_brl_suffix.sql
+- `public.activate_recovery_mode` � supabase/migrations/20260531000000_engagement_expansion.sql
+- `public.admin_apply_simulator_scenario` � supabase/migrations/20260527100000_admin_phases_complete.sql
+- `public.admin_approve_football_fixture` � supabase/migrations/20260701000000_football_markets.sql
+- `public.admin_approve_partner` � supabase/migrations/20260530000000_partner_program.sql
+- `public.admin_approve_partner` � supabase/migrations/20260709000000_partner_cpa_admin.sql
+- `public.admin_create_camera_upstream` � supabase/migrations/20260524161506_fca8d9fc-8759-40f1-8a16-1af6b6b05b9f.sql
+- `public.admin_delete_daily_poll` � supabase/migrations/20260710000000_admin_events_hub.sql
+- `public.admin_delete_partner_event` � supabase/migrations/20260710000000_admin_events_hub.sql
+- `public.admin_delete_platform_event` � supabase/migrations/20260710000000_admin_events_hub.sql
+- `public.admin_extend_market` � supabase/migrations/20260527100000_admin_phases_complete.sql
+- `public.admin_force_close` � supabase/migrations/20260527000000_admin_control_center.sql
+- `public.admin_freeze_account` � supabase/migrations/20260527000000_admin_control_center.sql
+- `public.admin_get_deposit_funnel_metrics` � supabase/migrations/20260710000002_deposit_funnel.sql
+- `public.admin_get_events_hub_overview` � supabase/migrations/20260710000000_admin_events_hub.sql
+- `public.admin_list_active_partners` � supabase/migrations/20260709000000_partner_cpa_admin.sql
+- `public.admin_list_cameras` � supabase/migrations/20260527000000_admin_control_center.sql
+- `public.admin_list_cameras` � supabase/migrations/20260604000000_camera_pipeline.sql
+- `public.admin_list_daily_polls` � supabase/migrations/20260710000000_admin_events_hub.sql
+- `public.admin_list_football_drafts` � supabase/migrations/20260701000000_football_markets.sql
+- `public.admin_list_football_live` � supabase/migrations/20260702000000_football_gaps.sql
+- `public.admin_list_football_pending` � supabase/migrations/20260701000000_football_markets.sql
+- `public.admin_list_partner_applications` � supabase/migrations/20260530000000_partner_program.sql
+- `public.admin_list_partner_events` � supabase/migrations/20260710000000_admin_events_hub.sql
+- `public.admin_list_platform_events` � supabase/migrations/20260710000000_admin_events_hub.sql
+- `public.admin_pause_bets` � supabase/migrations/20260527100000_admin_phases_complete.sql
+- `public.admin_publish_football_market` � supabase/migrations/20260701000000_football_markets.sql
+- `public.admin_reject_football_fixture` � supabase/migrations/20260701000000_football_markets.sql
+- `public.admin_reject_partner` � supabase/migrations/20260530000000_partner_program.sql
+- `public.admin_reprocess_market` � supabase/migrations/20260527000000_admin_control_center.sql
+- `public.admin_resolve_market` � supabase/migrations/20260522000001_resolution_engine.sql
+- `public.admin_set_bet_limit` � supabase/migrations/20260527000000_admin_control_center.sql
+- `public.admin_set_camera_status` � supabase/migrations/20260527100000_admin_phases_complete.sql
+- `public.admin_set_market_frozen` � supabase/migrations/20260522000003_resolution_hardening.sql
+- `public.admin_trigger_lifecycle` � supabase/migrations/20260527100000_admin_phases_complete.sql
+- `public.admin_update_kyc_status` � supabase/migrations/20260527100000_admin_phases_complete.sql
+- `public.admin_update_partner_terms` � supabase/migrations/20260709000000_partner_cpa_admin.sql
+- `public.admin_update_setting` � supabase/migrations/20260527000000_admin_control_center.sql
+- `public.admin_update_setting` � supabase/migrations/20260530000000_partner_program.sql
+- `public.admin_update_setting` � supabase/migrations/20260709000000_partner_cpa_admin.sql
+- `public.admin_upsert_camera` � supabase/migrations/20260527000000_admin_control_center.sql
+- `public.admin_upsert_camera` � supabase/migrations/20260604000000_camera_pipeline.sql
+- `public.admin_upsert_daily_poll` � supabase/migrations/20260710000000_admin_events_hub.sql
+- `public.admin_upsert_platform_event` � supabase/migrations/20260710000000_admin_events_hub.sql
+- `public.admin_void_football_market` � supabase/migrations/20260701000000_football_markets.sql
+- `public.allocate_partner_commissions` � supabase/migrations/20260530000000_partner_program.sql
+- `public.apply_partner_program` � supabase/migrations/20260530000000_partner_program.sql
+- `public.apply_partner_program` � supabase/migrations/20260705000000_account_hierarchy.sql
+- `public.apply_user_progress` � supabase/migrations/20260528000000_retention_habits.sql
+- `public.assert_admin` � supabase/migrations/20260527000000_admin_control_center.sql
+- `public.assert_community_market_access` � supabase/migrations/20260707000000_community_markets.sql
+- `public.bind_referral_attribution` � supabase/migrations/20260530000000_partner_program.sql
+- `public.bind_referral_attribution` � supabase/migrations/20260705000000_account_hierarchy.sql
+- `public.buy_streak_freeze` � supabase/migrations/20260531000000_engagement_expansion.sql
+- `public.casino_daily_spin` � supabase/migrations/20260529000000_casino_mechanics.sql
+- `public.casino_deposit_bonus_spin` � supabase/migrations/20260529000000_casino_mechanics.sql
+- `public.casino_quick_deposit` � supabase/migrations/20260529000000_casino_mechanics.sql
+- `public.casino_spin_status` � supabase/migrations/20260529000000_casino_mechanics.sql
+- `public.check_user_achievements` � supabase/migrations/20260528000000_retention_habits.sql
+- `public.check_user_achievements` � supabase/migrations/20260531000000_engagement_expansion.sql
+- `public.claim_admin_invite` � supabase/migrations/20260525000000_admin_bootstrap.sql
+- `public.claim_admin_invite` � supabase/migrations/20260705000000_account_hierarchy.sql
+- `public.claim_sub_partner_invite` � supabase/migrations/20260530000000_partner_program.sql
+- `public.collect_oracle_reading` � supabase/migrations/20260522000001_resolution_engine.sql
+- `public.collect_oracle_reading` � supabase/migrations/20260523000002_gaps_closure.sql
+- `public.comment_feed_post` � supabase/migrations/20260521000008_plan_features.sql
+- `public.community_market_row_to_json` � supabase/migrations/20260707000000_community_markets.sql
+- `public.community_market_row_to_json` � supabase/migrations/20260715000000_community_cover_and_ends.sql
+- `public.complete_mission` � supabase/migrations/20260531000000_engagement_expansion.sql
+- `public.complete_registration` � supabase/migrations/20260705000000_account_hierarchy.sql
+- `public.create_community_market` � supabase/migrations/20260707000000_community_markets.sql
+- `public.create_community_market` � supabase/migrations/20260715000000_community_cover_and_ends.sql
+- `public.create_market` � supabase/migrations/20260523000002_gaps_closure.sql
+- `public.create_partner_campaign` � supabase/migrations/20260530000000_partner_program.sql
+- `public.cron_close_football_bets` � supabase/migrations/20260701000000_football_markets.sql
+- `public.daily_check_in` � supabase/migrations/20260528000000_retention_habits.sql
+- `public.daily_check_in` � supabase/migrations/20260531000000_engagement_expansion.sql
+- `public.division_for_xp` � supabase/migrations/20260528000000_retention_habits.sql
+- `public.emit_partner_event` � supabase/migrations/20260530000000_partner_program.sql
+- `public.football_assert_admin` � supabase/migrations/20260701000000_football_markets.sql
+- `public.football_derive_outcome` � supabase/migrations/20260701000000_football_markets.sql
+- `public.football_min_minority_ratio` � supabase/migrations/20260701000000_football_markets.sql
+- `public.football_run_acceptance_flow` � supabase/migrations/20260702000000_football_gaps.sql
+- `public.football_setting_json` � supabase/migrations/20260701000000_football_markets.sql
+- `public.football_setting_num` � supabase/migrations/20260701000000_football_markets.sql
+- `public.get_admin_actions_log` � supabase/migrations/20260527100000_admin_phases_complete.sql
+- `public.get_admin_community_markets_list` � supabase/migrations/20260708000000_community_moderation.sql
+- `public.get_admin_community_reports` � supabase/migrations/20260708000000_community_moderation.sql
+- `public.get_admin_dashboard_metrics` � supabase/migrations/20260527000000_admin_control_center.sql
+- `public.get_admin_finance_breakdown` � supabase/migrations/20260527000000_admin_control_center.sql
+- `public.get_admin_live_feed` � supabase/migrations/20260527000000_admin_control_center.sql
+- `public.get_admin_open_exposure` � supabase/migrations/20260527100000_admin_phases_complete.sql
+- `public.get_admin_oracle_health` � supabase/migrations/20260527000000_admin_control_center.sql
+- `public.get_admin_oracle_health` � supabase/migrations/20260604000000_camera_pipeline.sql
+- `public.get_admin_risk_alerts` � supabase/migrations/20260527000000_admin_control_center.sql
+- `public.get_admin_settlement_queue` � supabase/migrations/20260527000000_admin_control_center.sql
+- `public.get_admin_users_list` � supabase/migrations/20260527000000_admin_control_center.sql
+- `public.get_admin_users_list` � supabase/migrations/20260706000000_registration_gaps.sql
+- `public.get_admin_volume_by_hour` � supabase/migrations/20260527000000_admin_control_center.sql
+- `public.get_admin_volume_by_region` � supabase/migrations/20260527100000_admin_phases_complete.sql
+- `public.get_camera_health` � supabase/migrations/20260605000001_camera_health_oracle_seed.sql
+- `public.get_camera_region_raw` � supabase/migrations/20260604000000_camera_pipeline.sql
+- `public.get_camera_upstream` � supabase/migrations/20260524161506_fca8d9fc-8759-40f1-8a16-1af6b6b05b9f.sql
+- `public.get_community_market` � supabase/migrations/20260707000000_community_markets.sql
+- `public.get_daily_missions` � supabase/migrations/20260531000000_engagement_expansion.sql
+- `public.get_following_active_bets` � supabase/migrations/20260703000002_following_active_bets.sql
+- `public.get_following_trader_ids` � supabase/migrations/20260521000010_trader_follows.sql
+- `public.get_lifecycle_health` � supabase/migrations/20260524000001_oracle_ops.sql
+- `public.get_market_audit` � supabase/migrations/20260523000002_gaps_closure.sql
+- `public.get_market_audit` � supabase/migrations/20260524000000_security_hardening.sql
+- `public.get_market_recent_bets` � supabase/migrations/20260521000008_plan_features.sql
+- `public.get_market_social_proof` � supabase/migrations/20260531000000_engagement_expansion.sql
+- `public.get_my_account_context` � supabase/migrations/20260705000000_account_hierarchy.sql
+- `public.get_my_partner_status` � supabase/migrations/20260530000000_partner_program.sql
+- `public.get_partner_analytics` � supabase/migrations/20260530000000_partner_program.sql
+- `public.get_partner_campaigns` � supabase/migrations/20260530000000_partner_program.sql
+- `public.get_partner_events_feed` � supabase/migrations/20260530000000_partner_program.sql
+- `public.get_partner_invites_list` � supabase/migrations/20260530000000_partner_program.sql
+- `public.get_partner_leaderboard` � supabase/migrations/20260530000000_partner_program.sql
+- `public.get_partner_overview` � supabase/migrations/20260530000000_partner_program.sql
+- `public.get_partner_overview` � supabase/migrations/20260709000000_partner_cpa_admin.sql
+- `public.get_partner_payouts` � supabase/migrations/20260530000000_partner_program.sql
+- `public.get_partner_revenue_series` � supabase/migrations/20260530000000_partner_program.sql
+- `public.get_partner_sub_affiliates` � supabase/migrations/20260530000000_partner_program.sql
+- `public.get_platform_ledger_summary` � supabase/migrations/20260524000002_wallet_rpc.sql
+- `public.get_platform_settings_admin` � supabase/migrations/20260527000000_admin_control_center.sql
+- `public.get_public_active_bets` � supabase/migrations/20260703000001_public_active_bets.sql
+- `public.get_public_expert_profile` � supabase/migrations/20260530000000_partner_program.sql
+- `public.get_public_trader_bets` � supabase/migrations/20260521000011_public_trader_bets.sql
+- `public.get_recent_near_miss` � supabase/migrations/20260529000000_casino_mechanics.sql
+- `public.get_region_camera_status` � supabase/migrations/20260604000000_camera_pipeline.sql
+- `public.get_trader_archetype` � supabase/migrations/20260531000000_engagement_expansion.sql
+- `public.get_urbanmind_digest` � supabase/migrations/20260528000000_retention_habits.sql
+- `public.get_urbanmind_digest` � supabase/migrations/20260531000000_engagement_expansion.sql
+- `public.get_user_achievements` � supabase/migrations/20260528000000_retention_habits.sql
+- `public.get_weekly_pulse_report` � supabase/migrations/20260531000000_engagement_expansion.sql
+- `public.grant_email_link_bonus` � supabase/migrations/20260528000000_retention_habits.sql
+- `public.guard_market_mutation` � supabase/migrations/20260522000001_resolution_engine.sql
+- `public.guard_profiles_sensitive_columns` � supabase/migrations/20260524000000_security_hardening.sql
+- `public.guard_profiles_sensitive_columns` � supabase/migrations/20260528000000_retention_habits.sql
+- `public.handle_new_user` � supabase/migrations/20260521000004_triggers.sql
+- `public.ingest_camera_metrics` � supabase/migrations/20260604000000_camera_pipeline.sql
+- `public.ingest_oracle_snapshots` � supabase/migrations/20260523000002_gaps_closure.sql
+- `public.insert_user_notification` � supabase/migrations/20260528000000_retention_habits.sql
+- `public.is_admin` � supabase/migrations/20260523013831_aedb0e35-0a78-4b43-87fa-08b0996ae349.sql
+- `public.is_allowed_stream_url` � supabase/migrations/20260604000000_camera_pipeline.sql
+- `public.is_casino_enabled` � supabase/migrations/20260529000000_casino_mechanics.sql
+- `public.is_current_user_admin` � supabase/migrations/20260712000000_profiles_rls_hardening.sql
+- `public.is_football_enabled` � supabase/migrations/20260701000000_football_markets.sql
+- `public.is_partner_program_enabled` � supabase/migrations/20260530000000_partner_program.sql
+- `public.is_user_anonymous` � supabase/migrations/20260705000000_account_hierarchy.sql
+- `public.is_user_registered` � supabase/migrations/20260705000000_account_hierarchy.sql
+- `public.join_community_market` � supabase/migrations/20260707000000_community_markets.sql
+- `public.join_community_market` � supabase/migrations/20260708000000_community_moderation.sql
+- `public.like_feed_post` � supabase/migrations/20260521000008_plan_features.sql
+- `public.list_cameras_for_ingest` � supabase/migrations/20260604000000_camera_pipeline.sql
+- `public.list_football_markets_for_resolve` � supabase/migrations/20260701000000_football_markets.sql
+- `public.list_live_cameras` � supabase/migrations/20260604000000_camera_pipeline.sql
+- `public.list_my_community_markets` � supabase/migrations/20260707000000_community_markets.sql
+- `public.list_public_community_markets` � supabase/migrations/20260707000000_community_markets.sql
+- `public.maybe_pay_partner_cpa` � supabase/migrations/20260709000000_partner_cpa_admin.sql
+- `public.maybe_send_deposit_nudge` � supabase/migrations/20260710000002_deposit_funnel.sql
+- `public.min_minority_ratio` � supabase/migrations/20260522000001_resolution_engine.sql
+- `public.min_oracle_confidence` � supabase/migrations/20260522000001_resolution_engine.sql
+- `public.open_market` � supabase/migrations/20260523000002_gaps_closure.sql
+- `public.open_market` � supabase/migrations/20260524000001_oracle_ops.sql
+- `public.oracle_derive_side` � supabase/migrations/20260522000001_resolution_engine.sql
+- `public.oracle_raw_metric` � supabase/migrations/20260522000001_resolution_engine.sql
+- `public.partner_request_payout` � supabase/migrations/20260530000000_partner_program.sql
+- `public.partner_setting_num` � supabase/migrations/20260530000000_partner_program.sql
+- `public.pick_casino_spin_outcome` � supabase/migrations/20260529000000_casino_mechanics.sql
+- `public.place_bet` � supabase/migrations/20260521000005_place_bet_fn.sql
+- `public.place_bet` � supabase/migrations/20260522000001_resolution_engine.sql
+- `public.place_bet` � supabase/migrations/20260523000002_gaps_closure.sql
+- `public.place_bet` � supabase/migrations/20260526000001_place_bet_status_guard.sql
+- `public.place_bet` � supabase/migrations/20260528000000_retention_habits.sql
+- `public.place_bet` � supabase/migrations/20260603000000_security_bet_hardening.sql
+- `public.place_bet` � supabase/migrations/20260604000001_p0_financial_integrity.sql
+- `public.place_bet` � supabase/migrations/20260626000000_currency_brl_suffix.sql
+- `public.place_bet` � supabase/migrations/20260707000000_community_markets.sql
+- `public.place_football_bet` � supabase/migrations/20260701000000_football_markets.sql
+- `public.place_football_bet` � supabase/migrations/20260702000000_football_gaps.sql
+- `public.place_football_bet_as` � supabase/migrations/20260702000000_football_gaps.sql
+- `public.process_market_resolution` � supabase/migrations/20260522000001_resolution_engine.sql
+- `public.process_market_resolution` � supabase/migrations/20260522000003_resolution_hardening.sql
+- `public.process_market_resolution` � supabase/migrations/20260523000002_gaps_closure.sql
+- `public.profiles_block_privileged_updates` � supabase/migrations/20260523013831_aedb0e35-0a78-4b43-87fa-08b0996ae349.sql
+- `public.record_comeback_if_needed` � supabase/migrations/20260528000000_retention_habits.sql
+- `public.record_market_view` � supabase/migrations/20260531000000_engagement_expansion.sql
+- `public.record_oracle_snapshot` � supabase/migrations/20260523000002_gaps_closure.sql
+- `public.record_oracle_snapshot` � supabase/migrations/20260604000000_camera_pipeline.sql
+- `public.refresh_demo_live_markets` � supabase/migrations/20260602000003_demo_markets_refresh_cron.sql
+- `public.refresh_market_lifecycle` � supabase/migrations/20260522000001_resolution_engine.sql
+- `public.refresh_market_participant_stats` � supabase/migrations/20260522000003_resolution_hardening.sql
+- `public.refresh_profile_stats` � supabase/migrations/20260522000003_resolution_hardening.sql
+- `public.refresh_user_ai_memory` � supabase/migrations/20260531000000_engagement_expansion.sql
+- `public.refund_football_market` � supabase/migrations/20260701000000_football_markets.sql
+- `public.refund_market` � supabase/migrations/20260522000001_resolution_engine.sql
+- `public.refund_market` � supabase/migrations/20260523000002_gaps_closure.sql
+- `public.report_community_market` � supabase/migrations/20260708000000_community_moderation.sql
+- `public.repost_feed_post` � supabase/migrations/20260521000008_plan_features.sql
+- `public.repost_feed_post` � supabase/migrations/20260521000009_ux_notifications_repost.sql
+- `public.request_withdrawal` � supabase/migrations/20260604000002_payment_intents.sql
+- `public.request_withdrawal` � supabase/migrations/20260626000000_currency_brl_suffix.sql
+- `public.request_withdrawal` � supabase/migrations/20260706000000_registration_gaps.sql
+- `public.resolve_community_market` � supabase/migrations/20260707000000_community_markets.sql
+- `public.resolve_expired_markets` � supabase/migrations/20260521000008_plan_features.sql
+- `public.resolve_expired_markets` � supabase/migrations/20260522000001_resolution_engine.sql
+- `public.resolve_football_fixture` � supabase/migrations/20260701000000_football_markets.sql
+- `public.resolve_market` � supabase/migrations/20260521000008_plan_features.sql
+- `public.resolve_market` � supabase/migrations/20260521000009_ux_notifications_repost.sql
+- `public.resolve_market` � supabase/migrations/20260522000001_resolution_engine.sql
+- `public.resolve_partner_slug` � supabase/migrations/20260530000000_partner_program.sql
+- `public.seed_oracle_snapshots_for_market` � supabase/migrations/20260524000001_oracle_ops.sql
+- `public.service_credit_balance` � supabase/migrations/20260604000002_payment_intents.sql
+- `public.service_credit_balance` � supabase/migrations/20260626000000_currency_brl_suffix.sql
+- `public.service_credit_balance` � supabase/migrations/20260709000000_partner_cpa_admin.sql
+- `public.service_credit_balance` � supabase/migrations/20260710000002_deposit_funnel.sql
+- `public.service_refund_withdrawal` � supabase/migrations/20260604000002_payment_intents.sql
+- `public.service_refund_withdrawal` � supabase/migrations/20260626000000_currency_brl_suffix.sql
+- `public.set_casino_opt_out` � supabase/migrations/20260529000000_casino_mechanics.sql
+- `public.settle_football_market` � supabase/migrations/20260701000000_football_markets.sql
+- `public.settle_market` � supabase/migrations/20260522000001_resolution_engine.sql
+- `public.settle_market` � supabase/migrations/20260522000002_platform_ledger.sql
+- `public.settle_market` � supabase/migrations/20260522000003_resolution_hardening.sql
+- `public.settle_market` � supabase/migrations/20260528000000_retention_habits.sql
+- `public.settle_market` � supabase/migrations/20260530000000_partner_program.sql
+- `public.settle_market` � supabase/migrations/20260604000001_p0_financial_integrity.sql
+- `public.settle_market` � supabase/migrations/20260626000000_currency_brl_suffix.sql
+- `public.should_send_notification` � supabase/migrations/20260528000000_retention_habits.sql
+- `public.snapshot_market_history` � supabase/migrations/20260521000004_triggers.sql
+- `public.streak_xp_multiplier` � supabase/migrations/20260531000000_engagement_expansion.sql
+- `public.sync_admin_from_allowlist` � supabase/migrations/20260525000000_admin_bootstrap.sql
+- `public.sync_region_telemetry_for_market` � supabase/migrations/20260522000003_resolution_hardening.sql
+- `public.tick_market_lifecycle` � supabase/migrations/20260522000001_resolution_engine.sql
+- `public.tick_market_lifecycle` � supabase/migrations/20260523000002_gaps_closure.sql
+- `public.tick_market_lifecycle` � supabase/migrations/20260524000001_oracle_ops.sql
+- `public.tick_market_lifecycle` � supabase/migrations/20260707000000_community_markets.sql
+- `public.tick_region_simulator` � supabase/migrations/20260526000005_region_simulator.sql
+- `public.tick_region_simulator` � supabase/migrations/20260604000000_camera_pipeline.sql
+- `public.toggle_trader_follow` � supabase/migrations/20260521000010_trader_follows.sql
+- `public.track_deposit_funnel_event` � supabase/migrations/20260710000002_deposit_funnel.sql
+- `public.track_partner_click` � supabase/migrations/20260530000000_partner_program.sql
+- `public.trg_bets_ai_memory` � supabase/migrations/20260528000000_retention_habits.sql
+- `public.trg_bets_first_referral_bet` � supabase/migrations/20260530000000_partner_program.sql
+- `public.trg_bets_on_payout` � supabase/migrations/20260528000000_retention_habits.sql
+- `public.trg_bets_on_payout` � supabase/migrations/20260529000000_casino_mechanics.sql
+- `public.trg_bets_on_payout` � supabase/migrations/20260531000000_engagement_expansion.sql
+- `public.trg_partner_parent_depth` � supabase/migrations/20260530000000_partner_program.sql
+- `public.trg_wallet_deposit_referral` � supabase/migrations/20260530000000_partner_program.sql
+- `public.try_sync_admin_allowlist` � supabase/migrations/20260525000000_admin_bootstrap.sql
+- `public.upsert_football_fixture` � supabase/migrations/20260701000000_football_markets.sql
+- `public.upsert_football_fixture` � supabase/migrations/20260702000000_football_gaps.sql
+- `public.upsert_football_fixture` � supabase/migrations/20260704000000_performance_and_live_score.sql
+- `public.use_streak_freeze` � supabase/migrations/20260528000000_retention_habits.sql
+- `public.user_has_deposited` � supabase/migrations/20260710000002_deposit_funnel.sql
+- `public.validate_football_pools` � supabase/migrations/20260701000000_football_markets.sql
+- `public.validate_market_pools` � supabase/migrations/20260522000001_resolution_engine.sql
+- `public.validate_oracle_reading` � supabase/migrations/20260522000001_resolution_engine.sql
+- `public.validate_oracle_reading` � supabase/migrations/20260522000003_resolution_hardening.sql
+- `public.validate_oracle_reading` � supabase/migrations/20260523000002_gaps_closure.sql
+- `public.void_community_market` � supabase/migrations/20260707000000_community_markets.sql
+- `public.wallet_deposit` � supabase/migrations/20260524000002_wallet_rpc.sql
+- `public.wallet_deposit` � supabase/migrations/20260530000000_partner_program.sql
+- `public.wallet_deposit` � supabase/migrations/20260604000001_p0_financial_integrity.sql
+- `public.wallet_deposit` � supabase/migrations/20260709000000_partner_cpa_admin.sql
+- `public.wallet_deposit` � supabase/migrations/20260710000002_deposit_funnel.sql
+- `public.wallet_withdraw` � supabase/migrations/20260524000002_wallet_rpc.sql
+- `public.wallet_withdraw` � supabase/migrations/20260604000001_p0_financial_integrity.sql
+- `vote_daily_poll` � supabase/migrations/20260601000000_remaining_sprints.sql
+
+## Uso de .rpc() no src
+
+- `admin_apply_simulator_scenario`
+  - src/hooks/use-admin-dashboard.ts
+- `admin_approve_football_fixture`
+  - src/hooks/use-admin-football.ts
+  - src/lib/football-cron.server.ts
+- `admin_approve_partner`
+  - src/hooks/use-admin-dashboard.ts
+- `admin_create_camera_upstream`
+  - src/hooks/use-admin-dashboard.ts
+- `admin_delete_daily_poll`
+  - src/hooks/use-admin-events.ts
+- `admin_delete_partner_event`
+  - src/hooks/use-admin-events.ts
+- `admin_delete_platform_event`
+  - src/hooks/use-admin-events.ts
+- `admin_extend_market`
+  - src/hooks/use-admin-dashboard.ts
+- `admin_force_close`
+  - src/hooks/use-admin-dashboard.ts
+- `admin_freeze_account`
+  - src/hooks/use-admin-dashboard.ts
+- `admin_get_deposit_funnel_metrics`
+  - src/hooks/use-admin-deposit-funnel.ts
+- `admin_get_events_hub_overview`
+  - src/hooks/use-admin-events.ts
+- `admin_list_active_partners`
+  - src/hooks/use-admin-dashboard.ts
+- `admin_list_cameras`
+  - src/hooks/use-admin-dashboard.ts
+- `admin_list_daily_polls`
+  - src/hooks/use-admin-events.ts
+- `admin_list_football_drafts`
+  - src/hooks/use-admin-football.ts
+- `admin_list_football_live`
+  - src/hooks/use-admin-football.ts
+- `admin_list_football_pending`
+  - src/hooks/use-admin-football.ts
+- `admin_list_partner_applications`
+  - src/hooks/use-admin-dashboard.ts
+- `admin_list_partner_events`
+  - src/hooks/use-admin-events.ts
+- `admin_list_platform_events`
+  - src/hooks/use-admin-events.ts
+- `admin_pause_bets`
+  - src/hooks/use-admin-dashboard.ts
+- `admin_publish_football_market`
+  - src/hooks/use-admin-football.ts
+- `admin_reject_football_fixture`
+  - src/hooks/use-admin-football.ts
+- `admin_reject_partner`
+  - src/hooks/use-admin-dashboard.ts
+- `admin_reprocess_market`
+  - src/hooks/use-admin-dashboard.ts
+- `admin_resolve_market`
+  - src/hooks/use-admin-resolve.ts
+- `admin_set_bet_limit`
+  - src/hooks/use-admin-dashboard.ts
+- `admin_set_camera_status`
+  - src/hooks/use-admin-dashboard.ts
+- `admin_set_market_frozen`
+  - src/hooks/use-admin-freeze.ts
+- `admin_trigger_lifecycle`
+  - src/hooks/use-admin-dashboard.ts
+- `admin_update_kyc_status`
+  - src/hooks/use-admin-dashboard.ts
+- `admin_update_partner_terms`
+  - src/hooks/use-admin-dashboard.ts
+- `admin_update_setting`
+  - src/hooks/use-admin-dashboard.ts
+- `admin_upsert_camera`
+  - src/hooks/use-admin-dashboard.ts
+- `admin_upsert_daily_poll`
+  - src/hooks/use-admin-events.ts
+- `admin_upsert_platform_event`
+  - src/hooks/use-admin-events.ts
+- `admin_void_football_market`
+  - src/hooks/use-admin-football.ts
+- `apply_partner_program`
+  - src/hooks/use-partner.ts
+- `bind_referral_attribution`
+  - src/hooks/use-auth.ts
+- `buy_streak_freeze`
+  - src/actions/retention.ts
+- `casino_daily_spin`
+  - src/actions/casino.ts
+- `casino_quick_deposit`
+  - src/actions/casino.ts
+  - src/hooks/use-casino-spin.ts
+- `casino_spin_status`
+  - src/hooks/use-casino-enabled.ts
+  - src/hooks/use-casino-spin.ts
+- `claim_admin_invite`
+  - src/hooks/use-claim-admin.ts
+- `comment_feed_post`
+  - src/actions/feed.ts
+- `complete_mission`
+  - src/actions/retention.ts
+- `complete_registration`
+  - src/lib/post-registration.ts
+- `create_community_market`
+  - src/actions/community-markets.ts
+- `create_league`
+  - src/actions/leagues.ts
+- `create_market`
+  - src/hooks/use-create-market.ts
+- `create_partner_campaign`
+  - src/hooks/use-partner.ts
+- `cron_close_football_bets`
+  - src/lib/football-cron.server.ts
+- `daily_check_in`
+  - src/actions/retention.ts
+- `get_admin_actions_log`
+  - src/hooks/use-admin-dashboard.ts
+- `get_admin_community_markets_list`
+  - src/actions/community-markets.ts
+- `get_admin_community_reports`
+  - src/actions/community-markets.ts
+- `get_admin_dashboard_metrics`
+  - src/hooks/use-admin-dashboard.ts
+- `get_admin_finance_breakdown`
+  - src/hooks/use-admin-dashboard.ts
+- `get_admin_live_feed`
+  - src/hooks/use-admin-dashboard.ts
+- `get_admin_open_exposure`
+  - src/hooks/use-admin-dashboard.ts
+- `get_admin_oracle_health`
+  - src/hooks/use-admin-dashboard.ts
+- `get_admin_risk_alerts`
+  - src/hooks/use-admin-dashboard.ts
+- `get_admin_settlement_queue`
+  - src/hooks/use-admin-dashboard.ts
+- `get_admin_users_list`
+  - src/hooks/use-admin-dashboard.ts
+- `get_admin_volume_by_hour`
+  - src/hooks/use-admin-dashboard.ts
+- `get_admin_volume_by_region`
+  - src/hooks/use-admin-dashboard.ts
+- `get_camera_health`
+  - src/hooks/use-admin-dashboard.ts
+- `get_community_market`
+  - src/actions/community-markets.ts
+- `get_daily_missions`
+  - src/actions/retention.ts
+- `get_following_active_bets`
+  - src/hooks/use-following-active-bets.ts
+- `get_following_trader_ids`
+  - src/hooks/use-followed-traders.ts
+- `get_league_leaderboard`
+  - src/actions/leagues.ts
+- `get_lifecycle_health`
+  - src/hooks/use-admin-ops.ts
+- `get_market_audit`
+  - src/hooks/use-market-audit.ts
+- `get_market_recent_bets`
+  - src/hooks/use-market-bets.ts
+- `get_market_social_proof`
+  - src/components/viax/market-social-proof-lite.tsx
+  - src/hooks/use-market-social-proof.ts
+- `get_my_account_context`
+  - src/hooks/use-account-context.ts
+  - src/lib/auth-guards.ts
+  - src/routes/partner/pending.tsx
+- `get_my_leagues`
+  - src/actions/leagues.ts
+- `get_partner_analytics`
+  - src/hooks/use-partner.ts
+- `get_partner_campaigns`
+  - src/hooks/use-partner.ts
+- `get_partner_events_feed`
+  - src/hooks/use-partner.ts
+- `get_partner_invites_list`
+  - src/hooks/use-partner.ts
+- `get_partner_leaderboard`
+  - src/hooks/use-partner.ts
+- `get_partner_overview`
+  - src/hooks/use-partner.ts
+- `get_partner_payouts`
+  - src/hooks/use-partner.ts
+- `get_partner_revenue_series`
+  - src/hooks/use-partner.ts
+- `get_partner_sub_affiliates`
+  - src/hooks/use-partner.ts
+- `get_platform_ledger_summary`
+  - src/hooks/use-admin-ops.ts
+- `get_platform_settings_admin`
+  - src/hooks/use-admin-dashboard.ts
+- `get_public_active_bets`
+  - src/hooks/use-public-active-bets.ts
+- `get_public_expert_profile`
+  - src/hooks/use-partner.ts
+- `get_public_trader_bets`
+  - src/hooks/use-public-trader-bets.ts
+- `get_recent_near_miss`
+  - src/hooks/use-near-miss-alerts.ts
+- `get_region_camera_status`
+  - src/hooks/use-live-cameras.ts
+- `get_trader_archetype`
+  - src/actions/retention.ts
+- `get_urbanmind_digest`
+  - src/hooks/use-urbanmind-digest.ts
+- `get_user_achievements`
+  - src/hooks/use-achievements.ts
+- `get_weekly_pulse_report`
+  - src/actions/retention.ts
+- `grant_email_link_bonus`
+  - src/actions/retention.ts
+- `is_football_enabled`
+  - src/lib/football-cron.server.ts
+- `is_user_registered`
+  - src/integrations/supabase/require-registered-middleware.ts
+- `join_community_market`
+  - src/actions/community-markets.ts
+- `join_league`
+  - src/actions/leagues.ts
+- `leave_league`
+  - src/actions/leagues.ts
+- `like_feed_post`
+  - src/actions/feed.ts
+- `list_football_markets_for_resolve`
+  - src/lib/football-cron.server.ts
+- `list_live_cameras`
+  - src/hooks/use-live-cameras.ts
+- `list_my_community_markets`
+  - src/actions/community-markets.ts
+- `list_public_community_markets`
+  - src/actions/community-markets.ts
+- `maybe_send_deposit_nudge`
+  - src/hooks/use-deposit-nudge.ts
+- `open_market`
+  - src/hooks/use-admin-market.ts
+- `partner_request_payout`
+  - src/hooks/use-partner.ts
+- `place_bet`
+  - src/actions/bets.ts
+- `place_football_bet`
+  - src/actions/football.ts
+- `record_comeback_if_needed`
+  - src/actions/retention.ts
+- `record_market_view`
+  - src/actions/retention.ts
+- `report_community_market`
+  - src/actions/community-markets.ts
+- `repost_feed_post`
+  - src/actions/feed.ts
+- `request_withdrawal`
+  - src/actions/payments.ts
+- `resolve_community_market`
+  - src/actions/community-markets.ts
+- `resolve_football_fixture`
+  - src/lib/football-cron.server.ts
+- `service_credit_balance`
+  - src/routes/api/webhooks/syncpay.ts
+- `service_refund_withdrawal`
+  - src/routes/api/webhooks/syncpay.ts
+- `set_casino_opt_out`
+  - src/actions/casino.ts
+- `toggle_trader_follow`
+  - src/actions/follows.ts
+- `track_deposit_funnel_event`
+  - src/lib/deposit-funnel.ts
+- `track_partner_click`
+  - src/routes/r.$slug.tsx
+- `try_sync_admin_allowlist`
+  - src/components/auth/admin-allowlist-sync.tsx
+  - src/hooks/use-claim-admin.ts
+  - src/lib/auth-guards.ts
+- `upsert_football_fixture`
+  - src/lib/football-cron.server.ts
+- `use_streak_freeze`
+  - src/actions/retention.ts
+- `user_has_deposited`
+  - src/hooks/use-has-deposited.ts
+- `void_community_market`
+  - src/actions/community-markets.ts
+- `vote_daily_poll`
+  - src/actions/polls.ts
+- `wallet_deposit`
+  - src/hooks/use-wallet-rpc.ts
+- `wallet_withdraw`
+  - src/hooks/use-wallet-rpc.ts

@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useBets } from "@/hooks/use-bets";
-import { useViaX } from "@/store/viax-store";
+import { useCatalogMarkets } from "@/hooks/use-markets";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL, PRIZE_RATIO } from "@/lib/parimutuel";
 import { Countdown } from "@/components/viax/countdown";
@@ -10,7 +10,7 @@ import { Briefcase } from "lucide-react";
 
 export function OpenPositionStrip({ marketId }: { marketId: string }) {
   const { data: bets } = useBets();
-  const markets = useViaX((s) => s.markets);
+  const markets = useCatalogMarkets();
   const bet = (bets ?? []).find((b) => b.marketId === marketId && isOpenBetStatus(b.marketStatus));
   if (!bet) return null;
 

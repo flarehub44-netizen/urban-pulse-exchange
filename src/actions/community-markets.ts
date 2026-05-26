@@ -10,7 +10,7 @@ async function adminRpc<T>(
   if (error) throw new Error(error.message);
   return data;
 }
-import type { SupabaseFnContext } from "@/integrations/supabase/loose";
+import type { SupabaseFnContext } from "@/integrations/supabase/context";
 
 const createSchema = z.object({
   question: z.string().min(10).max(280),
@@ -75,8 +75,8 @@ export const getCommunityMarketFn = createServerFn({ method: "GET" })
   });
 
 export const listPublicCommunityMarketsFn = createServerFn({ method: "GET" }).handler(async () => {
-  const { db } = await import("@/integrations/supabase/loose");
-  const { data, error } = await db.rpc("list_public_community_markets", { p_limit: 50 });
+  const { supabase } = await import("@/integrations/supabase/client");
+  const { data, error } = await supabase.rpc("list_public_community_markets", { p_limit: 50 });
   if (error) throw new Error(error.message);
   return (data ?? []) as Record<string, unknown>[];
 });

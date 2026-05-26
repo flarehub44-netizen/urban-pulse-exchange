@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { SupabaseFnContext } from "@/integrations/supabase/loose";
+import type { SupabaseFnContext } from "@/integrations/supabase/context";
 
 const createPostSchema = z.object({
   text: z.string().min(1).max(280),

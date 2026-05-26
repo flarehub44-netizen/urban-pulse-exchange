@@ -1,7 +1,7 @@
 import { MapPin, TrendingUp } from "lucide-react";
 import { copy } from "@/copy/pt-BR";
 import { useBets } from "@/hooks/use-bets";
-import { useViaX } from "@/store/viax-store";
+import { useCatalogMarkets } from "@/hooks/use-markets";
 
 interface Props {
   neighborhood: string | null;
@@ -10,7 +10,7 @@ interface Props {
 
 export function NeighborhoodWidget({ neighborhood, city = "São Paulo" }: Props) {
   const { data: bets } = useBets();
-  const markets = useViaX((s) => s.markets);
+  const markets = useCatalogMarkets();
 
   const location = neighborhood || city;
 

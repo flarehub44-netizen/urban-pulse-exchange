@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import type { Side } from "@/store/viax-store";
 
@@ -23,7 +23,7 @@ export function useFollowingActiveBets() {
   return useQuery({
     queryKey: ["following-active-bets", userId],
     queryFn: async () => {
-      const { data, error } = await db.rpc("get_following_active_bets");
+      const { data, error } = await supabase.rpc("get_following_active_bets");
       if (error) throw error;
       return ((data as Record<string, unknown>[]) ?? []).map((row) => ({
         betId: row.bet_id as string,

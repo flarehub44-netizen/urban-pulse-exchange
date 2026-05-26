@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 
 export function useMarketHistory(marketId: string, enabled = true) {
   return useQuery({
     queryKey: ["market_history", marketId],
     enabled: enabled && !!marketId,
     queryFn: async () => {
-      const { data, error } = (await db
+      const { data, error } = (await supabase
         .from("market_history")
         .select("p, recorded_at")
         .eq("market_id", marketId)

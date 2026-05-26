@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 import type { Side } from "@/store/viax-store";
 import { normalizeMarketStatus, type MarketStatus } from "@/lib/market-status";
 
@@ -45,7 +45,7 @@ export function useBets(options?: { enabled?: boolean }) {
     queryKey: ["bets"],
     enabled: options?.enabled ?? true,
     queryFn: async () => {
-      const { data, error } = (await db
+      const { data, error } = (await supabase
         .from("bets")
         .select("*, markets(question, region, status, ends_at, pool_yes, pool_no)")
         .order("created_at", { ascending: false })

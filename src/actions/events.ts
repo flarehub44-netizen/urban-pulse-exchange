@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 
 export type PlatformEvent = {
   id: string;
@@ -14,7 +14,7 @@ export type PlatformEvent = {
 export const getActiveEventsFn = createServerFn({ method: "GET" }).handler(async () => {
   try {
     const now = new Date().toISOString();
-    const { data, error } = (await db
+    const { data, error } = (await supabase
       .from("platform_events")
       .select("id, name, slug, description, badge_icon, xp_boost, ends_at")
       .lte("starts_at", now)

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { requireAuth } from "@/lib/auth-guards";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 import { redirect } from "@tanstack/react-router";
 import type { AccountContext } from "@/hooks/use-account-context";
 import { copy } from "@/copy/pt-BR";
@@ -8,7 +8,7 @@ import { copy } from "@/copy/pt-BR";
 export const Route = createFileRoute("/partner/pending")({
   beforeLoad: async () => {
     await requireAuth();
-    const { data, error } = await db.rpc("get_my_account_context");
+    const { data, error } = await supabase.rpc("get_my_account_context");
     if (error) throw redirect({ to: "/profile", search: { tab: "config" } });
     const ctx = data as AccountContext;
     if (ctx.partner?.role === "partner" && ctx.partner?.status === "active") {

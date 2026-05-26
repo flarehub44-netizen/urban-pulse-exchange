@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { recordMarketViewFn } from "@/actions/retention";
 import { useAuth } from "@/hooks/use-auth";
@@ -30,7 +30,7 @@ export function useMarketSocialProof(marketId: string | undefined) {
   return useQuery({
     queryKey: ["market-social-proof", marketId],
     queryFn: async () => {
-      const { data, error } = await db.rpc("get_market_social_proof", {
+      const { data, error } = await supabase.rpc("get_market_social_proof", {
         p_market_id: marketId!,
       });
       if (error) throw error;

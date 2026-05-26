@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 import type { Trader } from "@/store/viax-store";
 
 function mapTrader(row: Record<string, unknown>): Trader {
@@ -23,7 +23,7 @@ export function useTraders() {
   return useQuery({
     queryKey: ["traders"],
     queryFn: async () => {
-      const { data, error } = (await db.from("leaderboard").select("*").limit(50)) as {
+      const { data, error } = (await supabase.from("leaderboard").select("*").limit(50)) as {
         data: Record<string, unknown>[] | null;
         error: Error | null;
       };

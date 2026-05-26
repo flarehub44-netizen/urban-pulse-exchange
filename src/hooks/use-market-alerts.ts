@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
 export interface MarketAlert {
@@ -67,7 +67,7 @@ export function useCreateMarketAlert() {
       side: "YES" | "NO";
       threshold: number;
     }) => {
-      const { data, error } = await db
+      const { data, error } = await supabase
         .from("market_alerts")
         .insert({ user_id: userId as string, market_id: marketId, side, threshold })
         .select()
@@ -88,7 +88,7 @@ export function useDeleteMarketAlert() {
 
   return useMutation({
     mutationFn: async (alertId: string) => {
-      const { error } = await db.from("market_alerts").delete().eq("id", alertId);
+      const { error } = await supabase.from("market_alerts").delete().eq("id", alertId);
       if (error) throw error;
     },
     onSuccess: () => {

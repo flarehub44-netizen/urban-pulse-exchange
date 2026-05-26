@@ -81,7 +81,10 @@ export default {
     }
   },
 
-  /** Cloudflare Cron — ver wrangler.jsonc triggers.crons */
+  /**
+   * Primary football cron executor (see docs/OPS_CRONS.md).
+   * HTTP /api/cron/* is for manual runs with CRON_SECRET only.
+   */
   scheduled(event: { cron?: string }, _env: unknown, ctx: ScheduledContext) {
     if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return;
     const cron = event.cron ?? "";

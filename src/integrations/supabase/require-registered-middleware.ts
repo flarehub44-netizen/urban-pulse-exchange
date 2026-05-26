@@ -1,5 +1,5 @@
 import { createMiddleware } from "@tanstack/react-start";
-import type { SupabaseFnContext } from "@/integrations/supabase/loose";
+import type { SupabaseFnContext } from "@/integrations/supabase/context";
 
 /** Exige e-mail confirmado (RPC is_user_registered) após requireSupabaseAuth. */
 export const requireRegisteredAuth = createMiddleware({ type: "function" }).server(

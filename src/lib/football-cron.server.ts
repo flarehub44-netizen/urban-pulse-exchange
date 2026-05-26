@@ -1,6 +1,3 @@
-/**
- * Football sync/resolve jobs — shared by HTTP cron routes and Worker scheduled().
- */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import {
   dateRangeDays,
@@ -8,6 +5,7 @@ import {
   getFixturesByDate,
   type ApiFootballFixtureDto,
 } from "@/lib/api-football.server";
+import { withJobLog } from "@/lib/structured-log.server";
 
 function getServiceClient(): SupabaseClient {
   const url = process.env.SUPABASE_URL;
@@ -43,98 +41,101 @@ async function upsertFixture(supabase: SupabaseClient, f: ApiFootballFixtureDto)
 }
 
 export async function runFootballSync(): Promise<Record<string, unknown>> {
-  const supabase = getServiceClient();
+  return withJobLog("football_sync", async () => {
+    const supabase = getServiceClient();
 
-  const { data: enabled } = await supabase.rpc("is_football_enabled");
-  if (enabled === false) return { ok: true, skipped: "football_disabled" };
+    const { data: enabled } = await supabase.rpc("is_football_enabled");
+    if (enabled === false) return { ok: true, skipped: "football_disabled" };
 
-  const { data: leagueIdsRow } = await supabase
-    .from("platform_settings")
-    .select("value")
-    .eq("key", "football_league_ids")
-    .maybeSingle();
+    const { data: leagueIdsRow } = await supabase
+      .from("platform_settings")
+      .select("value")
+      .eq("key", "football_league_ids")
+      .maybeSingle();
 
-  const leagueIds = (leagueIdsRow?.value as number[] | undefined) ?? [71];
+    const leagueIds = (leagueIdsRow?.value as number[] | undefined) ?? [71];
 
-  const { data: daysRow } = await supabase
-    .from("platform_settings")
-    .select("value")
-    .eq("key", "football_sync_days_ahead")
-    .maybeSingle();
+    const { data: daysRow } = await supabase
+      .from("platform_settings")
+      .select("value")
+      .eq("key", "football_sync_days_ahead")
+      .maybeSingle();
 
-  const daysAhead = Number(daysRow?.value ?? 7);
-  const dates = dateRangeDays(new Date(), daysAhead);
-  let upserted = 0;
-  const errors: string[] = [];
+    const daysAhead = Number(daysRow?.value ?? 7);
+    const dates = dateRangeDays(new Date(), daysAhead);
+    let upserted = 0;
+    const errors: string[] = [];
 
-  if (!process.env.API_FOOTBALL_KEY) {
-    return { ok: false, error: "API_FOOTBALL_KEY not configured", upserted: 0 };
-  }
-
-  const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
-  let autoApproved = 0;
-
-  for (const date of dates) {
-    try {
-      const fixtures = await getFixturesByDate(date, leagueIds);
-      for (const f of fixtures) {
-        await upsertFixture(supabase, f);
-        upserted++;
-
-        // Auto-approve fixtures from enabled leagues with kickoff > 2h from now
-        const kickoffMs = new Date(f.kickoff_at).getTime();
-        if (kickoffMs > Date.now() + TWO_HOURS_MS) {
-          const { error: approveErr } = await supabase.rpc("admin_approve_football_fixture", {
-            p_fixture_id: f.api_fixture_id,
-          });
-          if (!approveErr) autoApproved++;
-        }
-      }
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      console.error("[FootballSync]", date, msg);
-      errors.push(`${date}: ${msg}`);
+    if (!process.env.API_FOOTBALL_KEY) {
+      return { ok: false, error: "API_FOOTBALL_KEY not configured", upserted: 0 };
     }
-  }
 
-  await supabase.rpc("cron_close_football_bets");
+    const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
+    let autoApproved = 0;
 
-  return { ok: true, upserted, autoApproved, dates: dates.length, errors };
+    for (const date of dates) {
+      try {
+        const fixtures = await getFixturesByDate(date, leagueIds);
+        for (const f of fixtures) {
+          await upsertFixture(supabase, f);
+          upserted++;
+
+          const kickoffMs = new Date(f.kickoff_at).getTime();
+          if (kickoffMs > Date.now() + TWO_HOURS_MS) {
+            const { error: approveErr } = await supabase.rpc("admin_approve_football_fixture", {
+              p_fixture_id: f.api_fixture_id,
+            });
+            if (!approveErr) autoApproved++;
+          }
+        }
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        console.error("[FootballSync]", date, msg);
+        errors.push(`${date}: ${msg}`);
+      }
+    }
+
+    await supabase.rpc("cron_close_football_bets");
+
+    return { ok: true, upserted, autoApproved, dates: dates.length, errors };
+  });
 }
 
 export async function runFootballResolve(): Promise<Record<string, unknown>> {
-  const supabase = getServiceClient();
+  return withJobLog("football_resolve", async () => {
+    const supabase = getServiceClient();
 
-  const { data: enabled } = await supabase.rpc("is_football_enabled");
-  if (enabled === false) return { ok: true, skipped: "football_disabled" };
+    const { data: enabled } = await supabase.rpc("is_football_enabled");
+    if (enabled === false) return { ok: true, skipped: "football_disabled" };
 
-  const { data: fixtureIds, error: listErr } = await supabase.rpc(
-    "list_football_markets_for_resolve",
-  );
-  if (listErr) throw new Error(listErr.message);
+    const { data: fixtureIds, error: listErr } = await supabase.rpc(
+      "list_football_markets_for_resolve",
+    );
+    if (listErr) throw new Error(listErr.message);
 
-  const ids = (fixtureIds as bigint[] | number[] | null) ?? [];
-  const results: unknown[] = [];
+    const ids = (fixtureIds as bigint[] | number[] | null) ?? [];
+    const results: unknown[] = [];
 
-  for (const rawId of ids) {
-    const fixtureId = Number(rawId);
-    try {
-      if (process.env.API_FOOTBALL_KEY) {
-        const fresh = await getFixtureById(fixtureId);
-        if (fresh) await upsertFixture(supabase, fresh);
+    for (const rawId of ids) {
+      const fixtureId = Number(rawId);
+      try {
+        if (process.env.API_FOOTBALL_KEY) {
+          const fresh = await getFixtureById(fixtureId);
+          if (fresh) await upsertFixture(supabase, fresh);
+        }
+
+        const { data, error } = await supabase.rpc("resolve_football_fixture", {
+          p_fixture_id: fixtureId,
+        });
+        if (error) throw new Error(error.message);
+        results.push({ fixtureId, ...(data as object) });
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        console.error("[FootballResolve]", fixtureId, msg);
+        results.push({ fixtureId, error: msg });
       }
-
-      const { data, error } = await supabase.rpc("resolve_football_fixture", {
-        p_fixture_id: fixtureId,
-      });
-      if (error) throw new Error(error.message);
-      results.push({ fixtureId, ...(data as object) });
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      console.error("[FootballResolve]", fixtureId, msg);
-      results.push({ fixtureId, error: msg });
     }
-  }
 
-  return { ok: true, processed: results.length, results };
+    return { ok: true, processed: results.length, results };
+  });
 }

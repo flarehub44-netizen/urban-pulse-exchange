@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { db as supabase } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 import type { Side } from "@/lib/parimutuel";
 
 export function useAdminResolveMarket() {

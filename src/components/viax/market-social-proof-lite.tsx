@@ -1,6 +1,6 @@
 import { Eye, Flame } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 import type { MarketSocialProof } from "@/hooks/use-market-social-proof";
 import { copy } from "@/copy/pt-BR";
 
@@ -9,7 +9,7 @@ export function MarketSocialProofLite({ marketId }: { marketId: string }) {
   const { data } = useQuery({
     queryKey: ["market-social-proof-lite", marketId],
     queryFn: async () => {
-      const { data: row, error } = await db.rpc("get_market_social_proof", {
+      const { data: row, error } = await supabase.rpc("get_market_social_proof", {
         p_market_id: marketId,
       });
       if (error) throw error;

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { db as supabase } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 
 export type AdminEventsOverview = {
   platform_events: { active: number; upcoming: number; ended: number };

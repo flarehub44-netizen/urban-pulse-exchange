@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useViaX } from "@/store/viax-store";
 import { mapNotification } from "@/hooks/use-notifications";
 import { mapMarket } from "@/hooks/use-markets";
 import type { Market, ViaXNotification } from "@/store/viax-store";
@@ -30,11 +29,6 @@ export function useSupabaseRealtime() {
                   : m,
               ) ?? old,
           );
-
-          // Sync Zustand so tick() stays anchored to real values
-          useViaX.setState((s) => ({
-            markets: s.markets.map((m) => (m.id === updated.id ? { ...m, pool: updated.pool } : m)),
-          }));
         },
       )
       .subscribe();

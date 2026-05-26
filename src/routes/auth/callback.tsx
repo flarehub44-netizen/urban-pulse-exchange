@@ -5,7 +5,6 @@ import { parseAuthSession } from "@/lib/auth";
 import { runPostRegistrationFlow } from "@/lib/post-registration";
 import { copy } from "@/copy/pt-BR";
 import { AuthShell } from "@/components/auth/auth-shell";
-import { db } from "@/integrations/supabase/loose";
 import { getDefaultPostAuthPath } from "@/lib/post-auth-redirect";
 
 export const Route = createFileRoute("/auth/callback")({
@@ -54,7 +53,7 @@ function AuthCallbackPage() {
 
         let hasDeposited = false;
         if (auth.userId) {
-          const { data } = (await db
+          const { data } = (await supabase
             .from("transactions")
             .select("id")
             .eq("type", "deposit")

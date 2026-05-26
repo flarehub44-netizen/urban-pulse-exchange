@@ -1,4 +1,4 @@
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 
 export type DepositFunnelEvent =
   | "auth_modal_open"

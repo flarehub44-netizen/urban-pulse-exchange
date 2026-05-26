@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 import type { Transaction } from "@/store/viax-store";
 
 function mapTransaction(row: Record<string, unknown>): Transaction {
@@ -16,7 +16,7 @@ export function useTransactions() {
   return useQuery({
     queryKey: ["transactions"],
     queryFn: async () => {
-      const { data, error } = (await db
+      const { data, error } = (await supabase
         .from("transactions")
         .select("*")
         .order("created_at", { ascending: false })

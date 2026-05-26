@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { db as supabase } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 import { casinoDailySpinFn, type SpinResult } from "@/actions/casino";
 import { useAuth } from "@/hooks/use-auth";
 

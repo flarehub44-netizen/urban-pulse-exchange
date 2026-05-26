@@ -1,8 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { SupabaseFnContext } from "@/integrations/supabase/loose";
-import { db } from "@/integrations/supabase/loose";
+import type { SupabaseFnContext } from "@/integrations/supabase/context";
+import { supabase } from "@/integrations/supabase/client";
+import { mapSupabaseBusinessError } from "@/lib/server-errors";
 
 const placeBetSchema = z.object({
   marketId: z.string(),
@@ -20,7 +21,7 @@ export const placeBetFn = createServerFn({ method: "POST" })
       p_side: data.side,
       p_stake: data.stake,
     });
-    if (error) throw new Error(error.message);
+    if (error) throw mapSupabaseBusinessError(error.message);
     return result as {
       bet_id: string;
       tx_id: string;
@@ -39,7 +40,7 @@ export const saveBetNoteFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { bet_id: string; note: string }) => d)
   .handler(async ({ data }) => {
-    const { error } = await db
+    const { error } = await supabase
       .from("bets")
       .update({ note: data.note.trim().slice(0, 280) })
       .eq("id", data.bet_id);

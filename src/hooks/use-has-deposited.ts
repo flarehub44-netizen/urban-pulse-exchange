@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 
 export function useHasDeposited(userId?: string | null) {
   return useQuery({
     queryKey: ["has-deposited", userId],
     queryFn: async () => {
-      const { data, error } = await db.rpc("user_has_deposited");
+      const { data, error } = await supabase.rpc("user_has_deposited");
       if (error) throw error;
       return Boolean(data);
     },

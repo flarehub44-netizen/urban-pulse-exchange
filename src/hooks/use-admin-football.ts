@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminFootballResolveFn, adminFootballSyncFn } from "@/actions/football-admin";
 import { useAdminUpdateSetting } from "@/hooks/use-admin-dashboard";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 
 export type FootballPendingRow = {
   api_fixture_id: number;
@@ -47,7 +47,7 @@ export function useAdminFootballPending() {
   return useQuery({
     queryKey: ["admin-football-pending"],
     queryFn: async () => {
-      const { data, error } = await db.rpc("admin_list_football_pending", { p_limit: 100 });
+      const { data, error } = await supabase.rpc("admin_list_football_pending", { p_limit: 100 });
       if (error) throw error;
       return (data ?? []) as FootballPendingRow[];
     },
@@ -59,7 +59,7 @@ export function useAdminFootballDrafts() {
   return useQuery({
     queryKey: ["admin-football-drafts"],
     queryFn: async () => {
-      const { data, error } = await db.rpc("admin_list_football_drafts", { p_limit: 100 });
+      const { data, error } = await supabase.rpc("admin_list_football_drafts", { p_limit: 100 });
       if (error) throw error;
       return (data ?? []) as FootballDraftRow[];
     },
@@ -71,7 +71,7 @@ export function useAdminFootballLive() {
   return useQuery({
     queryKey: ["admin-football-live"],
     queryFn: async () => {
-      const { data, error } = await db.rpc("admin_list_football_live", { p_limit: 100 });
+      const { data, error } = await supabase.rpc("admin_list_football_live", { p_limit: 100 });
       if (error) throw error;
       return (data ?? []) as FootballLiveRow[];
     },
@@ -83,7 +83,7 @@ export function useAdminApproveFootballFixture() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (fixtureId: number) => {
-      const { data, error } = await db.rpc("admin_approve_football_fixture", {
+      const { data, error } = await supabase.rpc("admin_approve_football_fixture", {
         p_fixture_id: fixtureId,
       });
       if (error) throw error;
@@ -100,7 +100,7 @@ export function useAdminRejectFootballFixture() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ fixtureId, reason }: { fixtureId: number; reason?: string }) => {
-      const { data, error } = await db.rpc("admin_reject_football_fixture", {
+      const { data, error } = await supabase.rpc("admin_reject_football_fixture", {
         p_fixture_id: fixtureId,
         p_reason: reason ?? null,
       });
@@ -117,7 +117,7 @@ export function useAdminPublishFootballMarket() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (marketId: string) => {
-      const { data, error } = await db.rpc("admin_publish_football_market", {
+      const { data, error } = await supabase.rpc("admin_publish_football_market", {
         p_market_id: marketId,
       });
       if (error) throw error;
@@ -135,7 +135,7 @@ export function useAdminVoidFootballMarket() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ marketId, reason }: { marketId: string; reason?: string }) => {
-      const { data, error } = await db.rpc("admin_void_football_market", {
+      const { data, error } = await supabase.rpc("admin_void_football_market", {
         p_market_id: marketId,
         p_reason: reason ?? "admin_void",
       });
@@ -155,7 +155,7 @@ export function useFootballLeagueSettings() {
   return useQuery({
     queryKey: ["football-league-settings"],
     queryFn: async () => {
-      const { data, error } = await db
+      const { data, error } = await supabase
         .from("platform_settings")
         .select("key, value")
         .in("key", [

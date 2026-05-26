@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { validateWebhookSignature, type SyncPayWebhookPayload } from "@/lib/syncpay";
+import { assertRateLimit } from "@/lib/rate-limit.server";
 
 function getServiceClient() {
   return createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
@@ -19,13 +20,16 @@ export const Route = createFileRoute("/api/webhooks/syncpay")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const ip = request.headers.get("cf-connecting-ip") ?? "unknown";
+        const limited = assertRateLimit(`syncpay:${ip}`, { max: 60, windowMs: 60_000 });
+        if (limited) return limited;
+
         const rawBody = await request.text();
         const signature = request.headers.get("x-syncpay-signature") ?? "";
 
-        // 1. Validar assinatura HMAC — rejeitar qualquer payload não autenticado
         const valid = await validateWebhookSignature(rawBody, signature);
         if (!valid) {
-          console.error("[SyncPay Webhook] Invalid signature — rejected");
+          console.error("[SyncPay Webhook] Invalid signature � rejected");
           return json({ error: "invalid_signature" }, 401);
         }
 
@@ -39,7 +43,6 @@ export const Route = createFileRoute("/api/webhooks/syncpay")({
         const { event, data } = payload;
         const supabase = getServiceClient();
 
-        // 2. Buscar o payment_intent pelo provider_id do SyncPay
         const { data: intent } = await supabase
           .from("payment_intents")
           .select("id, user_id, type, amount, status")
@@ -47,17 +50,14 @@ export const Route = createFileRoute("/api/webhooks/syncpay")({
           .single();
 
         if (!intent) {
-          // Idempotência: SyncPay re-envia eventos — logar e retornar 200
           console.warn("[SyncPay Webhook] Unknown provider_id:", data.id);
           return json({ ok: true, ignored: true });
         }
 
-        // 3. Idempotência: ignorar se já processado
         if (intent.status !== "pending") {
           return json({ ok: true, already_processed: true });
         }
 
-        // 4. Depósito confirmado → creditar saldo
         if (event === "PAYMENT_RECEIVED" && intent.type === "deposit") {
           const { error: creditErr } = await supabase.rpc("service_credit_balance", {
             p_user_id: intent.user_id,
@@ -78,7 +78,6 @@ export const Route = createFileRoute("/api/webhooks/syncpay")({
           return json({ ok: true });
         }
 
-        // 5. Saque confirmado pelo banco → marcar como pago
         if (event === "PAYOUT_COMPLETED" && intent.type === "withdraw") {
           await supabase
             .from("payment_intents")
@@ -87,7 +86,6 @@ export const Route = createFileRoute("/api/webhooks/syncpay")({
           return json({ ok: true });
         }
 
-        // 6. Falha ou expiração → estornar saldo se era saque
         if (["PAYMENT_FAILED", "PAYMENT_EXPIRED", "PAYOUT_FAILED"].includes(event)) {
           const newStatus = event.includes("EXPIRED") ? "expired" : "failed";
 

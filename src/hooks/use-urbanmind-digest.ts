@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { db } from "@/integrations/supabase/loose";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
 export type UrbanMindDigest = {
@@ -16,7 +16,7 @@ export function useUrbanMindDigest() {
   return useQuery({
     queryKey: ["urbanmind-digest", userId],
     queryFn: async () => {
-      const { data, error } = await db.rpc("get_urbanmind_digest");
+      const { data, error } = await supabase.rpc("get_urbanmind_digest");
       if (error) throw error;
       return data as UrbanMindDigest;
     },
