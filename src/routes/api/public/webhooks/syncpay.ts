@@ -26,6 +26,10 @@ export const Route = createFileRoute("/api/public/webhooks/syncpay")({
 
         const rawBody = await request.text();
         const signature = request.headers.get("x-syncpay-signature") ?? "";
+        const providerEventId =
+          request.headers.get("x-syncpay-event-id") ??
+          request.headers.get("x-event-id") ??
+          null;
 
         const valid = await validateWebhookSignature(rawBody, signature);
         if (!valid) {
@@ -42,67 +46,34 @@ export const Route = createFileRoute("/api/public/webhooks/syncpay")({
 
         const { event, data } = payload;
         const supabase = getServiceClient();
+        const { data: result, error: processErr } = await supabase.rpc(
+          "service_process_syncpay_webhook",
+          {
+            p_provider_id: data.id,
+            p_event: event,
+            p_payload: payload as unknown as Record<string, unknown>,
+            p_signature: signature,
+            p_provider_event_id: providerEventId,
+          },
+        );
 
-        const { data: intent } = await supabase
-          .from("payment_intents")
-          .select("id, user_id, type, amount, status")
-          .eq("provider_id", data.id)
-          .single();
-
-        if (!intent) {
-          console.warn("[SyncPay Webhook] Unknown provider_id:", data.id);
-          return json({ ok: true, ignored: true });
-        }
-
-        if (intent.status !== "pending") {
-          return json({ ok: true, already_processed: true });
-        }
-
-        if (event === "PAYMENT_RECEIVED" && intent.type === "deposit") {
-          const { error: creditErr } = await supabase.rpc("service_credit_balance", {
-            p_user_id: intent.user_id,
-            p_amount: intent.amount,
-            p_intent_id: intent.id,
+        if (processErr) {
+          console.error("[SyncPay Webhook] process failed", {
+            providerId: data.id,
+            providerEventId,
+            event,
+            error: processErr.message,
           });
-
-          if (creditErr) {
-            console.error("[SyncPay Webhook] Credit failed:", creditErr.message);
-            return json({ error: "credit_failed" }, 500);
-          }
-
-          await supabase
-            .from("payment_intents")
-            .update({ status: "paid", settled_at: new Date().toISOString() })
-            .eq("id", intent.id);
-
-          return json({ ok: true });
+          return json({ error: "process_failed" }, 500);
         }
 
-        if (event === "PAYOUT_COMPLETED" && intent.type === "withdraw") {
-          await supabase
-            .from("payment_intents")
-            .update({ status: "paid", settled_at: new Date().toISOString() })
-            .eq("id", intent.id);
-          return json({ ok: true });
-        }
-
-        if (["PAYMENT_FAILED", "PAYMENT_EXPIRED", "PAYOUT_FAILED"].includes(event)) {
-          const newStatus = event.includes("EXPIRED") ? "expired" : "failed";
-
-          if (intent.type === "withdraw") {
-            await supabase.rpc("service_refund_withdrawal", {
-              p_user_id: intent.user_id,
-              p_amount: intent.amount,
-              p_intent_id: intent.id,
-            });
-          }
-
-          await supabase.from("payment_intents").update({ status: newStatus }).eq("id", intent.id);
-
-          return json({ ok: true });
-        }
-
-        return json({ ok: true, event_ignored: event });
+        console.info("[SyncPay Webhook] processed", {
+          providerId: data.id,
+          providerEventId,
+          event,
+          result,
+        });
+        return json(result ?? { ok: true });
       },
     },
   },

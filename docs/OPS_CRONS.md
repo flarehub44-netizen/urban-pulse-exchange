@@ -23,7 +23,7 @@ Não configure um segundo Cron Trigger HTTP apontando para as mesmas rotas em pa
 | Demo markets refresh | 6 h | Supabase `pg_cron` | ver [OPS_MARKETS.md](./OPS_MARKETS.md) | — |
 | Football sync | `*/30 * * * *` | Worker `scheduled` | `runFootballSync()` | `SUPABASE_SERVICE_ROLE_KEY`, `API_FOOTBALL_KEY` |
 | Football resolve | `*/5 * * * *` | Worker `scheduled` | `runFootballResolve()` | idem |
-| SyncPay webhook | sob demanda | Worker HTTP | `/api/webhooks/syncpay` | `SUPABASE_SERVICE_ROLE_KEY`, HMAC SyncPay |
+| SyncPay webhook | sob demanda | Worker HTTP | `/api/public/webhooks/syncpay` | `SUPABASE_SERVICE_ROLE_KEY`, `SYNCPAY_WEBHOOK_SECRET` |
 
 ## Futebol — manual
 

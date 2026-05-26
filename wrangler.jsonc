@@ -7,6 +7,7 @@
   // Required at deploy (wrangler secret put or Dashboard → Variables):
   //   SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, SUPABASE_SERVICE_ROLE_KEY
   //   API_FOOTBALL_KEY, CRON_SECRET
+  //   SYNCPAY_API_URL, SYNCPAY_API_KEY, SYNCPAY_WEBHOOK_SECRET
   "triggers": {
     "crons": ["*/30 * * * *", "*/5 * * * *"],
   },

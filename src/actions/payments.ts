@@ -4,7 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireRegisteredAuth } from "@/integrations/supabase/require-registered-middleware";
 import type { SupabaseFnContext } from "@/integrations/supabase/context";
 import { createClient } from "@supabase/supabase-js";
-import { createPixCharge } from "@/lib/syncpay";
+import { createPixCharge, createPixPayout } from "@/lib/syncpay";
 import { formatBRL } from "@/lib/parimutuel";
 
 // Service-role client para escrita nas tabelas de pagamento
@@ -53,6 +53,11 @@ export const initiateDepositFn = createServerFn({ method: "POST" })
       description: `Depósito ViaX — ${formatBRL(data.amount)}`,
       expiresInMinutes: 30,
     });
+    console.info("[SyncPay] deposit charge created", {
+      intentId: intent.id,
+      providerId: charge.id,
+      amount: data.amount,
+    });
 
     // 3. Atualizar intent com dados do provider
     await service
@@ -63,6 +68,7 @@ export const initiateDepositFn = createServerFn({ method: "POST" })
         qr_code_img: charge.qr_code_base64,
         expires_at: charge.expiration,
         status: "pending",
+        provider_payload: charge as unknown as Record<string, unknown>,
         meta: charge as unknown as Record<string, unknown>,
       })
       .eq("id", intent.id);
@@ -84,7 +90,8 @@ export const initiateWithdrawFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth, requireRegisteredAuth])
   .inputValidator(withdrawSchema)
   .handler(async ({ data, context }) => {
-    const { supabase } = context as unknown as SupabaseFnContext;
+    const { supabase, userId } = context as unknown as SupabaseFnContext;
+    const service = getServiceClient();
 
     // RPC cria o intent + reserva o saldo + aplica KYC gate
     const { data: result, error } = await supabase.rpc("request_withdrawal", {
@@ -93,8 +100,57 @@ export const initiateWithdrawFn = createServerFn({ method: "POST" })
     });
 
     if (error) throw new Error(error.message);
+    const parsed = result as { intent_id: string; balance: number };
 
-    return result as { intent_id: string; balance: number };
+    try {
+      const payout = await createPixPayout({
+        amount: data.amount,
+        pixKey: data.pixKey,
+        correlationId: parsed.intent_id,
+        description: `Saque ViaX — ${formatBRL(data.amount)}`,
+      });
+      console.info("[SyncPay] payout created", {
+        intentId: parsed.intent_id,
+        providerId: payout.id,
+        amount: data.amount,
+      });
+
+      const { error: updateErr } = await service
+        .from("payment_intents")
+        .update({
+          provider_id: payout.id,
+          status: "pending",
+          provider_payload: payout as unknown as Record<string, unknown>,
+          meta: payout as unknown as Record<string, unknown>,
+        })
+        .eq("id", parsed.intent_id);
+
+      if (updateErr) {
+        throw new Error(updateErr.message);
+      }
+    } catch (payoutErr) {
+      // Se falhar ao criar payout no provider, estorna a reserva imediatamente.
+      await service.rpc("service_refund_withdrawal", {
+        p_user_id: userId,
+        p_amount: data.amount,
+        p_intent_id: parsed.intent_id,
+      });
+      await service
+        .from("payment_intents")
+        .update({
+          status: "failed",
+          meta: {
+            reason: "payout_init_failed",
+            message: payoutErr instanceof Error ? payoutErr.message : "unknown_error",
+          },
+        })
+        .eq("id", parsed.intent_id);
+      throw new Error(
+        payoutErr instanceof Error ? payoutErr.message : "Falha ao iniciar saque no provedor",
+      );
+    }
+
+    return parsed;
   });
 
 /**

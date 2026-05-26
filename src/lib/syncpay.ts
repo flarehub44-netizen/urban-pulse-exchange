@@ -4,6 +4,9 @@
 const API_URL = process.env.SYNCPAY_API_URL ?? "https://api.syncpay.com.br/v1";
 const API_KEY = process.env.SYNCPAY_API_KEY ?? "";
 const WEBHOOK_SECRET = process.env.SYNCPAY_WEBHOOK_SECRET ?? "";
+const IS_PROD = process.env.NODE_ENV === "production";
+const REQUEST_TIMEOUT_MS = 10_000;
+const MAX_RETRIES = 2;
 
 export type PixChargeResponse = {
   id: string; // provider_id
@@ -36,24 +39,71 @@ export type SyncPayWebhookPayload = {
   };
 };
 
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (!API_KEY) throw new Error("SYNCPAY_API_KEY not configured");
 
-  const res = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${API_KEY}`,
-      ...init.headers,
-    },
-  });
+  let lastError: Error | null = null;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt += 1) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
+    try {
+      const startedAt = Date.now();
+      const res = await fetch(`${API_URL}${path}`, {
+        ...init,
+        signal: ctrl.signal,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${API_KEY}`,
+          ...init.headers,
+        },
+      });
 
-  if (!res.ok) {
-    const body = await res.text().catch(() => "(empty)");
-    throw new Error(`SyncPay ${res.status}: ${body}`);
+      if (!res.ok) {
+        const body = await res.text().catch(() => "(empty)");
+        const err = new Error(`SyncPay ${res.status}: ${body}`);
+        const retryable = res.status >= 500 || res.status === 429;
+        if (!retryable || attempt === MAX_RETRIES) {
+          throw err;
+        }
+        lastError = err;
+        const backoffMs = 250 * 2 ** attempt;
+        console.warn("[SyncPay] retrying request", {
+          path,
+          attempt,
+          backoffMs,
+          status: res.status,
+        });
+        await sleep(backoffMs);
+        continue;
+      }
+
+      const durationMs = Date.now() - startedAt;
+      console.info("[SyncPay] request ok", {
+        path,
+        method: init.method ?? "GET",
+        durationMs,
+        attempt,
+      });
+      return res.json() as Promise<T>;
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error("Unknown SyncPay request error");
+      const retryable = lastError.name === "AbortError";
+      if (!retryable || attempt === MAX_RETRIES) {
+        throw lastError;
+      }
+      const backoffMs = 250 * 2 ** attempt;
+      console.warn("[SyncPay] timeout/network retry", { path, attempt, backoffMs });
+      await sleep(backoffMs);
+    } finally {
+      clearTimeout(timer);
+    }
   }
 
-  return res.json() as Promise<T>;
+  throw lastError ?? new Error("SyncPay request failed");
 }
 
 /**
@@ -107,8 +157,12 @@ export async function validateWebhookSignature(
   signatureHeader: string,
 ): Promise<boolean> {
   if (!WEBHOOK_SECRET) {
-    console.warn("[SyncPay] SYNCPAY_WEBHOOK_SECRET not set — skipping signature validation");
-    return true; // aceita em dev; NUNCA em produção sem o secret configurado
+    if (IS_PROD) {
+      console.error("[SyncPay] Missing SYNCPAY_WEBHOOK_SECRET in production");
+      return false;
+    }
+    console.warn("[SyncPay] SYNCPAY_WEBHOOK_SECRET not set — allowing only in non-production");
+    return true;
   }
 
   try {

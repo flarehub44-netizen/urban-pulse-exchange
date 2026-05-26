@@ -537,9 +537,9 @@ Gerado por `scripts/gen-rpc-index.mjs`.
 - `resolve_football_fixture`
   - src/lib/football-cron.server.ts
 - `service_credit_balance`
-  - src/routes/api/webhooks/syncpay.ts
+  - src/routes/api/public/webhooks/syncpay.ts
 - `service_refund_withdrawal`
-  - src/routes/api/webhooks/syncpay.ts
+  - src/routes/api/public/webhooks/syncpay.ts
 - `set_casino_opt_out`
   - src/actions/casino.ts
 - `toggle_trader_follow`
