@@ -42,7 +42,7 @@ export function useNotificationPrefs() {
         .eq("id", userId)
         .single();
       if (data?.notification_prefs) {
-        const merged = { ...defaults, ...data.notification_prefs };
+        const merged = { ...defaults, ...(data.notification_prefs as object) };
         setPrefs(merged);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
       }
