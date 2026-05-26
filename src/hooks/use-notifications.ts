@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import type { ViaXNotification } from "@/store/viax-store";
+import { getEngagementSnapshotFn } from "@/actions/account";
+import { useEngagementSnapshot } from "@/hooks/use-engagement-snapshot";
 
 function mapNotification(row: Record<string, unknown>): ViaXNotification {
   return {
@@ -14,16 +15,16 @@ function mapNotification(row: Record<string, unknown>): ViaXNotification {
 }
 
 export function useNotifications() {
+  const snapshot = useEngagementSnapshot();
+
   return useQuery({
     queryKey: ["notifications"],
     queryFn: async () => {
-      const { data, error } = (await supabase
-        .from("notifications")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(20)) as { data: Record<string, unknown>[] | null; error: Error | null };
-      if (error) throw error;
-      return (data ?? []).map(mapNotification);
+      if (snapshot.data) return snapshot.data.notifications as ViaXNotification[];
+      const data = await getEngagementSnapshotFn({
+        data: { notificationLimit: 20, betsLimit: 1, feedLimit: 1 },
+      });
+      return data.notifications as ViaXNotification[];
     },
     staleTime: 30_000,
   });

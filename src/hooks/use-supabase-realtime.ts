@@ -38,6 +38,7 @@ export function useSupabaseRealtime() {
       .channel("feed-live", { config: { private: true } })
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "feed_posts" }, () => {
         queryClient.invalidateQueries({ queryKey: ["feed"] });
+        queryClient.invalidateQueries({ queryKey: ["engagement", "snapshot"] });
       })
       .subscribe();
 
@@ -67,6 +68,7 @@ export function useSupabaseRealtime() {
               notif,
               ...(old ?? []),
             ]);
+            queryClient.invalidateQueries({ queryKey: ["engagement", "snapshot"] });
             toast(notif.text);
           },
         )

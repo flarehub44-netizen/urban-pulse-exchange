@@ -1,10 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Division } from "@/store/viax-store";
-
-/** Explicit columns — avoids SELECT * leaking future sensitive columns. */
-const OWN_PROFILE_COLUMNS =
-  "id,name,handle,avatar,division,balance,xp,xp_to_next,streak,streak_multiplier,streak_freezes_left,recovery_mode,recovery_days_left,accuracy,roi,pnl,volume_24h,city,neighborhood,is_admin" as const;
+import { getOwnProfileFn } from "@/actions/account";
 
 export interface Profile {
   id: string;
@@ -27,31 +24,6 @@ export interface Profile {
   city: string;
   neighborhood: string;
   isAdmin: boolean;
-}
-
-function mapProfile(row: Record<string, unknown>): Profile {
-  return {
-    id: row.id as string,
-    name: row.name as string,
-    handle: row.handle as string,
-    avatar: row.avatar as string,
-    division: row.division as Division,
-    balance: Number(row.balance),
-    xp: Number(row.xp),
-    xpToNext: Number(row.xp_to_next),
-    streak: Number(row.streak),
-    streakMultiplier: Number(row.streak_multiplier ?? 1),
-    streakFreezesLeft: Number(row.streak_freezes_left ?? 0),
-    recoveryMode: Boolean(row.recovery_mode),
-    recoveryDaysLeft: Number(row.recovery_days_left ?? 0),
-    accuracy: Number(row.accuracy),
-    roi: Number(row.roi),
-    pnl: Number(row.pnl),
-    volume24h: Number(row.volume_24h ?? row.volume ?? 0),
-    city: row.city as string,
-    neighborhood: row.neighborhood as string,
-    isAdmin: Boolean(row.is_admin),
-  };
 }
 
 function mapPublicProfile(row: Record<string, unknown>): Profile {
@@ -89,13 +61,7 @@ export function useProfile(userId?: string | null) {
       const isOwn = !!user?.id && user.id === userId;
 
       if (isOwn) {
-        const { data, error } = (await supabase
-          .from("profiles")
-          .select(OWN_PROFILE_COLUMNS)
-          .eq("id", userId!)
-          .single()) as { data: Record<string, unknown> | null; error: Error | null };
-        if (error) throw error;
-        return mapProfile(data as Record<string, unknown>);
+        return (await getOwnProfileFn()) as Profile;
       }
 
       const { data, error } = (await supabase

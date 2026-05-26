@@ -2,15 +2,15 @@
 
 ## Variáveis de ambiente
 
-| Variável | Onde | Obrigatória |
-|----------|------|-------------|
-| `VITE_SUPABASE_URL` | Build cliente | Sim (dev/CI) |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | Build cliente (anon) | Sim |
-| `SUPABASE_URL` | Worker SSR | Sim (deploy) |
-| `SUPABASE_PUBLISHABLE_KEY` | Worker SSR | Sim |
-| `SUPABASE_SERVICE_ROLE_KEY` | Worker cron/webhooks | Sim (prod) |
-| `CRON_SECRET` | `/api/cron/*` manual | Recomendado |
-| `API_FOOTBALL_KEY` | Sync futebol | Se futebol ativo |
+| Variável                        | Onde                 | Obrigatória      |
+| ------------------------------- | -------------------- | ---------------- |
+| `VITE_SUPABASE_URL`             | Build cliente        | Sim (dev/CI)     |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Build cliente (anon) | Sim              |
+| `SUPABASE_URL`                  | Worker SSR           | Sim (deploy)     |
+| `SUPABASE_PUBLISHABLE_KEY`      | Worker SSR           | Sim              |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Worker cron/webhooks | Sim (prod)       |
+| `CRON_SECRET`                   | `/api/cron/*` manual | Recomendado      |
+| `API_FOOTBALL_KEY`              | Sync futebol         | Se futebol ativo |
 
 Não commitar chaves reais. Rotacionar anon key no Supabase se o repositório foi público com fallbacks antigos.
 
@@ -18,41 +18,41 @@ Não commitar chaves reais. Rotacionar anon key no Supabase se o repositório fo
 
 Operações sensíveis (apostas, carteira, depósito) devem usar **RPC** ou **serverFn**; `.from()` abaixo depende de políticas RLS.
 
-| Tabela | SELECT | INSERT | UPDATE | DELETE | Notas |
-|--------|--------|--------|--------|--------|-------|
-| `markets` | anon + authenticated | admin/RPC | admin/RPC | admin | `markets_read_anon`, `markets_read_all` |
-| `market_history` | anon + authenticated | — | — | — | leitura pública |
-| `regions` | anon + authenticated | — | — | — | |
-| `bets` | own (+ público limitado via views/RPC) | via `place_bet` RPC | own note | — | não confiar em insert direto |
-| `profiles` | own only | signup trigger | own campos não sensíveis | — | admin via RPC; sem `pix_key` na tabela |
-| `transactions` | own | service/RPC | — | — | callback auth |
-| `notifications` | own | sistema | own read | — | |
-| `feed_posts` | público | authenticated | — | — | |
-| `feed_comments` | público | authenticated | — | — | |
-| `leaderboard` | público | — | — | — | |
-| `market_alerts` | own | own | own | own | `user_own_alerts` |
-| `daily_check_ins` | own | own | — | — | |
-| `trader_follows` | own/rede | own | — | own | |
-| `football_markets` | público (regras status) | admin | admin | admin | apostas via RPC |
-| `football_bets` | own | RPC | — | — | |
-| `payment_intents` | own | service | service | — | `pix_key` = chave saque (RPC) ou metadata depósito; webhook SyncPay |
-| `platform_settings` | leitura flags | admin | admin | — | preferir RPC `is_*_enabled` |
-| `daily_polls` / `poll_votes` | público | own vote | — | — | |
-| `platform_events` | público | admin | — | — | |
+| Tabela                       | SELECT                                 | INSERT              | UPDATE                   | DELETE | Notas                                                               |
+| ---------------------------- | -------------------------------------- | ------------------- | ------------------------ | ------ | ------------------------------------------------------------------- |
+| `markets`                    | anon + authenticated                   | admin/RPC           | admin/RPC                | admin  | `markets_read_anon`, `markets_read_all`                             |
+| `market_history`             | anon + authenticated                   | —                   | —                        | —      | leitura pública                                                     |
+| `regions`                    | anon + authenticated                   | —                   | —                        | —      |                                                                     |
+| `bets`                       | own (+ público limitado via views/RPC) | via `place_bet` RPC | own note                 | —      | não confiar em insert direto                                        |
+| `profiles`                   | own only                               | signup trigger      | own campos não sensíveis | —      | admin via RPC; sem `pix_key` na tabela                              |
+| `transactions`               | own                                    | service/RPC         | —                        | —      | callback auth                                                       |
+| `notifications`              | own                                    | sistema             | own read                 | —      |                                                                     |
+| `feed_posts`                 | público                                | authenticated       | —                        | —      |                                                                     |
+| `feed_comments`              | público                                | authenticated       | —                        | —      |                                                                     |
+| `leaderboard`                | público                                | —                   | —                        | —      |                                                                     |
+| `market_alerts`              | own                                    | own                 | own                      | own    | `user_own_alerts`                                                   |
+| `daily_check_ins`            | own                                    | own                 | —                        | —      |                                                                     |
+| `trader_follows`             | own/rede                               | own                 | —                        | own    |                                                                     |
+| `football_markets`           | público (regras status)                | admin               | admin                    | admin  | apostas via RPC                                                     |
+| `football_bets`              | own                                    | RPC                 | —                        | —      |                                                                     |
+| `payment_intents`            | own                                    | service             | service                  | —      | `pix_key` = chave saque (RPC) ou metadata depósito; webhook SyncPay |
+| `platform_settings`          | leitura flags                          | admin               | admin                    | —      | preferir RPC `is_*_enabled`                                         |
+| `daily_polls` / `poll_votes` | público                                | own vote            | —                        | —      |                                                                     |
+| `platform_events`            | público                                | admin               | —                        | —      |                                                                     |
 
 ## Realtime (`realtime.messages` RLS)
 
 Canais privados (`config: { private: true }`) em `src/hooks/*`. Políticas em `20260717000000_realtime_messages_rls.sql`.
 
-| Tópico | Uso |
-|--------|-----|
-| `markets-pool` | pool mercados urbanos |
-| `feed-live` | feed |
-| `football-realtime` | futebol |
-| `markets-lifecycle` | lifecycle UI |
+| Tópico                   | Uso                    |
+| ------------------------ | ---------------------- |
+| `markets-pool`           | pool mercados urbanos  |
+| `feed-live`              | feed                   |
+| `football-realtime`      | futebol                |
+| `markets-lifecycle`      | lifecycle UI           |
 | `notifications:{userId}` | notificações (só dono) |
-| `win-toast-{userId}` | toast vitória |
-| `near-miss-{userId}` | near-miss casino |
+| `win-toast-{userId}`     | toast vitória          |
+| `near-miss-{userId}`     | near-miss casino       |
 
 **Regra:** novo `.channel(...)` → adicionar policy + `private: true`. Rodar `node scripts/check-realtime-private-channels.mjs`.
 
@@ -67,6 +67,7 @@ Canais privados (`config: { private: true }`) em `src/hooks/*`. Políticas em `2
 - `REVOKE` de `PUBLIC` em todas as funções `public` (`20260717000002_revoke_public_function_execute.sql`).
 - Grants explícitos `anon` / `authenticated` / `service_role` nas migrations de feature.
 - Inventário anon: `supabase/tests/security_anon_functions_inventory.sql`.
+- Inventário `SECURITY DEFINER` sem `search_path`: `supabase/tests/security_definer_search_path_inventory.sql`.
 
 ## Checklist pós-alteração de schema
 
@@ -77,4 +78,10 @@ Canais privados (`config: { private: true }`) em `src/hooks/*`. Políticas em `2
 
 ## Rate limiting (edge)
 
-Ver Fase 4: limites em serverFns de aposta e webhook SyncPay documentados no Worker.
+- `/api/public/webhooks/syncpay`: janela curta por IP + assinatura obrigatória.
+- `/api/public/cron/football-*`: `CRON_SECRET` + rate limit por IP.
+- `/api/public/hls-proxy/*` e `/api/public/snapshot-proxy/*`: rate limit por IP para reduzir abuso.
+
+## Governança SQL
+
+Checklist e processo de revisão contínua em [`DB_GOVERNANCE.md`](./DB_GOVERNANCE.md).

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getSnapshotUpstream } from "@/lib/snapshot-upstream-map.server";
+import { assertRateLimit } from "@/lib/rate-limit.server";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -12,7 +13,11 @@ export const Route = createFileRoute("/api/public/snapshot-proxy/$")({
   server: {
     handlers: {
       OPTIONS: async () => new Response(null, { status: 204, headers: CORS_HEADERS }),
-      GET: async ({ params }) => {
+      GET: async ({ request, params }) => {
+        const ip = request.headers.get("cf-connecting-ip") ?? "unknown";
+        const limited = assertRateLimit(`snapshot-proxy:${ip}`, { max: 120, windowMs: 60_000 });
+        if (limited) return limited;
+
         const splat = (params as { _splat?: string })._splat ?? "";
         const [slug] = splat.split("/");
         if (!slug) {

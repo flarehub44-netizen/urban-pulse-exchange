@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { invalidateAllUserQueries } from "@/lib/query-invalidation";
 
 /**
  * UI refresh only — lifecycle runs on pg_cron (`tick_market_lifecycle`).
@@ -14,10 +15,7 @@ export function useResolveExpired() {
 
     const invalidate = () => {
       queryClient.invalidateQueries({ queryKey: ["markets"] });
-      queryClient.invalidateQueries({ queryKey: ["bets"] });
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      queryClient.invalidateQueries({ queryKey: ["me"] });
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      invalidateAllUserQueries(queryClient);
     };
 
     const channel = supabase

@@ -5,10 +5,10 @@ import { requireRegisteredAuth } from "@/integrations/supabase/require-registere
 
 async function adminRpc<T>(
   fn: () => PromiseLike<{ data: T | null; error: { message: string } | null }>,
-): Promise<any> {
+): Promise<T> {
   const { data, error } = await fn();
   if (error) throw new Error(error.message);
-  return data as any;
+  return data as T;
 }
 
 import type { SupabaseFnContext } from "@/integrations/supabase/context";
@@ -96,7 +96,7 @@ export const listPublicCommunityMarketsFn = createServerFn({ method: "GET" }).ha
   const { supabase } = await import("@/integrations/supabase/client");
   const { data, error } = await supabase.rpc("list_public_community_markets", { p_limit: 50 });
   if (error) throw new Error(error.message);
-  return (data ?? []) as any[];
+  return (data ?? []) as unknown[];
 });
 
 export const listMyCommunityMarketsFn = createServerFn({ method: "GET" })
@@ -105,9 +105,8 @@ export const listMyCommunityMarketsFn = createServerFn({ method: "GET" })
     const { supabase } = context as unknown as SupabaseFnContext;
     const { data, error } = await supabase.rpc("list_my_community_markets");
     if (error) throw new Error(error.message);
-    return (data ?? []) as any[];
+    return (data ?? []) as unknown[];
   });
-
 
 const resolveSchema = z.object({
   marketId: z.string(),

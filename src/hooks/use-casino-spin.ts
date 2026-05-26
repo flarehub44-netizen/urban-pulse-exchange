@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { casinoDailySpinFn, type SpinResult } from "@/actions/casino";
 import { useAuth } from "@/hooks/use-auth";
+import { invalidateWalletQueries } from "@/lib/query-invalidation";
 
 export function useCasinoSpinStatus() {
   const { userId } = useAuth();
@@ -28,8 +29,7 @@ export function useCasinoDailySpin() {
     mutationFn: async () => casinoDailySpinFn(),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["casino"] });
-      qc.invalidateQueries({ queryKey: ["me"] });
-      qc.invalidateQueries({ queryKey: ["transactions"] });
+      invalidateWalletQueries(qc);
     },
   });
 }
@@ -53,8 +53,7 @@ export function useCasinoQuickDeposit() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["casino"] });
-      qc.invalidateQueries({ queryKey: ["me"] });
-      qc.invalidateQueries({ queryKey: ["transactions"] });
+      invalidateWalletQueries(qc);
     },
   });
 }

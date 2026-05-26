@@ -9,7 +9,6 @@ export const Route = createFileRoute("/auth/login")({
     redirect: typeof search.redirect === "string" ? search.redirect : undefined,
   }),
   beforeLoad: async ({ search }) => {
-
     await requireGuestOnly();
     const redirectTo =
       typeof search.redirect === "string" && search.redirect ? search.redirect : "/markets";

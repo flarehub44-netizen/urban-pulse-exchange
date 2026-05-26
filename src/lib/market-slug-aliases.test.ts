@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  isKnownLegacyMarketId,
-  resolveMarketRouteId,
-} from "@/lib/market-slug-aliases";
+import { isKnownLegacyMarketId, resolveMarketRouteId } from "@/lib/market-slug-aliases";
 
 describe("market-slug-aliases", () => {
   it("maps legacy slugs to *-live ids", () => {

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { invalidateWalletQueries } from "@/lib/query-invalidation";
 
 export function useWalletDeposit() {
   const queryClient = useQueryClient();
@@ -10,8 +11,7 @@ export function useWalletDeposit() {
       return data as { tx_id: string; balance: number };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["me"] });
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      invalidateWalletQueries(queryClient);
     },
   });
 }
@@ -25,8 +25,7 @@ export function useWalletWithdraw() {
       return data as { tx_id: string; balance: number };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["me"] });
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      invalidateWalletQueries(queryClient);
     },
   });
 }

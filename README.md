@@ -12,7 +12,7 @@ Plataforma de mercados de previsão urbana (trânsito), futebol 1X2 e mercados c
 
 ```bash
 npm ci
-cp .env.example .env.local   # preencher VITE_SUPABASE_* 
+cp .env.example .env.local   # preencher VITE_SUPABASE_*
 npm run dev
 ```
 
@@ -26,30 +26,30 @@ npm run db:push       # aplicar migrations no remoto
 npm run db:types      # regenerar types TypeScript
 ```
 
-Documentação: [`docs/AUTH.md`](docs/AUTH.md), [`docs/FOOTBALL.md`](docs/FOOTBALL.md), [`docs/COMMUNITY_MARKETS.md`](docs/COMMUNITY_MARKETS.md).
+Documentação: [`docs/AUTH.md`](docs/AUTH.md), [`docs/FOOTBALL.md`](docs/FOOTBALL.md), [`docs/COMMUNITY_MARKETS.md`](docs/COMMUNITY_MARKETS.md), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/SLOS.md`](docs/SLOS.md), [`docs/DB_GOVERNANCE.md`](docs/DB_GOVERNANCE.md).
 
 ## Scripts úteis
 
-| Comando | Descrição |
-|---------|-----------|
-| `npm run dev` | Dev server Vite |
-| `npm run build` | Build produção |
-| `npm run deploy` | Build + deploy Worker |
-| `npm run lint` | ESLint |
-| `npm run test` | Vitest (unit) |
-| `npm run test:e2e` | Playwright |
-| `npm run db:push` | Migrations → remoto |
+| Comando            | Descrição             |
+| ------------------ | --------------------- |
+| `npm run dev`      | Dev server Vite       |
+| `npm run build`    | Build produção        |
+| `npm run deploy`   | Build + deploy Worker |
+| `npm run lint`     | ESLint                |
+| `npm run test`     | Vitest (unit)         |
+| `npm run test:e2e` | Playwright            |
+| `npm run db:push`  | Migrations → remoto   |
 
 ## Rotas principais
 
-| Rota | Acesso | Conteúdo |
-|------|--------|----------|
-| `/markets` | Público | Hub: Trânsito · Futebol · Outros (`?segment=`) |
-| `/football/$marketId` | Público | Detalhe jogo 1X2 |
-| `/live` | Público | Mapa ao vivo |
-| `/ranking` | Público | Leaderboards |
-| `/dashboard` | Autenticado | Terminal do trader |
-| `/admin/*` | Admin | Painel operacional |
+| Rota                  | Acesso      | Conteúdo                                       |
+| --------------------- | ----------- | ---------------------------------------------- |
+| `/markets`            | Público     | Hub: Trânsito · Futebol · Outros (`?segment=`) |
+| `/football/$marketId` | Público     | Detalhe jogo 1X2                               |
+| `/live`               | Público     | Mapa ao vivo                                   |
+| `/ranking`            | Público     | Leaderboards                                   |
+| `/dashboard`          | Autenticado | Terminal do trader                             |
+| `/admin/*`            | Admin       | Painel operacional                             |
 
 ## CI
 

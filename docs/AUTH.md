@@ -2,11 +2,11 @@
 
 ## Papéis
 
-| Papel | Armazenamento | Acesso |
-|-------|---------------|--------|
-| **Trader** | `profiles` (padrão) | App `/dashboard`, apostas, carteira |
-| **Afiliado (partner)** | `partner_accounts` | Portal `/partner/*` após aprovação admin |
-| **Admin** | `profiles.is_admin` | `/admin/*` via convite ou allowlist |
+| Papel                  | Armazenamento       | Acesso                                   |
+| ---------------------- | ------------------- | ---------------------------------------- |
+| **Trader**             | `profiles` (padrão) | App `/dashboard`, apostas, carteira      |
+| **Afiliado (partner)** | `partner_accounts`  | Portal `/partner/*` após aprovação admin |
+| **Admin**              | `profiles.is_admin` | `/admin/*` via convite ou allowlist      |
 
 Papéis são **acumulativos**: um partner continua sendo trader; admin pode coexistir com trader.
 

@@ -179,7 +179,7 @@ function MarketDetail() {
     fromList ?? fromPublicList ?? communityDetail?.market ?? directMarket ?? undefined;
   const isCreator = Boolean(
     communityDetail?.isCreator ||
-      (userId && (fromList?.createdBy === userId || fromPublicList?.createdBy === userId)),
+    (userId && (fromList?.createdBy === userId || fromPublicList?.createdBy === userId)),
   );
   const isCommunity = m?.marketKind === "community" || isCommunityId;
   const deferCommunityNotFound = shouldDeferCommunityNotFound({
@@ -216,10 +216,9 @@ function MarketDetail() {
     };
   }, [activeTab, marketId]);
 
-  const resolutionDone =
-    isCommunityId
-      ? communityFetched
-      : !marketsLoading && (!needsDirectFetch || directFetched);
+  const resolutionDone = isCommunityId
+    ? communityFetched
+    : !marketsLoading && (!needsDirectFetch || directFetched);
 
   useEffect(() => {
     if (!clientReady || !resolutionDone || m) return;

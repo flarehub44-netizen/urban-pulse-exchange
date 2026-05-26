@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { getAccountContextFn } from "@/actions/account";
 
 export type AccountContext = {
   auth: {
@@ -35,8 +35,7 @@ export function useAccountContext(enabled = true) {
   return useQuery({
     queryKey: ["account", "context", userId],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_my_account_context");
-      if (error) throw error;
+      const data = await getAccountContextFn();
       return data as AccountContext;
     },
     enabled: enabled && authReady && !!userId,

@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { createFeedPostFn } from "@/actions/feed";
 import { useQueryClient } from "@tanstack/react-query";
+import { invalidateEngagementQueries } from "@/lib/query-invalidation";
 
 export function useWinToast() {
   const { userId } = useAuth();
@@ -29,7 +30,7 @@ export function useWinToast() {
           const text = row.text as string;
           const marketId = (row.market_id as string | null) ?? undefined;
 
-          qc.invalidateQueries({ queryKey: ["notifications"] });
+          invalidateEngagementQueries(qc);
 
           toast.success(text, {
             duration: 8000,
@@ -45,7 +46,7 @@ export function useWinToast() {
                   },
                 })
                   .then(() => {
-                    qc.invalidateQueries({ queryKey: ["feed"] });
+                    invalidateEngagementQueries(qc);
                     toast.success("Post publicado no feed!");
                   })
                   .catch((e: unknown) => {

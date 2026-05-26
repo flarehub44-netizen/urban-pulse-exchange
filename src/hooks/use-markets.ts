@@ -45,7 +45,9 @@ export function useMarkets() {
         .eq("archived", false)
         .order("created_at");
       if (error) throw error;
-      return filterCatalogMarkets((data ?? []).map((row) => mapMarket(row as Record<string, unknown>)));
+      return filterCatalogMarkets(
+        (data ?? []).map((row) => mapMarket(row as Record<string, unknown>)),
+      );
     },
     staleTime: 60_000,
     refetchOnMount: false,

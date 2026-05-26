@@ -104,8 +104,7 @@ export function useCommunityMarketDetail(marketId: string, accessToken?: string)
   const authenticated = !!userId;
   return useQuery({
     queryKey: communityMarketDetailQueryKey(marketId, accessToken, userId),
-    queryFn: () =>
-      fetchCommunityMarketDetail(marketId, accessToken, { authenticated }),
+    queryFn: () => fetchCommunityMarketDetail(marketId, accessToken, { authenticated }),
     enabled: authReady && marketId.startsWith("cm-"),
     retry: false,
   });

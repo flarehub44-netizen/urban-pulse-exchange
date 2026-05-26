@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Side } from "@/lib/parimutuel";
+import { invalidateAllUserQueries } from "@/lib/query-invalidation";
 
 export function useAdminResolveMarket() {
   const queryClient = useQueryClient();
@@ -19,16 +20,13 @@ export function useAdminResolveMarket() {
         p_market_id: marketId,
         p_winning_side: side,
         p_note: note ?? undefined,
-      } as any);
+      });
       if (error) throw error;
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["markets"] });
-      queryClient.invalidateQueries({ queryKey: ["bets"] });
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      queryClient.invalidateQueries({ queryKey: ["me"] });
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      invalidateAllUserQueries(queryClient);
     },
   });
 }

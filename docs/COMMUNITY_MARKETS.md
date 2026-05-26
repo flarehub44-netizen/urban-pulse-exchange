@@ -2,10 +2,10 @@
 
 Traders com **cadastro formal** podem criar mercados Sim/Não:
 
-| Visibilidade | Comportamento |
-|--------------|---------------|
-| **Público** | Listado na aba Mercados → Comunidade |
-| **Privado** | Só com link `?access=TOKEN`; participantes entram via `join_community_market` |
+| Visibilidade | Comportamento                                                                 |
+| ------------ | ----------------------------------------------------------------------------- |
+| **Público**  | Listado na aba Mercados → Comunidade                                          |
+| **Privado**  | Só com link `?access=TOKEN`; participantes entram via `join_community_market` |
 
 ## Regras
 
@@ -27,6 +27,7 @@ Traders com **cadastro formal** podem criar mercados Sim/Não:
 - `/markets/{id}?access=…` — mercado privado
 
 Migrations:
+
 - `supabase/migrations/20260707000000_community_markets.sql`
 - `supabase/migrations/20260708000000_community_moderation.sql` (denúncias, admin list, rate limit join)
 

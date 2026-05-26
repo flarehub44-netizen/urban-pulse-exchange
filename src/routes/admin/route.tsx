@@ -8,7 +8,9 @@ const AdminLayout = React.lazy(() =>
 
 function AdminLayoutLazy() {
   return (
-    <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Carregando painel...</div>}>
+    <Suspense
+      fallback={<div className="p-4 text-sm text-muted-foreground">Carregando painel...</div>}
+    >
       <AdminLayout />
     </Suspense>
   );

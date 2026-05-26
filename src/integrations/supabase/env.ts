@@ -9,9 +9,7 @@ export function resolveSupabasePublicEnv(): { url: string; publishableKey: strin
   if (!url || !publishableKey) {
     const missing = [
       ...(!url ? ["VITE_SUPABASE_URL or SUPABASE_URL"] : []),
-      ...(!publishableKey
-        ? ["VITE_SUPABASE_PUBLISHABLE_KEY or SUPABASE_PUBLISHABLE_KEY"]
-        : []),
+      ...(!publishableKey ? ["VITE_SUPABASE_PUBLISHABLE_KEY or SUPABASE_PUBLISHABLE_KEY"] : []),
     ];
     throw new Error(
       `Missing Supabase environment variable(s): ${missing.join(", ")}. ` +

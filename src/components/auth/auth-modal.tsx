@@ -87,7 +87,7 @@ export function AuthModal() {
   const clearAuthSearch = useCallback(() => {
     if (!urlAuth.auth && !urlAuth.deposit) return;
     navigate({
-      search: ((prev: any) => stripAuthModalSearch(prev as Record<string, unknown>)) as any,
+      search: (prev) => stripAuthModalSearch(prev as Record<string, unknown>),
       replace: true,
     });
   }, [navigate, urlAuth.auth, urlAuth.deposit]);

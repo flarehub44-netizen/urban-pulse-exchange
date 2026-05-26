@@ -22,9 +22,7 @@ export function EventsBanner() {
   const visible = (events ?? []).filter((e) => !dismissed.includes(e.id));
 
   if (isFetched && visible.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">Nenhum evento ativo no momento.</p>
-    );
+    return <p className="text-sm text-muted-foreground">Nenhum evento ativo no momento.</p>;
   }
 
   if (!visible.length) return null;

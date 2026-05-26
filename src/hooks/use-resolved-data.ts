@@ -9,13 +9,21 @@ import { useTransactions } from "@/hooks/use-transactions";
 import { useTraders } from "@/hooks/use-traders";
 import { useNotifications } from "@/hooks/use-notifications";
 import { useFeed } from "@/hooks/use-feed";
+import { useDashboardSnapshot } from "@/hooks/use-dashboard-snapshot";
 
 export function useResolvedProfile() {
   const { userId } = useAuth();
+  const snapshot = useDashboardSnapshot();
   const { data: profile, isLoading, isError } = useProfile(userId);
+  const snapshotProfile = snapshot.data?.profile;
   const seed = useViaX((s) => s.me);
-  const me = pickDbOrSeed(profile, seed);
-  return { me, profile, isLoading, isError };
+  const me = pickDbOrSeed(snapshotProfile ?? profile, seed);
+  return {
+    me,
+    profile: (snapshotProfile ?? profile) as typeof profile,
+    isLoading: snapshot.isLoading || isLoading,
+    isError: snapshot.isError || isError,
+  };
 }
 
 export function useResolvedMarkets() {
@@ -31,10 +39,15 @@ export function useResolvedRegions(options?: { refetchInterval?: number }) {
 }
 
 export function useResolvedTransactions() {
+  const snapshot = useDashboardSnapshot();
   const { data: db, isLoading, isError } = useTransactions();
   const seed = useViaX((s) => s.transactions);
-  const transactions = pickDbOrEmptyArray(db, seed);
-  return { transactions, isLoading, isError };
+  const transactions = pickDbOrEmptyArray(snapshot.data?.transactions ?? db, seed);
+  return {
+    transactions,
+    isLoading: snapshot.isLoading || isLoading,
+    isError: snapshot.isError || isError,
+  };
 }
 
 export function useResolvedTraders() {

@@ -8,7 +8,9 @@ const PartnerLayout = React.lazy(() =>
 
 function PartnerLayoutLazy() {
   return (
-    <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Carregando portal...</div>}>
+    <Suspense
+      fallback={<div className="p-4 text-sm text-muted-foreground">Carregando portal...</div>}
+    >
       <PartnerLayout />
     </Suspense>
   );

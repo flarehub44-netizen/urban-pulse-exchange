@@ -15,7 +15,7 @@ export function mapSupabaseBusinessError(errorMessage: string): AppError {
     return new AppError("INSUFFICIENT_BALANCE", "Saldo insuficiente para esta aposta.", 400);
   }
   if (text.includes("closed") || text.includes("encerr")) {
-    return new AppError("MARKET_CLOSED", "Este mercado não aceita mais apostas.", 400);
+    return new AppError("MARKET_CLOSED", "Este mercado nï¿½o aceita mais apostas.", 400);
   }
   return new AppError("UNKNOWN", errorMessage, 400);
 }

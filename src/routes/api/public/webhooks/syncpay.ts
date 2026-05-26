@@ -27,13 +27,11 @@ export const Route = createFileRoute("/api/public/webhooks/syncpay")({
         const rawBody = await request.text();
         const signature = request.headers.get("x-syncpay-signature") ?? "";
         const providerEventId =
-          request.headers.get("x-syncpay-event-id") ??
-          request.headers.get("x-event-id") ??
-          null;
+          request.headers.get("x-syncpay-event-id") ?? request.headers.get("x-event-id") ?? null;
 
         const valid = await validateWebhookSignature(rawBody, signature);
         if (!valid) {
-          console.error("[SyncPay Webhook] Invalid signature — rejected");
+          console.error("[SyncPay Webhook] Invalid signature ï¿½ rejected");
           return json({ error: "invalid_signature" }, 401);
         }
 

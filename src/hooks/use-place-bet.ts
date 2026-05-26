@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { placeBetFn } from "@/actions/bets";
 import type { Market, Side } from "@/store/viax-store";
+import { invalidateAllUserQueries } from "@/lib/query-invalidation";
 
 export function usePlaceBet() {
   const queryClient = useQueryClient();
@@ -28,8 +29,7 @@ export function usePlaceBet() {
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["markets"] });
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      queryClient.invalidateQueries({ queryKey: ["me"] });
+      invalidateAllUserQueries(queryClient);
     },
 
     onError: (_err, _vars, context) => {

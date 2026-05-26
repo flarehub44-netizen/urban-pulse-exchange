@@ -18,7 +18,7 @@ export function useAdminFreezeMarket() {
         p_market_id: marketId,
         p_frozen: frozen,
         p_note: note ?? undefined,
-      } as any);
+      });
       if (error) throw error;
       return data;
     },

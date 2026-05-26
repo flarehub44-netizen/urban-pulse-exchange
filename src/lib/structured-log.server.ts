@@ -12,6 +12,21 @@ export function logJob(
   );
 }
 
+/** Structured API/BFF metrics for p50/p95 analysis in logs. */
+export function logApiMetric(
+  endpoint: string,
+  payload: Record<string, unknown> & { ok?: boolean; durationMs?: number },
+): void {
+  console.log(
+    JSON.stringify({
+      kind: "api_metric",
+      endpoint,
+      ts: new Date().toISOString(),
+      ...payload,
+    }),
+  );
+}
+
 export async function withJobLog<T extends Record<string, unknown>>(
   job: string,
   fn: () => Promise<T>,

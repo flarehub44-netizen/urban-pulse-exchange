@@ -14,6 +14,7 @@ import { trackDepositFunnel } from "@/lib/deposit-funnel";
 import { getLastImpulseAmount, setLastImpulseAmount } from "@/lib/impulse-deposit";
 import { getStoredPartnerRef } from "@/lib/partner-attribution";
 import { copy } from "@/copy/pt-BR";
+import { invalidateWalletQueries } from "@/lib/query-invalidation";
 
 interface QuickDepositSheetProps {
   open: boolean;
@@ -62,8 +63,7 @@ export function QuickDepositSheet({
           trackDepositFunnel("deposit_paid", { amount: status.amount });
           setDone(true);
           setQr(null);
-          queryClient.invalidateQueries({ queryKey: ["me"] });
-          queryClient.invalidateQueries({ queryKey: ["transactions"] });
+          invalidateWalletQueries(queryClient);
           queryClient.invalidateQueries({ queryKey: ["has-deposited"] });
           toast.success("Depósito confirmado!", {
             description: `${formatBRL(status.amount)} adicionado ao seu saldo.`,
@@ -85,7 +85,7 @@ export function QuickDepositSheet({
       }
     }, 5000);
     return () => clearInterval(id);
-  }, [qr, done, queryClient, onOpenChange]);
+  }, [qr, done, queryClient, onOpenChange, depositMut]);
 
   // Reset state when sheet closes
   useEffect(() => {

@@ -51,7 +51,7 @@ const lines = [
 ];
 
 for (const row of functions.sort((a, b) => a.fn.localeCompare(b.fn))) {
-  lines.push(`- \`${row.fn}\` — ${row.file}`);
+  lines.push(`- \`${row.fn}\` ï¿½ ${row.file}`);
 }
 
 lines.push("", "## Uso de .rpc() no src", "");
