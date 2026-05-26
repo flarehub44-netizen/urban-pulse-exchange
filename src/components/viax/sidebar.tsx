@@ -1,11 +1,15 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
-import { PanelLeftClose, PanelLeft } from "lucide-react";
+import { PanelLeftClose, PanelLeft, Scale, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { sidebarNav, settingsNav, notificationsNav, isNavActive } from "@/config/navigation";
 import { useNavBadges } from "@/hooks/use-nav-badges";
+import { useAuth } from "@/hooks/use-auth";
+import { useProfile } from "@/hooks/use-profile";
+import { useAccountContext } from "@/hooks/use-account-context";
+import { copy } from "@/copy/pt-BR";
 
 function NavBadge({ count }: { count: number }) {
   if (count <= 0) return null;
@@ -13,6 +17,80 @@ function NavBadge({ count }: { count: number }) {
     <span className="ml-auto flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
       {count > 9 ? "9+" : count}
     </span>
+  );
+}
+
+function RoleSidebarLinks({
+  collapsed,
+  onNavigate,
+}: {
+  collapsed?: boolean;
+  onNavigate?: () => void;
+}) {
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  const { userId } = useAuth();
+  const { data: profile } = useProfile(userId);
+  const { data: accountCtx } = useAccountContext(!!userId);
+
+  const isAdmin = profile?.isAdmin || accountCtx?.admin?.is_admin;
+  const isActivePartner =
+    accountCtx?.partner?.role === "partner" && accountCtx?.partner?.status === "active";
+
+  if (!isAdmin && !isActivePartner) return null;
+
+  const adminActive = path === "/admin" || path.startsWith("/admin/");
+  const partnerActive = path === "/partner" || path.startsWith("/partner/");
+
+  return (
+    <div className="mt-2 space-y-1 border-t border-border/40 pt-2">
+      {!collapsed && (
+        <div className="px-3 pb-0.5 text-[10px] uppercase tracking-wider text-muted-foreground/70">
+          Painéis
+        </div>
+      )}
+      {isAdmin && (
+        <Link
+          to="/admin"
+          onClick={onNavigate}
+          title={collapsed ? copy.admin.title : undefined}
+          aria-current={adminActive ? "page" : undefined}
+          className={cn(
+            "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition",
+            collapsed && "justify-center px-2",
+            adminActive
+              ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/35"
+              : "text-muted-foreground hover:bg-primary/10 hover:text-primary",
+          )}
+        >
+          {adminActive && !collapsed && (
+            <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r bg-primary shadow-[var(--shadow-glow-primary)]" />
+          )}
+          <Scale className={cn("size-4 shrink-0", adminActive && "text-primary")} />
+          {!collapsed && <span className="flex-1">{copy.admin.title}</span>}
+        </Link>
+      )}
+      {isActivePartner && (
+        <Link
+          to="/partner"
+          onClick={onNavigate}
+          title={collapsed ? copy.auth.rolePartner : undefined}
+          aria-current={partnerActive ? "page" : undefined}
+          className={cn(
+            "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition",
+            collapsed && "justify-center px-2",
+            partnerActive
+              ? "bg-warn/15 text-warn ring-1 ring-inset ring-warn/35"
+              : "text-muted-foreground hover:bg-warn/10 hover:text-warn",
+          )}
+        >
+          {partnerActive && !collapsed && (
+            <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r bg-warn" />
+          )}
+          <Sparkles className={cn("size-4 shrink-0", partnerActive && "text-warn")} />
+          {!collapsed && <span className="flex-1">{copy.auth.rolePartner}</span>}
+        </Link>
+      )}
+    </div>
   );
 }
 
@@ -62,6 +140,7 @@ function SidebarNav({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate
             </Link>
           );
         })}
+        <RoleSidebarLinks collapsed={collapsed} onNavigate={onNavigate} />
       </nav>
       <div className="border-t border-border/60 px-3 py-3 space-y-1">
         <Link
