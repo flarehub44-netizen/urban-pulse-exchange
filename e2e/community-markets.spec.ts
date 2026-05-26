@@ -70,6 +70,23 @@ test.describe("Mercados da comunidade", () => {
 });
 
 test.describe("Mercados community — erros de negócio (smoke UI)", () => {
+  test("formulario create tem data e horario de encerramento", async ({ page }) => {
+    await page.goto("/markets/create");
+    await page.waitForTimeout(2000);
+    await expect(page.locator('input[type="date"]')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('input[type="time"]')).toBeVisible();
+  });
+
+  test("detalhe cm- com sessao mostra loading antes de desistir", async ({ page }) => {
+    await primeAppStorage(page);
+    await page.goto("/markets/cm-e2e-not-found-smoke");
+    await page.waitForTimeout(800);
+    const hasLoading = (await page.locator(".animate-pulse").count()) > 0;
+    const body = await page.locator("body").innerText();
+    const notInstantRoot404 = hasLoading || /comunidade|acesso|login|cadastro|encerra/i.test(body);
+    expect(notInstantRoot404).toBeTruthy();
+  });
+
   test("formulário create exige pergunta mínima", async ({ page }) => {
     await primeAppStorage(page);
     await page.goto("/markets/create");

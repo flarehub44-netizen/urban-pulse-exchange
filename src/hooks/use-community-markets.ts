@@ -17,6 +17,50 @@ function mapRows(rows: Record<string, unknown>[]): Market[] {
   return rows.map((r) => mapCommunityMarketRow(r as unknown as CommunityMarketRow));
 }
 
+export type CommunityMarketDetailResult = {
+  market: Market | null;
+  isCreator: boolean;
+  reason?: string;
+};
+
+export function communityMarketDetailQueryKey(
+  marketId: string,
+  accessToken?: string,
+  userId?: string | null,
+) {
+  return ["markets", "community", marketId, accessToken ?? "", userId ?? ""] as const;
+}
+
+export async function fetchCommunityMarketDetail(
+  marketId: string,
+  accessToken?: string,
+): Promise<CommunityMarketDetailResult> {
+  const res = await getCommunityMarketFn({
+    data: { marketId, accessToken },
+  });
+  if (!res.ok || !res.market) {
+    return { market: null, isCreator: false, reason: res.reason };
+  }
+  return {
+    market: mapCommunityMarketRow(res.market as unknown as CommunityMarketRow),
+    isCreator: Boolean(res.is_creator),
+    reason: undefined,
+  };
+}
+
+/** True while community detail must not 404 yet (auth or fetch pending). */
+export function shouldDeferCommunityNotFound(opts: {
+  authReady: boolean;
+  userId: string | null | undefined;
+  communityFetched: boolean;
+  hasMarket: boolean;
+}): boolean {
+  if (opts.hasMarket) return false;
+  if (!opts.authReady) return true;
+  if (!opts.userId) return true;
+  return !opts.communityFetched;
+}
+
 export function usePublicCommunityMarkets() {
   return useQuery({
     queryKey: ["markets", "community", "public"],
@@ -41,30 +85,19 @@ export function useMyCommunityMarkets(enabled = true) {
   });
 }
 
-export function useCommunityMarketDetail(marketId: string, accessToken?: string, skip = false) {
+export function useCommunityMarketDetail(marketId: string, accessToken?: string) {
   const { userId, authReady } = useAuth();
   return useQuery({
-    queryKey: ["markets", "community", marketId, accessToken ?? "", userId],
-    queryFn: async () => {
-      const res = await getCommunityMarketFn({
-        data: { marketId, accessToken },
-      });
-      if (!res.ok || !res.market) {
-        return { market: null as Market | null, isCreator: false, reason: res.reason };
-      }
-      return {
-        market: mapCommunityMarketRow(res.market as unknown as CommunityMarketRow),
-        isCreator: Boolean(res.is_creator),
-        reason: undefined as string | undefined,
-      };
-    },
-    enabled: !skip && authReady && !!userId && marketId.startsWith("cm-"),
+    queryKey: communityMarketDetailQueryKey(marketId, accessToken, userId),
+    queryFn: () => fetchCommunityMarketDetail(marketId, accessToken),
+    enabled: authReady && !!userId && marketId.startsWith("cm-"),
     retry: false,
   });
 }
 
 export function useCreateCommunityMarket() {
   const qc = useQueryClient();
+  const { userId } = useAuth();
   return useMutation({
     mutationFn: (input: {
       question: string;
@@ -80,8 +113,16 @@ export function useCreateCommunityMarket() {
           coverUrl: input.coverUrl,
         },
       }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["markets"] });
+    onSuccess: (result) => {
+      const marketId = result.market_id;
+      if (userId && marketId?.startsWith("cm-")) {
+        void qc.prefetchQuery({
+          queryKey: communityMarketDetailQueryKey(marketId, undefined, userId),
+          queryFn: () => fetchCommunityMarketDetail(marketId),
+        });
+      }
+      void qc.invalidateQueries({ queryKey: ["markets"] });
+      void qc.invalidateQueries({ queryKey: ["markets", "community"] });
     },
   });
 }

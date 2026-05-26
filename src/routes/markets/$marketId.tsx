@@ -31,7 +31,11 @@ import { MarketAuditPanel } from "@/components/viax/market-audit-panel";
 import { LiveCameraStrip } from "@/components/viax/live-camera-strip";
 import { MarketSocialProofLite } from "@/components/viax/market-social-proof-lite";
 import { MarketAlertButton } from "@/components/viax/market-alert-button";
-import { useCommunityMarketDetail, useJoinCommunityMarket } from "@/hooks/use-community-markets";
+import {
+  shouldDeferCommunityNotFound,
+  useCommunityMarketDetail,
+  useJoinCommunityMarket,
+} from "@/hooks/use-community-markets";
 import { CommunityMarketResolvePanel } from "@/components/viax/community-market-resolve-panel";
 import { CommunityReportButton } from "@/components/viax/community-report-button";
 import { useAuth } from "@/hooks/use-auth";
@@ -110,7 +114,7 @@ function MarketCommentsPanel({ marketId }: { marketId: string }) {
 
 function MarketDetail() {
   const { enabled: casinoEnabled } = useCasinoEnabled();
-  const { userId } = useAuth();
+  const { userId, authReady } = useAuth();
   const { marketId } = Route.useParams();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/markets/$marketId" });
@@ -123,9 +127,10 @@ function MarketDetail() {
   const fromList = markets.find((x) => x.id === marketId);
   const {
     data: communityDetail,
-    isLoading: communityLoading,
+    isFetched: communityFetched,
+    isError: communityError,
     refetch: refetchCommunity,
-  } = useCommunityMarketDetail(marketId, search.access, Boolean(fromList));
+  } = useCommunityMarketDetail(marketId, search.access);
   const { mutateAsync: joinMarket } = useJoinCommunityMarket();
 
   useEffect(() => {
@@ -138,7 +143,13 @@ function MarketDetail() {
     communityDetail?.isCreator || (userId && fromList?.createdBy === userId),
   );
   const isCommunity = m?.marketKind === "community" || isCommunityId;
-  const detailLoading = marketsLoading || (isCommunityId && !fromList && communityLoading);
+  const deferCommunityNotFound = shouldDeferCommunityNotFound({
+    authReady,
+    userId,
+    communityFetched: !isCommunityId || communityFetched,
+    hasMarket: !!m,
+  });
+  const detailLoading = marketsLoading || (isCommunityId && deferCommunityNotFound);
 
   const { data: dbHistory } = useMarketHistory(marketId, !isCommunity);
   const history = useMemo(() => {
@@ -178,6 +189,32 @@ function MarketDetail() {
     return (
       <div className="mx-auto max-w-md space-y-3 p-6 text-center">
         <p className="text-sm text-warn">{copy.community.accessDenied}</p>
+        <Link
+          to="/markets"
+          search={{ segment: "outros" }}
+          className="text-sm text-primary underline"
+        >
+          {copy.community.backToList}
+        </Link>
+      </div>
+    );
+  }
+
+  if (isCommunityId && authReady && !userId) {
+    return (
+      <div className="mx-auto max-w-md space-y-3 p-6 text-center">
+        <p className="text-sm text-warn">{copy.auth.registerRequired}</p>
+        <Link to="/auth/login" className="text-sm text-primary underline">
+          {copy.auth.loginCta}
+        </Link>
+      </div>
+    );
+  }
+
+  if (isCommunityId && communityError) {
+    return (
+      <div className="mx-auto max-w-md space-y-3 p-6 text-center">
+        <p className="text-sm text-warn">{copy.errors.generic}</p>
         <Link
           to="/markets"
           search={{ segment: "outros" }}

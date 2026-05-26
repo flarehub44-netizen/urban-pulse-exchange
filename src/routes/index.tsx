@@ -8,10 +8,11 @@ import {
   Users,
   Map,
   BarChart3,
-  Smartphone,
   Zap,
   Trophy,
   Radio,
+  Flag,
+  Sparkles,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useViaX } from "@/store/viax-store";
@@ -32,6 +33,9 @@ import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "rec
 import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
 import { PublicNav } from "@/components/viax/public-nav";
 import { PublicMobileNav } from "@/components/viax/public-mobile-nav";
+import { LandingSegmentPillars } from "@/components/viax/landing-segment-pillars";
+import { LandingLiveMarkets } from "@/components/viax/landing-live-markets";
+import { usePublicCommunityMarkets } from "@/hooks/use-community-markets";
 import type { AuthModalSearch } from "@/lib/auth-modal-search";
 import { parseAuthModalSearch } from "@/lib/auth-modal-search";
 
@@ -62,6 +66,7 @@ function Landing() {
   }, [navigate]);
 
   const markets = useCatalogMarkets();
+  const { data: communityMarkets = [] } = usePublicCommunityMarkets();
   const traders = useViaX((s) => s.traders);
   const aiAcc = useViaX((s) => s.aiAccuracy);
   const totalVol = markets.reduce((a, m) => a + m.pool.YES + m.pool.NO, 0);
@@ -90,10 +95,10 @@ function Landing() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.05 }}
-                className="heading-page mt-6 text-5xl leading-[1.04] md:text-6xl lg:text-7xl"
+                className="heading-page mt-6 text-4xl leading-[1.06] md:text-5xl lg:text-6xl"
               >
-                Transforme o movimento da cidade em{" "}
-                <span className="text-highlight">previsões que valem prêmio</span>.
+                <span className="text-highlight">{copy.landing.heroTitleLead}</span>{" "}
+                {copy.landing.heroTitleTail}
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0, y: 16 }}
@@ -119,30 +124,51 @@ function Landing() {
                 </AuthModalTrigger>
                 <Link
                   to="/markets"
-                  search={{ status: "live" }}
-                  className="inline-flex items-center gap-2 rounded-xl border bg-card px-5 py-3 font-medium hover:bg-surface-2"
+                  search={{ segment: "transito" }}
+                  className="inline-flex items-center gap-2 rounded-xl border bg-card px-4 py-3 text-sm font-medium hover:bg-surface-2"
                 >
-                  Ver mercados
+                  <Map className="size-4" />
+                  {copy.landing.ctaTransito}
                 </Link>
                 <Link
-                  to="/ranking"
-                  className="inline-flex items-center gap-2 rounded-xl border bg-card px-5 py-3 font-medium hover:bg-surface-2"
+                  to="/markets"
+                  search={{ segment: "futebol" }}
+                  className="inline-flex items-center gap-2 rounded-xl border bg-card px-4 py-3 text-sm font-medium hover:bg-surface-2"
                 >
-                  Ver ranking
+                  <Flag className="size-4" />
+                  {copy.landing.ctaFutebol}
+                </Link>
+                <Link
+                  to="/markets"
+                  search={{ segment: "outros" }}
+                  className="inline-flex items-center gap-2 rounded-xl border bg-card px-4 py-3 text-sm font-medium hover:bg-surface-2"
+                >
+                  <Sparkles className="size-4" />
+                  {copy.landing.ctaOutros}
+                </Link>
+                <Link
+                  to="/markets/create"
+                  className="inline-flex items-center gap-2 rounded-xl border border-primary/40 bg-primary/10 px-4 py-3 text-sm font-medium text-primary hover:bg-primary/20"
+                >
+                  {copy.landing.createMarketCta}
                 </Link>
               </motion.div>
 
-              <div className="mt-10 grid max-w-xl grid-cols-3 gap-4">
+              <div className="mt-10 grid max-w-xl grid-cols-2 gap-4 sm:grid-cols-4">
                 <KpiTile
                   label="Volume 24h"
                   value={<AnimatedNumber value={totalVol} format={formatBRL} />}
                 />
                 <KpiTile
-                  label="Mercados ativos"
+                  label="Trânsito ao vivo"
                   value={<AnimatedNumber value={markets.length} />}
                 />
                 <KpiTile
-                  label="Traders online"
+                  label={copy.landing.kpiCommunity}
+                  value={<AnimatedNumber value={communityMarkets.length} />}
+                />
+                <KpiTile
+                  label="Participantes"
                   value={<AnimatedNumber value={totalPart} format={formatCompact} />}
                 />
               </div>
@@ -161,10 +187,12 @@ function Landing() {
         <Ticker />
       </section>
 
+      <LandingSegmentPillars />
+
       {/* HOW IT WORKS */}
       <section className="mx-auto max-w-7xl px-6 py-24">
         <SectionHeader
-          eyebrow={copy.landing.howEyebrow}
+          eyebrow={copy.landing.howUrbanEyebrow}
           title={
             <>
               Da rua para a <span className="text-highlight">previsão</span>, em poucos passos.
@@ -212,30 +240,7 @@ function Landing() {
         </div>
       </section>
 
-      {/* MERCADOS */}
-      <section className="border-y border-border/60 bg-card/30">
-        <div className="mx-auto max-w-7xl px-6 py-20">
-          <SectionHeader eyebrow="Mercados ViaX" title={copy.landing.marketsTitle} />
-          <p className="text-lead mt-3 max-w-2xl">
-            Mercados sobre <span className="text-emphasis">trânsito e mobilidade</span> em São
-            Paulo. Pools atualizam em tempo real — entre antes do fechamento.
-          </p>
-          <MobileMarketsCarousel markets={markets.slice(0, 6)} className="mt-10 md:hidden" />
-          <div className="mt-10 hidden gap-4 md:grid md:grid-cols-2 lg:grid-cols-3">
-            {markets.slice(0, 6).map((m) => (
-              <MarketCard key={m.id} m={m} />
-            ))}
-          </div>
-          <div className="mt-8 text-center">
-            <Link
-              to="/markets"
-              className="inline-flex items-center gap-2 rounded-xl border bg-card px-5 py-3 font-medium hover:bg-surface-2"
-            >
-              Ver todos os mercados <ArrowRight className="size-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
+      <LandingLiveMarkets />
 
       {/* AI vs HUMANS */}
       <section className="mx-auto max-w-7xl px-6 py-24">
@@ -251,10 +256,7 @@ function Landing() {
               }
               align="left"
             />
-            <p className="mt-4 max-w-xl text-muted-foreground">
-              A UrbanMind processa câmeras, sensores e padrões históricos. Você joga com intuição,
-              contexto e velocidade. Quem decidiu melhor essa semana?
-            </p>
+            <p className="mt-4 max-w-xl text-muted-foreground">{copy.landing.urbanMindLead}</p>
             <div className="mt-6 grid grid-cols-2 gap-3">
               <KpiTile label={copy.landing.kpiAiPrecision} value="78.4%" tone="primary" />
               <KpiTile label={copy.landing.kpiHumanPrecision} value="64.1%" />
@@ -333,7 +335,7 @@ function Landing() {
       <section className="border-y border-border/60 bg-card/30">
         <div className="mx-auto max-w-7xl px-6 py-20">
           <SectionHeader
-            eyebrow="Mercados em tempo real"
+            eyebrow={copy.landing.mapSectionEyebrow}
             title={
               <>
                 A cidade respira. Os <span className="text-highlight">mercados</span> também.
@@ -506,8 +508,16 @@ function Landing() {
             <Logo size={18} />
             <span>ViaX · Inteligência urbana em tempo real</span>
           </div>
-          <div className="flex gap-5">
-            <Link to="/markets">Mercados</Link>
+          <div className="flex flex-wrap justify-center gap-4 md:gap-5">
+            <Link to="/markets" search={{ segment: "transito" }}>
+              {copy.landing.ctaTransito}
+            </Link>
+            <Link to="/markets" search={{ segment: "futebol" }}>
+              {copy.landing.ctaFutebol}
+            </Link>
+            <Link to="/markets" search={{ segment: "outros" }}>
+              {copy.landing.ctaOutros}
+            </Link>
             <Link to="/ranking">Ranking</Link>
             <Link to="/urbanmind">UrbanMind</Link>
             <Link to="/dashboard">{copy.landing.footerTerminal}</Link>

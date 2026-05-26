@@ -23,11 +23,14 @@ export function PublicNav({ variant = "shell" }: PublicNavProps) {
           <span className="font-semibold tracking-tight">ViaX</span>
         </Link>
         <nav className="hidden gap-6 text-sm text-muted-foreground md:flex">
-          <Link to="/markets" className="hover:text-foreground">
-            Mercados
+          <Link to="/markets" search={{ segment: "transito" }} className="hover:text-foreground">
+            {copy.markets.transitoTab}
           </Link>
           <Link to="/markets" search={{ segment: "futebol" }} className="hover:text-foreground">
-            {copy.nav.football}
+            {copy.markets.futebolTab}
+          </Link>
+          <Link to="/markets" search={{ segment: "outros" }} className="hover:text-foreground">
+            {copy.markets.outrosTab}
           </Link>
           <Link to="/live" className="hover:text-foreground">
             Mapa
