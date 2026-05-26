@@ -198,19 +198,6 @@ function MarketsList() {
     return () => clearTimeout(t);
   }, [qInput]);
 
-  useEffect(() => {
-    if (!mounted) return;
-    trackProductEvent("market_list_view", {
-      segment,
-      status: statusKey,
-      listed: list.length,
-      hasQuery: Boolean(q),
-      favorites: showFavorites,
-      aiPicks,
-      hasPosition,
-    });
-  }, [mounted, segment, statusKey, list.length, q, showFavorites, aiPicks, hasPosition]);
-
   const list = useMemo(() => {
     const filtered = markets.filter((m) => {
       if (showFavorites) return watchlist.includes(m.id);
@@ -253,6 +240,19 @@ function MarketsList() {
     sortKey,
     aiPicks,
   ]);
+
+  useEffect(() => {
+    if (!mounted) return;
+    trackProductEvent("market_list_view", {
+      segment,
+      status: statusKey,
+      listed: list.length,
+      hasQuery: Boolean(q),
+      favorites: showFavorites,
+      aiPicks,
+      hasPosition,
+    });
+  }, [mounted, segment, statusKey, list.length, q, showFavorites, aiPicks, hasPosition]);
 
   return (
     <div className="space-y-5">

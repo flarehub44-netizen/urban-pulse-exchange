@@ -7,8 +7,24 @@ test("landing carrega com título ViaX", async ({ page }) => {
 });
 
 test("rota mercados responde", async ({ page }) => {
-  await page.goto("/markets");
+  await page.goto("/markets?status=live");
   await expect(page).toHaveTitle(/Mercados/i);
+  await page.waitForTimeout(2000);
+  const text = await page.locator("body").innerText();
+  expect(text).not.toMatch(/algo deu errado|before initialization/i);
+  await expect(page.getByRole("heading", { name: /mercados/i }).first()).toBeVisible();
+});
+
+test("auth login abre modal via redirect em mercados", async ({ page }) => {
+  await page.goto("/auth/login");
+  await page.waitForTimeout(2500);
+  const url = page.url();
+  expect(url).toMatch(/auth=login/i);
+  const text = await page.locator("body").innerText();
+  expect(text).not.toMatch(/before initialization/i);
+  await expect(page.getByRole("heading", { name: /entrar na viax/i })).toBeVisible({
+    timeout: 10_000,
+  });
 });
 
 test("dashboard sem login exige autenticação", async ({ page }) => {
