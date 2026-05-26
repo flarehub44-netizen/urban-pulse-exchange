@@ -37,7 +37,7 @@ export function useMarketAlerts(marketId?: string) {
   return useQuery({
     queryKey: ["market-alerts", userId, marketId],
     queryFn: async () => {
-      let q = db
+      let q = supabase
         .from("market_alerts")
         .select("id, market_id, side, threshold, triggered, created_at")
         .eq("user_id", userId as string)

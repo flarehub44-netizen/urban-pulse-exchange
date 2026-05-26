@@ -34,7 +34,7 @@ export function useFeed(marketId?: string) {
   return useQuery({
     queryKey: ["feed", marketId ?? "all"],
     queryFn: async () => {
-      let query = db
+      let query = supabase
         .from("feed_posts")
         .select(
           "*, profiles(id, name, handle, avatar, division, accuracy, roi, streak, volume_24h, city, neighborhood)",
