@@ -87,7 +87,7 @@ export function CommunityMarketResolvePanel({
           )}
         </>
       )}
-      {market.status !== "settled" && market.status !== "void" && (
+      {(market.status as string) !== "settled" && (market.status as string) !== "void" && (
         <button
           type="button"
           disabled={voiding || resolving}

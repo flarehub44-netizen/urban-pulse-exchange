@@ -4,12 +4,13 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireRegisteredAuth } from "@/integrations/supabase/require-registered-middleware";
 
 async function adminRpc<T>(
-  fn: () => Promise<{ data: T | null; error: { message: string } | null }>,
-) {
+  fn: () => PromiseLike<{ data: T | null; error: { message: string } | null }>,
+): Promise<any> {
   const { data, error } = await fn();
   if (error) throw new Error(error.message);
-  return data;
+  return data as any;
 }
+
 import type { SupabaseFnContext } from "@/integrations/supabase/context";
 
 const createSchema = z.object({
@@ -28,7 +29,7 @@ export const createCommunityMarketFn = createServerFn({ method: "POST" })
       p_question: data.question,
       p_ends_at: data.endsAt,
       p_visibility: data.visibility,
-      p_cover_url: data.coverUrl ?? null,
+      p_cover_url: data.coverUrl ?? undefined,
     });
     if (error) throw new Error(error.message);
     return result as {
@@ -63,22 +64,17 @@ export const getCommunityMarketFn = createServerFn({ method: "GET" })
     const { supabase } = context as unknown as SupabaseFnContext;
     const { data: result, error } = await supabase.rpc("get_community_market", {
       p_market_id: data.marketId,
-      p_access_token: data.accessToken ?? null,
+      p_access_token: data.accessToken ?? undefined,
     });
     if (error) throw new Error(error.message);
-    return result as {
-      ok: boolean;
-      reason?: string;
-      market?: Record<string, unknown>;
-      is_creator?: boolean;
-    };
+    return result as any;
   });
 
 export const listPublicCommunityMarketsFn = createServerFn({ method: "GET" }).handler(async () => {
   const { supabase } = await import("@/integrations/supabase/client");
   const { data, error } = await supabase.rpc("list_public_community_markets", { p_limit: 50 });
   if (error) throw new Error(error.message);
-  return (data ?? []) as Record<string, unknown>[];
+  return (data ?? []) as any[];
 });
 
 export const listMyCommunityMarketsFn = createServerFn({ method: "GET" })
@@ -87,8 +83,9 @@ export const listMyCommunityMarketsFn = createServerFn({ method: "GET" })
     const { supabase } = context as unknown as SupabaseFnContext;
     const { data, error } = await supabase.rpc("list_my_community_markets");
     if (error) throw new Error(error.message);
-    return (data ?? []) as Record<string, unknown>[];
+    return (data ?? []) as any[];
   });
+
 
 const resolveSchema = z.object({
   marketId: z.string(),

@@ -5,7 +5,7 @@ import { Copy, QrCode, Clock, Wallet } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { initiateDepositFn, getDepositStatusFn } from "@/actions/payments";
 import { ImpulseDepositChips } from "@/components/viax/impulse-deposit-bar";
-import { setLastImpulseAmount } from "@/lib/impulse-deposit";
+
 import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
 import { formatBRL } from "@/lib/parimutuel";
 import { useAuth } from "@/hooks/use-auth";

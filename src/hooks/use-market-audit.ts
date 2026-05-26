@@ -28,7 +28,7 @@ export function useMarketAudit(marketId: string) {
         p_market_id: marketId,
       });
       if (error) throw error;
-      return data as MarketAudit;
+      return data as unknown as MarketAudit;
     },
     enabled: !!marketId,
     staleTime: 30_000,

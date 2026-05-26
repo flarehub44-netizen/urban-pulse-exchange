@@ -6,10 +6,9 @@ describe("getNotificationLink", () => {
     const link = getNotificationLink({
       id: "1",
       kind: "win",
-      title: "Vitória",
-      body: "",
+      text: "Vitória",
+      time: Date.now(),
       read: false,
-      createdAt: Date.now(),
       marketId: "fb-999999001",
     });
     expect(link).toEqual({
@@ -22,10 +21,9 @@ describe("getNotificationLink", () => {
     const link = getNotificationLink({
       id: "2",
       kind: "win",
-      title: "Vitória",
-      body: "",
+      text: "Vitória",
+      time: Date.now(),
       read: false,
-      createdAt: Date.now(),
       marketId: "mkt-abc",
     });
     expect(link).toEqual({

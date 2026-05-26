@@ -40,7 +40,7 @@ async function upsertFixture(supabase: SupabaseClient, f: ApiFootballFixtureDto)
   if (error) throw new Error(error.message);
 }
 
-export async function runFootballSync(): Promise<Record<string, unknown>> {
+export async function runFootballSync(): Promise<any> {
   return withJobLog("football_sync", async () => {
     const supabase = getServiceClient();
 
@@ -101,7 +101,7 @@ export async function runFootballSync(): Promise<Record<string, unknown>> {
   });
 }
 
-export async function runFootballResolve(): Promise<Record<string, unknown>> {
+export async function runFootballResolve(): Promise<any> {
   return withJobLog("football_resolve", async () => {
     const supabase = getServiceClient();
 

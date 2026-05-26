@@ -41,7 +41,11 @@ export function LandingSegmentPillars() {
         <h2 className="heading-page mt-2 text-3xl md:text-4xl">{copy.landing.pillarsTitle}</h2>
       </div>
       <div className="mt-12 grid gap-5 md:grid-cols-3">
-        {pillars.map(({ icon: Icon, title, desc, to, search, cta, extra }, k) => (
+        {pillars.map((pillar, k) => {
+          const { icon: Icon, title, desc, to, search, cta } = pillar;
+          const extra = "extra" in pillar ? pillar.extra : false;
+          return (
+
           <motion.div
             key={title}
             initial={{ opacity: 0, y: 16 }}
@@ -91,7 +95,10 @@ export function LandingSegmentPillars() {
               )}
             </div>
           </motion.div>
-        ))}
+          );
+        })}
+
+
       </div>
     </section>
   );

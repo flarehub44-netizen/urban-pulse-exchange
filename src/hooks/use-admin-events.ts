@@ -80,7 +80,7 @@ export function useAdminUpsertPlatformEvent() {
       xpBoost: number;
     }) => {
       const { data, error } = await supabase.rpc("admin_upsert_platform_event", {
-        p_id: input.id ?? null,
+        p_id: input.id ?? undefined,
         p_name: input.name,
         p_slug: input.slug,
         p_description: input.description,
@@ -88,7 +88,7 @@ export function useAdminUpsertPlatformEvent() {
         p_ends_at: input.endsAt,
         p_badge_icon: input.badgeIcon,
         p_xp_boost: input.xpBoost,
-      });
+      } as any);
       if (error) throw error;
       return data;
     },
@@ -104,7 +104,7 @@ export function useAdminDeletePlatformEvent() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data, error } = await supabase.rpc("admin_delete_platform_event", { p_id: id });
+      const { data, error } = await supabase.rpc("admin_delete_platform_event", { p_id: id } as any);
       if (error) throw error;
       return data;
     },
@@ -120,7 +120,7 @@ export function useAdminDailyPolls(enabled = true) {
   return useQuery({
     queryKey: ["admin", "daily-polls"],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_list_daily_polls", { p_limit: 30 });
+      const { data, error } = await supabase.rpc("admin_list_daily_polls", { p_limit: 30 } as any);
       if (error) throw error;
       return (data ?? []) as AdminDailyPoll[];
     },
@@ -133,10 +133,10 @@ export function useAdminUpsertDailyPoll() {
   return useMutation({
     mutationFn: async (input: { id?: string | null; question: string; pollDate: string }) => {
       const { data, error } = await supabase.rpc("admin_upsert_daily_poll", {
-        p_id: input.id ?? null,
+        p_id: input.id ?? undefined,
         p_question: input.question,
         p_poll_date: input.pollDate,
-      });
+      } as any);
       if (error) throw error;
       return data;
     },
@@ -151,7 +151,7 @@ export function useAdminDeleteDailyPoll() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data, error } = await supabase.rpc("admin_delete_daily_poll", { p_id: id });
+      const { data, error } = await supabase.rpc("admin_delete_daily_poll", { p_id: id } as any);
       if (error) throw error;
       return data;
     },
@@ -169,8 +169,8 @@ export function useAdminPartnerEventsFeed(partnerId?: string | null, enabled = t
       const { data, error } = await supabase.rpc("admin_list_partner_events", {
         p_limit: 50,
         p_partner_id: null,
-        p_partner_query: partnerId ?? null,
-      });
+        p_partner_query: partnerId ?? undefined,
+      } as any);
       if (error) throw error;
       return (data ?? []) as AdminPartnerEventRow[];
     },
@@ -182,7 +182,7 @@ export function useAdminDeletePartnerEvent() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: number) => {
-      const { data, error } = await supabase.rpc("admin_delete_partner_event", { p_id: id });
+      const { data, error } = await supabase.rpc("admin_delete_partner_event", { p_id: id } as any);
       if (error) throw error;
       return data;
     },

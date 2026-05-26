@@ -50,7 +50,7 @@ export function usePartnerRevenueSeries(days = 30, enabled = true) {
   return useQuery({
     queryKey: ["partner", "revenue-series", days],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_partner_revenue_series", { p_days: days });
+      const { data, error } = await supabase.rpc("get_partner_revenue_series", { p_days: days } as any);
       if (error) throw error;
       return (data ?? []) as { day: string; amount: number }[];
     },
@@ -62,7 +62,7 @@ export function usePartnerEvents(enabled = true) {
   return useQuery({
     queryKey: ["partner", "events"],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_partner_events_feed", { p_limit: 25 });
+      const { data, error } = await supabase.rpc("get_partner_events_feed", { p_limit: 25 } as any);
       if (error) throw error;
       return (data ?? []) as { kind: string; message: string; at: string }[];
     },
@@ -114,7 +114,7 @@ export function usePartnerLeaderboard(enabled = true) {
   return useQuery({
     queryKey: ["partner", "leaderboard"],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_partner_leaderboard", { p_metric: "volume" });
+      const { data, error } = await supabase.rpc("get_partner_leaderboard", { p_metric: "volume" } as any);
       if (error) throw error;
       return (data ?? []) as {
         partner_id: string;
@@ -179,7 +179,7 @@ export function useApplyPartner() {
     mutationFn: async (input: { bio: string; focusCity?: string }) => {
       const { data, error } = await supabase.rpc("apply_partner_program", {
         p_bio: input.bio,
-        p_focus_city: input.focusCity ?? null,
+        p_focus_city: input.focusCity ?? undefined,
         p_social: {},
       });
       if (error) throw error;
@@ -199,7 +199,7 @@ export function useCreatePartnerCampaign() {
     }) => {
       const { data, error } = await supabase.rpc("create_partner_campaign", {
         p_name: input.name,
-        p_slug_suffix: input.slugSuffix ?? null,
+        p_slug_suffix: input.slugSuffix ?? undefined,
         p_target: input.target ?? { path: "/dashboard" },
       });
       if (error) throw error;
@@ -213,7 +213,7 @@ export function usePartnerPayoutRequest() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (amount: number) => {
-      const { data, error } = await supabase.rpc("partner_request_payout", { p_amount: amount });
+      const { data, error } = await supabase.rpc("partner_request_payout", { p_amount: amount } as any);
       if (error) throw error;
       return data as { ok: boolean; balance: number };
     },
@@ -229,7 +229,7 @@ export function usePublicExpertProfile(userId: string | null) {
     queryFn: async () => {
       const { data, error } = await supabase.rpc("get_public_expert_profile", {
         p_user_id: userId!,
-      });
+      } as any);
       if (error) throw error;
       return data as {
         is_partner: boolean;

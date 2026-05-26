@@ -17,8 +17,8 @@ export const createFeedPostFn = createServerFn({ method: "POST" })
     const { error } = await supabase.from("feed_posts").insert({
       user_id: userId,
       text: data.text,
-      market_id: data.marketId ?? null,
-      tag: data.tag ?? null,
+      market_id: data.marketId ?? undefined,
+      tag: data.tag ?? undefined,
     });
     if (error) throw new Error(error.message);
     return { ok: true };

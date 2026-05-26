@@ -47,7 +47,7 @@ export function useAdminFootballPending() {
   return useQuery({
     queryKey: ["admin-football-pending"],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_list_football_pending", { p_limit: 100 });
+      const { data, error } = await supabase.rpc("admin_list_football_pending", { p_limit: 100 } as any);
       if (error) throw error;
       return (data ?? []) as FootballPendingRow[];
     },
@@ -59,7 +59,7 @@ export function useAdminFootballDrafts() {
   return useQuery({
     queryKey: ["admin-football-drafts"],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_list_football_drafts", { p_limit: 100 });
+      const { data, error } = await supabase.rpc("admin_list_football_drafts", { p_limit: 100 } as any);
       if (error) throw error;
       return (data ?? []) as FootballDraftRow[];
     },
@@ -71,7 +71,7 @@ export function useAdminFootballLive() {
   return useQuery({
     queryKey: ["admin-football-live"],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_list_football_live", { p_limit: 100 });
+      const { data, error } = await supabase.rpc("admin_list_football_live", { p_limit: 100 } as any);
       if (error) throw error;
       return (data ?? []) as FootballLiveRow[];
     },
@@ -85,7 +85,7 @@ export function useAdminApproveFootballFixture() {
     mutationFn: async (fixtureId: number) => {
       const { data, error } = await supabase.rpc("admin_approve_football_fixture", {
         p_fixture_id: fixtureId,
-      });
+      } as any);
       if (error) throw error;
       return data;
     },
@@ -102,8 +102,8 @@ export function useAdminRejectFootballFixture() {
     mutationFn: async ({ fixtureId, reason }: { fixtureId: number; reason?: string }) => {
       const { data, error } = await supabase.rpc("admin_reject_football_fixture", {
         p_fixture_id: fixtureId,
-        p_reason: reason ?? null,
-      });
+        p_reason: reason ?? undefined,
+      } as any);
       if (error) throw error;
       return data;
     },
@@ -119,7 +119,7 @@ export function useAdminPublishFootballMarket() {
     mutationFn: async (marketId: string) => {
       const { data, error } = await supabase.rpc("admin_publish_football_market", {
         p_market_id: marketId,
-      });
+      } as any);
       if (error) throw error;
       return data;
     },
@@ -138,7 +138,7 @@ export function useAdminVoidFootballMarket() {
       const { data, error } = await supabase.rpc("admin_void_football_market", {
         p_market_id: marketId,
         p_reason: reason ?? "admin_void",
-      });
+      } as any);
       if (error) throw error;
       return data;
     },

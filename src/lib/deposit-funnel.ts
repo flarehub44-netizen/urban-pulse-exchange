@@ -34,7 +34,7 @@ export function trackDepositFunnel(
     ? Object.fromEntries(Object.entries(props).filter(([, v]) => v !== undefined))
     : {};
 
-  void db
+  void supabase
     .rpc("track_deposit_funnel_event", {
       p_event: event,
       p_props: cleanProps,
