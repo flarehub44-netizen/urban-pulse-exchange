@@ -5,7 +5,11 @@ import { authModalRedirectTarget } from "@/lib/auth-modal-redirect";
 export type LoginSearch = { redirect?: string };
 
 export const Route = createFileRoute("/auth/login")({
+  validateSearch: (search: Record<string, unknown>): LoginSearch => ({
+    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
+  }),
   beforeLoad: async ({ search }) => {
+
     await requireGuestOnly();
     const redirectTo =
       typeof search.redirect === "string" && search.redirect ? search.redirect : "/markets";
