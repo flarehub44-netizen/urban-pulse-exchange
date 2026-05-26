@@ -4,12 +4,13 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireRegisteredAuth } from "@/integrations/supabase/require-registered-middleware";
 
 async function adminRpc<T>(
-  fn: () => Promise<{ data: T | null; error: { message: string } | null }>,
-) {
+  fn: () => PromiseLike<{ data: T | null; error: { message: string } | null }>,
+): Promise<any> {
   const { data, error } = await fn();
   if (error) throw new Error(error.message);
-  return data;
+  return data as any;
 }
+
 import type { SupabaseFnContext } from "@/integrations/supabase/context";
 
 const createSchema = z.object({
