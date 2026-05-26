@@ -3,9 +3,21 @@ import { ArrowLeft, Sparkles } from "lucide-react";
 import { partnerNav, isPartnerNavActive } from "@/config/partner-navigation";
 import { copy } from "@/copy/pt-BR";
 import { cn } from "@/lib/utils";
+import { usePartnerOverview } from "@/hooks/use-partner";
+import { toast } from "sonner";
+import { trackProductEvent } from "@/lib/product-analytics";
 
 export function PartnerLayout() {
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const { data: overview } = usePartnerOverview();
+
+  const copyPartnerLink = async () => {
+    if (!overview?.slug) return;
+    const referralUrl = `${window.location.origin}/r/${overview.slug}`;
+    await navigator.clipboard.writeText(referralUrl);
+    trackProductEvent("partner_link_copied", { source: "partner_layout", slug: overview.slug });
+    toast.success("Link de divulgação copiado.");
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -49,6 +61,30 @@ export function PartnerLayout() {
           </div>
         </aside>
         <div className="flex min-w-0 flex-1 flex-col">
+          <div className="border-b border-border/60 px-3 py-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs text-muted-foreground">
+                {overview?.slug ? `Seu link: /r/${overview.slug}` : "Carregando link de divulgação..."}
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={copyPartnerLink}
+                  disabled={!overview?.slug}
+                  className="rounded-lg border px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-surface-2 disabled:opacity-50"
+                >
+                  Copiar link
+                </button>
+                <Link
+                  to="/markets"
+                  search={{ status: "live" }}
+                  className="rounded-lg bg-primary px-2.5 py-1.5 text-xs text-primary-foreground"
+                >
+                  Ver mercados
+                </Link>
+              </div>
+            </div>
+          </div>
           <div className="flex gap-1 overflow-x-auto border-b px-2 py-2 lg:hidden">
             {partnerNav.map((item) => (
               <Link

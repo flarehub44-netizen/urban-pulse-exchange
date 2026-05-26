@@ -6,6 +6,31 @@ import { cn } from "@/lib/utils";
 
 export function AdminLayout() {
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const navGroups = [
+    {
+      key: "ops",
+      label: "Operação",
+      items: adminNav.filter((it) =>
+        ["/admin", "/admin/markets", "/admin/football", "/admin/settlement", "/admin/risk"].includes(
+          it.to,
+        ),
+      ),
+    },
+    {
+      key: "growth",
+      label: "Growth",
+      items: adminNav.filter((it) =>
+        ["/admin/partners", "/admin/events", "/admin/users", "/admin/intelligence"].includes(it.to),
+      ),
+    },
+    {
+      key: "platform",
+      label: "Plataforma",
+      items: adminNav.filter((it) =>
+        ["/admin/finance", "/admin/sources", "/admin/system", "/admin/simulator"].includes(it.to),
+      ),
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -18,26 +43,35 @@ export function AdminLayout() {
             </div>
             <p className="mt-1 text-[10px] text-muted-foreground">{copy.admin.subtitle}</p>
           </div>
-          <nav className="flex-1 space-y-0.5 p-2" aria-label="Admin">
-            {adminNav.map((item) => {
-              const active = isAdminNavActive(path, item);
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={cn(
-                    "flex items-center gap-2 rounded-lg px-3 py-2 text-xs transition",
-                    active
-                      ? "bg-primary/15 text-foreground"
-                      : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
-                  )}
-                >
-                  <Icon className="size-3.5 shrink-0" />
-                  {item.label}
-                </Link>
-              );
-            })}
+          <nav className="flex-1 space-y-3 p-2" aria-label="Admin">
+            {navGroups.map((group) => (
+              <div key={group.key}>
+                <div className="px-2 pb-1 text-[10px] uppercase tracking-wider text-muted-foreground/70">
+                  {group.label}
+                </div>
+                <div className="space-y-0.5">
+                  {group.items.map((item) => {
+                    const active = isAdminNavActive(path, item);
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.to}
+                        to={item.to}
+                        className={cn(
+                          "flex items-center gap-2 rounded-lg px-3 py-2 text-xs transition",
+                          active
+                            ? "bg-primary/15 text-foreground"
+                            : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
+                        )}
+                      >
+                        <Icon className="size-3.5 shrink-0" />
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </nav>
           <div className="border-t border-border/60 p-3">
             <Link

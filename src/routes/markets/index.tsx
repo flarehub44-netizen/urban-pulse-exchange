@@ -12,7 +12,7 @@ import { getMarketEdge } from "@/lib/market-edge";
 import { useWatchlist } from "@/hooks/use-watchlist";
 import { MarketCard } from "@/components/viax/market-card";
 import { MobileMarketsCarousel } from "@/components/viax/mobile-markets-carousel";
-import { Search, Star, X, TrendingUp, Clock, Bot, MapPin } from "lucide-react";
+import { Search, Star, X, TrendingUp, Clock, Bot, MapPin, SlidersHorizontal } from "lucide-react";
 import { EmptyState } from "@/components/viax/empty-state";
 import { cn } from "@/lib/utils";
 import { loadMarketsFilters, saveMarketsFilters } from "@/lib/markets-filter-persist";
@@ -33,6 +33,8 @@ import { FootballMarketsList } from "@/components/football/football-markets-list
 import { DepositFunnelBannerSlot } from "@/components/viax/deposit-funnel-banner-slot";
 import { parseMarketSegment, segmentDescription } from "@/lib/markets-segment";
 import type { MarketSegment } from "@/routes/markets";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { trackProductEvent } from "@/lib/product-analytics";
 
 export const Route = createFileRoute("/markets/")({
   head: () => ({
@@ -117,6 +119,7 @@ function MarketsList() {
   const [qInput, setQInput] = useState(q);
   const [hydrated, setHydrated] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -138,6 +141,11 @@ function MarketsList() {
       const saved = loadMarketsFilters();
       if (saved && (saved.status || saved.category || saved.sort || saved.hasPosition)) {
         navigate({ search: saved, replace: true });
+      } else {
+        navigate({
+          search: (prev) => ({ ...prev, status: "live", sort: "closing" }),
+          replace: true,
+        });
       }
     }
     setHydrated(true);
@@ -146,9 +154,29 @@ function MarketsList() {
   useEffect(() => {
     if (!hydrated) return;
     saveMarketsFilters(search);
-  }, [hydrated, search.status, search.category, search.sort, search.hasPosition]);
+  }, [
+    hydrated,
+    search.status,
+    search.category,
+    search.sort,
+    search.hasPosition,
+    search.q,
+    search.region,
+    search.aiPicks,
+    search.segment,
+  ]);
 
-  const patchSearch = (patch: Partial<MarketsSearch>) => {
+  const patchSearch = (patch: Partial<MarketsSearch>, source = "markets_ui") => {
+    trackProductEvent("filter_applied", {
+      source,
+      segment: segment,
+      status: patch.status ?? search.status ?? "all",
+      sort: patch.sort ?? search.sort ?? "trend",
+      favorites: patch.favorites === "1" || search.favorites === "1",
+      hasPosition: patch.hasPosition === "1" || search.hasPosition === "1",
+      aiPicks: patch.aiPicks === "1" || search.aiPicks === "1",
+      hasQuery: Boolean((patch.q ?? search.q)?.length),
+    });
     navigate({
       search: (prev: MarketsSearch) => {
         const next = {
@@ -165,10 +193,23 @@ function MarketsList() {
 
   useEffect(() => {
     const t = setTimeout(() => {
-      if (qInput !== (search.q ?? "")) patchSearch({ q: qInput || undefined });
+      if (qInput !== (search.q ?? "")) patchSearch({ q: qInput || undefined }, "search_input");
     }, 300);
     return () => clearTimeout(t);
   }, [qInput]);
+
+  useEffect(() => {
+    if (!mounted) return;
+    trackProductEvent("market_list_view", {
+      segment,
+      status: statusKey,
+      listed: list.length,
+      hasQuery: Boolean(q),
+      favorites: showFavorites,
+      aiPicks,
+      hasPosition,
+    });
+  }, [mounted, segment, statusKey, list.length, q, showFavorites, aiPicks, hasPosition]);
 
   const list = useMemo(() => {
     const filtered = markets.filter((m) => {
@@ -389,16 +430,19 @@ function MarketsList() {
             })()}
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={() =>
-                patchSearch({
-                  favorites: showFavorites ? undefined : "1",
-                  status: undefined,
-                  category: undefined,
-                  aiPicks: undefined,
-                })
+                patchSearch(
+                  {
+                    favorites: showFavorites ? undefined : "1",
+                    status: undefined,
+                    category: undefined,
+                    aiPicks: undefined,
+                  },
+                  "favorites_toggle",
+                )
               }
               className={cn(
                 "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition",
@@ -410,85 +454,168 @@ function MarketsList() {
               <Star className={cn("size-3", showFavorites && "fill-warn")} />
               Favoritos {watchlist.length > 0 && `(${watchlist.length})`}
             </button>
-            {!showFavorites &&
-              statusFilters.map((f) => (
-                <button
-                  key={f.key}
-                  type="button"
-                  onClick={() =>
-                    patchSearch({
-                      status: f.key === "all" ? undefined : f.key,
-                      category: undefined,
-                      favorites: undefined,
-                    })
-                  }
-                  className={cn(
-                    "rounded-full border px-3 py-1.5 text-xs transition",
-                    statusKey === f.key && !category
-                      ? "border-primary/60 bg-primary/15 text-primary shadow-[var(--shadow-glow-primary)]"
-                      : "border-border bg-card text-muted-foreground hover:bg-surface-2",
-                  )}
-                >
-                  {f.label}
-                </button>
-              ))}
-            {!showFavorites && userId && (
-              <button
-                type="button"
-                onClick={() =>
-                  patchSearch({ hasPosition: hasPosition ? undefined : "1", favorites: undefined })
-                }
-                className={cn(
-                  "rounded-full border px-3 py-1.5 text-xs transition",
-                  hasPosition
-                    ? "border-primary/60 bg-primary/15 text-primary"
-                    : "border-border bg-card text-muted-foreground hover:bg-surface-2",
-                )}
-              >
-                Minhas posições {openMarketIds.size > 0 && `(${openMarketIds.size})`}
-              </button>
+            {!showFavorites && (
+              <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+                <SheetTrigger asChild>
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground transition hover:bg-surface-2"
+                  >
+                    <SlidersHorizontal className="size-3" />
+                    Filtros avançados
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="bottom" className="max-h-[78vh] overflow-auto">
+                  <SheetHeader>
+                    <SheetTitle>Filtros de mercados</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-4 space-y-4">
+                    <div>
+                      <p className="mb-2 text-xs uppercase tracking-wider text-muted-foreground">
+                        Status
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {statusFilters.map((f) => (
+                          <button
+                            key={f.key}
+                            type="button"
+                            onClick={() =>
+                              patchSearch(
+                                {
+                                  status: f.key === "all" ? undefined : f.key,
+                                  category: undefined,
+                                  favorites: undefined,
+                                },
+                                "status_filter",
+                              )
+                            }
+                            className={cn(
+                              "rounded-full border px-3 py-1.5 text-xs transition",
+                              statusKey === f.key && !category
+                                ? "border-primary/60 bg-primary/15 text-primary shadow-[var(--shadow-glow-primary)]"
+                                : "border-border bg-card text-muted-foreground hover:bg-surface-2",
+                            )}
+                          >
+                            {f.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    {userId && (
+                      <div>
+                        <p className="mb-2 text-xs uppercase tracking-wider text-muted-foreground">
+                          Posições
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            patchSearch(
+                              {
+                                hasPosition: hasPosition ? undefined : "1",
+                                favorites: undefined,
+                              },
+                              "positions_filter",
+                            )
+                          }
+                          className={cn(
+                            "rounded-full border px-3 py-1.5 text-xs transition",
+                            hasPosition
+                              ? "border-primary/60 bg-primary/15 text-primary"
+                              : "border-border bg-card text-muted-foreground hover:bg-surface-2",
+                          )}
+                        >
+                          Minhas posições {openMarketIds.size > 0 && `(${openMarketIds.size})`}
+                        </button>
+                      </div>
+                    )}
+                    <div>
+                      <p className="mb-2 text-xs uppercase tracking-wider text-muted-foreground">
+                        Ordenar
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {(
+                          [
+                            { key: "trend" as const, label: copy.markets.sortTrend },
+                            { key: "edge" as const, label: copy.markets.sortEdge },
+                            { key: "closing" as const, label: "Encerrando" },
+                          ] as const
+                        ).map((s) => (
+                          <button
+                            key={s.key}
+                            type="button"
+                            onClick={() =>
+                              patchSearch(
+                                { sort: sortKey === s.key ? undefined : s.key },
+                                "sort_filter",
+                              )
+                            }
+                            className={cn(
+                              "rounded-full border px-3 py-1.5 text-xs transition",
+                              sortKey === s.key
+                                ? "border-primary/60 bg-primary/15 text-primary"
+                                : "border-border bg-card text-muted-foreground hover:bg-surface-2",
+                            )}
+                          >
+                            {s.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="mb-2 text-xs uppercase tracking-wider text-muted-foreground">
+                        Categoria
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {MARKET_CATEGORY_FILTERS.map((f) => (
+                          <button
+                            key={f}
+                            type="button"
+                            onClick={() =>
+                              patchSearch(
+                                { category: category === f ? undefined : f, favorites: undefined },
+                                "category_filter",
+                              )
+                            }
+                            className={cn(
+                              "rounded-full border px-3 py-1.5 text-xs transition",
+                              category === f
+                                ? "border-primary/60 bg-primary/15 text-primary shadow-[var(--shadow-glow-primary)]"
+                                : "border-border bg-card text-muted-foreground hover:bg-surface-2",
+                            )}
+                          >
+                            {f}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
             )}
-            {!showFavorites &&
-              (
-                [
-                  { key: "trend" as const, label: copy.markets.sortTrend },
-                  { key: "edge" as const, label: copy.markets.sortEdge },
-                  { key: "closing" as const, label: "Encerrando" },
-                ] as const
-              ).map((s) => (
-                <button
-                  key={s.key}
-                  type="button"
-                  onClick={() => patchSearch({ sort: sortKey === s.key ? undefined : s.key })}
-                  className={cn(
-                    "rounded-full border px-3 py-1.5 text-xs transition",
-                    sortKey === s.key
-                      ? "border-primary/60 bg-primary/15 text-primary"
-                      : "border-border bg-card text-muted-foreground hover:bg-surface-2",
-                  )}
-                >
-                  {s.label}
-                </button>
-              ))}
-            {!showFavorites &&
-              MARKET_CATEGORY_FILTERS.map((f) => (
-                <button
-                  key={f}
-                  type="button"
-                  onClick={() =>
-                    patchSearch({ category: category === f ? undefined : f, favorites: undefined })
-                  }
-                  className={cn(
-                    "rounded-full border px-3 py-1.5 text-xs transition",
-                    category === f
-                      ? "border-primary/60 bg-primary/15 text-primary shadow-[var(--shadow-glow-primary)]"
-                      : "border-border bg-card text-muted-foreground hover:bg-surface-2",
-                  )}
-                >
-                  {f}
-                </button>
-              ))}
           </div>
+
+          {isRegistered && hasDeposited === false && (
+            <div className="md:hidden sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-20 rounded-xl border border-primary/35 bg-card/95 p-3 backdrop-blur">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs text-muted-foreground">
+                  Reforce saldo para entrar nos mercados mais quentes.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    trackProductEvent("click_deposit", {
+                      source: "markets_sticky_cta",
+                      segment,
+                    });
+                    navigate({ to: "/wallet", search: { tab: "deposit" } });
+                  }}
+                  className="shrink-0 rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground"
+                >
+                  Depositar e apostar
+                </button>
+              </div>
+            </div>
+          )}
 
           {showFavorites && watchlist.length === 0 && (
             <EmptyState
@@ -561,10 +688,30 @@ function MarketsList() {
 
           {!marketsLoading && !marketsError && (
             <>
-              <MobileMarketsCarousel markets={list} className="md:hidden" />
+              <MobileMarketsCarousel
+                markets={list}
+                className="md:hidden"
+                onOpen={(marketId) =>
+                  trackProductEvent("market_card_click", {
+                    source: "markets_mobile_carousel",
+                    marketId,
+                    segment,
+                  })
+                }
+              />
               <div className="hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-3">
                 {list.map((m) => (
-                  <MarketCard key={m.id} m={m} />
+                  <MarketCard
+                    key={m.id}
+                    m={m}
+                    onOpen={(marketId) =>
+                      trackProductEvent("market_card_click", {
+                        source: "markets_grid",
+                        marketId,
+                        segment,
+                      })
+                    }
+                  />
                 ))}
               </div>
             </>

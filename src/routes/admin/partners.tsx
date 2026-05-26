@@ -13,6 +13,7 @@ import { InlineError } from "@/components/viax/inline-error";
 import { formatBRL } from "@/lib/parimutuel";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { trackProductEvent } from "@/lib/product-analytics";
 
 export const Route = createFileRoute("/admin/partners")({
   component: AdminPartnersPage,
@@ -30,6 +31,7 @@ function AdminPartnersPage() {
   const [activeTerms, setActiveTerms] = useState<
     Record<string, { share: string; cpa: string; useDefault: boolean }>
   >({});
+  const [approvalStep, setApprovalStep] = useState<Record<string, 1 | 2 | 3>>({});
 
   useEffect(() => {
     if (!active?.length) return;
@@ -81,6 +83,14 @@ function AdminPartnersPage() {
     }
   };
 
+  const onCopyReferral = async (slugOrHandle: string) => {
+    const slug = slugOrHandle.trim();
+    const referralUrl = `${window.location.origin}/r/${slug}`;
+    await navigator.clipboard.writeText(referralUrl);
+    trackProductEvent("partner_link_copied", { source: "admin_partners", slug });
+    toast.success(`Link copiado: ${referralUrl}`);
+  };
+
   const onReject = async (userId: string) => {
     try {
       await reject({ userId });
@@ -124,9 +134,33 @@ function AdminPartnersPage() {
       {!apps?.length && (
         <p className="text-sm text-muted-foreground">{copy.admin.partners.empty}</p>
       )}
+
+      <div className="rounded-xl border bg-card/40 p-4">
+        <h2 className="text-sm font-semibold">Funil por creator (sinal rápido)</h2>
+        <div className="mt-3 grid gap-2 sm:grid-cols-3 text-xs">
+          {(active ?? [])
+            .slice()
+            .sort((a, b) => b.referrals_count - a.referrals_count)
+            .slice(0, 3)
+            .map((p) => (
+              <div key={`funnel-${p.user_id}`} className="rounded-lg border bg-surface/40 px-3 py-2">
+                <div className="font-medium">@{p.handle}</div>
+                <div className="text-muted-foreground mt-1">Indicados: {p.referrals_count}</div>
+                <div className="text-muted-foreground">Comissão acumulada: {formatBRL(Number(p.balance))}</div>
+              </div>
+            ))}
+          {!active?.length && (
+            <div className="rounded-lg border bg-surface/40 px-3 py-2 text-muted-foreground">
+              Sem creators ativos para análise.
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="space-y-3">
         {(apps ?? []).map((a) => {
           const terms = getApproveTerms(a.user_id);
+          const step = approvalStep[a.user_id] ?? 1;
           return (
             <div key={a.id} className="rounded-xl border bg-card/60 p-4">
               <div className="flex justify-between gap-2">
@@ -142,46 +176,68 @@ function AdminPartnersPage() {
                 </span>
               </div>
               <p className="mt-2 text-sm text-muted-foreground line-clamp-3">{a.bio}</p>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                <label className="block text-xs">
-                  <span className="text-muted-foreground">{copy.admin.partners.revenueShare}</span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min={0}
-                    max={1}
-                    value={terms.share}
-                    onChange={(e) =>
-                      setApproveTerms((prev) => ({
-                        ...prev,
-                        [a.user_id]: { ...terms, share: e.target.value },
-                      }))
-                    }
-                    className="mt-1 w-full rounded-lg border bg-surface px-2 py-1.5 mono"
-                  />
-                </label>
-                <label className="block text-xs">
-                  <span className="text-muted-foreground">{copy.admin.partners.cpaAmount}</span>
-                  <input
-                    type="number"
-                    min={0}
-                    step="1"
-                    placeholder={copy.admin.partners.cpaUseDefault}
-                    value={terms.cpa}
-                    onChange={(e) =>
-                      setApproveTerms((prev) => ({
-                        ...prev,
-                        [a.user_id]: { ...terms, cpa: e.target.value },
-                      }))
-                    }
-                    className="mt-1 w-full rounded-lg border bg-surface px-2 py-1.5 mono"
-                  />
-                </label>
+              <div className="mt-3 rounded-lg border bg-surface/40 p-3 text-xs">
+                <div className="mb-2 text-muted-foreground">Wizard de aprovação</div>
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3].map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => setApprovalStep((prev) => ({ ...prev, [a.user_id]: n as 1 | 2 | 3 }))}
+                      className={`size-7 rounded-full border text-[11px] ${
+                        step >= n ? "border-primary bg-primary/15 text-primary" : "border-border text-muted-foreground"
+                      }`}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                  <span className="text-muted-foreground">
+                    {step === 1 ? "Revisar candidatura" : step === 2 ? "Definir termos" : "Confirmar aprovação"}
+                  </span>
+                </div>
               </div>
+              {step >= 2 && (
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  <label className="block text-xs">
+                    <span className="text-muted-foreground">{copy.admin.partners.revenueShare}</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min={0}
+                      max={1}
+                      value={terms.share}
+                      onChange={(e) =>
+                        setApproveTerms((prev) => ({
+                          ...prev,
+                          [a.user_id]: { ...terms, share: e.target.value },
+                        }))
+                      }
+                      className="mt-1 w-full rounded-lg border bg-surface px-2 py-1.5 mono"
+                    />
+                  </label>
+                  <label className="block text-xs">
+                    <span className="text-muted-foreground">{copy.admin.partners.cpaAmount}</span>
+                    <input
+                      type="number"
+                      min={0}
+                      step="1"
+                      placeholder={copy.admin.partners.cpaUseDefault}
+                      value={terms.cpa}
+                      onChange={(e) =>
+                        setApproveTerms((prev) => ({
+                          ...prev,
+                          [a.user_id]: { ...terms, cpa: e.target.value },
+                        }))
+                      }
+                      className="mt-1 w-full rounded-lg border bg-surface px-2 py-1.5 mono"
+                    />
+                  </label>
+                </div>
+              )}
               <div className="mt-3 flex gap-2">
                 <button
                   type="button"
-                  disabled={approving}
+                  disabled={approving || step < 3}
                   onClick={() => onApprove(a.user_id, a.handle)}
                   className="rounded-lg bg-primary px-3 py-1.5 text-xs text-primary-foreground disabled:opacity-50"
                 >
@@ -215,6 +271,7 @@ function AdminPartnersPage() {
                 <th className="px-3 py-2 text-right">Saldo</th>
                 <th className="px-3 py-2 text-left">{copy.admin.partners.revenueShare}</th>
                 <th className="px-3 py-2 text-left">{copy.admin.partners.cpaAmount}</th>
+                <th className="px-3 py-2 text-left">Link</th>
                 <th className="px-3 py-2 text-left">Ações</th>
               </tr>
             </thead>
@@ -276,6 +333,17 @@ function AdminPartnersPage() {
                             className="w-20 rounded border bg-surface px-1 py-0.5 mono"
                           />
                         )}
+                      </div>
+                    </td>
+                    <td className="px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => onCopyReferral(p.slug)}
+                          className="rounded border px-2 py-1 text-[10px] hover:bg-surface"
+                        >
+                          Copiar link
+                        </button>
                       </div>
                     </td>
                     <td className="px-3 py-2">

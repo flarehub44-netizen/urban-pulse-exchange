@@ -44,8 +44,11 @@ export async function requirePartnerRoute() {
   if (error) throw redirect({ to: "/dashboard" });
 
   const ctx = data as {
+    admin?: { is_admin?: boolean };
     partner?: { role?: string; status?: string };
   };
+  if (ctx?.admin?.is_admin) return;
+
   const partner = ctx?.partner;
   if (partner?.role === "partner" && partner?.status === "active") return;
 

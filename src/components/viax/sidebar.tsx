@@ -35,8 +35,9 @@ function RoleSidebarLinks({
   const isAdmin = profile?.isAdmin || accountCtx?.admin?.is_admin;
   const isActivePartner =
     accountCtx?.partner?.role === "partner" && accountCtx?.partner?.status === "active";
+  const canAccessPartnerPortal = isAdmin || isActivePartner;
 
-  if (!isAdmin && !isActivePartner) return null;
+  if (!isAdmin && !canAccessPartnerPortal) return null;
 
   const adminActive = path === "/admin" || path.startsWith("/admin/");
   const partnerActive = path === "/partner" || path.startsWith("/partner/");
@@ -69,7 +70,7 @@ function RoleSidebarLinks({
           {!collapsed && <span className="flex-1">{copy.admin.title}</span>}
         </Link>
       )}
-      {isActivePartner && (
+      {canAccessPartnerPortal && (
         <Link
           to="/partner"
           onClick={onNavigate}

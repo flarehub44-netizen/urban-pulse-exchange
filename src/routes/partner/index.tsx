@@ -6,6 +6,7 @@ import { usePartnerOverview, usePartnerRevenueSeries, usePartnerEvents } from "@
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
 import { InlineError } from "@/components/viax/inline-error";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/partner/")({
   component: PartnerOverviewPage,
@@ -26,6 +27,24 @@ function PartnerOverviewPage() {
 
   return (
     <div className="space-y-6">
+      {Number(o.referrals) === 0 && (
+        <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
+          <h2 className="text-sm font-semibold">Checklist de ativação</h2>
+          <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+            <li>1. Copie seu link de divulgação.</li>
+            <li>2. Compartilhe em campanhas e comunidade.</li>
+            <li>3. Acompanhe primeiro depósito e primeira aposta dos indicados.</li>
+          </ul>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Link to="/partner/campaigns" className="rounded-lg border px-3 py-1.5 text-xs hover:bg-surface-2">
+              Abrir campanhas
+            </Link>
+            <Link to="/partner/invites" className="rounded-lg border px-3 py-1.5 text-xs hover:bg-surface-2">
+              Ver indicados
+            </Link>
+          </div>
+        </div>
+      )}
       <div>
         <h1 className="text-lg font-semibold">{copy.partner.nav.overview}</h1>
         <p className="text-xs text-muted-foreground">

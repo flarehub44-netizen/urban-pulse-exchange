@@ -36,8 +36,10 @@ export function Topbar() {
   const { me } = useResolvedProfile();
   const { data: profile } = useProfile(userId);
   const { data: accountCtx } = useAccountContext(!!userId);
+  const isAdmin = profile?.isAdmin || accountCtx?.admin?.is_admin;
   const isActivePartner =
     accountCtx?.partner?.role === "partner" && accountCtx.partner.status === "active";
+  const canAccessPartnerPortal = isAdmin || isActivePartner;
   const { notifications } = useResolvedNotifications();
 
   const { data: bets } = useBets();
@@ -80,7 +82,7 @@ export function Topbar() {
       </div>
 
       <div className="ml-auto flex items-center gap-2 md:gap-4">
-        {(profile?.isAdmin || accountCtx?.admin?.is_admin) && (
+        {isAdmin && (
           <Link
             to="/admin"
             className="hidden sm:flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[10px] text-primary hover:bg-primary/20"
@@ -90,7 +92,7 @@ export function Topbar() {
             Ops
           </Link>
         )}
-        {isActivePartner && (
+        {canAccessPartnerPortal && (
           <Link
             to="/partner"
             className="hidden sm:flex items-center gap-1.5 rounded-full border border-warn/30 bg-warn/10 px-2.5 py-1 text-[10px] text-warn hover:bg-warn/20"

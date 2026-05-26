@@ -48,7 +48,7 @@ import { isKnownLegacyMarketId, resolveMarketRouteId } from "@/lib/market-slug-a
 import { useMarketById } from "@/hooks/use-market-by-id";
 
 export type MarketDetailSearch = {
-  tab?: "chart" | "book" | "comments" | "audit";
+  tab?: "bet" | "chart" | "book" | "comments" | "audit";
   side?: "YES" | "NO";
   access?: string;
 } & AuthModalSearch;
@@ -56,7 +56,7 @@ export type MarketDetailSearch = {
 export const Route = createFileRoute("/markets/$marketId")({
   head: ({ params }) => ({
     meta: [
-      { title: `${params.marketId} · ViaX` },
+      { title: `Mercado · ViaX` },
       {
         name: "description",
         content: copy.markets.detailMeta,
@@ -66,7 +66,13 @@ export const Route = createFileRoute("/markets/$marketId")({
   validateSearch: (search: Record<string, unknown>): MarketDetailSearch => {
     const tab = search.tab;
     const validTab =
-      tab === "chart" || tab === "book" || tab === "comments" || tab === "audit" ? tab : undefined;
+      tab === "bet" ||
+      tab === "chart" ||
+      tab === "book" ||
+      tab === "comments" ||
+      tab === "audit"
+        ? tab
+        : undefined;
     const side = search.side === "YES" || search.side === "NO" ? search.side : undefined;
     const access = typeof search.access === "string" && search.access ? search.access : undefined;
     return { tab: validTab, side, access, ...parseAuthModalSearch(search) };
@@ -86,6 +92,7 @@ export const Route = createFileRoute("/markets/$marketId")({
 });
 
 const allTabs = [
+  { key: "bet" as const, label: "Apostar" },
   { key: "chart" as const, label: "Gráfico" },
   { key: "book" as const, label: copy.markets.tabBook },
   { key: "comments" as const, label: "Comentários" },
@@ -140,7 +147,7 @@ function MarketDetail() {
   const { marketId } = Route.useParams();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/markets/$marketId" });
-  const activeTab = search.tab ?? "book";
+  const activeTab = search.tab ?? "bet";
   const initialSide = search.side ?? undefined;
   const [showSocialBook, setShowSocialBook] = useState(false);
   const isCommunityId = marketId.startsWith("cm-");
@@ -324,6 +331,11 @@ function MarketDetail() {
 
   const setTab = (tab: MarketDetailSearch["tab"]) => {
     navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, tab }), replace: true });
+    if (tab === "bet") {
+      requestAnimationFrame(() => {
+        document.getElementById("order-box-panel")?.scrollIntoView({ behavior: "smooth" });
+      });
+    }
   };
 
   const visibleTabs = isCommunity ? allTabs.filter((t) => t.key !== "audit") : [...allTabs];
@@ -633,7 +645,7 @@ function MarketDetail() {
           )}
         </div>
 
-        <div className="space-y-5 lg:sticky lg:top-20 lg:self-start">
+        <div id="order-box-panel" className="space-y-5 lg:sticky lg:top-20 lg:self-start">
           <OrderBox
             m={m}
             initialSide={initialSide}

@@ -1,8 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   useAdminDashboardMetrics,
   useAdminVolumeByHour,
   useAdminLiveFeed,
+  useAdminSettlementQueue,
+  useAdminPartnerApplications,
 } from "@/hooks/use-admin-dashboard";
 import { useAdminDepositFunnelMetrics } from "@/hooks/use-admin-deposit-funnel";
 import { AdminStatCard } from "@/components/admin/admin-stat-card";
@@ -22,6 +24,8 @@ function AdminOverviewPage() {
   const { data: metrics, isLoading, isError, refetch } = useAdminDashboardMetrics();
   const { data: volumeHour } = useAdminVolumeByHour();
   const { data: feed } = useAdminLiveFeed();
+  const { data: settlementQueue } = useAdminSettlementQueue();
+  const { data: partnerApps } = useAdminPartnerApplications();
   const { data: funnel } = useAdminDepositFunnelMetrics(7);
 
   if (isError) {
@@ -46,6 +50,55 @@ function AdminOverviewPage() {
       <div>
         <h1 className="text-lg font-semibold">{copy.admin.nav.overview}</h1>
         <p className="text-xs text-muted-foreground">{copy.admin.subtitle}</p>
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-3">
+        <Link
+          to="/admin/markets"
+          search={{ tab: "disputes" }}
+          className="rounded-xl border bg-card/40 p-3 text-sm hover:bg-surface-2 transition"
+        >
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Fila operacional</p>
+          <p className="mt-1 font-semibold">
+            {(metrics?.dispute_count ?? 0) + (settlementQueue?.length ?? 0)} itens críticos
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">Disputas + mercados em liquidação</p>
+        </Link>
+        <Link
+          to="/admin/partners"
+          className="rounded-xl border bg-card/40 p-3 text-sm hover:bg-surface-2 transition"
+        >
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Afiliados</p>
+          <p className="mt-1 font-semibold">{partnerApps?.length ?? 0} candidaturas pendentes</p>
+          <p className="text-xs text-muted-foreground mt-1">Aprovação de creators e termos</p>
+        </Link>
+        <Link
+          to="/admin/markets"
+          search={{ tab: "live" }}
+          className="rounded-xl border bg-card/40 p-3 text-sm hover:bg-surface-2 transition"
+        >
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Mercados ao vivo</p>
+          <p className="mt-1 font-semibold">{metrics?.active_markets ?? 0} ativos agora</p>
+          <p className="text-xs text-muted-foreground mt-1">Acesse painel de operação em tempo real</p>
+        </Link>
+      </div>
+
+      <div className="rounded-xl border bg-card/40 p-4">
+        <h2 className="text-sm font-semibold">Inbox operacional</h2>
+        <div className="mt-3 grid gap-2 sm:grid-cols-3 text-xs">
+          <div className="rounded-lg border bg-surface/40 px-3 py-2">
+            <div className="text-muted-foreground">Disputas abertas</div>
+            <div className="mono mt-1 text-lg font-semibold">{metrics?.dispute_count ?? 0}</div>
+          </div>
+          <div className="rounded-lg border bg-surface/40 px-3 py-2">
+            <div className="text-muted-foreground">Liquidação pendente</div>
+            <div className="mono mt-1 text-lg font-semibold">{settlementQueue?.length ?? 0}</div>
+          </div>
+          <div className="rounded-lg border bg-surface/40 px-3 py-2">
+            <div className="text-muted-foreground">Candidaturas afiliado</div>
+            <div className="mono mt-1 text-lg font-semibold">{partnerApps?.length ?? 0}</div>
+          </div>
+        </div>
       </div>
 
       {funnel && (

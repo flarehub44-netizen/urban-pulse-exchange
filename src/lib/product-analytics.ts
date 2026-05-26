@@ -7,7 +7,11 @@ export type ProductEventName =
   | "market_opened_from_dashboard"
   | "wallet_tab_changed"
   | "first_bet_after_deposit"
-  | "dashboard_cta_variant_assigned";
+  | "dashboard_cta_variant_assigned"
+  | "market_list_view"
+  | "filter_applied"
+  | "market_card_click"
+  | "partner_link_copied";
 
 type EventProps = Record<string, string | number | boolean | undefined>;
 

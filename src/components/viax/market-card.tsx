@@ -34,7 +34,15 @@ import { useWatchlist } from "@/hooks/use-watchlist";
 import { cn } from "@/lib/utils";
 import { statusLabel } from "@/lib/market-status";
 
-export function MarketCard({ m, compact }: { m: Market; compact?: boolean }) {
+export function MarketCard({
+  m,
+  compact,
+  onOpen,
+}: {
+  m: Market;
+  compact?: boolean;
+  onOpen?: (marketId: string) => void;
+}) {
   const pY = probability(m.pool, "YES");
   const pN = 1 - pY;
   const total = poolTotal(m.pool);
@@ -129,6 +137,7 @@ export function MarketCard({ m, compact }: { m: Market; compact?: boolean }) {
         <Link
           to="/markets/$marketId"
           params={{ marketId: m.id }}
+          onClick={() => onOpen?.(m.id)}
           className="mt-3 block"
           data-testid="market-card-link"
         >
