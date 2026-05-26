@@ -33,5 +33,8 @@ export function authErrorMessage(error: { message: string } | null): string {
   if (m.includes("user already registered")) return "Este e-mail já está cadastrado.";
   if (m.includes("password")) return "Senha inválida (mínimo 6 caracteres).";
   if (m.includes("email not confirmed")) return "Confirme seu e-mail antes de entrar.";
+  if (m.includes("anonymous_provider_disabled")) {
+    return "Login anônimo está desativado no Supabase. Habilite Email/Password (e Anonymous, se necessário) em Authentication → Providers do projeto.";
+  }
   return error.message;
 }

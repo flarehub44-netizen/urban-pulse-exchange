@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { lazy, Suspense, useMemo, useEffect, useState } from "react";
+import { useClientOnly } from "@/lib/use-client-only";
 import { useMarketHistory } from "@/hooks/use-market-history";
 import { useMarketsList } from "@/hooks/use-markets";
 import { useResolvedFeedForMarket } from "@/hooks/use-resolved-data";
@@ -115,6 +116,7 @@ function MarketCommentsPanel({ marketId }: { marketId: string }) {
 
 function MarketDetail() {
   const { enabled: casinoEnabled } = useCasinoEnabled();
+  const clientReady = useClientOnly();
   const { userId, authReady } = useAuth();
   const { marketId } = Route.useParams();
   const search = Route.useSearch();
@@ -180,7 +182,7 @@ function MarketDetail() {
     };
   }, [activeTab, marketId]);
 
-  if (detailLoading) {
+  if (!clientReady || detailLoading) {
     return (
       <div className="space-y-4 animate-pulse">
         <div className="h-8 w-48 rounded-lg bg-surface-2" />
@@ -484,7 +486,7 @@ function MarketDetail() {
             ))}
           </div>
 
-          {activeTab === "chart" && (
+          {clientReady && activeTab === "chart" && (
             <>
               <div className="rounded-2xl border bg-card/60 p-5 backdrop-blur">
                 <div className="flex items-center justify-between">
@@ -565,7 +567,7 @@ function MarketDetail() {
             initialSide={initialSide}
             className="max-lg:sticky max-lg:bottom-[calc(4.5rem+env(safe-area-inset-bottom))] max-lg:z-20 max-lg:shadow-[var(--shadow-elevated)]"
           />
-          {showSocialBook && activeTab === "book" && <SocialBook m={m} />}
+          {clientReady && showSocialBook && activeTab === "book" && <SocialBook m={m} />}
         </div>
       </div>
     </div>

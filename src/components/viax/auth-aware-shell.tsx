@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { AppShell } from "@/components/viax/app-shell";
 import { PublicShell } from "@/components/viax/public-shell";
 import { AppLoadingSkeleton } from "@/components/viax/app-loading-skeleton";
@@ -9,7 +9,17 @@ type AuthAwareShellProps = {
 };
 
 export function AuthAwareShell({ children }: AuthAwareShellProps) {
+  const [mounted, setMounted] = useState(false);
   const { isRegistered, authReady } = useAuthPublic();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Keep first SSR/CSR paint deterministic to avoid hydration mismatches.
+  if (!mounted) {
+    return <PublicShell>{children}</PublicShell>;
+  }
 
   if (!authReady) {
     return <AppLoadingSkeleton />;

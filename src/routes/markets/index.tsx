@@ -115,11 +115,16 @@ function MarketsList() {
 
   const [qInput, setQInput] = useState(q);
   const [hydrated, setHydrated] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => setQInput(q), [q]);
 
   useEffect(() => {
-    if (hydrated) return;
+    if (!mounted || hydrated) return;
     const empty =
       !search.status &&
       !search.category &&
@@ -222,16 +227,27 @@ function MarketsList() {
         onChange={(s) => patchSearch({ segment: s === "transito" ? undefined : s })}
       />
 
-      {segment === "futebol" && (
+      {!mounted && (
+        <div className="space-y-4">
+          <div className="h-8 w-44 animate-pulse rounded-lg bg-surface-2" />
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <MarketCardSkeleton key={`initial-${i}`} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {mounted && segment === "futebol" && (
         <>
           <DepositFunnelBannerSlot />
           <FootballMarketsList embedded />
         </>
       )}
 
-      {segment === "outros" && <CommunityMarketsList embedded />}
+      {mounted && segment === "outros" && <CommunityMarketsList embedded />}
 
-      {segment === "transito" && (
+      {mounted && segment === "transito" && (
         <>
           <div className="page-section flex flex-wrap items-end justify-between gap-4">
             <p className="flex-1 min-w-[200px] text-sm text-muted-foreground">
