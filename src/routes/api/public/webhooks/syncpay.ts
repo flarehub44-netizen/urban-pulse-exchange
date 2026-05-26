@@ -29,6 +29,12 @@ export const Route = createFileRoute("/api/public/webhooks/syncpay")({
         const providerEventId =
           request.headers.get("x-syncpay-event-id") ?? request.headers.get("x-event-id") ?? null;
 
+        if (!providerEventId) {
+          // DB-level deduplication via service_process_syncpay_webhook still applies,
+          // but traceability is reduced without a stable event id.
+          console.warn("[SyncPay Webhook] missing x-syncpay-event-id header — deduplication relies on DB-level idempotency");
+        }
+
         const valid = await validateWebhookSignature(rawBody, signature);
         if (!valid) {
           console.error("[SyncPay Webhook] Invalid signature � rejected");

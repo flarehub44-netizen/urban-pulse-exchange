@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { SupabaseFnContext } from "@/integrations/supabase/context";
 
@@ -22,7 +23,7 @@ export const casinoDailySpinFn = createServerFn({ method: "POST" })
 
 export const casinoQuickDepositFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { amount: number; context?: string }) => d)
+  .inputValidator(z.object({ amount: z.number().positive().max(10_000), context: z.string().optional() }))
   .handler(async ({ context, data }) => {
     const { supabase } = context as unknown as SupabaseFnContext;
     const { data: res, error } = await supabase.rpc("casino_quick_deposit", {
@@ -35,7 +36,7 @@ export const casinoQuickDepositFn = createServerFn({ method: "POST" })
 
 export const setCasinoOptOutFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { optOut: boolean }) => d)
+  .inputValidator(z.object({ optOut: z.boolean() }))
   .handler(async ({ context, data }) => {
     const { supabase } = context as unknown as SupabaseFnContext;
     const { data: res, error } = await supabase.rpc("set_casino_opt_out", {

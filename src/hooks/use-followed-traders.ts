@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toggleTraderFollowFn } from "@/actions/follows";
+import { copy } from "@/copy/pt-BR";
 
 const STORAGE_KEY = "viax_followed_traders";
 const QUERY_KEY = "followed-traders";
@@ -71,6 +73,7 @@ export function useFollowedTraders() {
     },
     onError: (_err, _id, ctx) => {
       if (ctx?.prev) qc.setQueryData([QUERY_KEY, userId], ctx.prev);
+      toast.error(copy.errors.followFailed);
     },
     onSettled: () => qc.invalidateQueries({ queryKey: [QUERY_KEY, userId] }),
   });

@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { requireAuth } from "@/lib/auth-guards";
 import { AppShell } from "@/components/viax/app-shell";
+import { RouteErrorBoundary } from "@/components/viax/route-error-boundary";
 
 export const Route = createFileRoute("/_app")({
   beforeLoad: () => requireAuth(),
@@ -10,7 +11,9 @@ export const Route = createFileRoute("/_app")({
 function AppLayout() {
   return (
     <AppShell>
-      <Outlet />
+      <RouteErrorBoundary>
+        <Outlet />
+      </RouteErrorBoundary>
     </AppShell>
   );
 }

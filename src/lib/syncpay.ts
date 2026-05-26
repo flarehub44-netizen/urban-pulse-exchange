@@ -179,8 +179,14 @@ export async function validateWebhookSignature(
       .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
 
-    // Comparação timing-safe básica (Web Crypto garante que sign é constante-time)
-    return expected === signatureHeader.toLowerCase().replace("sha256=", "");
+    // XOR byte-a-byte para evitar timing attack via early-exit da comparação de string
+    const incoming = signatureHeader.toLowerCase().replace("sha256=", "");
+    if (incoming.length !== expected.length) return false;
+    let diff = 0;
+    for (let i = 0; i < expected.length; i++) {
+      diff |= expected.charCodeAt(i) ^ incoming.charCodeAt(i);
+    }
+    return diff === 0;
   } catch {
     return false;
   }

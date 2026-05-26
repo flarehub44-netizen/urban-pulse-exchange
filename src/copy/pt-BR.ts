@@ -514,6 +514,13 @@ export const copy = {
     genericDesc: "Tente de novo ou volte ao início.",
     marketStuck: "Não foi possível carregar este mercado",
     backToApp: "Voltar ao app",
+    rateLimited: "Muitas tentativas. Aguarde um momento e tente de novo.",
+    unauthorized: "Sessão expirada. Faça login novamente.",
+    registrationRequired: "Conclua o cadastro para continuar.",
+    insufficientBalance: "Saldo insuficiente para esta operação.",
+    followFailed: "Não foi possível atualizar o acompanhamento.",
+    depositPollFailed: "Não conseguimos confirmar o pagamento. Verifique em Histórico.",
+    loadFailed: "Não foi possível carregar os dados.",
   },
 
   command: {

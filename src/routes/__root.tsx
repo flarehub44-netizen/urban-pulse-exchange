@@ -8,6 +8,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { copy } from "@/copy/pt-BR";
+import { consumeLastCapturedError } from "@/lib/error-capture";
 import { ThemeToaster } from "@/components/viax/theme-toaster";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { DepositSheetHost } from "@/components/viax/deposit-sheet-host";
@@ -37,13 +38,15 @@ function NotFoundComponent() {
 }
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
-  console.error(error);
+  const captured = consumeLastCapturedError();
+  const displayError = (captured instanceof Error ? captured : null) ?? error;
+  console.error("[root-error]", displayError);
   const router = useRouter();
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold">{copy.root.errorTitle}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{displayError.message}</p>
         <div className="mt-6 flex justify-center gap-2">
           <button
             onClick={() => {

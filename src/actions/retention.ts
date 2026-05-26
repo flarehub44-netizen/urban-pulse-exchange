@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { SupabaseFnContext } from "@/integrations/supabase/context";
 
@@ -70,7 +71,7 @@ export const getDailyMissionsFn = createServerFn({ method: "GET" })
 
 export const completeMissionFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { mission_id: string }) => d)
+  .inputValidator(z.object({ mission_id: z.string().uuid() }))
   .handler(async ({ context, data }) => {
     const { supabase } = context as unknown as SupabaseFnContext;
     const { data: res, error } = await supabase.rpc("complete_mission", {
@@ -100,10 +101,12 @@ export const getTraderArchetypeFn = createServerFn({ method: "GET" })
 
 export const recordMarketViewFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { market_id: string }) => d)
+  .inputValidator(z.object({ market_id: z.string().uuid() }))
   .handler(async ({ context, data }) => {
     const { supabase } = context as unknown as SupabaseFnContext;
-    await supabase.rpc("record_market_view", { p_market_id: data.market_id });
+    const { error } = await supabase.rpc("record_market_view", { p_market_id: data.market_id });
+    if (error) console.warn("[recordMarketView] failed silently:", error.message);
+    return { ok: !error };
   });
 
 export type AchievementUnlock = { id: string; name: string; description: string; icon?: string };

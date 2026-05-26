@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { SupabaseFnContext } from "@/integrations/supabase/context";
 
@@ -32,7 +33,7 @@ export const getMyLeaguesFn = createServerFn({ method: "GET" })
 
 export const createLeagueFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { name: string }) => d)
+  .inputValidator(z.object({ name: z.string().min(2).max(40) }))
   .handler(async ({ context, data }) => {
     const { supabase } = context as unknown as SupabaseFnContext;
     const { data: res, error } = await supabase.rpc("create_league", { p_name: data.name });
@@ -42,7 +43,7 @@ export const createLeagueFn = createServerFn({ method: "POST" })
 
 export const joinLeagueFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { invite_code: string }) => d)
+  .inputValidator(z.object({ invite_code: z.string().min(4).max(20) }))
   .handler(async ({ context, data }) => {
     const { supabase } = context as unknown as SupabaseFnContext;
     const { data: res, error } = await supabase.rpc("join_league", {
@@ -60,7 +61,7 @@ export const joinLeagueFn = createServerFn({ method: "POST" })
 
 export const leaveLeagueFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { league_id: string }) => d)
+  .inputValidator(z.object({ league_id: z.string().uuid() }))
   .handler(async ({ context, data }) => {
     const { supabase } = context as unknown as SupabaseFnContext;
     const { data: res, error } = await supabase.rpc("leave_league", {
@@ -72,7 +73,7 @@ export const leaveLeagueFn = createServerFn({ method: "POST" })
 
 export const getLeagueLeaderboardFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { league_id: string }) => d)
+  .inputValidator(z.object({ league_id: z.string().uuid() }))
   .handler(async ({ context, data }) => {
     const { supabase } = context as unknown as SupabaseFnContext;
     const { data: res, error } = await supabase.rpc("get_league_leaderboard", {

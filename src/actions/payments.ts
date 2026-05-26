@@ -37,51 +37,56 @@ export const initiateDepositFn = createServerFn({ method: "POST" })
     const { userId } = context as unknown as SupabaseFnContext;
     const service = getServiceClient();
 
-    // 1. Criar o intent no banco (status: pending)
-    const { data: intent, error: intentErr } = await service
-      .from("payment_intents")
-      .insert({ user_id: userId, type: "deposit", amount: data.amount, status: "pending" })
-      .select("id")
-      .single();
+    try {
+      // 1. Criar o intent no banco (status: pending)
+      const { data: intent, error: intentErr } = await service
+        .from("payment_intents")
+        .insert({ user_id: userId, type: "deposit", amount: data.amount, status: "pending" })
+        .select("id")
+        .single();
 
-    if (intentErr || !intent) {
-      throw new Error("Falha ao registrar intenção de pagamento");
+      if (intentErr || !intent) {
+        throw new Error("Falha ao registrar intenção de pagamento");
+      }
+
+      // 2. Chamar SyncPay para gerar QR Code Pix
+      const charge = await createPixCharge({
+        amount: data.amount,
+        correlationId: intent.id,
+        description: `Depósito ViaX — ${formatBRL(data.amount)}`,
+        expiresInMinutes: 30,
+      });
+      console.info("[SyncPay] deposit charge created", {
+        intentId: intent.id,
+        providerId: charge.id,
+        amount: data.amount,
+      });
+
+      // 3. Atualizar intent com dados do provider
+      await service
+        .from("payment_intents")
+        .update({
+          provider_id: charge.id,
+          qr_code: charge.qr_code,
+          qr_code_img: charge.qr_code_base64,
+          expires_at: charge.expiration,
+          status: "pending",
+          provider_payload: charge as unknown as Record<string, unknown>,
+          meta: charge as unknown as Record<string, unknown>,
+        })
+        .eq("id", intent.id);
+
+      logApiMetric("bff.initiate_deposit", { ok: true, durationMs: Date.now() - started });
+      return {
+        intentId: intent.id,
+        qrCode: charge.qr_code,
+        qrCodeImg: charge.qr_code_base64,
+        expiresAt: charge.expiration,
+      };
+    } catch (e) {
+      logApiMetric("bff.initiate_deposit", { ok: false, durationMs: Date.now() - started });
+      throw e;
     }
-
-    // 2. Chamar SyncPay para gerar QR Code Pix
-    const charge = await createPixCharge({
-      amount: data.amount,
-      correlationId: intent.id,
-      description: `Depósito ViaX — ${formatBRL(data.amount)}`,
-      expiresInMinutes: 30,
-    });
-    console.info("[SyncPay] deposit charge created", {
-      intentId: intent.id,
-      providerId: charge.id,
-      amount: data.amount,
-    });
-
-    // 3. Atualizar intent com dados do provider
-    await service
-      .from("payment_intents")
-      .update({
-        provider_id: charge.id,
-        qr_code: charge.qr_code,
-        qr_code_img: charge.qr_code_base64,
-        expires_at: charge.expiration,
-        status: "pending",
-        provider_payload: charge as unknown as Record<string, unknown>,
-        meta: charge as unknown as Record<string, unknown>,
-      })
-      .eq("id", intent.id);
-
-    logApiMetric("bff.initiate_deposit", { ok: true, durationMs: Date.now() - started });
-    return {
-      intentId: intent.id,
-      qrCode: charge.qr_code,
-      qrCodeImg: charge.qr_code_base64,
-      expiresAt: charge.expiration,
-    };
   });
 
 /**
@@ -97,65 +102,70 @@ export const initiateWithdrawFn = createServerFn({ method: "POST" })
     const { supabase, userId } = context as unknown as SupabaseFnContext;
     const service = getServiceClient();
 
-    // RPC cria o intent + reserva o saldo + aplica KYC gate
-    const { data: result, error } = await supabase.rpc("request_withdrawal", {
-      p_amount: data.amount,
-      p_pix_key: data.pixKey,
-    });
-
-    if (error) throw new Error(error.message);
-    const parsed = result as { intent_id: string; balance: number };
-
     try {
-      const payout = await createPixPayout({
-        amount: data.amount,
-        pixKey: data.pixKey,
-        correlationId: parsed.intent_id,
-        description: `Saque ViaX — ${formatBRL(data.amount)}`,
-      });
-      console.info("[SyncPay] payout created", {
-        intentId: parsed.intent_id,
-        providerId: payout.id,
-        amount: data.amount,
-      });
-
-      const { error: updateErr } = await service
-        .from("payment_intents")
-        .update({
-          provider_id: payout.id,
-          status: "pending",
-          provider_payload: payout as unknown as Record<string, unknown>,
-          meta: payout as unknown as Record<string, unknown>,
-        })
-        .eq("id", parsed.intent_id);
-
-      if (updateErr) {
-        throw new Error(updateErr.message);
-      }
-    } catch (payoutErr) {
-      // Se falhar ao criar payout no provider, estorna a reserva imediatamente.
-      await service.rpc("service_refund_withdrawal", {
-        p_user_id: userId,
+      // RPC cria o intent + reserva o saldo + aplica KYC gate
+      const { data: result, error } = await supabase.rpc("request_withdrawal", {
         p_amount: data.amount,
-        p_intent_id: parsed.intent_id,
+        p_pix_key: data.pixKey,
       });
-      await service
-        .from("payment_intents")
-        .update({
-          status: "failed",
-          meta: {
-            reason: "payout_init_failed",
-            message: payoutErr instanceof Error ? payoutErr.message : "unknown_error",
-          },
-        })
-        .eq("id", parsed.intent_id);
-      throw new Error(
-        payoutErr instanceof Error ? payoutErr.message : "Falha ao iniciar saque no provedor",
-      );
-    }
 
-    logApiMetric("bff.initiate_withdraw", { ok: true, durationMs: Date.now() - started });
-    return parsed;
+      if (error) throw new Error(error.message);
+      const parsed = result as { intent_id: string; balance: number };
+
+      try {
+        const payout = await createPixPayout({
+          amount: data.amount,
+          pixKey: data.pixKey,
+          correlationId: parsed.intent_id,
+          description: `Saque ViaX — ${formatBRL(data.amount)}`,
+        });
+        console.info("[SyncPay] payout created", {
+          intentId: parsed.intent_id,
+          providerId: payout.id,
+          amount: data.amount,
+        });
+
+        const { error: updateErr } = await service
+          .from("payment_intents")
+          .update({
+            provider_id: payout.id,
+            status: "pending",
+            provider_payload: payout as unknown as Record<string, unknown>,
+            meta: payout as unknown as Record<string, unknown>,
+          })
+          .eq("id", parsed.intent_id);
+
+        if (updateErr) {
+          throw new Error(updateErr.message);
+        }
+      } catch (payoutErr) {
+        // Se falhar ao criar payout no provider, estorna a reserva imediatamente.
+        await service.rpc("service_refund_withdrawal", {
+          p_user_id: userId,
+          p_amount: data.amount,
+          p_intent_id: parsed.intent_id,
+        });
+        await service
+          .from("payment_intents")
+          .update({
+            status: "failed",
+            meta: {
+              reason: "payout_init_failed",
+              message: payoutErr instanceof Error ? payoutErr.message : "unknown_error",
+            },
+          })
+          .eq("id", parsed.intent_id);
+        throw new Error(
+          payoutErr instanceof Error ? payoutErr.message : "Falha ao iniciar saque no provedor",
+        );
+      }
+
+      logApiMetric("bff.initiate_withdraw", { ok: true, durationMs: Date.now() - started });
+      return parsed;
+    } catch (e) {
+      logApiMetric("bff.initiate_withdraw", { ok: false, durationMs: Date.now() - started });
+      throw e;
+    }
   });
 
 /**
@@ -166,23 +176,30 @@ export const getDepositStatusFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator(z.object({ intentId: z.string().uuid() }))
   .handler(async ({ data, context }) => {
+    const started = Date.now();
     const { userId } = context as unknown as SupabaseFnContext;
     const service = getServiceClient();
 
-    const { data: intent, error } = await service
-      .from("payment_intents")
-      .select("id, status, amount, created_at, expires_at")
-      .eq("id", data.intentId)
-      .eq("user_id", userId)
-      .single();
+    try {
+      const { data: intent, error } = await service
+        .from("payment_intents")
+        .select("id, status, amount, created_at, expires_at")
+        .eq("id", data.intentId)
+        .eq("user_id", userId)
+        .single();
 
-    if (error || !intent) throw new Error("Intent não encontrado");
+      if (error || !intent) throw new Error("Intent não encontrado");
 
-    return intent as {
-      id: string;
-      status: "pending" | "paid" | "failed" | "expired";
-      amount: number;
-      created_at: string;
-      expires_at: string | null;
-    };
+      logApiMetric("bff.get_deposit_status", { ok: true, durationMs: Date.now() - started });
+      return intent as {
+        id: string;
+        status: "pending" | "paid" | "failed" | "expired";
+        amount: number;
+        created_at: string;
+        expires_at: string | null;
+      };
+    } catch (e) {
+      logApiMetric("bff.get_deposit_status", { ok: false, durationMs: Date.now() - started });
+      throw e;
+    }
   });

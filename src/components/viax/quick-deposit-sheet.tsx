@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Copy, QrCode, Clock, Wallet, Gift } from "lucide-react";
@@ -40,6 +40,7 @@ export function QuickDepositSheet({
     expiresAt: string;
   } | null>(null);
   const [done, setDone] = useState(false);
+  const pollErrors = useRef(0);
 
   const depositMut = useMutation({
     mutationFn: (amt: number) => initiateDepositFn({ data: { amount: amt } }),
@@ -58,6 +59,7 @@ export function QuickDepositSheet({
   // Poll for payment confirmation while QR is shown
   useEffect(() => {
     if (!qr || done) return;
+    pollErrors.current = 0;
     const id = setInterval(async () => {
       try {
         const status = await getDepositStatusFn({ data: { intentId: qr.intentId } });
@@ -83,7 +85,11 @@ export function QuickDepositSheet({
           });
         }
       } catch {
-        /* silencioso */
+        pollErrors.current += 1;
+        if (pollErrors.current >= 3) {
+          clearInterval(id);
+          toast.error(copy.errors.depositPollFailed);
+        }
       }
     }, 5000);
     return () => clearInterval(id);

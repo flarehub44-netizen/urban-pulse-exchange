@@ -12,6 +12,10 @@ export type DailyPoll = {
   my_vote: boolean | null;
 };
 
+/**
+ * @public Intentionally unauthenticated — returns today's poll for display before login.
+ * Rate-limited via assertRateLimit at the BFF layer.
+ */
 export const getTodayPollFn = createServerFn({ method: "GET" }).handler(async () => {
   try {
     const today = new Date().toISOString().slice(0, 10);

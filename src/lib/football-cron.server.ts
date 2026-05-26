@@ -5,7 +5,10 @@ import {
   getFixturesByDate,
   type ApiFootballFixtureDto,
 } from "@/lib/api-football.server";
-import { withJobLog } from "@/lib/structured-log.server";
+import { withJobLog, logApiMetric } from "@/lib/structured-log.server";
+
+let consecutiveSyncFailures = 0;
+const CRON_ALERT_THRESHOLD = 3;
 
 function getServiceClient(): SupabaseClient {
   const url = process.env.SUPABASE_URL;
@@ -96,6 +99,20 @@ export async function runFootballSync(): Promise<unknown> {
     }
 
     await supabase.rpc("cron_close_football_bets");
+
+    if (errors.length > 0) {
+      consecutiveSyncFailures++;
+      if (consecutiveSyncFailures >= CRON_ALERT_THRESHOLD) {
+        logApiMetric("football_cron.consecutive_failures", {
+          ok: false,
+          kind: "cron_alert",
+          count: consecutiveSyncFailures,
+          errors,
+        });
+      }
+    } else {
+      consecutiveSyncFailures = 0;
+    }
 
     return { ok: true, upserted, autoApproved, dates: dates.length, errors };
   });

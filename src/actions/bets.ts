@@ -44,7 +44,7 @@ export const placeBetFn = createServerFn({ method: "POST" })
 
 export const saveBetNoteFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { bet_id: string; note: string }) => d)
+  .inputValidator(z.object({ bet_id: z.string().uuid(), note: z.string().max(280) }))
   .handler(async ({ data }) => {
     const { error } = await supabase
       .from("bets")

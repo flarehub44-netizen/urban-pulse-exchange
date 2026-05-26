@@ -57,6 +57,10 @@ const communityMarketDetailSchema = z.object({
   accessToken: z.string().optional(),
 });
 
+/**
+ * @public Intentionally unauthenticated — returns read-only market data for sharing/preview.
+ * Rate-limited via assertRateLimit at the BFF layer.
+ */
 export const getCommunityMarketPublicFn = createServerFn({ method: "GET" })
   .inputValidator(communityMarketDetailSchema)
   .handler(async ({ data }) => {
@@ -92,6 +96,10 @@ export const getCommunityMarketFn = createServerFn({ method: "GET" })
     };
   });
 
+/**
+ * @public Intentionally unauthenticated — lists public community markets for discovery.
+ * Rate-limited via assertRateLimit at the BFF layer.
+ */
 export const listPublicCommunityMarketsFn = createServerFn({ method: "GET" }).handler(async () => {
   const { supabase } = await import("@/integrations/supabase/client");
   const { data, error } = await supabase.rpc("list_public_community_markets", { p_limit: 50 });

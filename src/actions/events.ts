@@ -18,6 +18,10 @@ function parseActiveEventsPayload(data: unknown): PlatformEvent[] {
   return rows as PlatformEvent[];
 }
 
+/**
+ * @public Intentionally unauthenticated — returns read-only active platform events.
+ * Rate-limited via assertRateLimit at the BFF layer.
+ */
 export const getActiveEventsFn = createServerFn({ method: "GET" }).handler(async () => {
   const { data, error } = await supabase.rpc("get_active_events");
   if (error) {

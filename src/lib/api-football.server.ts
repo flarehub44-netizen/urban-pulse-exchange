@@ -67,6 +67,11 @@ async function apiGet<T>(path: string, params: Record<string, string>): Promise<
 
   if (!res.ok) {
     const text = await res.text();
+    if (res.status === 429) {
+      const retryAfterSec = parseInt(res.headers.get("Retry-After") ?? "60", 10);
+      console.warn("[API-Football] rate limited", { path, retryAfterSec });
+      await sleep(retryAfterSec * 1000);
+    }
     throw new Error(`API-Football ${res.status}: ${text.slice(0, 200)}`);
   }
 
