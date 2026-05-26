@@ -39,7 +39,7 @@ export function mapFootballMarket(row: Record<string, unknown>): FootballMarketR
     pool_draw: Number(row.pool_draw),
     pool_away: Number(row.pool_away),
     participants: Number(row.participants),
-    winning_outcome: (row.winning_outcome as FootballOutcome | null) ?? undefined,
+    winning_outcome: (row.winning_outcome as FootballOutcome | null) ?? null,
     accept_bets: Boolean(row.accept_bets),
     betting_closes_at: row.betting_closes_at as string,
     fixture: {
@@ -52,8 +52,8 @@ export function mapFootballMarket(row: Record<string, unknown>): FootballMarketR
       goals_home: fixture.goals_home != null ? Number(fixture.goals_home) : null,
       goals_away: fixture.goals_away != null ? Number(fixture.goals_away) : null,
       api_league_id: Number(fixture.api_league_id),
-      home_logo_url: (fixture.home_logo_url as string | null) ?? undefined,
-      away_logo_url: (fixture.away_logo_url as string | null) ?? undefined,
+      home_logo_url: (fixture.home_logo_url as string | null) ?? null,
+      away_logo_url: (fixture.away_logo_url as string | null) ?? null,
     },
   };
 }
