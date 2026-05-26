@@ -95,7 +95,10 @@ export function LandingSegmentPillars() {
               )}
             </div>
           </motion.div>
-        ))}
+          </motion.div>
+          );
+        })}
+
       </div>
     </section>
   );
