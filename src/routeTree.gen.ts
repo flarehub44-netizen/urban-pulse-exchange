@@ -62,14 +62,14 @@ import { Route as AppNotificationsRouteImport } from './routes/_app/notification
 import { Route as AppLeaguesRouteImport } from './routes/_app/leagues'
 import { Route as AppFeedRouteImport } from './routes/_app/feed'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
-import { Route as ApiWebhooksSyncpayRouteImport } from './routes/api/webhooks/syncpay'
-import { Route as ApiCronFootballSyncRouteImport } from './routes/api/cron/football-sync'
-import { Route as ApiCronFootballResolveRouteImport } from './routes/api/cron/football-resolve'
 import { Route as AppProfileUserIdRouteImport } from './routes/_app/profile.$userId'
 import { Route as AppMarketsCreateRouteImport } from './routes/_app/markets.create'
 import { Route as AppFeedPostIdRouteImport } from './routes/_app/feed.$postId'
+import { Route as ApiPublicWebhooksSyncpayRouteImport } from './routes/api/public/webhooks/syncpay'
 import { Route as ApiPublicSnapshotProxySplatRouteImport } from './routes/api/public/snapshot-proxy/$'
 import { Route as ApiPublicHlsProxySplatRouteImport } from './routes/api/public/hls-proxy/$'
+import { Route as ApiPublicCronFootballSyncRouteImport } from './routes/api/public/cron/football-sync'
+import { Route as ApiPublicCronFootballResolveRouteImport } from './routes/api/public/cron/football-resolve'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -335,21 +335,6 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
-const ApiWebhooksSyncpayRoute = ApiWebhooksSyncpayRouteImport.update({
-  id: '/api/webhooks/syncpay',
-  path: '/api/webhooks/syncpay',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiCronFootballSyncRoute = ApiCronFootballSyncRouteImport.update({
-  id: '/api/cron/football-sync',
-  path: '/api/cron/football-sync',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiCronFootballResolveRoute = ApiCronFootballResolveRouteImport.update({
-  id: '/api/cron/football-resolve',
-  path: '/api/cron/football-resolve',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AppProfileUserIdRoute = AppProfileUserIdRouteImport.update({
   id: '/$userId',
   path: '/$userId',
@@ -365,6 +350,12 @@ const AppFeedPostIdRoute = AppFeedPostIdRouteImport.update({
   path: '/$postId',
   getParentRoute: () => AppFeedRoute,
 } as any)
+const ApiPublicWebhooksSyncpayRoute =
+  ApiPublicWebhooksSyncpayRouteImport.update({
+    id: '/api/public/webhooks/syncpay',
+    path: '/api/public/webhooks/syncpay',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicSnapshotProxySplatRoute =
   ApiPublicSnapshotProxySplatRouteImport.update({
     id: '/api/public/snapshot-proxy/$',
@@ -376,6 +367,18 @@ const ApiPublicHlsProxySplatRoute = ApiPublicHlsProxySplatRouteImport.update({
   path: '/api/public/hls-proxy/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCronFootballSyncRoute =
+  ApiPublicCronFootballSyncRouteImport.update({
+    id: '/api/public/cron/football-sync',
+    path: '/api/public/cron/football-sync',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicCronFootballResolveRoute =
+  ApiPublicCronFootballResolveRouteImport.update({
+    id: '/api/public/cron/football-resolve',
+    path: '/api/public/cron/football-resolve',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -433,11 +436,11 @@ export interface FileRoutesByFullPath {
   '/feed/$postId': typeof AppFeedPostIdRoute
   '/markets/create': typeof AppMarketsCreateRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
-  '/api/cron/football-resolve': typeof ApiCronFootballResolveRoute
-  '/api/cron/football-sync': typeof ApiCronFootballSyncRoute
-  '/api/webhooks/syncpay': typeof ApiWebhooksSyncpayRoute
+  '/api/public/cron/football-resolve': typeof ApiPublicCronFootballResolveRoute
+  '/api/public/cron/football-sync': typeof ApiPublicCronFootballSyncRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
   '/api/public/snapshot-proxy/$': typeof ApiPublicSnapshotProxySplatRoute
+  '/api/public/webhooks/syncpay': typeof ApiPublicWebhooksSyncpayRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -491,11 +494,11 @@ export interface FileRoutesByTo {
   '/feed/$postId': typeof AppFeedPostIdRoute
   '/markets/create': typeof AppMarketsCreateRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
-  '/api/cron/football-resolve': typeof ApiCronFootballResolveRoute
-  '/api/cron/football-sync': typeof ApiCronFootballSyncRoute
-  '/api/webhooks/syncpay': typeof ApiWebhooksSyncpayRoute
+  '/api/public/cron/football-resolve': typeof ApiPublicCronFootballResolveRoute
+  '/api/public/cron/football-sync': typeof ApiPublicCronFootballSyncRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
   '/api/public/snapshot-proxy/$': typeof ApiPublicSnapshotProxySplatRoute
+  '/api/public/webhooks/syncpay': typeof ApiPublicWebhooksSyncpayRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -555,11 +558,11 @@ export interface FileRoutesById {
   '/_app/feed/$postId': typeof AppFeedPostIdRoute
   '/_app/markets/create': typeof AppMarketsCreateRoute
   '/_app/profile/$userId': typeof AppProfileUserIdRoute
-  '/api/cron/football-resolve': typeof ApiCronFootballResolveRoute
-  '/api/cron/football-sync': typeof ApiCronFootballSyncRoute
-  '/api/webhooks/syncpay': typeof ApiWebhooksSyncpayRoute
+  '/api/public/cron/football-resolve': typeof ApiPublicCronFootballResolveRoute
+  '/api/public/cron/football-sync': typeof ApiPublicCronFootballSyncRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
   '/api/public/snapshot-proxy/$': typeof ApiPublicSnapshotProxySplatRoute
+  '/api/public/webhooks/syncpay': typeof ApiPublicWebhooksSyncpayRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -619,11 +622,11 @@ export interface FileRouteTypes {
     | '/feed/$postId'
     | '/markets/create'
     | '/profile/$userId'
-    | '/api/cron/football-resolve'
-    | '/api/cron/football-sync'
-    | '/api/webhooks/syncpay'
+    | '/api/public/cron/football-resolve'
+    | '/api/public/cron/football-sync'
     | '/api/public/hls-proxy/$'
     | '/api/public/snapshot-proxy/$'
+    | '/api/public/webhooks/syncpay'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -677,11 +680,11 @@ export interface FileRouteTypes {
     | '/feed/$postId'
     | '/markets/create'
     | '/profile/$userId'
-    | '/api/cron/football-resolve'
-    | '/api/cron/football-sync'
-    | '/api/webhooks/syncpay'
+    | '/api/public/cron/football-resolve'
+    | '/api/public/cron/football-sync'
     | '/api/public/hls-proxy/$'
     | '/api/public/snapshot-proxy/$'
+    | '/api/public/webhooks/syncpay'
   id:
     | '__root__'
     | '/'
@@ -740,11 +743,11 @@ export interface FileRouteTypes {
     | '/_app/feed/$postId'
     | '/_app/markets/create'
     | '/_app/profile/$userId'
-    | '/api/cron/football-resolve'
-    | '/api/cron/football-sync'
-    | '/api/webhooks/syncpay'
+    | '/api/public/cron/football-resolve'
+    | '/api/public/cron/football-sync'
     | '/api/public/hls-proxy/$'
     | '/api/public/snapshot-proxy/$'
+    | '/api/public/webhooks/syncpay'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -759,11 +762,11 @@ export interface RootRouteChildren {
   RankingRoute: typeof RankingRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   RSlugRoute: typeof RSlugRoute
-  ApiCronFootballResolveRoute: typeof ApiCronFootballResolveRoute
-  ApiCronFootballSyncRoute: typeof ApiCronFootballSyncRoute
-  ApiWebhooksSyncpayRoute: typeof ApiWebhooksSyncpayRoute
+  ApiPublicCronFootballResolveRoute: typeof ApiPublicCronFootballResolveRoute
+  ApiPublicCronFootballSyncRoute: typeof ApiPublicCronFootballSyncRoute
   ApiPublicHlsProxySplatRoute: typeof ApiPublicHlsProxySplatRoute
   ApiPublicSnapshotProxySplatRoute: typeof ApiPublicSnapshotProxySplatRoute
+  ApiPublicWebhooksSyncpayRoute: typeof ApiPublicWebhooksSyncpayRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1139,27 +1142,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
-    '/api/webhooks/syncpay': {
-      id: '/api/webhooks/syncpay'
-      path: '/api/webhooks/syncpay'
-      fullPath: '/api/webhooks/syncpay'
-      preLoaderRoute: typeof ApiWebhooksSyncpayRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/cron/football-sync': {
-      id: '/api/cron/football-sync'
-      path: '/api/cron/football-sync'
-      fullPath: '/api/cron/football-sync'
-      preLoaderRoute: typeof ApiCronFootballSyncRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/cron/football-resolve': {
-      id: '/api/cron/football-resolve'
-      path: '/api/cron/football-resolve'
-      fullPath: '/api/cron/football-resolve'
-      preLoaderRoute: typeof ApiCronFootballResolveRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_app/profile/$userId': {
       id: '/_app/profile/$userId'
       path: '/$userId'
@@ -1181,6 +1163,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFeedPostIdRouteImport
       parentRoute: typeof AppFeedRoute
     }
+    '/api/public/webhooks/syncpay': {
+      id: '/api/public/webhooks/syncpay'
+      path: '/api/public/webhooks/syncpay'
+      fullPath: '/api/public/webhooks/syncpay'
+      preLoaderRoute: typeof ApiPublicWebhooksSyncpayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/snapshot-proxy/$': {
       id: '/api/public/snapshot-proxy/$'
       path: '/api/public/snapshot-proxy/$'
@@ -1193,6 +1182,20 @@ declare module '@tanstack/react-router' {
       path: '/api/public/hls-proxy/$'
       fullPath: '/api/public/hls-proxy/$'
       preLoaderRoute: typeof ApiPublicHlsProxySplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/cron/football-sync': {
+      id: '/api/public/cron/football-sync'
+      path: '/api/public/cron/football-sync'
+      fullPath: '/api/public/cron/football-sync'
+      preLoaderRoute: typeof ApiPublicCronFootballSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/cron/football-resolve': {
+      id: '/api/public/cron/football-resolve'
+      path: '/api/public/cron/football-resolve'
+      fullPath: '/api/public/cron/football-resolve'
+      preLoaderRoute: typeof ApiPublicCronFootballResolveRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -1376,12 +1379,22 @@ const rootRouteChildren: RootRouteChildren = {
   RankingRoute: RankingRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   RSlugRoute: RSlugRoute,
-  ApiCronFootballResolveRoute: ApiCronFootballResolveRoute,
-  ApiCronFootballSyncRoute: ApiCronFootballSyncRoute,
-  ApiWebhooksSyncpayRoute: ApiWebhooksSyncpayRoute,
+  ApiPublicCronFootballResolveRoute: ApiPublicCronFootballResolveRoute,
+  ApiPublicCronFootballSyncRoute: ApiPublicCronFootballSyncRoute,
   ApiPublicHlsProxySplatRoute: ApiPublicHlsProxySplatRoute,
   ApiPublicSnapshotProxySplatRoute: ApiPublicSnapshotProxySplatRoute,
+  ApiPublicWebhooksSyncpayRoute: ApiPublicWebhooksSyncpayRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

@@ -16,7 +16,7 @@ function json(body: unknown, status = 200) {
   });
 }
 
-export const Route = createFileRoute("/api/webhooks/syncpay")({
+export const Route = createFileRoute("/api/public/webhooks/syncpay")({
   server: {
     handlers: {
       POST: async ({ request }) => {

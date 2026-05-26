@@ -22,7 +22,7 @@ async function handleFootballResolve(request: Request) {
   }
 }
 
-export const Route = createFileRoute("/api/cron/football-resolve")({
+export const Route = createFileRoute("/api/public/cron/football-resolve")({
   server: {
     handlers: {
       GET: ({ request }) => handleFootballResolve(request),
