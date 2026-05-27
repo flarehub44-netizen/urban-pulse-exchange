@@ -3271,7 +3271,6 @@ export type Database = {
       is_current_user_admin: { Args: never; Returns: boolean };
       is_football_enabled: { Args: never; Returns: boolean };
       is_partner_program_enabled: { Args: never; Returns: boolean };
-      is_user_anonymous: { Args: { p_user_id?: string }; Returns: boolean };
       is_user_registered: { Args: { p_user_id?: string }; Returns: boolean };
       join_community_market: { Args: { p_access_token: string }; Returns: Json };
       join_league: { Args: { p_invite_code: string }; Returns: Json };

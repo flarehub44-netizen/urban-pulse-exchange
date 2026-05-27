@@ -1,4 +1,4 @@
--- Auto-create profile on anonymous or regular sign-in
+-- Auto-create profile on sign-up
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$
 declare

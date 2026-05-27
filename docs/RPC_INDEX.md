@@ -163,8 +163,7 @@ Gerado por `scripts/gen-rpc-index.mjs`.
 - `public.is_current_user_admin` � supabase/migrations/20260712000000_profiles_rls_hardening.sql
 - `public.is_football_enabled` � supabase/migrations/20260701000000_football_markets.sql
 - `public.is_partner_program_enabled` � supabase/migrations/20260530000000_partner_program.sql
-- `public.is_user_anonymous` � supabase/migrations/20260705000000_account_hierarchy.sql
-- `public.is_user_registered` � supabase/migrations/20260705000000_account_hierarchy.sql
+- `public.is_user_registered` — e-mail confirmado em `auth.users`.
 - `public.join_community_market` � supabase/migrations/20260707000000_community_markets.sql
 - `public.join_community_market` � supabase/migrations/20260708000000_community_moderation.sql
 - `public.like_feed_post` � supabase/migrations/20260521000008_plan_features.sql

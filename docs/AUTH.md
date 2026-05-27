@@ -22,7 +22,6 @@ Papéis são **acumulativos**: um partner continua sendo trader; admin pode coex
 ## Supabase Dashboard
 
 - Habilitar **Email** provider e confirmação de e-mail.
-- **Desabilitar Anonymous sign-ins** (modo anônimo removido do app).
 - **Site URL** e **Redirect URLs**: `{origin}/auth/callback`, `{origin}/auth/verify`, `{origin}/auth/login`.
 - Confirmação de e-mail e reset de senha devem apontar para `/auth/callback` (PKCE + `detectSessionInUrl` no client).
 

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { shouldDeferCommunityNotFound } from "./use-community-markets";
 
 describe("shouldDeferCommunityNotFound", () => {
-  it("does not defer forever for anonymous users after fetch", () => {
+  it("does not defer forever for unauthenticated visitors after fetch", () => {
     expect(
       shouldDeferCommunityNotFound({
         authReady: true,

@@ -115,7 +115,9 @@ const stepData = [
     visual: (
       <div className="mt-4 rounded-xl border border-up/30 bg-background/50 p-3 text-sm text-center">
         <div className="text-[10px] uppercase tracking-wider text-up">Pix instantâneo</div>
-        <div className="mt-2 text-lg font-semibold text-up">R$ 50 · R$ 100 · R$ 200</div>
+        <div className="mt-2 text-lg font-semibold text-up">
+          {[50, 100, 200].map(formatBRL).join(" · ")}
+        </div>
       </div>
     ),
     finishTo: "deposit",

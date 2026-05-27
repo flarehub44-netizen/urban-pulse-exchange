@@ -4,7 +4,6 @@ export type AuthSessionState = {
   userId: string | null;
   user: User | null;
   session: Session | null;
-  isGuest: boolean;
   isRegistered: boolean;
   email: string | null;
 };
@@ -14,13 +13,11 @@ export function parseAuthSession(session: Session | null): AuthSessionState {
   const userId = user?.id ?? null;
   const email = user?.email?.trim() || null;
   const isRegistered = Boolean(email && user?.email_confirmed_at);
-  const isGuest = !userId;
 
   return {
     userId,
     user,
     session,
-    isGuest,
     isRegistered,
     email,
   };
@@ -33,8 +30,8 @@ export function authErrorMessage(error: { message: string } | null): string {
   if (m.includes("user already registered")) return "Este e-mail já está cadastrado.";
   if (m.includes("password")) return "Senha inválida (mínimo 6 caracteres).";
   if (m.includes("email not confirmed")) return "Confirme seu e-mail antes de entrar.";
-  if (m.includes("anonymous_provider_disabled")) {
-    return "Login anônimo está desativado no Supabase. Habilite Email/Password (e Anonymous, se necessário) em Authentication → Providers do projeto.";
+  if (m.includes("signup_disabled") || m.includes("signups not allowed")) {
+    return "Cadastro desativado no Supabase. Habilite signups em Authentication → Providers → Email.";
   }
   return error.message;
 }

@@ -188,7 +188,7 @@ function AdminBonusesPage() {
                 value={grantKind}
                 onChange={(e) => setGrantKind(e.target.value as "balance" | "xp")}
               >
-                <option value="balance">Saldo (R$)</option>
+                <option value="balance">Saldo (BRL)</option>
                 <option value="xp">XP</option>
               </select>
             </label>
@@ -242,7 +242,7 @@ function AdminBonusesPage() {
                 <tr>
                   <th className="py-1 text-left">Prêmio</th>
                   <th className="py-1 text-right">Peso</th>
-                  <th className="py-1 text-right">R$</th>
+                  <th className="py-1 text-right">BRL</th>
                   <th className="py-1 text-right">XP</th>
                   <th className="py-1 text-center">Near</th>
                 </tr>

@@ -35,7 +35,6 @@ export const accountContextSnapshotSchema = z.object({
   auth: z.object({
     authenticated: z.boolean(),
     registered: z.boolean(),
-    anonymous: z.boolean(),
     email: z.string().nullable().optional(),
   }),
   trader: z.object({

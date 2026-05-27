@@ -45,7 +45,6 @@ export type AccountContextSnapshot = {
   auth: {
     authenticated: boolean;
     registered: boolean;
-    anonymous: boolean;
     email?: string | null;
   };
   trader: {

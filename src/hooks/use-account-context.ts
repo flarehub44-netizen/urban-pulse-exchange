@@ -6,7 +6,6 @@ export type AccountContext = {
   auth: {
     authenticated: boolean;
     registered: boolean;
-    anonymous: boolean;
     email?: string | null;
   };
   trader: {

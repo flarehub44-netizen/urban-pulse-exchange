@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { parseAuthSession, type AuthSessionState } from "@/lib/auth";
 
-/** Returns the current Supabase session without creating a guest/anonymous session. */
+/** Returns the current Supabase session (no auto sign-in). */
 export async function ensureAuthSession(): Promise<AuthSessionState> {
   if (typeof window === "undefined") {
     return parseAuthSession(null);
