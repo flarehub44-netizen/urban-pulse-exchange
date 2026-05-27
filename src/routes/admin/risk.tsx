@@ -46,6 +46,21 @@ function rowAccentClass(status: string | null | undefined, flagged: boolean) {
   return "";
 }
 
+function readMetaString(meta: Record<string, unknown> | null | undefined, key: string) {
+  const value = meta?.[key];
+  return typeof value === "string" && value.trim() ? value : null;
+}
+
+function readMetaNumber(meta: Record<string, unknown> | null | undefined, key: string) {
+  const value = meta?.[key];
+  if (typeof value === "number") return value;
+  if (typeof value === "string" && value.trim()) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
 type ReferralRowProps = {
   row: AdminCpaReferral;
   riskInput: Record<string, string>;
@@ -599,7 +614,7 @@ function AdminRiskPage() {
         <ul className="space-y-3">
           {(alerts ?? []).map((a, i) => (
             <li
-              key={`${a.user_id}-${i}`}
+              key={a.alert_id ?? `${a.user_id}-${i}`}
               className={cn(
                 "rounded-xl border px-4 py-3 text-sm",
                 a.severity === "medium" ? "border-warn/40 bg-warn/5" : "bg-card/60",
@@ -609,6 +624,46 @@ function AdminRiskPage() {
               <p className="mt-1 text-xs text-muted-foreground">
                 {a.type} · {a.username ?? a.user_id}
               </p>
+              {a.type === "deposit_cpf_mismatch" && (
+                <div className="mt-2 space-y-1 rounded-lg border border-warn/30 bg-surface/60 p-2 text-xs">
+                  <p>
+                    <span className="text-muted-foreground">CPF perfil:</span>{" "}
+                    <span className="mono font-medium">
+                      {readMetaString(a.meta, "profile_cpf") ??
+                        `***${readMetaString(a.meta, "profile_cpf_last4") ?? "—"}`}
+                    </span>
+                  </p>
+                  <p>
+                    <span className="text-muted-foreground">CPF pagador:</span>{" "}
+                    <span className="mono font-medium">
+                      {readMetaString(a.meta, "payer_cpf") ??
+                        `***${readMetaString(a.meta, "payer_cpf_last4") ?? "—"}`}
+                    </span>
+                  </p>
+                  <p>
+                    <span className="text-muted-foreground">Intent:</span>{" "}
+                    <span className="mono">{readMetaString(a.meta, "intent_id") ?? "—"}</span>
+                  </p>
+                  <p>
+                    <span className="text-muted-foreground">Valor:</span>{" "}
+                    <span className="mono">
+                      {formatBRL(readMetaNumber(a.meta, "amount") ?? 0)}
+                    </span>
+                  </p>
+                  <p>
+                    <span className="text-muted-foreground">Provider ID:</span>{" "}
+                    <span className="mono">{readMetaString(a.meta, "provider_id") ?? "—"}</span>
+                  </p>
+                  <p>
+                    <span className="text-muted-foreground">Evento provider:</span>{" "}
+                    <span className="mono">
+                      {readMetaString(a.meta, "provider_event_id") ??
+                        readMetaString(a.meta, "transaction_id") ??
+                        "—"}
+                    </span>
+                  </p>
+                </div>
+              )}
               <Link
                 to="/admin/users"
                 className="mt-2 inline-block text-xs text-primary hover:underline"

@@ -158,6 +158,24 @@ export function useAdminVoidFootballMarket() {
   });
 }
 
+export function useAdminDeleteFootballMarket() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (marketId: string) => {
+      const { data, error } = await supabase.rpc("admin_delete_football_market" as never, {
+        p_market_id: marketId,
+      } as never);
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-football-drafts"] });
+      qc.invalidateQueries({ queryKey: ["admin-football-pending"] });
+      qc.invalidateQueries({ queryKey: ["football-markets"] });
+    },
+  });
+}
+
 export function useFootballLeagueSettings() {
   return useQuery({
     queryKey: ["football-league-settings"],

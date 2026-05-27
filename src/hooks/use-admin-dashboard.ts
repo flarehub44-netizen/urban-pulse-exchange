@@ -164,6 +164,9 @@ export function useAdminRiskAlerts(enabled = true) {
         username: string;
         detail: string;
         severity: string;
+        alert_id?: string;
+        created_at?: string;
+        meta?: Record<string, unknown> | null;
       }[];
     },
     enabled,

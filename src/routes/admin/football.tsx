@@ -5,6 +5,7 @@ import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import {
   useAdminApproveFootballFixture,
+  useAdminDeleteFootballMarket,
   useAdminFootballDrafts,
   useAdminFootballLive,
   useAdminFootballPending,
@@ -25,6 +26,15 @@ export const Route = createFileRoute("/admin/football")({
 
 type Tab = "pending" | "drafts" | "published" | "settings";
 
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error && error.message) return error.message;
+  if (error && typeof error === "object" && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === "string" && message.trim()) return message;
+  }
+  return null;
+}
+
 function AdminFootballPage() {
   const [tab, setTab] = useState<Tab>("pending");
   const todayYmd = format(new Date(), "yyyy-MM-dd");
@@ -41,6 +51,7 @@ function AdminFootballPage() {
   const reject = useAdminRejectFootballFixture();
   const publish = useAdminPublishFootballMarket();
   const voidMarket = useAdminVoidFootballMarket();
+  const deleteMarket = useAdminDeleteFootballMarket();
   const syncNow = useAdminFootballSync();
   const resolveNow = useAdminFootballResolve();
   const saveSettings = useUpdateFootballSettings();
@@ -152,7 +163,7 @@ function AdminFootballPage() {
                       await approve.mutateAsync(row.api_fixture_id);
                       toast.success(copy.admin.football.approved);
                     } catch (e) {
-                      toast.error(e instanceof Error ? e.message : copy.settings.adminResolveError);
+                      toast.error(getErrorMessage(e) ?? "Não foi possível aprovar o jogo.");
                     }
                   }}
                   className="rounded-md bg-primary px-3 py-1.5 text-[10px] font-medium text-primary-foreground"
@@ -167,7 +178,7 @@ function AdminFootballPage() {
                       await reject.mutateAsync({ fixtureId: row.api_fixture_id });
                       toast.success(copy.admin.football.rejected);
                     } catch (e) {
-                      toast.error(e instanceof Error ? e.message : copy.settings.adminResolveError);
+                      toast.error(getErrorMessage(e) ?? "Não foi possível rejeitar o jogo.");
                     }
                   }}
                   className="rounded-md border px-3 py-1.5 text-[10px] text-muted-foreground hover:bg-muted"
@@ -205,12 +216,28 @@ function AdminFootballPage() {
                     await publish.mutateAsync(row.market_id);
                     toast.success(copy.admin.football.published);
                   } catch (e) {
-                    toast.error(e instanceof Error ? e.message : copy.settings.adminResolveError);
+                    toast.error(getErrorMessage(e) ?? "Não foi possível publicar o jogo.");
                   }
                 }}
                 className="rounded-md border border-primary/40 px-3 py-1.5 text-[10px] text-primary hover:bg-primary/10"
               >
                 {copy.admin.football.publish}
+              </button>
+              <button
+                type="button"
+                disabled={deleteMarket.isPending}
+                onClick={async () => {
+                  if (!window.confirm(`Excluir rascunho ${row.market_id}?`)) return;
+                  try {
+                    await deleteMarket.mutateAsync(row.market_id);
+                    toast.success("Jogo excluído.");
+                  } catch (e) {
+                    toast.error(getErrorMessage(e) ?? "Não foi possível excluir o jogo.");
+                  }
+                }}
+                className="rounded-md border border-down/40 px-3 py-1.5 text-[10px] text-down hover:bg-down/10"
+              >
+                Excluir
               </button>
             </div>
           ))}
@@ -249,7 +276,7 @@ function AdminFootballPage() {
                       await voidMarket.mutateAsync({ marketId: row.market_id });
                       toast.success(copy.admin.football.voidDone);
                     } catch (e) {
-                      toast.error(e instanceof Error ? e.message : copy.settings.adminResolveError);
+                      toast.error(getErrorMessage(e) ?? "Não foi possível anular o jogo.");
                     }
                   }}
                   className="rounded-md border border-down/40 px-3 py-1.5 text-[10px] text-down hover:bg-down/10"
