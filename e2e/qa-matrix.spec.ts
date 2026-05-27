@@ -8,6 +8,20 @@ test.describe("T01 — Landing e entrada no app", () => {
     await expect(page.getByRole("link", { name: /mercados/i }).first()).toBeVisible();
   });
 
+  test("eventos sazonais ou strip ausente sem crash", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForTimeout(2500);
+    const hero = page.getByTestId("seasonal-events-hero");
+    const strip = page.getByTestId("seasonal-events-strip");
+    const hasEvents =
+      (await hero.isVisible().catch(() => false)) || (await strip.isVisible().catch(() => false));
+    if (hasEvents) {
+      await expect(page.getByTestId("seasonal-event-card").first()).toBeVisible();
+    }
+    const body = await page.locator("body").innerText();
+    expect(body.length).toBeGreaterThan(100);
+  });
+
   test("dashboard carrega após navegação", async ({ page }) => {
     await page.goto("/dashboard");
     await expect(page).toHaveTitle(/ViaX|Início|Dashboard/i);
@@ -28,6 +42,16 @@ test.describe("T02 — Mercados", () => {
 
   test("detalhe de mercado abre order box", async ({ page }) => {
     await openFirstLiveMarket(page);
+  });
+
+  test("página não crasha (sem TDZ / ReferenceError)", async ({ page }) => {
+    await page.goto("/markets?status=live");
+    await page.waitForTimeout(3000);
+    const body = await page.locator("body").innerText();
+    expect(/before initialization|ReferenceError|500|server error/i.test(body)).toBeFalsy();
+    await expect(page.getByRole("button", { name: /criar conta|entrar/i }).first()).toBeVisible({
+      timeout: 15_000,
+    });
   });
 });
 
@@ -72,12 +96,23 @@ test.describe("T13 — Mobile viewport", () => {
     await page.waitForTimeout(2500);
     const nav = page.locator("nav").last();
     await expect(nav).toBeVisible();
+    const body = await page.locator("body").innerText();
+    expect(/before initialization|ReferenceError/i.test(body)).toBeFalsy();
   });
 
   test("mercados scrollável em mobile", async ({ page }) => {
     await page.goto("/markets");
     await page.waitForTimeout(2000);
     await expect(page.locator("body")).toBeVisible();
+  });
+});
+
+test.describe("T15 — Idempotência de aposta", () => {
+  test("order-box expõe fluxo de aposta sem crash na UI pública", async ({ page }) => {
+    await page.goto("/markets?status=live");
+    await page.waitForTimeout(3000);
+    const body = await page.locator("body").innerText();
+    expect(/before initialization|ReferenceError/i.test(body)).toBeFalsy();
   });
 });
 

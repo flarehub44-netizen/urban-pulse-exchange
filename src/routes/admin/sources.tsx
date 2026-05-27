@@ -108,9 +108,7 @@ function AdminSourcesPage() {
       <div
         className={cn(
           "rounded-xl border px-4 py-3 text-sm",
-          workerStatus?.healthy
-            ? "border-up/30 bg-up/5"
-            : "border-warn/30 bg-warn/10",
+          workerStatus?.healthy ? "border-up/30 bg-up/5" : "border-warn/30 bg-warn/10",
         )}
       >
         <div className="flex flex-wrap items-center justify-between gap-2">

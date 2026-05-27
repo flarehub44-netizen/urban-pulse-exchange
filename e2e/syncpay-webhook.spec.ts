@@ -37,7 +37,10 @@ test.describe("SyncPay — depósito staging", () => {
     await page.goto("/wallet?tab=deposit");
     await page.waitForTimeout(2500);
 
-    const needsRegister = await page.getByText(/cadastro|registr/i).isVisible().catch(() => false);
+    const needsRegister = await page
+      .getByText(/cadastro|registr/i)
+      .isVisible()
+      .catch(() => false);
     if (needsRegister) {
       test.skip(true, "Usuário de teste não está registrado para depósito Pix");
       return;
@@ -71,7 +74,9 @@ test.describe("SyncPay — depósito staging", () => {
     });
     expect(webhookRes.ok()).toBeTruthy();
 
-    await expect(page.getByText(/depósito confirmado|adicionado ao seu saldo/i).first()).toBeVisible({
+    await expect(
+      page.getByText(/depósito confirmado|adicionado ao seu saldo/i).first(),
+    ).toBeVisible({
       timeout: 20_000,
     });
   });

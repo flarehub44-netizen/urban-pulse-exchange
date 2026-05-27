@@ -14,7 +14,8 @@ export type SupabaseFnContext = {
 export function getSupabaseCtx(context: unknown): SupabaseFnContext {
   const ctx = context as SupabaseFnContext;
   if (process.env.NODE_ENV !== "production") {
-    if (!ctx?.supabase) throw new Error("[getSupabaseCtx] supabase ausente no contexto do middleware");
+    if (!ctx?.supabase)
+      throw new Error("[getSupabaseCtx] supabase ausente no contexto do middleware");
     if (!ctx?.userId) throw new Error("[getSupabaseCtx] userId ausente no contexto do middleware");
   }
   return ctx;

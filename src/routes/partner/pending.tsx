@@ -27,7 +27,10 @@ function PartnerPendingPage() {
       <h1 className="text-lg font-semibold">{copy.partner.pendingPageTitle}</h1>
       <p className="text-sm text-muted-foreground">{copy.partner.pendingPageDesc}</p>
       <p className="text-sm text-warn">{copy.partner.applyPending}</p>
-      <Link to="/settings" className="inline-flex rounded-lg border px-4 py-2 text-sm hover:bg-surface">
+      <Link
+        to="/settings"
+        className="inline-flex rounded-lg border px-4 py-2 text-sm hover:bg-surface"
+      >
         {copy.partner.pendingBackToSettings}
       </Link>
     </div>

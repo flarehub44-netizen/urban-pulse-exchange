@@ -64,7 +64,9 @@ export function PartnerLayout() {
           <div className="border-b border-border/60 px-3 py-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-xs text-muted-foreground">
-                {overview?.slug ? `Seu link: /r/${overview.slug}` : "Carregando link de divulgação..."}
+                {overview?.slug
+                  ? `Seu link: /r/${overview.slug}`
+                  : "Carregando link de divulgação..."}
               </p>
               <div className="flex items-center gap-2">
                 <button

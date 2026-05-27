@@ -49,6 +49,11 @@ const LandingAiAccuracyChart = lazy(() =>
     default: m.LandingAiAccuracyChart,
   })),
 );
+const SeasonalEventsStrip = lazy(() =>
+  import("@/components/viax/seasonal-events-strip").then((m) => ({
+    default: m.SeasonalEventsStrip,
+  })),
+);
 
 function SectionFallback({ className = "h-48" }: { className?: string }) {
   return <div className={`animate-pulse rounded-2xl bg-surface/60 ${className}`} />;
@@ -221,6 +226,10 @@ function Landing() {
 
       <LandingSegmentPillars />
 
+      <Suspense fallback={<SectionFallback className="h-28" />}>
+        <SeasonalEventsStrip variant="hero" />
+      </Suspense>
+
       {/* HOW IT WORKS */}
       <section className="mx-auto max-w-7xl px-6 py-24">
         <SectionHeader
@@ -316,9 +325,9 @@ function Landing() {
             }
           />
           <div className="mt-10 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-          <Suspense fallback={<SectionFallback className="h-[460px]" />}>
-            <CityHeatmap height={460} />
-          </Suspense>
+            <Suspense fallback={<SectionFallback className="h-[460px]" />}>
+              <CityHeatmap height={460} />
+            </Suspense>
             <div className="space-y-3">
               {markets.slice(0, 4).map((m) => (
                 <div

@@ -79,11 +79,7 @@ export function CommandPalette() {
         if (!v) setQuery("");
       }}
     >
-      <CommandInput
-        placeholder={copy.command.placeholder}
-        value={query}
-        onValueChange={setQuery}
-      />
+      <CommandInput placeholder={copy.command.placeholder} value={query} onValueChange={setQuery} />
       <CommandList>
         <CommandEmpty>{copy.command.empty}</CommandEmpty>
         <CommandGroup heading={copy.command.routes}>

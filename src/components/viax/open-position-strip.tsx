@@ -29,10 +29,7 @@ export function OpenPositionStrip({ marketId }: { marketId: string }) {
         <span className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-primary">
           <Briefcase className="size-3.5" /> Sua posição neste mercado
         </span>
-        <Link
-          to="/positions"
-          className="text-[11px] text-primary hover:underline"
-        >
+        <Link to="/positions" className="text-[11px] text-primary hover:underline">
           Ver todas
         </Link>
       </div>

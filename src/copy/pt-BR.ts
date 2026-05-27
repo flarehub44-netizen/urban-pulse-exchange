@@ -663,8 +663,13 @@ export const copy = {
   },
 
   events: {
+    sectionTitle: "Eventos sazonais",
+    liveNow: "Ao vivo",
+    viewOnDashboard: "Ver no dashboard →",
+    dismiss: "Dispensar evento",
+    loadError: "Não foi possível carregar os eventos.",
+    endsIn: (when: string) => `Encerra ${when}`,
     xpBoost: (n: number) => `+${n} XP bônus`,
-    endsIn: "Encerra",
   },
 
   depositFunnel: {

@@ -51,7 +51,8 @@ export function useWeeklyReport() {
   const alreadySeen = wasSeenThisWeek();
   const midweekAlreadySeen = wasMidweekSeenThisWeek();
 
-  const shouldFetch = !!userId && (isMonday || isThursday) && !(isMonday ? alreadySeen : midweekAlreadySeen);
+  const shouldFetch =
+    !!userId && (isMonday || isThursday) && !(isMonday ? alreadySeen : midweekAlreadySeen);
 
   const query = useQuery({
     queryKey: ["weekly-report", userId],

@@ -31,7 +31,9 @@ test.describe("C1b — Páginas de auth formal", () => {
     await page.waitForTimeout(2500);
     const body = await page.locator("body").innerText();
     const url = page.url();
-    expect(/confirmando|aguarde|erro|mercados|viax/i.test(body) || /\/markets|\/dashboard/.test(url)).toBeTruthy();
+    expect(
+      /confirmando|aguarde|erro|mercados|viax/i.test(body) || /\/markets|\/dashboard/.test(url),
+    ).toBeTruthy();
     expect(/500|server error|before initialization/i.test(body)).toBeFalsy();
   });
 
@@ -136,8 +138,14 @@ test.describe("C8 — Rotas canônicas com sessão E2E", () => {
     await page.waitForTimeout(2000);
     await expectCanonicalPath(page, /\/wallet/);
     const depositPanel =
-      (await page.getByText(/adicionar.*saldo/i).isVisible().catch(() => false)) ||
-      (await page.getByText(/conta registrada|cadastro/i).isVisible().catch(() => false));
+      (await page
+        .getByText(/adicionar.*saldo/i)
+        .isVisible()
+        .catch(() => false)) ||
+      (await page
+        .getByText(/conta registrada|cadastro/i)
+        .isVisible()
+        .catch(() => false));
     expect(depositPanel).toBeTruthy();
     const generateBtn = page.getByRole("button", { name: /gerar qr code pix/i });
     if (await generateBtn.isVisible({ timeout: 3_000 }).catch(() => false)) {
@@ -186,7 +194,10 @@ test.describe("C9 — Funil depósito na carteira (sessão E2E)", () => {
     await page.waitForTimeout(2500);
 
     const generateBtn = page.getByRole("button", { name: /gerar qr code pix/i });
-    const needsRegister = await page.getByText(/cadastro|registr/i).isVisible().catch(() => false);
+    const needsRegister = await page
+      .getByText(/cadastro|registr/i)
+      .isVisible()
+      .catch(() => false);
 
     if (needsRegister) {
       test.skip(true, "Usuário de teste não está registrado para depósito");

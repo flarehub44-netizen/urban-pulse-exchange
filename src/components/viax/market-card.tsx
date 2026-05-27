@@ -217,11 +217,12 @@ export function MarketCard({
             {formatPct(Math.abs(m.trend) * 0.05, 2)}
           </span>
         </div>
-        {m.aiPrediction.confidence >= 0.70 && (
+        {m.aiPrediction.confidence >= 0.7 && (
           <div className="mt-2 flex items-center gap-1 text-[10px] text-primary/80">
             <Brain className="size-3 shrink-0" />
             <span>
-              IA: <span className="font-semibold">{(m.aiPrediction.confidence * 100).toFixed(0)}%</span>{" "}
+              IA:{" "}
+              <span className="font-semibold">{(m.aiPrediction.confidence * 100).toFixed(0)}%</span>{" "}
               de confiança · lado {m.aiPrediction.side === "YES" ? "SIM" : "NÃO"}
             </span>
           </div>

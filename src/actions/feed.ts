@@ -32,10 +32,9 @@ export const likeFeedPostFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(postIdSchema)
   .handler(async ({ data, context }) => {
-    const { data: likes, error } = await (getSupabaseCtx(context)).supabase.rpc(
-      "like_feed_post",
-      { p_post_id: data.postId },
-    );
+    const { data: likes, error } = await getSupabaseCtx(context).supabase.rpc("like_feed_post", {
+      p_post_id: data.postId,
+    });
     if (error) throw new Error(error.message);
     return { likes: safeNum(likes) };
   });
@@ -44,7 +43,7 @@ export const repostFeedPostFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(postIdSchema)
   .handler(async ({ data, context }) => {
-    const { data: reposts, error } = await (getSupabaseCtx(context)).supabase.rpc(
+    const { data: reposts, error } = await getSupabaseCtx(context).supabase.rpc(
       "repost_feed_post",
       { p_post_id: data.postId },
     );
@@ -61,7 +60,7 @@ export const commentFeedPostFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(commentSchema)
   .handler(async ({ data, context }) => {
-    const { data: comments, error } = await (getSupabaseCtx(context)).supabase.rpc(
+    const { data: comments, error } = await getSupabaseCtx(context).supabase.rpc(
       "comment_feed_post",
       { p_post_id: data.postId, p_text: data.text },
     );

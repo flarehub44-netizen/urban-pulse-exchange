@@ -42,7 +42,10 @@ export const Route = createFileRoute("/_app/profile/$userId")({
 });
 
 // Client-side progress hints for known achievement IDs
-const PROGRESS_HINTS: Record<string, { label: string; max: number; statKey: "streak" | "wins" | "bets" }> = {
+const PROGRESS_HINTS: Record<
+  string,
+  { label: string; max: number; statKey: "streak" | "wins" | "bets" }
+> = {
   streak_3: { label: "dias de sequência", max: 3, statKey: "streak" },
   streak_7: { label: "dias de sequência", max: 7, statKey: "streak" },
   wins_5: { label: "vitórias", max: 5, statKey: "wins" },
@@ -365,7 +368,10 @@ function PublicProfile() {
         {(achievements ?? []).length === 0 ? (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="animate-pulse rounded-2xl border border-border bg-card/40 p-4 h-24" />
+              <div
+                key={i}
+                className="animate-pulse rounded-2xl border border-border bg-card/40 p-4 h-24"
+              />
             ))}
           </div>
         ) : (
@@ -379,9 +385,7 @@ function PublicProfile() {
                   key={b.id}
                   className={cn(
                     "rounded-2xl border p-4",
-                    b.unlocked
-                      ? "border-primary/40 bg-primary/10"
-                      : "border-border bg-card/40",
+                    b.unlocked ? "border-primary/40 bg-primary/10" : "border-border bg-card/40",
                   )}
                 >
                   <div className="flex items-center justify-between">
@@ -395,7 +399,12 @@ function PublicProfile() {
                     </div>
                     {!b.unlocked && <Lock className="size-3.5 text-muted-foreground" />}
                   </div>
-                  <div className={cn("mt-3 text-sm font-medium", !b.unlocked && "text-muted-foreground")}>
+                  <div
+                    className={cn(
+                      "mt-3 text-sm font-medium",
+                      !b.unlocked && "text-muted-foreground",
+                    )}
+                  >
                     {b.name}
                   </div>
                   <div className="text-[11px] text-muted-foreground">{b.description}</div>

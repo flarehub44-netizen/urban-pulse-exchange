@@ -58,7 +58,9 @@ function AdminOverviewPage() {
           search={{ tab: "disputes" }}
           className="rounded-xl border bg-card/40 p-3 text-sm hover:bg-surface-2 transition"
         >
-          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Fila operacional</p>
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
+            Fila operacional
+          </p>
           <p className="mt-1 font-semibold">
             {(metrics?.dispute_count ?? 0) + (settlementQueue?.length ?? 0)} itens críticos
           </p>
@@ -77,9 +79,13 @@ function AdminOverviewPage() {
           search={{ tab: "live" }}
           className="rounded-xl border bg-card/40 p-3 text-sm hover:bg-surface-2 transition"
         >
-          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Mercados ao vivo</p>
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
+            Mercados ao vivo
+          </p>
           <p className="mt-1 font-semibold">{metrics?.active_markets ?? 0} ativos agora</p>
-          <p className="text-xs text-muted-foreground mt-1">Acesse painel de operação em tempo real</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Acesse painel de operação em tempo real
+          </p>
         </Link>
       </div>
 

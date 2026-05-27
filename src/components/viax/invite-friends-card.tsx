@@ -27,7 +27,11 @@ export function InviteFriendsCard({ handle }: InviteFriendsCardProps) {
   const handleShare = async () => {
     if (navigator.share) {
       try {
-        await navigator.share({ title: "ViaX — Previsões Urbanas", text: shareText, url: inviteUrl });
+        await navigator.share({
+          title: "ViaX — Previsões Urbanas",
+          text: shareText,
+          url: inviteUrl,
+        });
       } catch {
         // user cancelled
       }

@@ -112,9 +112,7 @@ export function DailyPulse() {
               <p
                 className={cn(
                   "mt-1 flex items-center gap-1 text-[10px]",
-                  daysToNext === 1
-                    ? "font-semibold text-warn"
-                    : "text-muted-foreground",
+                  daysToNext === 1 ? "font-semibold text-warn" : "text-muted-foreground",
                 )}
               >
                 {daysToNext === 1 ? (

@@ -17,8 +17,7 @@ export function handleServerError(err: unknown, fallback?: string): void {
     }
   }
 
-  const message =
-    err instanceof Error ? err.message : typeof err === "string" ? err : undefined;
+  const message = err instanceof Error ? err.message : typeof err === "string" ? err : undefined;
 
   if (message?.toLowerCase().includes("registration_required")) {
     toast.error(copy.errors.registrationRequired);

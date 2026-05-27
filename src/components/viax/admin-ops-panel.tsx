@@ -8,8 +8,18 @@ import { cn } from "@/lib/utils";
 import { InlineErrorState } from "@/components/viax/inline-error-state";
 
 export function AdminOpsPanel() {
-  const { data: health, isLoading: healthLoading, isError: healthError, refetch: refetchHealth } = useLifecycleHealth(true);
-  const { data: ledger, isLoading: ledgerLoading, isError: ledgerError, refetch: refetchLedger } = usePlatformLedgerSummary(true);
+  const {
+    data: health,
+    isLoading: healthLoading,
+    isError: healthError,
+    refetch: refetchHealth,
+  } = useLifecycleHealth(true);
+  const {
+    data: ledger,
+    isLoading: ledgerLoading,
+    isError: ledgerError,
+    refetch: refetchLedger,
+  } = usePlatformLedgerSummary(true);
 
   return (
     <div className="space-y-4">
@@ -21,7 +31,11 @@ export function AdminOpsPanel() {
         {healthLoading ? (
           <p className="mt-2 text-xs text-muted-foreground">…</p>
         ) : healthError ? (
-          <InlineErrorState message={copy.errors.loadFailed} onRetry={() => refetchHealth()} className="py-4" />
+          <InlineErrorState
+            message={copy.errors.loadFailed}
+            onRetry={() => refetchHealth()}
+            className="py-4"
+          />
         ) : health ? (
           <ul className="mt-3 space-y-1 text-xs">
             <li>
@@ -63,7 +77,11 @@ export function AdminOpsPanel() {
         {ledgerLoading ? (
           <p className="mt-2 text-xs text-muted-foreground">…</p>
         ) : ledgerError ? (
-          <InlineErrorState message={copy.errors.loadFailed} onRetry={() => refetchLedger()} className="py-4" />
+          <InlineErrorState
+            message={copy.errors.loadFailed}
+            onRetry={() => refetchLedger()}
+            className="py-4"
+          />
         ) : ledger ? (
           <div className="mt-3 space-y-1 text-sm">
             <div className="mono font-semibold">

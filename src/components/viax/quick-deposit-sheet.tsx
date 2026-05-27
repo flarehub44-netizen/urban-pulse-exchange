@@ -173,7 +173,8 @@ export function QuickDepositSheet({
                 <div>
                   <p className="text-xs font-semibold text-up">Bônus de primeiro depósito</p>
                   <p className="mt-0.5 text-[11px] text-muted-foreground">
-                    Deposite R$ 200 ou mais e ganhe <span className="font-medium text-foreground">+10% de bônus</span> (até R$ 50).
+                    Deposite R$ 200 ou mais e ganhe{" "}
+                    <span className="font-medium text-foreground">+10% de bônus</span> (até R$ 50).
                   </p>
                 </div>
               </div>

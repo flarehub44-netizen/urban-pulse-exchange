@@ -5,7 +5,10 @@ export const Route = createFileRoute("/_app/settings")({
   head: () => ({
     meta: [
       { title: "Configurações · ViaX" },
-      { name: "description", content: "Gerencie conta, notificações e preferências da plataforma." },
+      {
+        name: "description",
+        content: "Gerencie conta, notificações e preferências da plataforma.",
+      },
     ],
   }),
   component: SettingsPage,

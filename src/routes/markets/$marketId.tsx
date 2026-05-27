@@ -66,11 +66,7 @@ export const Route = createFileRoute("/markets/$marketId")({
   validateSearch: (search: Record<string, unknown>): MarketDetailSearch => {
     const tab = search.tab;
     const validTab =
-      tab === "bet" ||
-      tab === "chart" ||
-      tab === "book" ||
-      tab === "comments" ||
-      tab === "audit"
+      tab === "bet" || tab === "chart" || tab === "book" || tab === "comments" || tab === "audit"
         ? tab
         : undefined;
     const side = search.side === "YES" || search.side === "NO" ? search.side : undefined;

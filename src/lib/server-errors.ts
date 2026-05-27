@@ -21,7 +21,11 @@ export function mapSupabaseBusinessError(errorMessage: string): AppError {
   if (text.includes("market_already_resolved") || text.includes("already resolved")) {
     return new AppError("MARKET_RESOLVED", "Este mercado já foi encerrado.", 409);
   }
-  if (text.includes("duplicate_bet") || text.includes("already bet") || text.includes("already_bet")) {
+  if (
+    text.includes("duplicate_bet") ||
+    text.includes("already bet") ||
+    text.includes("already_bet")
+  ) {
     return new AppError("DUPLICATE_BET", "Você já tem uma previsão neste mercado.", 409);
   }
   if (text.includes("kyc_required") || text.includes("kyc required")) {

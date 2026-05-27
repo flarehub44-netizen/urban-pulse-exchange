@@ -36,7 +36,8 @@ export function useWinToast() {
 
           invalidateEngagementQueries(qc);
 
-          const origin = typeof window !== "undefined" ? window.location.origin : "https://viax.com.br";
+          const origin =
+            typeof window !== "undefined" ? window.location.origin : "https://viax.com.br";
           const handle = profile?.handle ?? "";
           const shareUrl = handle ? `${origin}/r/${handle}` : origin;
           const shareText = `${text} 🎯 Entre no ViaX:`;

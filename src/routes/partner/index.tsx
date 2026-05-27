@@ -36,10 +36,16 @@ function PartnerOverviewPage() {
             <li>3. Acompanhe primeiro depósito e primeira aposta dos indicados.</li>
           </ul>
           <div className="mt-3 flex flex-wrap gap-2">
-            <Link to="/partner/campaigns" className="rounded-lg border px-3 py-1.5 text-xs hover:bg-surface-2">
+            <Link
+              to="/partner/campaigns"
+              className="rounded-lg border px-3 py-1.5 text-xs hover:bg-surface-2"
+            >
               Abrir campanhas
             </Link>
-            <Link to="/partner/invites" className="rounded-lg border px-3 py-1.5 text-xs hover:bg-surface-2">
+            <Link
+              to="/partner/invites"
+              className="rounded-lg border px-3 py-1.5 text-xs hover:bg-surface-2"
+            >
               Ver indicados
             </Link>
           </div>

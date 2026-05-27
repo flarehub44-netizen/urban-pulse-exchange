@@ -53,12 +53,7 @@ export const Route = createFileRoute("/_app/profile")({
     const t = search.tab;
     const auth = parseAuthModalSearch(search);
     const tab =
-      t === "favoritos" ||
-      t === "badges" ||
-      t === "atividade" ||
-      t === "mercados"
-        ? t
-        : "visao";
+      t === "favoritos" || t === "badges" || t === "atividade" || t === "mercados" ? t : "visao";
     return { tab, ...auth };
   },
   component: Profile,

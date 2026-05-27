@@ -53,8 +53,10 @@ const DailyMissions = lazy(() =>
 const DailyPoll = lazy(() =>
   import("@/components/viax/daily-poll").then((m) => ({ default: m.DailyPoll })),
 );
-const EventsBanner = lazy(() =>
-  import("@/components/viax/events-banner").then((m) => ({ default: m.EventsBanner })),
+const SeasonalEventsStrip = lazy(() =>
+  import("@/components/viax/seasonal-events-strip").then((m) => ({
+    default: m.SeasonalEventsStrip,
+  })),
 );
 const ComebackBanner = lazy(() =>
   import("@/components/viax/comeback-banner").then((m) => ({ default: m.ComebackBanner })),
@@ -211,7 +213,10 @@ function Dashboard() {
       userId ?? "anon",
     ) as "deposit_first" | "market_first";
     setCtaVariant(assigned);
-    trackProductEvent("dashboard_cta_variant_assigned", { variant: assigned, userId: userId ?? "anon" });
+    trackProductEvent("dashboard_cta_variant_assigned", {
+      variant: assigned,
+      userId: userId ?? "anon",
+    });
   }, [userId]);
 
   useEffect(() => {
@@ -374,7 +379,7 @@ function Dashboard() {
       )}
       {deferredReady && (
         <Suspense fallback={<WidgetFallback className="h-14" />}>
-          <EventsBanner />
+          <SeasonalEventsStrip variant="dashboard" />
         </Suspense>
       )}
       {deferredReady && (
@@ -746,8 +751,8 @@ function Dashboard() {
         </Suspense>
       )}
 
-      {isRegistered && (
-        myLeagues.length > 0 ? (
+      {isRegistered &&
+        (myLeagues.length > 0 ? (
           <div className="rounded-2xl border border-primary/25 bg-card/60 p-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold">
@@ -782,14 +787,15 @@ function Dashboard() {
           >
             <span>
               <span className="font-medium">Crie uma liga com amigos</span>
-              <span className="mt-0.5 block text-xs text-muted-foreground">Compete, sobe de divisão, ganha XP em grupo</span>
+              <span className="mt-0.5 block text-xs text-muted-foreground">
+                Compete, sobe de divisão, ganha XP em grupo
+              </span>
             </span>
             <span className="shrink-0 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground">
               Criar
             </span>
           </Link>
-        )
-      )}
+        ))}
 
       {deferredReady && (
         <Suspense fallback={<WidgetFallback />}>
@@ -835,10 +841,7 @@ function Dashboard() {
             <h2 className="heading-subsection">
               Suas <span className="text-highlight">posições</span> abertas
             </h2>
-            <Link
-              to="/positions"
-              className="text-xs text-primary hover:underline"
-            >
+            <Link to="/positions" className="text-xs text-primary hover:underline">
               Ver todas →
             </Link>
           </div>

@@ -11,9 +11,13 @@ export function AdminLayout() {
       key: "ops",
       label: "Operação",
       items: adminNav.filter((it) =>
-        ["/admin", "/admin/markets", "/admin/football", "/admin/settlement", "/admin/risk"].includes(
-          it.to,
-        ),
+        [
+          "/admin",
+          "/admin/markets",
+          "/admin/football",
+          "/admin/settlement",
+          "/admin/risk",
+        ].includes(it.to),
       ),
     },
     {

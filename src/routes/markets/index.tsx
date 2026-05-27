@@ -12,7 +12,17 @@ import { getMarketEdge } from "@/lib/market-edge";
 import { useWatchlist } from "@/hooks/use-watchlist";
 import { MarketCard } from "@/components/viax/market-card";
 import { MobileMarketsCarousel } from "@/components/viax/mobile-markets-carousel";
-import { Search, Star, X, TrendingUp, Clock, Bot, MapPin, SlidersHorizontal, Brain } from "lucide-react";
+import {
+  Search,
+  Star,
+  X,
+  TrendingUp,
+  Clock,
+  Bot,
+  MapPin,
+  SlidersHorizontal,
+  Brain,
+} from "lucide-react";
 import { EmptyState } from "@/components/viax/empty-state";
 import { cn } from "@/lib/utils";
 import { loadMarketsFilters, saveMarketsFilters } from "@/lib/markets-filter-persist";
@@ -33,6 +43,7 @@ import { FootballMarketsList } from "@/components/football/football-markets-list
 import { DepositFunnelBannerSlot } from "@/components/viax/deposit-funnel-banner-slot";
 import { parseMarketSegment, segmentDescription } from "@/lib/markets-segment";
 import type { MarketSegment } from "@/routes/markets";
+import { SeasonalEventsStrip } from "@/components/viax/seasonal-events-strip";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { trackProductEvent } from "@/lib/product-analytics";
 
@@ -268,6 +279,8 @@ function MarketsList() {
         segment={segment}
         onChange={(s) => patchSearch({ segment: s === "transito" ? undefined : s })}
       />
+
+      <SeasonalEventsStrip variant="compact" showCta={false} />
 
       {search.marketMissing === "1" && (
         <div
@@ -623,7 +636,9 @@ function MarketsList() {
             <div className="flex items-start gap-2 rounded-xl border border-primary/30 bg-primary/8 px-3 py-2.5 text-sm">
               <Brain className="size-4 shrink-0 text-primary mt-0.5" />
               <p className="text-xs text-muted-foreground">
-                <span className="font-medium text-foreground">UrbanMind filtrou {list.length} mercado{list.length !== 1 ? "s" : ""}</span>{" "}
+                <span className="font-medium text-foreground">
+                  UrbanMind filtrou {list.length} mercado{list.length !== 1 ? "s" : ""}
+                </span>{" "}
                 com confiança ≥ 75% e edge positivo. Precisão histórica:{" "}
                 <span className="font-medium text-primary">78.4%</span>
               </p>
@@ -698,10 +713,12 @@ function MarketsList() {
               </div>
               {markets.length > 0 && (
                 <div className="mt-2">
-                  <p className="mb-3 text-xs text-muted-foreground text-center">Você pode gostar de…</p>
+                  <p className="mb-3 text-xs text-muted-foreground text-center">
+                    Você pode gostar de…
+                  </p>
                   <div className="space-y-3 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
                     {[...markets]
-                      .sort((a, b) => (b.pool.YES + b.pool.NO) - (a.pool.YES + a.pool.NO))
+                      .sort((a, b) => b.pool.YES + b.pool.NO - (a.pool.YES + a.pool.NO))
                       .slice(0, 3)
                       .map((m) => (
                         <MarketCard key={m.id} m={m} compact />

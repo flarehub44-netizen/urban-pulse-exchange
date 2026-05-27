@@ -143,10 +143,15 @@ function AdminPartnersPage() {
             .sort((a, b) => b.referrals_count - a.referrals_count)
             .slice(0, 3)
             .map((p) => (
-              <div key={`funnel-${p.user_id}`} className="rounded-lg border bg-surface/40 px-3 py-2">
+              <div
+                key={`funnel-${p.user_id}`}
+                className="rounded-lg border bg-surface/40 px-3 py-2"
+              >
                 <div className="font-medium">@{p.handle}</div>
                 <div className="text-muted-foreground mt-1">Indicados: {p.referrals_count}</div>
-                <div className="text-muted-foreground">Comissão acumulada: {formatBRL(Number(p.balance))}</div>
+                <div className="text-muted-foreground">
+                  Comissão acumulada: {formatBRL(Number(p.balance))}
+                </div>
               </div>
             ))}
           {!active?.length && (
@@ -183,23 +188,33 @@ function AdminPartnersPage() {
                     <button
                       key={n}
                       type="button"
-                      onClick={() => setApprovalStep((prev) => ({ ...prev, [a.user_id]: n as 1 | 2 | 3 }))}
+                      onClick={() =>
+                        setApprovalStep((prev) => ({ ...prev, [a.user_id]: n as 1 | 2 | 3 }))
+                      }
                       className={`size-7 rounded-full border text-[11px] ${
-                        step >= n ? "border-primary bg-primary/15 text-primary" : "border-border text-muted-foreground"
+                        step >= n
+                          ? "border-primary bg-primary/15 text-primary"
+                          : "border-border text-muted-foreground"
                       }`}
                     >
                       {n}
                     </button>
                   ))}
                   <span className="text-muted-foreground">
-                    {step === 1 ? "Revisar candidatura" : step === 2 ? "Definir termos" : "Confirmar aprovação"}
+                    {step === 1
+                      ? "Revisar candidatura"
+                      : step === 2
+                        ? "Definir termos"
+                        : "Confirmar aprovação"}
                   </span>
                 </div>
               </div>
               {step >= 2 && (
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <label className="block text-xs">
-                    <span className="text-muted-foreground">{copy.admin.partners.revenueShare}</span>
+                    <span className="text-muted-foreground">
+                      {copy.admin.partners.revenueShare}
+                    </span>
                     <input
                       type="number"
                       step="0.01"

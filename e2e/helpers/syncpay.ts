@@ -16,10 +16,7 @@ export function signSyncPayWebhook(rawBody: string, secret = process.env.SYNCPAY
   return createHmac("sha256", secret).update(rawBody).digest("hex");
 }
 
-export function buildPaymentReceivedPayload(opts: {
-  providerId: string;
-  amount: number;
-}) {
+export function buildPaymentReceivedPayload(opts: { providerId: string; amount: number }) {
   return {
     event: "PAYMENT_RECEIVED" as const,
     data: {

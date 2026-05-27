@@ -82,7 +82,11 @@ export function WalletPanel({
   const updateTab = (nextTab: WalletTab) => {
     setTab(nextTab);
     if (!embedded) {
-      navigate({ to: "/wallet", search: nextTab === "overview" ? {} : { tab: nextTab }, replace: true });
+      navigate({
+        to: "/wallet",
+        search: nextTab === "overview" ? {} : { tab: nextTab },
+        replace: true,
+      });
     }
     trackProductEvent("wallet_tab_changed", { tab: nextTab, embedded: !!embedded });
   };
@@ -91,7 +95,10 @@ export function WalletPanel({
     mutationFn: (amount: number) => initiateDepositFn({ data: { amount } }),
     onSuccess: (res) => {
       trackDepositFunnel("deposit_qr_shown", { amount: Number(walletAmount) || 0 });
-      trackProductEvent("deposit_qr_generated", { amount: Number(walletAmount) || 0, source: "wallet" });
+      trackProductEvent("deposit_qr_generated", {
+        amount: Number(walletAmount) || 0,
+        source: "wallet",
+      });
       setDepositQr({
         qrCode: res.qrCode,
         qrCodeImg: res.qrCodeImg,
