@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AlertTriangle, Info } from "lucide-react";
 import {
@@ -14,6 +14,7 @@ import { isPartnerPayoutsReal } from "@/lib/partner-payouts";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/viax/empty-state";
 
 export const Route = createFileRoute("/partner/payouts")({
   component: PartnerPayoutsPage,
@@ -32,6 +33,14 @@ function PartnerPayoutsPage() {
   const { data: history } = usePartnerPayouts();
   const { mutateAsync: payout, isPending } = usePartnerPayoutRequest();
   const [amount, setAmount] = useState("100");
+  const payoutStats = useMemo(() => {
+    const all = history ?? [];
+    return {
+      total: all.length,
+      pending: all.filter((x) => x.status === "pending").length,
+      simulated: all.filter((x) => x.status === "simulated").length,
+    };
+  }, [history]);
 
   const onPayout = async () => {
     try {
@@ -77,6 +86,20 @@ function PartnerPayoutsPage() {
       <div className="rounded-xl border bg-card/60 p-4">
         <div className="text-xs text-muted-foreground">Saldo creator</div>
         <div className="text-3xl font-semibold">{formatBRL(o?.balance ?? 0)}</div>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-3 text-xs">
+        <div className="rounded-lg border bg-card/40 px-3 py-2">
+          <div className="text-muted-foreground">Solicitações</div>
+          <div className="mono mt-1 text-lg font-semibold">{payoutStats.total}</div>
+        </div>
+        <div className="rounded-lg border bg-card/40 px-3 py-2">
+          <div className="text-muted-foreground">Pendentes</div>
+          <div className="mono mt-1 text-lg font-semibold">{payoutStats.pending}</div>
+        </div>
+        <div className="rounded-lg border bg-card/40 px-3 py-2">
+          <div className="text-muted-foreground">Simulados</div>
+          <div className="mono mt-1 text-lg font-semibold">{payoutStats.simulated}</div>
+        </div>
       </div>
 
       <div className="flex gap-2 items-end">
@@ -125,6 +148,13 @@ function PartnerPayoutsPage() {
           </li>
         ))}
       </ul>
+      {(history ?? []).length === 0 && (
+        <EmptyState
+          icon={Info}
+          title="Sem solicitações ainda"
+          description="Quando você simular ou solicitar saque, o histórico aparecerá aqui."
+        />
+      )}
     </div>
   );
 }

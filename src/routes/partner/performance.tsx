@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { usePartnerOverview, usePartnerAnalytics } from "@/hooks/use-partner";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
+import { EmptyState } from "@/components/viax/empty-state";
+import { TrendingUp } from "lucide-react";
 
 export const Route = createFileRoute("/partner/performance")({
   component: PartnerPerformancePage,
@@ -10,6 +12,10 @@ export const Route = createFileRoute("/partner/performance")({
 function PartnerPerformancePage() {
   const { data: o } = usePartnerOverview();
   const { data: a } = usePartnerAnalytics();
+  const hasAnyData =
+    (a?.active_bets_24h ?? 0) > 0 ||
+    (a?.new_referrals_7d ?? 0) > 0 ||
+    (o?.volume ?? 0) > 0;
 
   return (
     <div className="space-y-6">
@@ -31,6 +37,13 @@ function PartnerPerformancePage() {
           <div className="mt-1 text-2xl font-semibold">{formatBRL(o?.volume ?? 0)}</div>
         </div>
       </div>
+      {!hasAnyData && (
+        <EmptyState
+          icon={TrendingUp}
+          title="Sem dados de performance ainda"
+          description="Assim que seus convidados começarem a operar, você verá os números aqui."
+        />
+      )}
       <div className="rounded-xl border p-4">
         <h2 className="text-sm font-medium">{copy.partner.missionsTitle}</h2>
         <ul className="mt-3 space-y-2 text-sm text-muted-foreground">

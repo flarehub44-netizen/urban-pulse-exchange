@@ -3,6 +3,8 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recha
 import { usePartnerAnalytics } from "@/hooks/use-partner";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
+import { EmptyState } from "@/components/viax/empty-state";
+import { BarChart3 } from "lucide-react";
 
 export const Route = createFileRoute("/partner/analytics")({
   component: PartnerAnalyticsPage,
@@ -11,6 +13,7 @@ export const Route = createFileRoute("/partner/analytics")({
 function PartnerAnalyticsPage() {
   const { data: a } = usePartnerAnalytics();
   const chart = (a?.volume_by_city ?? []).map((c) => ({ city: c.city, v: Number(c.volume) }));
+  const topCity = chart.length ? [...chart].sort((x, y) => y.v - x.v)[0] : null;
 
   return (
     <div className="space-y-6">
@@ -29,6 +32,21 @@ function PartnerAnalyticsPage() {
           <div className="text-2xl font-semibold">{a?.total_referrals ?? 0} traders</div>
         </div>
       </div>
+      <div className="rounded-xl border bg-card/60 p-4 text-sm">
+        <p className="text-xs uppercase tracking-wider text-muted-foreground">Insight rápido</p>
+        <p className="mt-1">
+          {topCity
+            ? `Cidade líder: ${topCity.city} (${formatBRL(topCity.v)} de volume).`
+            : "Ainda sem dados suficientes para insight por cidade."}
+        </p>
+      </div>
+      {chart.length === 0 ? (
+        <EmptyState
+          icon={BarChart3}
+          title="Sem dados por cidade"
+          description="As primeiras conversões vão liberar o comparativo geográfico aqui."
+        />
+      ) : null}
       <div className="rounded-xl border p-4 h-64">
         <h2 className="text-sm font-medium mb-2">Volume por cidade</h2>
         <ResponsiveContainer width="100%" height="90%">
