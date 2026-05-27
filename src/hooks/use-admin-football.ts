@@ -170,6 +170,7 @@ export function useAdminDeleteFootballMarket() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-football-drafts"] });
+      qc.invalidateQueries({ queryKey: ["admin-football-live"] });
       qc.invalidateQueries({ queryKey: ["admin-football-pending"] });
       qc.invalidateQueries({ queryKey: ["football-markets"] });
     },

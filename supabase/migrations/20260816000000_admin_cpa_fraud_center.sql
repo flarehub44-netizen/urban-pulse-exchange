@@ -50,28 +50,32 @@ declare
 begin
   perform public.assert_admin();
 
-  return coalesce((
-    select jsonb_agg(jsonb_build_object(
-      'flag_id', x.flag_id,
-      'user_id', x.user_id,
-      'user_handle', x.user_handle,
-      'user_name', x.user_name,
-      'partner_id', x.partner_id,
-      'partner_handle', x.partner_handle,
-      'partner_slug', x.partner_slug,
-      'qualified_deposit_total', x.qualified_deposit_total,
-      'cpa_paid_at', x.cpa_paid_at,
-      'status', x.status,
-      'risk_score', x.risk_score,
-      'reasons', x.reasons,
-      'notes', x.notes,
-      'is_cpa_counted', x.is_cpa_counted,
-      'reviewed_at', x.reviewed_at,
-      'reviewed_by', x.reviewed_by,
-      'created_at', x.created_at,
-      'updated_at', x.updated_at
-    ) order by x.created_at desc), '[]'::jsonb)
-    from (
+  return coalesce(
+    (
+      select jsonb_agg(
+        jsonb_build_object(
+          'flag_id', x.flag_id,
+          'user_id', x.user_id,
+          'user_handle', x.user_handle,
+          'user_name', x.user_name,
+          'partner_id', x.partner_id,
+          'partner_handle', x.partner_handle,
+          'partner_slug', x.partner_slug,
+          'qualified_deposit_total', x.qualified_deposit_total,
+          'cpa_paid_at', x.cpa_paid_at,
+          'status', x.status,
+          'risk_score', x.risk_score,
+          'reasons', x.reasons,
+          'notes', x.notes,
+          'is_cpa_counted', x.is_cpa_counted,
+          'reviewed_at', x.reviewed_at,
+          'reviewed_by', x.reviewed_by,
+          'created_at', x.created_at,
+          'updated_at', x.updated_at
+        )
+        order by x.created_at desc
+      )
+      from (
       select
         f.id as flag_id,
         f.user_id,
@@ -99,8 +103,10 @@ begin
       where v_status is null or f.status = v_status
       order by f.created_at desc
       limit greatest(1, least(coalesce(p_limit, 200), 500))
-    ) x
-  ), '[]'::jsonb);
+      ) x
+    ),
+    '[]'::jsonb
+  );
 end;
 $$;
 

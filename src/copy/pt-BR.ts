@@ -898,6 +898,10 @@ export const copy = {
       emptyPublished: "Nenhum mercado publicado ou liquidado.",
       void: "Anular mercado",
       voidDone: "Mercado anulado — apostas reembolsadas.",
+      deleteMarket: "Excluir jogo",
+      deleteConfirm: "Excluir o mercado {id}? O jogo volta para Pendentes.",
+      deleteDone: "Jogo excluído.",
+      deleteFailed: "Não foi possível excluir o jogo.",
       regulationHint:
         "Resultado: placar final reportado pela API (FT/AET). Com football_regulation=90min no banco, o sync usa o placar do intervalo regulamentar quando disponível.",
       approve: "Aprovar",
@@ -1116,6 +1120,8 @@ export const copy = {
       noConfirmed: "Nenhum caso confirmado como fraude.",
       statsOpen: "Suspeitos",
       statsConfirmed: "Confirmados",
+      cpaRpcNotInstalled:
+        "Centro CPA não instalado no banco — execute npm run db:push no projeto ou contate o suporte.",
     },
     system: {
       title: "DNA do produto",

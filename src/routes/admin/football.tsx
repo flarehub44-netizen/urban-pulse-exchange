@@ -208,9 +208,10 @@ function AdminFootballPage() {
                   {format(new Date(row.kickoff_at), "dd/MM HH:mm", { locale: ptBR })}
                 </p>
               </div>
+              <div className="flex flex-wrap gap-2">
               <button
                 type="button"
-                disabled={publish.isPending}
+                disabled={publish.isPending || deleteMarket.isPending}
                 onClick={async () => {
                   try {
                     await publish.mutateAsync(row.market_id);
@@ -225,20 +226,27 @@ function AdminFootballPage() {
               </button>
               <button
                 type="button"
-                disabled={deleteMarket.isPending}
+                disabled={publish.isPending || deleteMarket.isPending}
                 onClick={async () => {
-                  if (!window.confirm(`Excluir rascunho ${row.market_id}?`)) return;
+                  if (
+                    !window.confirm(
+                      copy.admin.football.deleteConfirm.replace("{id}", row.market_id),
+                    )
+                  ) {
+                    return;
+                  }
                   try {
                     await deleteMarket.mutateAsync(row.market_id);
-                    toast.success("Jogo excluído.");
+                    toast.success(copy.admin.football.deleteDone);
                   } catch (e) {
-                    toast.error(getErrorMessage(e) ?? "Não foi possível excluir o jogo.");
+                    toast.error(getErrorMessage(e) ?? copy.admin.football.deleteFailed);
                   }
                 }}
                 className="rounded-md border border-down/40 px-3 py-1.5 text-[10px] text-down hover:bg-down/10"
               >
-                Excluir
+                {copy.admin.football.deleteMarket}
               </button>
+              </div>
             </div>
           ))}
         </div>
@@ -266,24 +274,50 @@ function AdminFootballPage() {
                   {Number(row.pool_draw).toFixed(0)}/{Number(row.pool_away).toFixed(0)}
                 </p>
               </div>
-              {!["settled", "void"].includes(row.status) && (
-                <button
-                  type="button"
-                  disabled={voidMarket.isPending}
-                  onClick={async () => {
-                    if (!window.confirm(`Anular ${row.market_id}?`)) return;
-                    try {
-                      await voidMarket.mutateAsync({ marketId: row.market_id });
-                      toast.success(copy.admin.football.voidDone);
-                    } catch (e) {
-                      toast.error(getErrorMessage(e) ?? "Não foi possível anular o jogo.");
-                    }
-                  }}
-                  className="rounded-md border border-down/40 px-3 py-1.5 text-[10px] text-down hover:bg-down/10"
-                >
-                  {copy.admin.football.void}
-                </button>
-              )}
+              <div className="flex flex-wrap gap-2">
+                {!["settled", "void"].includes(row.status) && (
+                  <button
+                    type="button"
+                    disabled={voidMarket.isPending || deleteMarket.isPending}
+                    onClick={async () => {
+                      if (!window.confirm(`Anular ${row.market_id}?`)) return;
+                      try {
+                        await voidMarket.mutateAsync({ marketId: row.market_id });
+                        toast.success(copy.admin.football.voidDone);
+                      } catch (e) {
+                        toast.error(getErrorMessage(e) ?? "Não foi possível anular o jogo.");
+                      }
+                    }}
+                    className="rounded-md border border-down/40 px-3 py-1.5 text-[10px] text-down hover:bg-down/10"
+                  >
+                    {copy.admin.football.void}
+                  </button>
+                )}
+                {row.status !== "settled" && (
+                  <button
+                    type="button"
+                    disabled={voidMarket.isPending || deleteMarket.isPending}
+                    onClick={async () => {
+                      if (
+                        !window.confirm(
+                          copy.admin.football.deleteConfirm.replace("{id}", row.market_id),
+                        )
+                      ) {
+                        return;
+                      }
+                      try {
+                        await deleteMarket.mutateAsync(row.market_id);
+                        toast.success(copy.admin.football.deleteDone);
+                      } catch (e) {
+                        toast.error(getErrorMessage(e) ?? copy.admin.football.deleteFailed);
+                      }
+                    }}
+                    className="rounded-md border border-down/40 px-3 py-1.5 text-[10px] text-down hover:bg-down/10"
+                  >
+                    {copy.admin.football.deleteMarket}
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>

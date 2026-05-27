@@ -211,6 +211,20 @@ export type AdminCpaReferral = {
   cpf_duplicate: boolean;
 };
 
+/** PostgREST 404 / PGRST202 when CPA RPCs were never applied on the remote database. */
+export function isCpaRiskRpcMissingError(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const e = error as { code?: string; message?: string; status?: number };
+  if (e.code === "PGRST202") return true;
+  if (e.status === 404) return true;
+  const msg = String(e.message ?? "").toLowerCase();
+  return (
+    msg.includes("pgrst202") ||
+    msg.includes("could not find the function") ||
+    msg.includes("not found")
+  );
+}
+
 export function useAdminCpaFraudCases(status?: string) {
   return useQuery({
     queryKey: ["admin", "cpa-fraud-cases", status ?? "all"],

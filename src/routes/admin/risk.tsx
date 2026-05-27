@@ -9,6 +9,7 @@ import {
   useAdminClearCpaFraudCases,
   useAdminSuspendCpaFraudPartners,
   useAdminBanCpaFraudUsers,
+  isCpaRiskRpcMissingError,
   type AdminCpaFraudCase,
   type AdminCpaReferral,
 } from "@/hooks/use-admin-dashboard";
@@ -419,11 +420,13 @@ function AdminRiskPage() {
   const {
     data: allCases,
     isError: isCpaCasesError,
+    error: cpaCasesError,
     refetch: refetchCases,
   } = useAdminCpaFraudCases(undefined);
   const {
     data: referrals,
     isError: isReferralsError,
+    error: cpaReferralsError,
     refetch: refetchReferrals,
   } = useAdminCpaReferrals(onlyFlagged);
 
@@ -456,9 +459,13 @@ function AdminRiskPage() {
   const bulkNoteOk = bulkActionNote.trim().length >= MIN_ACTION_NOTE;
   const canRunDestructive = bulkNoteOk && confirmedCases.length > 0;
 
+  const cpaRpcMissing =
+    isCpaRiskRpcMissingError(cpaCasesError) || isCpaRiskRpcMissingError(cpaReferralsError);
+
   if (isError || isCpaCasesError || isReferralsError) {
     return (
       <InlineError
+        message={cpaRpcMissing ? copy.admin.risk.cpaRpcNotInstalled : undefined}
         onRetry={() => {
           void refetch();
           void refetchCases();
