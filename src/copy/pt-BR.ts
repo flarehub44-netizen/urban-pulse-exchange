@@ -786,11 +786,12 @@ export const copy = {
     payoutRequest: "Solicitar saque",
     payoutSimulateCta: "Simular saque",
     simulatedPayout:
-      "Saques de creator ainda são simulados. O saldo é debitado apenas para testes — nenhum Pix real é enviado.",
+      "Saques de creator ainda são simulados. Nenhum Pix real é enviado e o saldo não é debitado.",
     payoutSimulatedTitle: "Saques ainda não são reais",
     payoutSimulatedNote:
       "Quando Pix estiver habilitado, você receberá e-mail e verá status “Pendente” no histórico.",
-    payoutSimulatedSuccess: (balance: string) => `Saque simulado registrado · saldo ${balance}`,
+    payoutSimulatedSuccess: (balance: string) =>
+      `Saque simulado registrado (sem débito real) · saldo ${balance}`,
     payoutPendingSuccess: (balance: string) => `Saque Pix solicitado · saldo ${balance}`,
     payoutRealTitle: "Saques via Pix",
     payoutRealNote: "Transferências reais podem levar até 1 dia útil após aprovação.",
