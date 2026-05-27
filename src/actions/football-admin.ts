@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getSupabaseCtx, type SupabaseFnContext } from "@/integrations/supabase/context";
 import { runFootballResolve, runFootballSync } from "@/lib/football-cron.server";
@@ -15,10 +16,17 @@ async function assertAdmin(supabase: SupabaseFnContext["supabase"], userId: stri
 
 export const adminFootballSyncFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator(
+    z
+      .object({
+        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+      })
+      .optional(),
+  )
+  .handler(async ({ data, context }) => {
     const { supabase, userId } = getSupabaseCtx(context);
     await assertAdmin(supabase, userId);
-    return runFootballSync();
+    return runFootballSync(data?.date);
   });
 
 export const adminFootballResolveFn = createServerFn({ method: "POST" })

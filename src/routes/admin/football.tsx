@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import {
@@ -27,11 +27,13 @@ type Tab = "pending" | "drafts" | "published" | "settings";
 
 function AdminFootballPage() {
   const [tab, setTab] = useState<Tab>("pending");
+  const todayYmd = format(new Date(), "yyyy-MM-dd");
+  const [selectedDate, setSelectedDate] = useState(todayYmd);
   const {
     data: pending,
     isLoading: pendingLoading,
     refetch: refetchPending,
-  } = useAdminFootballPending();
+  } = useAdminFootballPending(selectedDate);
   const { data: drafts, isLoading: draftsLoading } = useAdminFootballDrafts();
   const { data: published, isLoading: publishedLoading } = useAdminFootballLive();
   const { data: settings } = useFootballLeagueSettings();
@@ -44,6 +46,9 @@ function AdminFootballPage() {
   const saveSettings = useUpdateFootballSettings();
 
   const [enabled, setEnabled] = useState(true);
+  const pendingDisplayDate = format(new Date(`${selectedDate}T12:00:00Z`), "dd/MM/yyyy", {
+    locale: ptBR,
+  });
 
   useEffect(() => {
     if (!settings) return;
@@ -84,6 +89,41 @@ function AdminFootballPage() {
 
       {tab === "pending" && (
         <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                const d = addDays(new Date(`${selectedDate}T12:00:00Z`), -1);
+                setSelectedDate(format(d, "yyyy-MM-dd"));
+              }}
+              className="rounded-xl border px-3 py-2 text-sm hover:bg-muted"
+            >
+              {"<"}
+            </button>
+            <button
+              type="button"
+              className="rounded-xl border px-4 py-2 text-sm font-semibold tracking-wide"
+            >
+              {pendingDisplayDate}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const d = addDays(new Date(`${selectedDate}T12:00:00Z`), 1);
+                setSelectedDate(format(d, "yyyy-MM-dd"));
+              }}
+              className="rounded-xl border px-3 py-2 text-sm hover:bg-muted"
+            >
+              {">"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedDate(todayYmd)}
+              className="rounded-xl border px-3 py-2 text-sm hover:bg-muted"
+            >
+              Hoje
+            </button>
+          </div>
           {pendingLoading && <p className="text-xs text-muted-foreground">{copy.common.loading}</p>}
           {!pendingLoading && (!pending || pending.length === 0) && (
             <p className="text-xs text-muted-foreground">{copy.admin.football.emptyPending}</p>
@@ -257,7 +297,7 @@ function AdminFootballPage() {
               disabled={syncNow.isPending}
               onClick={async () => {
                 try {
-                  const res = (await syncNow.mutateAsync()) as {
+                  const res = (await syncNow.mutateAsync(selectedDate)) as {
                     ok?: boolean;
                     upserted?: number;
                     errors?: string[];

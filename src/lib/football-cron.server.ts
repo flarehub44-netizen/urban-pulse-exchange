@@ -9,6 +9,7 @@ import { withJobLog, logApiMetric } from "@/lib/structured-log.server";
 
 let consecutiveSyncFailures = 0;
 const CRON_ALERT_THRESHOLD = 3;
+const DATE_YMD_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 function getServiceClient(): SupabaseClient {
   const url = process.env.SUPABASE_URL;
@@ -57,7 +58,7 @@ async function upsertFixture(supabase: SupabaseClient, f: ApiFootballFixtureDto)
   if (error) throw new Error(error.message);
 }
 
-export async function runFootballSync(): Promise<unknown> {
+export async function runFootballSync(targetDate?: string): Promise<unknown> {
   return withJobLog("football_sync", async () => {
     const supabase = getServiceClient();
 
@@ -66,9 +67,11 @@ export async function runFootballSync(): Promise<unknown> {
 
     const autoApproveEnabled = false;
     const currentYear = new Date().getUTCFullYear();
-    const dates = [formatDateYmd(new Date())];
+    const syncDate = targetDate && DATE_YMD_RE.test(targetDate) ? targetDate : formatDateYmd(new Date());
+    const dates = [syncDate];
     let upserted = 0;
     const errors: string[] = [];
+    const seasonTraces: string[] = [];
 
     if (!process.env.API_FOOTBALL_KEY) {
       return { ok: false, error: "API_FOOTBALL_KEY not configured", upserted: 0 };
@@ -79,10 +82,13 @@ export async function runFootballSync(): Promise<unknown> {
 
     for (const date of dates) {
       try {
-        const { fixtures, triedSeasons } = await getFixturesByDateAllWithFallback(
+        const { fixtures, triedSeasons, seasonUsed } = await getFixturesByDateAllWithFallback(
           date,
           currentYear,
           [2024, 2023, 2022],
+        );
+        seasonTraces.push(
+          `${date}:seasonUsed=${seasonUsed ?? "none"};tried=${triedSeasons.join(",") || "none"}`,
         );
         for (const f of fixtures) {
           await upsertFixture(supabase, f);
@@ -129,7 +135,7 @@ export async function runFootballSync(): Promise<unknown> {
       ok: syncOk,
       processed: upserted,
       errorsCount: errors.length,
-      notes: `autoApproveEnabled=${autoApproveEnabled}; autoApproved=${autoApproved}; window=today_only; preferredSeason=${currentYear}; fallbackSeasons=2024,2023,2022`,
+      notes: `autoApproveEnabled=${autoApproveEnabled}; autoApproved=${autoApproved}; window=manual_date_or_today; syncDate=${syncDate}; preferredSeason=${currentYear}; fallbackSeasons=2024,2023,2022; ${seasonTraces.join(" | ")}`,
     });
     return out;
   });

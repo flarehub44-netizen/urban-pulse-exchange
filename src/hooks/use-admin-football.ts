@@ -43,12 +43,13 @@ export type FootballLiveRow = {
   status_short: string;
 };
 
-export function useAdminFootballPending() {
+export function useAdminFootballPending(date?: string) {
   return useQuery({
-    queryKey: ["admin-football-pending"],
+    queryKey: ["admin-football-pending", date ?? "all"],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("admin_list_football_pending", {
         p_limit: 100,
+        p_date: date ?? null,
       });
       if (error) throw error;
       return (data ?? []) as FootballPendingRow[];
@@ -177,7 +178,7 @@ export function useFootballLeagueSettings() {
 export function useAdminFootballSync() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: () => adminFootballSyncFn(),
+    mutationFn: (date?: string) => adminFootballSyncFn({ data: date ? { date } : undefined }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-football-pending"] });
       qc.invalidateQueries({ queryKey: ["football-league-settings"] });
