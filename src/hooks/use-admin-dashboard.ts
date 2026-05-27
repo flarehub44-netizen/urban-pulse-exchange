@@ -210,6 +210,32 @@ export function useAdminCameraHealth(enabled = true) {
   });
 }
 
+export type VisionWorkerStatus = {
+  has_runs: boolean;
+  healthy: boolean;
+  message?: string;
+  last_run_at?: string;
+  minutes_since?: number;
+  source?: string;
+  cameras_total?: number;
+  cameras_ok?: number;
+  cameras_failed?: number;
+  error_summary?: string | null;
+};
+
+export function useVisionWorkerStatus(enabled = true) {
+  return useQuery({
+    queryKey: ["admin", "vision-worker"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_vision_worker_status");
+      if (error) throw error;
+      return data as VisionWorkerStatus;
+    },
+    enabled,
+    refetchInterval: 60_000,
+  });
+}
+
 export type AdminCamera = {
   id: string;
   region_id: string | null;

@@ -7,6 +7,7 @@ import {
   useAdminUpsertCamera,
   useAdminSetCameraStatus,
   useAdminCreateCameraUpstream,
+  useVisionWorkerStatus,
 } from "@/hooks/use-admin-dashboard";
 import { useRegions } from "@/hooks/use-regions";
 import { useAdminOracleHealth } from "@/hooks/use-admin-dashboard";
@@ -27,6 +28,7 @@ export const Route = createFileRoute("/admin/sources")({
 function AdminSourcesPage() {
   const { data: cameras, isError: camErr, refetch: refetchCam } = useAdminCameras();
   const { data: healthRows } = useAdminCameraHealth();
+  const { data: workerStatus } = useVisionWorkerStatus();
   const healthById = useMemo(() => new Map((healthRows ?? []).map((h) => [h.id, h])), [healthRows]);
   const { data: oracle } = useAdminOracleHealth();
   const { data: regions } = useRegions();
@@ -101,6 +103,50 @@ function AdminSourcesPage() {
       <div>
         <h1 className="text-lg font-semibold">{copy.admin.sources.title}</h1>
         <p className="text-xs text-muted-foreground">Câmeras · sensores · regiões simuladas</p>
+      </div>
+
+      <div
+        className={cn(
+          "rounded-xl border px-4 py-3 text-sm",
+          workerStatus?.healthy
+            ? "border-up/30 bg-up/5"
+            : "border-warn/30 bg-warn/10",
+        )}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="font-medium">{copy.admin.sources.visionWorkerTitle}</span>
+          <span
+            className={cn(
+              "rounded-md px-2 py-0.5 text-[10px] uppercase font-medium",
+              workerStatus?.healthy ? "bg-up/15 text-up" : "bg-warn/15 text-warn",
+            )}
+          >
+            {workerStatus?.healthy
+              ? copy.admin.sources.visionWorkerHealthy
+              : copy.admin.sources.visionWorkerStale}
+          </span>
+        </div>
+        {workerStatus?.has_runs ? (
+          <p className="mt-2 text-xs text-muted-foreground">
+            {copy.admin.sources.visionWorkerLastRun(
+              workerStatus.last_run_at
+                ? new Date(workerStatus.last_run_at).toLocaleString("pt-BR")
+                : "—",
+              workerStatus.source ?? "—",
+              workerStatus.cameras_ok ?? 0,
+              workerStatus.cameras_total ?? 0,
+            )}
+            {workerStatus.minutes_since != null &&
+              ` · ${Math.round(workerStatus.minutes_since)} min atrás`}
+            {workerStatus.error_summary && (
+              <span className="block mt-1 text-warn">{workerStatus.error_summary}</span>
+            )}
+          </p>
+        ) : (
+          <p className="mt-2 text-xs text-muted-foreground">
+            {workerStatus?.message ?? copy.admin.sources.visionWorkerNoRuns}
+          </p>
+        )}
       </div>
 
       <div className="rounded-xl border bg-card/60 p-4">

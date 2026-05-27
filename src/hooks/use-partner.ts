@@ -171,7 +171,13 @@ export function usePartnerPayouts(enabled = true) {
     queryFn: async () => {
       const { data, error } = await supabase.rpc("get_partner_payouts");
       if (error) throw error;
-      return (data ?? []) as { id: string; amount: number; method: string; at: string }[];
+      return (data ?? []) as {
+        id: string;
+        amount: number;
+        method: string;
+        status?: string;
+        at: string;
+      }[];
     },
     enabled,
   });
@@ -221,7 +227,7 @@ export function usePartnerPayoutRequest() {
         p_amount: amount,
       });
       if (error) throw error;
-      return data as { ok: boolean; balance: number };
+      return data as { ok: boolean; balance: number; simulated?: boolean };
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["partner"] });

@@ -7,8 +7,17 @@ export function usePlaceBet() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ marketId, side, stake }: { marketId: string; side: Side; stake: number }) =>
-      placeBetFn({ data: { marketId, side, stake } }),
+    mutationFn: ({
+      marketId,
+      side,
+      stake,
+      idempotencyKey,
+    }: {
+      marketId: string;
+      side: Side;
+      stake: number;
+      idempotencyKey?: string;
+    }) => placeBetFn({ data: { marketId, side, stake, idempotencyKey } }),
 
     onMutate: async ({ marketId, side, stake }) => {
       await queryClient.cancelQueries({ queryKey: ["markets"] });

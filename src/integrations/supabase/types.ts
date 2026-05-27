@@ -3144,6 +3144,7 @@ export type Database = {
       get_admin_volume_by_hour: { Args: never; Returns: Json };
       get_admin_volume_by_region: { Args: never; Returns: Json };
       get_camera_health: { Args: never; Returns: Json };
+      get_vision_worker_status: { Args: never; Returns: Json };
       get_camera_region_raw: {
         Args: { p_metric: string; p_region_id: string };
         Returns: number;
@@ -3319,6 +3320,7 @@ export type Database = {
           p_market_id: string;
           p_side: Database["public"]["Enums"]["bet_side"];
           p_stake: number;
+          p_idempotency_key?: string;
         };
         Returns: Json;
       };
@@ -3346,6 +3348,17 @@ export type Database = {
       record_comeback_if_needed: { Args: never; Returns: Json };
       record_market_view: { Args: { p_market_id: string }; Returns: undefined };
       record_oracle_snapshot: { Args: { p_market_id: string }; Returns: number };
+      record_vision_worker_run: {
+        Args: {
+          p_started_at: string;
+          p_source: string;
+          p_cameras_total: number;
+          p_cameras_ok: number;
+          p_cameras_failed: number;
+          p_error_summary?: string;
+        };
+        Returns: Json;
+      };
       refresh_demo_live_markets: { Args: never; Returns: Json };
       refresh_market_lifecycle: { Args: never; Returns: Json };
       refresh_market_participant_stats: {

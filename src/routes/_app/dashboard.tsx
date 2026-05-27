@@ -18,6 +18,7 @@ import { MarketCard } from "@/components/viax/market-card";
 import { AnimatedNumber } from "@/components/viax/animated-number";
 import { formatBRL, PRIZE_RATIO } from "@/lib/parimutuel";
 import { useDeferredMount } from "@/hooks/use-deferred-mount";
+import { useBelowFoldMount } from "@/hooks/use-below-fold-mount";
 
 const DashboardPnlChart = lazy(() =>
   import("@/components/viax/dashboard-pnl-chart").then((m) => ({ default: m.DashboardPnlChart })),
@@ -123,6 +124,7 @@ export const Route = createFileRoute("/_app/dashboard")({
 function Dashboard() {
   const navigate = useNavigate({ from: "/dashboard" });
   const deferredReady = useDeferredMount(150);
+  const casinoReady = useBelowFoldMount(2500);
   const { enabled: casinoEnabled } = useCasinoEnabled();
   const { from, highlight } = Route.useSearch();
   const { userId } = useAuth();
@@ -936,14 +938,6 @@ function Dashboard() {
         </div>
       )}
 
-      {casinoEnabled && deferredReady && (
-        <Suspense fallback={<ChartFallback />}>
-          <SpinWheel
-            onDepositBonusCta={() => navigate({ to: "/wallet" })}
-          />
-        </Suspense>
-      )}
-
       {/* Traders em Alta — momentum semanal */}
       {deferredReady && trendingTraders.length > 0 && (
         <div>
@@ -1042,6 +1036,14 @@ function Dashboard() {
             </div>
           </div>
         </div>
+      )}
+
+      {casinoEnabled && casinoReady && (
+        <section id="casino-below-fold" aria-label="Roleta diária">
+          <Suspense fallback={<ChartFallback />}>
+            <SpinWheel onDepositBonusCta={() => navigate({ to: "/wallet" })} />
+          </Suspense>
+        </section>
       )}
     </div>
   );

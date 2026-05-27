@@ -10,6 +10,7 @@ const placeBetSchema = z.object({
   marketId: z.string(),
   side: z.enum(["YES", "NO"]),
   stake: z.number().positive().max(100_000),
+  idempotencyKey: z.string().uuid().optional(),
 });
 
 export const placeBetFn = createServerFn({ method: "POST" })
@@ -22,6 +23,7 @@ export const placeBetFn = createServerFn({ method: "POST" })
       p_market_id: data.marketId,
       p_side: data.side,
       p_stake: data.stake,
+      p_idempotency_key: data.idempotencyKey ?? null,
     });
     if (error) {
       logApiMetric("bff.place_bet", { ok: false, durationMs: Date.now() - started });
@@ -34,6 +36,7 @@ export const placeBetFn = createServerFn({ method: "POST" })
       pool_yes: number;
       pool_no: number;
       balance: number;
+      idempotent?: boolean;
       progress?: {
         xp?: number;
         xp_delta?: number;

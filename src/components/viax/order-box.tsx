@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
@@ -58,6 +58,7 @@ export function OrderBox({
   const [note, setNote] = useState("");
   const [showNote, setShowNote] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const idempotencyKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
     setSide(initialSide);
@@ -128,7 +129,16 @@ export function OrderBox({
       return;
     }
     try {
-      const result = await placeBet({ marketId: m.id, side, stake });
+      if (!idempotencyKeyRef.current) {
+        idempotencyKeyRef.current = crypto.randomUUID();
+      }
+      const result = await placeBet({
+        marketId: m.id,
+        side,
+        stake,
+        idempotencyKey: idempotencyKeyRef.current,
+      });
+      idempotencyKeyRef.current = null;
       const depositAt = Number(sessionStorage.getItem("viax_last_deposit_confirmed_at") ?? "0");
       if (depositAt > 0) {
         trackProductEvent("first_bet_after_deposit", {

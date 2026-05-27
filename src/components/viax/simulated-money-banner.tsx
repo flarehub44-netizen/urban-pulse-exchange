@@ -1,6 +1,7 @@
 import { Info } from "lucide-react";
 import { copy } from "@/copy/pt-BR";
 import { isPixPaymentsEnabled } from "@/lib/pix-payments";
+import { isPartnerPayoutsReal } from "@/lib/partner-payouts";
 import { cn } from "@/lib/utils";
 
 type PaymentInfoBannerProps = {
@@ -23,6 +24,25 @@ export function PaymentInfoBanner({ className, context = "wallet" }: PaymentInfo
       : context === "partner"
         ? copy.partner.simulatedPayout
         : copy.wallet.pixDepositNote;
+
+  if (context === "partner" && !isPartnerPayoutsReal()) {
+    return (
+      <div
+        className={cn(
+          "flex items-start gap-2 rounded-xl border border-warn/25 bg-warn/5 px-3 py-2.5 text-xs",
+          className,
+        )}
+        role="note"
+      >
+        <Info className="mt-0.5 size-3.5 shrink-0 text-warn" />
+        <p className="text-muted-foreground">
+          <span className="font-medium text-foreground">{copy.partner.payoutSimulatedTitle}</span>
+          {" — "}
+          {copy.partner.simulatedPayout}
+        </p>
+      </div>
+    );
+  }
 
   if (context === "wallet" && !pix) {
     return (

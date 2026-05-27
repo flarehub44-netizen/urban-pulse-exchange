@@ -144,6 +144,7 @@ export function SpinWheel({ onNearMissSpin, onDepositBonusCta }: SpinWheelProps)
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
+              data-testid="casino-spin-btn"
               disabled={!available || isPending || spinning}
               onClick={runSpin}
               className="rounded-lg bg-warn px-4 py-2 text-sm font-semibold text-warn-foreground disabled:opacity-50"

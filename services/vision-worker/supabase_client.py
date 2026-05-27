@@ -47,3 +47,29 @@ class SupabaseWorkerClient:
             )
             r.raise_for_status()
             return r.json()
+
+    def record_run(
+        self,
+        *,
+        started_at: str,
+        source: str,
+        cameras_total: int,
+        cameras_ok: int,
+        cameras_failed: int,
+        error_summary: str | None = None,
+    ) -> dict[str, Any]:
+        with httpx.Client(timeout=30) as client:
+            r = client.post(
+                f"{self.url}/rest/v1/rpc/record_vision_worker_run",
+                headers=self.headers,
+                json={
+                    "p_started_at": started_at,
+                    "p_source": source,
+                    "p_cameras_total": cameras_total,
+                    "p_cameras_ok": cameras_ok,
+                    "p_cameras_failed": cameras_failed,
+                    "p_error_summary": error_summary,
+                },
+            )
+            r.raise_for_status()
+            return r.json()

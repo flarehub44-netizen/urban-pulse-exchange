@@ -102,7 +102,8 @@ test.describe("F7 — Casino / Spin Wheel", () => {
   test("casino spin wheel acessível no dashboard", async ({ page }) => {
     await primeAppStorage(page);
     await page.goto("/dashboard");
-    await page.waitForTimeout(4000);
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(3000);
 
     // Casino pode estar desabilitado ou não visível por padrão
     const spinBtn = page

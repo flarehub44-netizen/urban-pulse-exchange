@@ -31,17 +31,7 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          POLL_INTERVAL_SEC: "1"
+          VISION_WORKER_SOURCE: github-actions
         run: |
           cd services/vision-worker
-          timeout 120 python -c "
-          import os, time
-          os.environ['POLL_INTERVAL_SEC'] = '1'
-          from main import process_camera
-          from supabase_client import SupabaseWorkerClient
-          c = SupabaseWorkerClient()
-          cams = c.list_cameras()
-          print('cameras', len(cams))
-          for cam in cams:
-              process_camera(c, cam)
-          "
+          python run_once.py
