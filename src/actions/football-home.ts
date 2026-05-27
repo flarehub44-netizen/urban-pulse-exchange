@@ -1,12 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
-import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { getFixturesByDate, type ApiFootballFixtureDto } from "@/lib/api-football.server";
+import {
+  getFixturesByDateAllResilient,
+  type ApiFootballFixtureDto,
+} from "@/lib/api-football.server";
 
 const FIVE_MIN_MS = 5 * 60 * 1000;
 const cache = new Map<string, { expiresAt: number; value: FootballHomepagePayload }>();
-
-const fallbackLeagueIds = [39, 140, 135, 78, 61, 2, 3, 71, 72, 13, 848, 11, 10, 9, 94, 88, 253];
 
 const inputSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -72,10 +72,6 @@ function getStatusType(statusShort: string): MatchStatusType {
   return "other";
 }
 
-function deriveSeason(dateYmd: string): number {
-  return Number.parseInt(dateYmd.slice(0, 4), 10);
-}
-
 function mapFixture(dto: ApiFootballFixtureDto): FootballHomepageFixture {
   return {
     id: dto.api_fixture_id,
@@ -101,26 +97,6 @@ function mapFixture(dto: ApiFootballFixtureDto): FootballHomepageFixture {
     goalsAway: dto.goals_away,
     venue: dto.venue,
   };
-}
-
-function getServiceClient() {
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return null;
-  return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
-}
-
-async function resolveLeagueIds(): Promise<number[]> {
-  const supabase = getServiceClient();
-  if (!supabase) return fallbackLeagueIds;
-  const { data } = await supabase
-    .from("platform_settings")
-    .select("value")
-    .eq("key", "football_league_ids")
-    .maybeSingle();
-  const ids = (data?.value as number[] | undefined) ?? fallbackLeagueIds;
-  const normalized = ids.map((n) => Number(n)).filter((n) => Number.isFinite(n) && n > 0);
-  return normalized.length ? normalized : fallbackLeagueIds;
 }
 
 function summarize(fixtures: FootballHomepageFixture[]) {
@@ -159,9 +135,8 @@ export const getFootballHomepageFn = createServerFn({ method: "GET" })
       return { ...hit.value, meta: { ...hit.value.meta, cacheHit: true } } satisfies FootballHomepagePayload;
     }
 
-    const leagueIds = await resolveLeagueIds();
-    const season = deriveSeason(data.date);
-    const dtos = await getFixturesByDate(data.date, leagueIds, season);
+    const season = Number.parseInt(data.date.slice(0, 4), 10);
+    const { fixtures: dtos } = await getFixturesByDateAllResilient(data.date, season, [2024, 2023, 2022]);
     const fixtures = dtos.map(mapFixture).sort((a, b) => {
       const byKickoff = new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime();
       if (byKickoff !== 0) return byKickoff;

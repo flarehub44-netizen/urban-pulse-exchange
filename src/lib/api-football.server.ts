@@ -32,6 +32,13 @@ export type AllGamesFallbackResult = {
   triedSeasons: number[];
   seasonUsed: number | null;
 };
+export type AllGamesResilientResult = {
+  fixtures: ApiFootballFixtureDto[];
+  triedSeasons: number[];
+  seasonUsed: number | null;
+  strategyUsed: "date_only" | "date_plus_season_fallback" | "none";
+  attempts: string[];
+};
 
 type ApiFixtureItem = {
   fixture: {
@@ -199,6 +206,11 @@ export async function getFixturesByDateAll(
   return items.map(mapFixtureItem);
 }
 
+export async function getFixturesByDateAllDateOnly(date: string): Promise<ApiFootballFixtureDto[]> {
+  const items = await apiGet<ApiFixtureItem>("/fixtures", { date });
+  return items.map(mapFixtureItem);
+}
+
 export async function getFixturesByDateAllWithFallback(
   date: string,
   preferredSeason: number,
@@ -218,6 +230,52 @@ export async function getFixturesByDateAllWithFallback(
   }
 
   return { fixtures: [], triedSeasons, seasonUsed: null };
+}
+
+export async function getFixturesByDateAllResilient(
+  date: string,
+  preferredSeason: number,
+  fallbackSeasons: number[],
+): Promise<AllGamesResilientResult> {
+  const attempts: string[] = [];
+  try {
+    const dateOnly = await getFixturesByDateAllDateOnly(date);
+    attempts.push(`date_only:${dateOnly.length}`);
+    if (dateOnly.length > 0) {
+      return {
+        fixtures: dateOnly,
+        triedSeasons: [],
+        seasonUsed: null,
+        strategyUsed: "date_only",
+        attempts,
+      };
+    }
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    attempts.push(`date_only_error:${msg.slice(0, 120)}`);
+  }
+
+  const fallback = await getFixturesByDateAllWithFallback(date, preferredSeason, fallbackSeasons);
+  attempts.push(
+    `season_fallback:${fallback.fixtures.length};tried=${fallback.triedSeasons.join(",") || "none"}`,
+  );
+  if (fallback.fixtures.length > 0) {
+    return {
+      fixtures: fallback.fixtures,
+      triedSeasons: fallback.triedSeasons,
+      seasonUsed: fallback.seasonUsed,
+      strategyUsed: "date_plus_season_fallback",
+      attempts,
+    };
+  }
+
+  return {
+    fixtures: [],
+    triedSeasons: fallback.triedSeasons,
+    seasonUsed: fallback.seasonUsed,
+    strategyUsed: "none",
+    attempts,
+  };
 }
 
 export async function getFixtureById(fixtureId: number): Promise<ApiFootballFixtureDto | null> {

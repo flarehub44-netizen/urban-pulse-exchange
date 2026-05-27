@@ -2,6 +2,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   getFixturesByDate,
   getFixturesByDateAll,
+  getFixturesByDateAllDateOnly,
+  getFixturesByDateAllResilient,
   getFixturesByDateAllWithFallback,
   mapFixtureItem,
 } from "./api-football.server";
@@ -96,6 +98,22 @@ describe("api-football requests", () => {
     expect(firstUrl.searchParams.get("league")).toBeNull();
   });
 
+  it("loads all games by date without season in date-only mode", async () => {
+    process.env.API_FOOTBALL_KEY = "test-key";
+    const fetchMock = vi.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({ response: [] }),
+      headers: new Headers(),
+    } as Response);
+
+    await getFixturesByDateAllDateOnly("2026-05-27");
+
+    const firstUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(firstUrl.searchParams.get("date")).toBe("2026-05-27");
+    expect(firstUrl.searchParams.get("season")).toBeNull();
+    expect(firstUrl.searchParams.get("league")).toBeNull();
+  });
+
   it("falls back when primary season returns empty list", async () => {
     process.env.API_FOOTBALL_KEY = "test-key";
     const fetchMock = vi
@@ -129,5 +147,76 @@ describe("api-football requests", () => {
     const secondUrl = new URL(String(fetchMock.mock.calls[1]?.[0]));
     expect(firstUrl.searchParams.get("season")).toBe("2026");
     expect(secondUrl.searchParams.get("season")).toBe("2024");
+  });
+
+  it("uses date-only as first strategy in resilient mode", async () => {
+    process.env.API_FOOTBALL_KEY = "test-key";
+    const fetchMock = vi.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        response: [
+          {
+            fixture: { id: 9, date: "2026-05-27T16:00:00+00:00", status: { short: "NS", elapsed: null } },
+            league: { id: 39, season: 2026, name: "Premier League", country: "England" },
+            teams: { home: { id: 1, name: "A" }, away: { id: 2, name: "B" } },
+            goals: { home: null, away: null },
+          },
+        ],
+      }),
+      headers: new Headers(),
+    } as Response);
+
+    const out = await getFixturesByDateAllResilient("2026-05-27", 2026, [2024, 2023, 2022]);
+    expect(out.strategyUsed).toBe("date_only");
+    expect(out.fixtures).toHaveLength(1);
+    expect(out.triedSeasons).toEqual([]);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    const firstUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(firstUrl.searchParams.get("date")).toBe("2026-05-27");
+    expect(firstUrl.searchParams.get("season")).toBeNull();
+  });
+
+  it("falls back to date+season when date-only returns empty", async () => {
+    process.env.API_FOOTBALL_KEY = "test-key";
+    const fetchMock = vi
+      .spyOn(global, "fetch")
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ response: [] }),
+        headers: new Headers(),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ response: [] }),
+        headers: new Headers(),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          response: [
+            {
+              fixture: { id: 10, date: "2026-05-27T18:00:00+00:00", status: { short: "NS", elapsed: null } },
+              league: { id: 71, season: 2024, name: "Serie A", country: "Brazil" },
+              teams: { home: { id: 1, name: "A" }, away: { id: 2, name: "B" } },
+              goals: { home: null, away: null },
+            },
+          ],
+        }),
+        headers: new Headers(),
+      } as Response);
+
+    const out = await getFixturesByDateAllResilient("2026-05-27", 2026, [2024, 2023, 2022]);
+    expect(out.strategyUsed).toBe("date_plus_season_fallback");
+    expect(out.fixtures).toHaveLength(1);
+    expect(out.seasonUsed).toBe(2024);
+    expect(out.triedSeasons).toEqual([2026, 2024]);
+
+    const firstUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    const secondUrl = new URL(String(fetchMock.mock.calls[1]?.[0]));
+    const thirdUrl = new URL(String(fetchMock.mock.calls[2]?.[0]));
+    expect(firstUrl.searchParams.get("season")).toBeNull();
+    expect(secondUrl.searchParams.get("season")).toBe("2026");
+    expect(thirdUrl.searchParams.get("season")).toBe("2024");
   });
 });

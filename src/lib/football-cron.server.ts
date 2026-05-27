@@ -2,7 +2,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import {
   formatDateYmd,
   getFixtureById,
-  getFixturesByDateAllWithFallback,
+  getFixturesByDateAllResilient,
   type ApiFootballFixtureDto,
 } from "@/lib/api-football.server";
 import { withJobLog, logApiMetric } from "@/lib/structured-log.server";
@@ -71,7 +71,7 @@ export async function runFootballSync(targetDate?: string): Promise<unknown> {
     const dates = [syncDate];
     let upserted = 0;
     const errors: string[] = [];
-    const seasonTraces: string[] = [];
+    const syncTraces: string[] = [];
 
     if (!process.env.API_FOOTBALL_KEY) {
       return { ok: false, error: "API_FOOTBALL_KEY not configured", upserted: 0 };
@@ -82,13 +82,14 @@ export async function runFootballSync(targetDate?: string): Promise<unknown> {
 
     for (const date of dates) {
       try {
-        const { fixtures, triedSeasons, seasonUsed } = await getFixturesByDateAllWithFallback(
+        const { fixtures, triedSeasons, seasonUsed, strategyUsed, attempts } =
+          await getFixturesByDateAllResilient(
           date,
           currentYear,
           [2024, 2023, 2022],
         );
-        seasonTraces.push(
-          `${date}:seasonUsed=${seasonUsed ?? "none"};tried=${triedSeasons.join(",") || "none"}`,
+        syncTraces.push(
+          `${date}:strategy=${strategyUsed};responseCount=${fixtures.length};seasonUsed=${seasonUsed ?? "none"};tried=${triedSeasons.join(",") || "none"};attempts=${attempts.join("||")}`,
         );
         for (const f of fixtures) {
           await upsertFixture(supabase, f);
@@ -103,7 +104,7 @@ export async function runFootballSync(targetDate?: string): Promise<unknown> {
           }
         }
         if (!fixtures.length) {
-          errors.push(`${date}: no-fixtures for seasons=${triedSeasons.join(",")}`);
+          errors.push(`${date}: no-fixtures strategy=${strategyUsed}; seasons=${triedSeasons.join(",")}`);
         }
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
@@ -135,7 +136,7 @@ export async function runFootballSync(targetDate?: string): Promise<unknown> {
       ok: syncOk,
       processed: upserted,
       errorsCount: errors.length,
-      notes: `autoApproveEnabled=${autoApproveEnabled}; autoApproved=${autoApproved}; window=manual_date_or_today; syncDate=${syncDate}; preferredSeason=${currentYear}; fallbackSeasons=2024,2023,2022; ${seasonTraces.join(" | ")}`,
+      notes: `autoApproveEnabled=${autoApproveEnabled}; autoApproved=${autoApproved}; window=manual_date_or_today; syncDate=${syncDate}; preferredSeason=${currentYear}; fallbackSeasons=2024,2023,2022; ${syncTraces.join(" | ")}`,
     });
     return out;
   });
