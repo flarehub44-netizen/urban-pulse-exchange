@@ -7,6 +7,8 @@
 -- ---------------------------------------------------------------------------
 -- Schema
 -- ---------------------------------------------------------------------------
+create extension if not exists pgcrypto;
+
 alter table public.profiles
   add column if not exists banned_at timestamptz,
   add column if not exists ban_reason text,
@@ -108,7 +110,10 @@ immutable
 as $$
   select case
     when public.normalize_cpf_digits(p_document) is null then null
-    else encode(digest(public.normalize_cpf_digits(p_document), 'sha256'), 'hex')
+    else encode(
+      extensions.digest(convert_to(public.normalize_cpf_digits(p_document), 'UTF8'), 'sha256'),
+      'hex'
+    )
   end;
 $$;
 
@@ -1365,25 +1370,29 @@ as $$
 begin
   perform public.assert_admin();
 
-  return coalesce((
-    select jsonb_agg(jsonb_build_object(
-      'user_id', x.user_id,
-      'user_handle', x.user_handle,
-      'user_name', x.user_name,
-      'partner_id', x.partner_id,
-      'partner_handle', x.partner_handle,
-      'partner_slug', x.partner_slug,
-      'qualified_deposit_total', x.qualified_deposit_total,
-      'cpa_paid_at', x.cpa_paid_at,
-      'referred_at', x.referred_at,
-      'flagged', x.flagged,
-      'flag_status', x.flag_status,
-      'flag_risk_score', x.flag_risk_score,
-      'flag_reasons', x.flag_reasons,
-      'cpf_last4', x.cpf_last4,
-      'cpf_duplicate', x.cpf_duplicate
-    ) order by x.referred_at desc), '[]'::jsonb)
-    from (
+  return coalesce(
+    (
+      select jsonb_agg(
+        jsonb_build_object(
+          'user_id', x.user_id,
+          'user_handle', x.user_handle,
+          'user_name', x.user_name,
+          'partner_id', x.partner_id,
+          'partner_handle', x.partner_handle,
+          'partner_slug', x.partner_slug,
+          'qualified_deposit_total', x.qualified_deposit_total,
+          'cpa_paid_at', x.cpa_paid_at,
+          'referred_at', x.referred_at,
+          'flagged', x.flagged,
+          'flag_status', x.flag_status,
+          'flag_risk_score', x.flag_risk_score,
+          'flag_reasons', x.flag_reasons,
+          'cpf_last4', x.cpf_last4,
+          'cpf_duplicate', x.cpf_duplicate
+        )
+        order by x.referred_at desc
+      )
+      from (
       select
         ur.user_id,
         pu.handle as user_handle,
@@ -1415,8 +1424,10 @@ begin
       where not coalesce(p_only_flagged, false) or f.id is not null
       order by ur.created_at desc
       limit greatest(1, least(coalesce(p_limit, 200), 500))
-    ) x
-  ), '[]'::jsonb);
+      ) x
+    ),
+    '[]'::jsonb
+  );
 end;
 $$;
 

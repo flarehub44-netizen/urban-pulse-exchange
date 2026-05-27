@@ -325,9 +325,29 @@ begin
 end;
 $$;
 
-revoke execute on function public.admin_clear_cpa_fraud_cases(boolean) from authenticated;
-revoke execute on function public.admin_suspend_cpa_fraud_partners(uuid) from authenticated;
-revoke execute on function public.admin_delete_cpa_fraud_users(boolean) from authenticated;
+do $$
+begin
+  if to_regprocedure('public.admin_clear_cpa_fraud_cases(boolean)') is not null then
+    execute 'revoke execute on function public.admin_clear_cpa_fraud_cases(boolean) from authenticated';
+  end if;
+end;
+$$;
+
+do $$
+begin
+  if to_regprocedure('public.admin_suspend_cpa_fraud_partners(uuid)') is not null then
+    execute 'revoke execute on function public.admin_suspend_cpa_fraud_partners(uuid) from authenticated';
+  end if;
+end;
+$$;
+
+do $$
+begin
+  if to_regprocedure('public.admin_delete_cpa_fraud_users(boolean)') is not null then
+    execute 'revoke execute on function public.admin_delete_cpa_fraud_users(boolean) from authenticated';
+  end if;
+end;
+$$;
 
 grant execute on function public.admin_clear_cpa_fraud_cases(text, boolean) to authenticated;
 grant execute on function public.admin_suspend_cpa_fraud_partners(text, uuid) to authenticated;
