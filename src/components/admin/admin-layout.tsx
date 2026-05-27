@@ -15,6 +15,7 @@ export function AdminLayout() {
           "/admin",
           "/admin/markets",
           "/admin/football",
+          "/admin/traffic-events",
           "/admin/settlement",
           "/admin/risk",
         ].includes(it.to),
