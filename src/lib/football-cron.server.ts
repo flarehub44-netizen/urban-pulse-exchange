@@ -10,6 +10,8 @@ import { withJobLog, logApiMetric } from "@/lib/structured-log.server";
 let consecutiveSyncFailures = 0;
 const CRON_ALERT_THRESHOLD = 3;
 
+const ISO_DATE_ONLY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
 function getServiceClient(): SupabaseClient {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -57,6 +59,21 @@ async function upsertFixture(supabase: SupabaseClient, f: ApiFootballFixtureDto)
   if (error) throw new Error(error.message);
 }
 
+function parseBaseDate(value: unknown): Date | null {
+  if (typeof value !== "string" || !ISO_DATE_ONLY_RE.test(value)) return null;
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed;
+}
+
+export function computeSeasonFromBaseDate(baseDate: Date): number {
+  return baseDate.getUTCFullYear();
+}
+
+export function resolveSyncBaseDate(value: unknown, now = new Date()): Date {
+  return parseBaseDate(value) ?? now;
+}
+
 export async function runFootballSync(): Promise<unknown> {
   return withJobLog("football_sync", async () => {
     const supabase = getServiceClient();
@@ -88,10 +105,17 @@ export async function runFootballSync(): Promise<unknown> {
       .select("value")
       .eq("key", "football_auto_approve")
       .maybeSingle();
+    const { data: baseDateRow } = await supabase
+      .from("platform_settings")
+      .select("value")
+      .eq("key", "football_sync_base_date")
+      .maybeSingle();
 
     const daysAhead = Number(daysRow?.value ?? 1);
     const daysBack = Number(daysBackRow?.value ?? 1);
     const autoApproveEnabled = autoApproveRow?.value === true;
+    const effectiveBaseDate = resolveSyncBaseDate(baseDateRow?.value);
+    const syncSeason = computeSeasonFromBaseDate(effectiveBaseDate);
     const dates: string[] = [];
     for (let i = -daysBack; i <= daysAhead; i++) {
       const d = new Date();
@@ -110,7 +134,7 @@ export async function runFootballSync(): Promise<unknown> {
 
     for (const date of dates) {
       try {
-        const fixtures = await getFixturesByDate(date, leagueIds);
+        const fixtures = await getFixturesByDate(date, leagueIds, syncSeason);
         for (const f of fixtures) {
           await upsertFixture(supabase, f);
           upserted++;
@@ -153,7 +177,7 @@ export async function runFootballSync(): Promise<unknown> {
       ok: syncOk,
       processed: upserted,
       errorsCount: errors.length,
-      notes: `autoApproveEnabled=${autoApproveEnabled}; autoApproved=${autoApproved}; window=-${daysBack}/+${daysAhead}`,
+      notes: `autoApproveEnabled=${autoApproveEnabled}; autoApproved=${autoApproved}; window=-${daysBack}/+${daysAhead}; baseDate=${formatDateYmd(effectiveBaseDate)}; season=${syncSeason}`,
     });
     return out;
   });

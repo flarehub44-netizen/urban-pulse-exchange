@@ -116,12 +116,15 @@ export function mapFixtureItem(item: ApiFixtureItem): ApiFootballFixtureDto {
 export async function getFixturesByDate(
   date: string,
   leagueIds: number[],
+  season: number,
 ): Promise<ApiFootballFixtureDto[]> {
   const out: ApiFootballFixtureDto[] = [];
+  const seasonParam = String(Math.trunc(season));
   for (const leagueId of leagueIds) {
     const items = await apiGet<ApiFixtureItem>("/fixtures", {
       date,
       league: String(leagueId),
+      season: seasonParam,
     });
     for (const item of items) {
       out.push(mapFixtureItem(item));

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { adminBanCpaFraudUsersFn } from "@/actions/admin-risk";
 
 type OpsRunStatus = {
   at: string;
@@ -169,6 +170,176 @@ export function useAdminRiskAlerts(enabled = true) {
   });
 }
 
+export type AdminCpaFraudCase = {
+  flag_id: number;
+  user_id: string;
+  user_handle: string;
+  user_name: string;
+  partner_id: string | null;
+  partner_handle: string | null;
+  partner_slug: string | null;
+  qualified_deposit_total: number;
+  cpa_paid_at: string | null;
+  status: "open" | "confirmed" | "cleared" | "resolved";
+  risk_score: number;
+  reasons: string[];
+  notes: string | null;
+  is_cpa_counted: boolean;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type AdminCpaReferral = {
+  user_id: string;
+  user_handle: string;
+  user_name: string;
+  partner_id: string;
+  partner_handle: string | null;
+  partner_slug: string | null;
+  qualified_deposit_total: number;
+  cpa_paid_at: string | null;
+  flagged: boolean;
+  flag_status: string | null;
+  flag_risk_score: number | null;
+  flag_reasons: string[];
+  cpf_last4: string | null;
+  cpf_duplicate: boolean;
+};
+
+export function useAdminCpaFraudCases(status?: string) {
+  return useQuery({
+    queryKey: ["admin", "cpa-fraud-cases", status ?? "all"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_list_cpa_fraud_cases", {
+        p_status: status ?? null,
+        p_limit: 250,
+      });
+      if (error) throw error;
+      return (data ?? []) as AdminCpaFraudCase[];
+    },
+  });
+}
+
+export function useAdminCpaReferrals(onlyFlagged = false) {
+  return useQuery({
+    queryKey: ["admin", "cpa-referrals", onlyFlagged],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_list_cpa_referrals", {
+        p_only_flagged: onlyFlagged,
+        p_limit: 250,
+      });
+      if (error) throw error;
+      return (data ?? []) as AdminCpaReferral[];
+    },
+  });
+}
+
+export function useAdminTagCpaFraudCase() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      partnerId,
+      status,
+      riskScore,
+      reasons,
+      notes,
+    }: {
+      userId: string;
+      partnerId?: string | null;
+      status?: "open" | "confirmed" | "cleared" | "resolved";
+      riskScore?: number;
+      reasons?: string[];
+      notes?: string;
+    }) => {
+      const { data, error } = await supabase.rpc("admin_tag_cpa_fraud_case", {
+        p_user_id: userId,
+        p_partner_id: partnerId ?? null,
+        p_status: status ?? "open",
+        p_risk_score: riskScore ?? 60,
+        p_reasons: reasons ?? [],
+        p_notes: notes ?? null,
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "cpa-fraud-cases"] });
+      qc.invalidateQueries({ queryKey: ["admin", "cpa-referrals"] });
+      qc.invalidateQueries({ queryKey: ["admin", "actions-log"] });
+    },
+  });
+}
+
+export function useAdminClearCpaFraudCases() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ actionNote }: { actionNote: string }) => {
+      const { data, error } = await supabase.rpc("admin_clear_cpa_fraud_cases", {
+        p_action_note: actionNote,
+        p_only_confirmed: true,
+      });
+      if (error) throw error;
+      return data as { ok: boolean; reversed_cases: number; reversed_total: number };
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "cpa-fraud-cases"] });
+      qc.invalidateQueries({ queryKey: ["admin", "cpa-referrals"] });
+      qc.invalidateQueries({ queryKey: ["admin", "active-partners"] });
+      qc.invalidateQueries({ queryKey: ["admin", "actions-log"] });
+    },
+  });
+}
+
+export function useAdminSuspendCpaFraudPartners() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      actionNote,
+      partnerId,
+    }: {
+      actionNote: string;
+      partnerId?: string | null;
+    }) => {
+      const { data, error } = await supabase.rpc("admin_suspend_cpa_fraud_partners", {
+        p_action_note: actionNote,
+        p_partner_id: partnerId ?? null,
+      });
+      if (error) throw error;
+      return data as { ok: boolean; updated_partners: number };
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "cpa-fraud-cases"] });
+      qc.invalidateQueries({ queryKey: ["admin", "active-partners"] });
+      qc.invalidateQueries({ queryKey: ["admin", "actions-log"] });
+    },
+  });
+}
+
+export function useAdminBanCpaFraudUsers() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ actionNote }: { actionNote: string }) => {
+      return (await adminBanCpaFraudUsersFn({ data: { actionNote } })) as {
+        ok: boolean;
+        banned_users: number;
+        auth_ban_failed: string[];
+      };
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "cpa-fraud-cases"] });
+      qc.invalidateQueries({ queryKey: ["admin", "cpa-referrals"] });
+      qc.invalidateQueries({ queryKey: ["admin", "users"] });
+      qc.invalidateQueries({ queryKey: ["admin", "actions-log"] });
+    },
+  });
+}
+
+/** @deprecated Use useAdminBanCpaFraudUsers — mantido como alias */
+export const useAdminDeleteCpaFraudUsers = useAdminBanCpaFraudUsers;
+
 export function useAdminPlatformSettings(enabled = true) {
   return useQuery({
     queryKey: ["admin", "platform-settings"],
@@ -185,21 +356,23 @@ export function useAdminMarketOpsStatus(enabled = true) {
   return useQuery({
     queryKey: ["admin", "market-ops-status"],
     queryFn: async () => {
-      const [{ data: settingsRows, error: settingsError }, { data: overview, error: overviewError }] =
-        await Promise.all([
-          supabase
-            .from("platform_settings")
-            .select("key, value")
-            .in("key", [
-              "football_enabled",
-              "football_betting_close_minutes",
-              "football_sync_days_back",
-              "football_sync_days_ahead",
-              "football_last_sync_run",
-              "football_last_resolve_run",
-            ]),
-          supabase.rpc("admin_get_events_hub_overview"),
-        ]);
+      const [
+        { data: settingsRows, error: settingsError },
+        { data: overview, error: overviewError },
+      ] = await Promise.all([
+        supabase
+          .from("platform_settings")
+          .select("key, value")
+          .in("key", [
+            "football_enabled",
+            "football_betting_close_minutes",
+            "football_sync_days_back",
+            "football_sync_days_ahead",
+            "football_last_sync_run",
+            "football_last_resolve_run",
+          ]),
+        supabase.rpc("admin_get_events_hub_overview"),
+      ]);
 
       if (settingsError) throw settingsError;
       if (overviewError) throw overviewError;
@@ -421,13 +594,7 @@ export type AdminActivePartner = {
 export function useAdminSetPartnerSubCreators() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({
-      userId,
-      enabled,
-    }: {
-      userId: string;
-      enabled: boolean;
-    }) => {
+    mutationFn: async ({ userId, enabled }: { userId: string; enabled: boolean }) => {
       const { data, error } = await supabase.rpc("admin_set_partner_sub_creators", {
         p_user_id: userId,
         p_enabled: enabled,

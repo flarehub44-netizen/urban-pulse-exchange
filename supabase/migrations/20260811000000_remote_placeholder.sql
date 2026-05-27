@@ -1,0 +1,2 @@
+-- Placeholder migration kept to match remote migration history.
+-- Intentionally no-op.

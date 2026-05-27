@@ -169,6 +169,7 @@ export function useFootballLeagueSettings() {
           "football_league_ids",
           "football_sync_days_back",
           "football_sync_days_ahead",
+          "football_sync_base_date",
           "football_betting_close_minutes",
           "football_auto_approve",
         ]);
@@ -179,6 +180,8 @@ export function useFootballLeagueSettings() {
         leagueIds: (map.football_league_ids as number[] | undefined) ?? [71],
         syncDaysBack: Number(map.football_sync_days_back ?? 1),
         syncDaysAhead: Number(map.football_sync_days_ahead ?? 1),
+        syncBaseDate:
+          typeof map.football_sync_base_date === "string" ? map.football_sync_base_date : "",
         bettingCloseMinutes: Number(map.football_betting_close_minutes ?? 5),
         autoApprove: Boolean(map.football_auto_approve ?? false),
       };
@@ -218,6 +221,7 @@ export function useUpdateFootballSettings() {
       leagueIds: number[];
       syncDaysBack: number;
       syncDaysAhead: number;
+      syncBaseDate: string;
       bettingCloseMinutes: number;
       autoApprove: boolean;
     }) => {
@@ -225,6 +229,7 @@ export function useUpdateFootballSettings() {
       await update.mutateAsync({ key: "football_league_ids", value: input.leagueIds });
       await update.mutateAsync({ key: "football_sync_days_back", value: input.syncDaysBack });
       await update.mutateAsync({ key: "football_sync_days_ahead", value: input.syncDaysAhead });
+      await update.mutateAsync({ key: "football_sync_base_date", value: input.syncBaseDate });
       await update.mutateAsync({ key: "football_auto_approve", value: input.autoApprove });
       await update.mutateAsync({
         key: "football_betting_close_minutes",

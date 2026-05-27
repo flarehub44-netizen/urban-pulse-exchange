@@ -21,6 +21,9 @@ export function useMyPartnerStatus(enabled = true) {
 
 export type PartnerOverview = {
   balance: number;
+  pending_balance?: number;
+  cpa_pending?: number;
+  cpa_next_release_at?: string | null;
   tier: string;
   slug: string;
   referrals: number;

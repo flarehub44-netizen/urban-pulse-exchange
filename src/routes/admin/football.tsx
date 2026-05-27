@@ -47,6 +47,7 @@ function AdminFootballPage() {
   const [leagueIdsText, setLeagueIdsText] = useState("71");
   const [syncDaysBack, setSyncDaysBack] = useState("1");
   const [syncDays, setSyncDays] = useState("7");
+  const [syncBaseDate, setSyncBaseDate] = useState("");
   const [closeMinutes, setCloseMinutes] = useState("5");
   const [autoApprove, setAutoApprove] = useState(false);
 
@@ -56,6 +57,7 @@ function AdminFootballPage() {
     setLeagueIdsText(settings.leagueIds.join(", "));
     setSyncDaysBack(String(settings.syncDaysBack));
     setSyncDays(String(settings.syncDaysAhead));
+    setSyncBaseDate(settings.syncBaseDate || format(new Date(), "yyyy-MM-dd"));
     setCloseMinutes(String(settings.bettingCloseMinutes));
     setAutoApprove(settings.autoApprove);
   }, [settings]);
@@ -303,6 +305,21 @@ function AdminFootballPage() {
 
           <label className="block">
             <span className="text-xs text-muted-foreground">
+              {copy.admin.football.syncBaseDateLabel}
+            </span>
+            <input
+              type="date"
+              value={syncBaseDate}
+              onChange={(e) => setSyncBaseDate(e.target.value)}
+              className="mt-1 w-full rounded-lg border bg-surface px-3 py-2 text-sm"
+            />
+            <span className="text-[10px] text-muted-foreground">
+              {copy.admin.football.syncBaseDateHint}
+            </span>
+          </label>
+
+          <label className="block">
+            <span className="text-xs text-muted-foreground">
               {copy.admin.football.closeMinutesLabel}
             </span>
             <input
@@ -325,6 +342,7 @@ function AdminFootballPage() {
                   leagueIds: parseLeagueIds(),
                   syncDaysBack: Number(syncDaysBack),
                   syncDaysAhead: Number(syncDays),
+                  syncBaseDate,
                   bettingCloseMinutes: Number(closeMinutes),
                   autoApprove,
                 });

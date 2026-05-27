@@ -15,6 +15,26 @@ type ResolveResult = {
   target?: { path?: string; market_id?: string; city?: string };
 };
 
+async function buildClientIpHash(seed: string): Promise<string | undefined> {
+  if (typeof window === "undefined" || !window.crypto?.subtle) return undefined;
+  try {
+    const raw = [
+      seed,
+      navigator.userAgent ?? "",
+      navigator.language ?? "",
+      Intl.DateTimeFormat().resolvedOptions().timeZone ?? "",
+    ].join("|");
+    const bytes = new TextEncoder().encode(raw);
+    const digest = await window.crypto.subtle.digest("SHA-256", bytes);
+    const hex = Array.from(new Uint8Array(digest))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+    return hex;
+  } catch {
+    return undefined;
+  }
+}
+
 function PartnerRedirectPage() {
   const { slug } = Route.useParams();
   const navigate = useNavigate();
@@ -23,10 +43,11 @@ function PartnerRedirectPage() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      const ipHash = await buildClientIpHash(slug);
       const { data, error: rpcErr } = await supabase.rpc("track_partner_click", {
         p_slug: slug,
         p_campaign_id: undefined,
-        p_ip_hash: undefined,
+        p_ip_hash: ipHash,
       });
       if (cancelled) return;
       if (rpcErr) {

@@ -36,6 +36,11 @@ export type SyncPayWebhookPayload = {
       name?: string;
       document?: string;
     };
+    /** Cash-in Pix: documento do pagador (CPF/CNPJ) */
+    debtor_account?: {
+      name?: string;
+      document?: string;
+    };
   };
 };
 

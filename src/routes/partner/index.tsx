@@ -24,6 +24,9 @@ function PartnerOverviewPage() {
     d: new Date(p.day).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }),
     v: Number(p.amount),
   }));
+  const nextRelease = o.cpa_next_release_at
+    ? new Date(o.cpa_next_release_at).toLocaleDateString("pt-BR")
+    : "—";
 
   return (
     <div className="space-y-6">
@@ -78,6 +81,17 @@ function PartnerOverviewPage() {
           value={o.conversion_rate}
           format={(n) => `${n}%`}
         />
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <PartnerStatCard
+          label={copy.partner.stats.cpaPending}
+          value={Number(o.cpa_pending ?? o.pending_balance ?? 0)}
+          format={formatBRL}
+        />
+        <div className="rounded-xl border bg-card/60 p-4">
+          <p className="text-xs text-muted-foreground">{copy.partner.stats.cpaNextRelease}</p>
+          <p className="mt-1 text-lg font-semibold">{nextRelease}</p>
+        </div>
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="rounded-xl border bg-card/60 p-4">

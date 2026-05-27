@@ -2972,6 +2972,18 @@ export type Database = {
         Returns: Json;
       };
       admin_delete_daily_poll: { Args: { p_id: string }; Returns: Json };
+      admin_ban_cpa_fraud_users: {
+        Args: { p_action_note: string; p_only_confirmed?: boolean };
+        Returns: Json;
+      };
+      admin_delete_cpa_fraud_users: {
+        Args: { p_action_note: string; p_only_confirmed?: boolean };
+        Returns: Json;
+      };
+      partner_release_mature_cpa: {
+        Args: { p_partner_id?: string };
+        Returns: Json;
+      };
       admin_delete_partner_event: { Args: { p_id: number }; Returns: Json };
       admin_delete_platform_event: { Args: { p_id: string }; Returns: Json };
       admin_extend_market: {
@@ -2994,6 +3006,14 @@ export type Database = {
       admin_list_active_partners: { Args: never; Returns: Json };
       admin_list_cameras: { Args: never; Returns: Json };
       admin_list_daily_polls: { Args: { p_limit?: number }; Returns: Json };
+      admin_list_cpa_fraud_cases: {
+        Args: { p_limit?: number; p_status?: string };
+        Returns: Json;
+      };
+      admin_list_cpa_referrals: {
+        Args: { p_limit?: number; p_only_flagged?: boolean };
+        Returns: Json;
+      };
       admin_list_football_drafts: {
         Args: { p_limit?: number };
         Returns: Json[];
@@ -3050,7 +3070,26 @@ export type Database = {
         Args: { p_frozen: boolean; p_market_id: string; p_note?: string };
         Returns: Json;
       };
+      admin_suspend_cpa_fraud_partners: {
+        Args: { p_action_note: string; p_partner_id?: string };
+        Returns: Json;
+      };
+      admin_tag_cpa_fraud_case: {
+        Args: {
+          p_notes?: string;
+          p_partner_id?: string;
+          p_reasons?: Json;
+          p_risk_score?: number;
+          p_status?: string;
+          p_user_id: string;
+        };
+        Returns: Json;
+      };
       admin_trigger_lifecycle: { Args: never; Returns: Json };
+      admin_clear_cpa_fraud_cases: {
+        Args: { p_action_note: string; p_only_confirmed?: boolean };
+        Returns: Json;
+      };
       admin_update_kyc_status: {
         Args: { p_notes?: string; p_status: string; p_user_id: string };
         Returns: Json;
