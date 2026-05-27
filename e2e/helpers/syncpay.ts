@@ -26,3 +26,35 @@ export function buildPaymentReceivedPayload(opts: { providerId: string; amount: 
     },
   };
 }
+
+export function buildPayoutCompletedPayload(opts: {
+  providerId: string;
+  amount: number;
+  correlationId?: string;
+}) {
+  return {
+    event: "PAYOUT_COMPLETED" as const,
+    data: {
+      id: opts.providerId,
+      status: "COMPLETED",
+      amount: opts.amount,
+      correlation_id: opts.correlationId,
+    },
+  };
+}
+
+export function buildPayoutFailedPayload(opts: {
+  providerId: string;
+  amount: number;
+  correlationId?: string;
+}) {
+  return {
+    event: "PAYOUT_FAILED" as const,
+    data: {
+      id: opts.providerId,
+      status: "FAILED",
+      amount: opts.amount,
+      correlation_id: opts.correlationId,
+    },
+  };
+}

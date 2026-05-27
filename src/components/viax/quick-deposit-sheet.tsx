@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import { Copy, QrCode, Clock, Wallet, Gift } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { initiateDepositFn, getDepositStatusFn } from "@/actions/payments";
+import { PIX_MIN_AMOUNT_BRL } from "@/lib/pix-payments";
+import { copy } from "@/copy/pt-BR";
 import { ImpulseDepositChips } from "@/components/viax/impulse-deposit-bar";
 
 import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
@@ -14,7 +16,6 @@ import { RegisterRequiredCta } from "@/components/auth/register-required-cta";
 import { trackDepositFunnel } from "@/lib/deposit-funnel";
 import { getLastImpulseAmount, setLastImpulseAmount } from "@/lib/impulse-deposit";
 import { getStoredPartnerRef } from "@/lib/partner-attribution";
-import { copy } from "@/copy/pt-BR";
 import { invalidateWalletQueries } from "@/lib/query-invalidation";
 import { CpfCaptureSheet } from "@/components/viax/cpf-capture-sheet";
 import { useEnsureCpfForPix } from "@/hooks/use-ensure-cpf-for-pix";
@@ -115,8 +116,8 @@ export function QuickDepositSheet({
 
   const handleGenerate = () => {
     const amt = Number(amount);
-    if (!amt || amt < 1) {
-      toast.error("Informe um valor válido.");
+    if (!amt || amt < PIX_MIN_AMOUNT_BRL) {
+      toast.error(copy.wallet.pixAmountHint);
       return;
     }
     setLastImpulseAmount(amt);

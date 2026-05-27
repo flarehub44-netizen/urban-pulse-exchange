@@ -312,6 +312,16 @@ export const copy = {
       "Use o CPF da conta que fará o Pix. Se o pagador usar outro CPF, o valor entra na carteira, mas a equipe recebe um alerta para revisão.",
     cpfSaveContinue: "Salvar e continuar",
     cpfSaved: "CPF cadastrado. Você já pode usar Pix.",
+    withdrawPending: "Saque em processamento — aguardando confirmação do Pix.",
+    withdrawPaid: (amount: string) => `Saque de ${amount} transferido para sua chave Pix.`,
+    withdrawFailed: "Não foi possível concluir o saque. O saldo foi estornado.",
+    pixAmountHint: "Valor mínimo: R$ 10 · máximo: R$ 5.000",
+    withdrawMinHint: "Valor mínimo: R$ 10 · máximo: R$ 5.000",
+    withdrawKycHint: "Saques acima de R$ 100 exigem verificação de identidade (KYC).",
+    withdrawKycTitle: "Verificação necessária",
+    withdrawKycBody: "Para sacar acima de R$ 100, aguarde a aprovação do KYC pela equipe ViaX.",
+    pixWithdrawNote:
+      "O valor é reservado ao solicitar. A transferência Pix é confirmada em instantes ou até 1 dia útil.",
   },
 
   positions: {
@@ -910,6 +920,8 @@ export const copy = {
       approved: "Jogo aprovado — mercado em rascunho.",
       rejected: "Jogo rejeitado.",
       published: "Mercado publicado — apostas abertas.",
+      publishedClosed:
+        "Mercado publicado sem apostas (kickoff/janela já passou). Use Liquidar quando o jogo finalizar.",
       enabledLabel: "Ativo",
       autoApproveLabel: "Aprovar automaticamente após sync",
       autoApproveHint:

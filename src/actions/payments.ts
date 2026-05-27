@@ -5,6 +5,7 @@ import { requireRegisteredAuth } from "@/integrations/supabase/require-registere
 import { getSupabaseCtx } from "@/integrations/supabase/context";
 import { createClient } from "@supabase/supabase-js";
 import { createPixCharge, createPixPayout } from "@/lib/syncpay";
+import { PIX_MIN_AMOUNT_BRL } from "@/lib/pix-payments";
 import { formatBRL } from "@/lib/parimutuel";
 import { logApiMetric } from "@/lib/structured-log.server";
 
@@ -16,10 +17,10 @@ function getServiceClient() {
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }
 
-async function requireUserCpfDigits(service: ReturnType<typeof getServiceClient>, userId: string) {
+async function requireUserPixProfile(service: ReturnType<typeof getServiceClient>, userId: string) {
   const { data: profile, error } = await service
     .from("profiles")
-    .select("cpf")
+    .select("cpf, name")
     .eq("id", userId)
     .single();
 
@@ -30,15 +31,18 @@ async function requireUserCpfDigits(service: ReturnType<typeof getServiceClient>
     throw new Error("Cadastre um CPF válido no perfil para usar Pix.");
   }
 
-  return cpfDigits;
+  return {
+    cpfDigits,
+    name: String(profile?.name ?? "").trim() || "ViaX",
+  };
 }
 
 const depositSchema = z.object({
-  amount: z.number().positive().max(500_000),
+  amount: z.number().min(PIX_MIN_AMOUNT_BRL).max(500_000),
 });
 
 const withdrawSchema = z.object({
-  amount: z.number().positive().max(500_000),
+  amount: z.number().min(PIX_MIN_AMOUNT_BRL).max(500_000),
   pixKey: z.string().min(1),
 });
 
@@ -55,7 +59,7 @@ export const initiateDepositFn = createServerFn({ method: "POST" })
     const service = getServiceClient();
 
     try {
-      const cpfDigits = await requireUserCpfDigits(service, userId);
+      const { cpfDigits } = await requireUserPixProfile(service, userId);
 
       // 1. Criar o intent no banco (status: pending)
       const { data: intent, error: intentErr } = await service
@@ -129,7 +133,7 @@ export const initiateWithdrawFn = createServerFn({ method: "POST" })
     const service = getServiceClient();
 
     try {
-      await requireUserCpfDigits(service, userId);
+      const { cpfDigits, name } = await requireUserPixProfile(service, userId);
 
       // RPC cria o intent + reserva o saldo + aplica KYC gate
       const { data: result, error } = await supabase.rpc("request_withdrawal", {
@@ -139,6 +143,7 @@ export const initiateWithdrawFn = createServerFn({ method: "POST" })
 
       if (error) throw new Error(error.message);
       const parsed = result as { intent_id: string; balance: number };
+      let providerId: string | undefined;
 
       try {
         const payout = await createPixPayout({
@@ -146,6 +151,8 @@ export const initiateWithdrawFn = createServerFn({ method: "POST" })
           pixKey: data.pixKey,
           correlationId: parsed.intent_id,
           description: `Saque ViaX — ${formatBRL(data.amount)}`,
+          document: cpfDigits,
+          beneficiaryName: name,
         });
         console.info("[SyncPay] payout created", {
           intentId: parsed.intent_id,
@@ -166,6 +173,7 @@ export const initiateWithdrawFn = createServerFn({ method: "POST" })
         if (updateErr) {
           throw new Error(updateErr.message);
         }
+        providerId = payout.id;
       } catch (payoutErr) {
         // Se falhar ao criar payout no provider, estorna a reserva imediatamente.
         await service.rpc("service_refund_withdrawal", {
@@ -189,9 +197,48 @@ export const initiateWithdrawFn = createServerFn({ method: "POST" })
       }
 
       logApiMetric("bff.initiate_withdraw", { ok: true, durationMs: Date.now() - started });
-      return parsed;
+      return {
+        intentId: parsed.intent_id,
+        balance: parsed.balance,
+        providerId,
+      };
     } catch (e) {
       logApiMetric("bff.initiate_withdraw", { ok: false, durationMs: Date.now() - started });
+      throw e;
+    }
+  });
+
+/**
+ * Busca o status de um intent de saque Pix (polling na UI).
+ */
+export const getWithdrawStatusFn = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ intentId: z.string().uuid() }))
+  .handler(async ({ data, context }) => {
+    const started = Date.now();
+    const { userId } = getSupabaseCtx(context);
+    const service = getServiceClient();
+
+    try {
+      const { data: intent, error } = await service
+        .from("payment_intents")
+        .select("id, status, amount, type, created_at")
+        .eq("id", data.intentId)
+        .eq("user_id", userId)
+        .eq("type", "withdraw")
+        .single();
+
+      if (error || !intent) throw new Error("Saque não encontrado");
+
+      logApiMetric("bff.get_withdraw_status", { ok: true, durationMs: Date.now() - started });
+      return intent as {
+        id: string;
+        status: "pending" | "paid" | "failed" | "expired";
+        amount: number;
+        created_at: string;
+      };
+    } catch (e) {
+      logApiMetric("bff.get_withdraw_status", { ok: false, durationMs: Date.now() - started });
       throw e;
     }
   });

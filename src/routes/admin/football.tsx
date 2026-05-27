@@ -27,12 +27,29 @@ export const Route = createFileRoute("/admin/football")({
 type Tab = "pending" | "drafts" | "published" | "settings";
 
 function getErrorMessage(error: unknown) {
-  if (error instanceof Error && error.message) return error.message;
-  if (error && typeof error === "object" && "message" in error) {
+  let raw: string | null = null;
+  if (error instanceof Error && error.message) raw = error.message;
+  else if (error && typeof error === "object" && "message" in error) {
     const message = (error as { message?: unknown }).message;
-    if (typeof message === "string" && message.trim()) return message;
+    if (typeof message === "string" && message.trim()) raw = message;
   }
-  return null;
+  if (!raw) return null;
+  if (/kickoff already passed/i.test(raw)) {
+    return "O kickoff já passou — atualize o banco (db:push) ou tente novamente.";
+  }
+  return raw;
+}
+
+type PublishFootballResult = {
+  betting_window_open?: boolean;
+  accept_bets?: boolean;
+};
+
+function publishSuccessMessage(data: unknown) {
+  const result = data as PublishFootballResult | null;
+  const windowOpen = result?.betting_window_open ?? result?.accept_bets;
+  if (windowOpen === false) return copy.admin.football.publishedClosed;
+  return copy.admin.football.published;
 }
 
 function AdminFootballPage() {
@@ -214,8 +231,8 @@ function AdminFootballPage() {
                 disabled={publish.isPending || deleteMarket.isPending}
                 onClick={async () => {
                   try {
-                    await publish.mutateAsync(row.market_id);
-                    toast.success(copy.admin.football.published);
+                    const result = await publish.mutateAsync(row.market_id);
+                    toast.success(publishSuccessMessage(result));
                   } catch (e) {
                     toast.error(getErrorMessage(e) ?? "Não foi possível publicar o jogo.");
                   }

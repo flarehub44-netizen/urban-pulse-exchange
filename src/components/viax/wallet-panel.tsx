@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useViaX } from "@/store/viax-store";
 import { toast } from "sonner";
@@ -7,11 +7,17 @@ import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
 import { useCasinoQuickDeposit } from "@/hooks/use-casino-spin";
 import { ImpulseDepositChips } from "@/components/viax/impulse-deposit-bar";
 import { setLastImpulseAmount } from "@/lib/impulse-deposit";
-import { initiateDepositFn, initiateWithdrawFn, getDepositStatusFn } from "@/actions/payments";
+import {
+  initiateDepositFn,
+  initiateWithdrawFn,
+  getDepositStatusFn,
+  getWithdrawStatusFn,
+} from "@/actions/payments";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import { Copy, QrCode, Clock } from "lucide-react";
 import { copy } from "@/copy/pt-BR";
 import { useBalanceSeries } from "@/hooks/use-balance-series";
-import { useAuth } from "@/hooks/use-auth";
 import { RegisterRequiredCta } from "@/components/auth/register-required-cta";
 import { PaymentInfoBanner } from "@/components/viax/simulated-money-banner";
 import { useBets } from "@/hooks/use-bets";
@@ -31,6 +37,7 @@ import { trackProductEvent } from "@/lib/product-analytics";
 import { AppLoadingSkeleton } from "@/components/viax/app-loading-skeleton";
 import { CpfCaptureSheet } from "@/components/viax/cpf-capture-sheet";
 import { useEnsureCpfForPix } from "@/hooks/use-ensure-cpf-for-pix";
+import { PIX_MIN_AMOUNT_BRL } from "@/lib/pix-payments";
 
 const WalletBalanceChart = lazy(() =>
   import("@/components/viax/wallet-balance-chart").then((m) => ({
@@ -57,7 +64,7 @@ export function WalletPanel({
   initialTab?: WalletTab;
 }) {
   const navigate = useNavigate();
-  const { isRegistered } = useAuth();
+  const { isRegistered, userId } = useAuth();
   const { me } = useResolvedProfile();
   const { transactions: tx } = useResolvedTransactions();
   const { data: bets } = useBets();
@@ -74,6 +81,12 @@ export function WalletPanel({
     expiresAt: string;
   } | null>(null);
   const [depositDone, setDepositDone] = useState(false);
+  const [withdrawPending, setWithdrawPending] = useState<{
+    intentId: string;
+    providerId?: string;
+    amount: number;
+  } | null>(null);
+  const pixPrefilledRef = useRef(false);
   const { enabled: casinoEnabled } = useCasinoEnabled();
   const queryClient = useQueryClient();
   const pixCpf = useEnsureCpfForPix();
@@ -124,16 +137,21 @@ export function WalletPanel({
   const withdrawMut = useMutation({
     mutationFn: ({ amount, pixKey: pk }: { amount: number; pixKey: string }) =>
       initiateWithdrawFn({ data: { amount, pixKey: pk } }),
-    onSuccess: () => {
+    onSuccess: (res, vars) => {
+      setWithdrawPending({
+        intentId: res.intentId,
+        providerId: res.providerId,
+        amount: vars.amount,
+      });
       queryClient.invalidateQueries({ queryKey: ["me"] });
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      toast.success("Saque solicitado! O valor será transferido em instantes.");
+      toast.success(copy.wallet.withdrawPending);
     },
     onError: (err) => {
       const msg = err instanceof Error ? err.message : "Saque falhou.";
       if (msg.includes("kyc_required")) {
-        toast.error("Verificação necessária", {
-          description: "Complete o KYC para sacar acima de 100 BRL.",
+        toast.error(copy.wallet.withdrawKycTitle, {
+          description: copy.wallet.withdrawKycBody,
         });
       } else if (msg.toLowerCase().includes("cpf")) {
         pixCpf.setSheetOpen(true);
@@ -142,6 +160,26 @@ export function WalletPanel({
       }
     },
   });
+
+  useEffect(() => {
+    if (tab !== "withdraw" || !userId || pixPrefilledRef.current) return;
+    let cancelled = false;
+    void (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("pix_key, cpf")
+        .eq("id", userId)
+        .maybeSingle();
+      if (cancelled || !data) return;
+      const saved = String(data.pix_key ?? "").trim();
+      const cpf = String(data.cpf ?? "").replace(/\D/g, "");
+      setPixKey((prev) => prev.trim() || saved || (cpf.length === 11 ? cpf : ""));
+      pixPrefilledRef.current = true;
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [tab, userId]);
 
   // Polling: verifica se o depósito foi confirmado (a cada 5s enquanto QR exibido)
   useEffect(() => {
@@ -170,6 +208,32 @@ export function WalletPanel({
     }, 5000);
     return () => clearInterval(interval);
   }, [depositQr, depositDone, queryClient]);
+
+  useEffect(() => {
+    if (!withdrawPending) return;
+    const interval = setInterval(async () => {
+      try {
+        const status = await getWithdrawStatusFn({
+          data: { intentId: withdrawPending.intentId },
+        });
+        if (status.status === "paid") {
+          setWithdrawPending(null);
+          queryClient.invalidateQueries({ queryKey: ["me"] });
+          queryClient.invalidateQueries({ queryKey: ["transactions"] });
+          toast.success(copy.wallet.withdrawPaid(formatBRL(status.amount)));
+        } else if (status.status === "failed") {
+          setWithdrawPending(null);
+          queryClient.invalidateQueries({ queryKey: ["me"] });
+          queryClient.invalidateQueries({ queryKey: ["transactions"] });
+          toast.error(copy.wallet.withdrawFailed);
+        }
+      } catch {
+        /* silencioso */
+      }
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [withdrawPending, queryClient]);
+
   const quickDeposit = useCasinoQuickDeposit();
 
   const balanceSeries = useBalanceSeries(tx);
@@ -368,9 +432,24 @@ export function WalletPanel({
                 Cancelar e gerar novo código
               </button>
             </div>
+          ) : tab === "withdraw" && withdrawPending ? (
+            <div className="space-y-3 text-center">
+              <span
+                data-testid="withdraw-intent-id"
+                data-provider-id={withdrawPending.providerId ?? ""}
+                className="sr-only"
+              >
+                {withdrawPending.intentId}
+              </span>
+              <p className="text-sm text-muted-foreground">{copy.wallet.withdrawPending}</p>
+              <p className="text-[11px] text-muted-foreground">{copy.wallet.pixWithdrawNote}</p>
+            </div>
           ) : (
             <>
               {tab === "deposit" && <PaymentInfoBanner context="wallet" className="mb-1" />}
+              {tab === "withdraw" && (
+                <p className="text-[11px] text-muted-foreground">{copy.wallet.pixWithdrawNote}</p>
+              )}
 
               {tab === "deposit" && casinoEnabled && (
                 <div className="space-y-2">
@@ -392,13 +471,14 @@ export function WalletPanel({
                 <div className="mt-1 flex items-center gap-2 rounded-xl border bg-surface px-3 py-2">
                   <input
                     type="number"
-                    min={1}
+                    min={PIX_MIN_AMOUNT_BRL}
                     value={walletAmount}
                     onChange={(e) => setWalletAmount(e.target.value)}
                     className="w-full bg-transparent mono text-lg outline-none"
                   />
                   <span className="shrink-0 text-muted-foreground text-sm">BRL</span>
                 </div>
+                <p className="mt-1 text-[11px] text-muted-foreground">{copy.wallet.pixAmountHint}</p>
               </div>
 
               {tab === "withdraw" && (
@@ -414,9 +494,7 @@ export function WalletPanel({
                     className="mt-1 w-full rounded-xl border bg-surface px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
                   />
                   {Number(walletAmount) > 100 && (
-                    <p className="mt-1 text-[11px] text-warn">
-                      Saques acima de 100 BRL exigem verificação de identidade (KYC).
-                    </p>
+                    <p className="mt-1 text-[11px] text-warn">{copy.wallet.withdrawKycHint}</p>
                   )}
                 </div>
               )}
@@ -426,8 +504,8 @@ export function WalletPanel({
                 disabled={depositMut.isPending || withdrawMut.isPending}
                 onClick={async () => {
                   const amount = Number(walletAmount);
-                  if (!amount || amount <= 0) {
-                    toast.error("Informe um valor válido.");
+                  if (!amount || amount < PIX_MIN_AMOUNT_BRL) {
+                    toast.error(copy.wallet.pixAmountHint);
                     return;
                   }
                   const runPix = () => {
@@ -445,7 +523,7 @@ export function WalletPanel({
                 }}
                 className={cn(
                   "w-full rounded-xl px-4 py-3 font-medium disabled:opacity-50",
-                  tab === "Depositar" ? "bg-up text-up-foreground" : "bg-down text-down-foreground",
+                  tab === "deposit" ? "bg-up text-up-foreground" : "bg-down text-down-foreground",
                 )}
               >
                 {depositMut.isPending || withdrawMut.isPending

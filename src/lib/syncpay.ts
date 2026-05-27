@@ -141,15 +141,21 @@ export async function createPixPayout(opts: {
   pixKey: string;
   correlationId: string;
   description?: string;
+  document?: string;
+  beneficiaryName?: string;
 }): Promise<PixPayoutResponse> {
+  const body: Record<string, unknown> = {
+    amount: opts.amount,
+    pix_key: opts.pixKey,
+    correlation_id: opts.correlationId,
+    description: opts.description ?? "Saque ViaX",
+  };
+  if (opts.document) body.document = opts.document;
+  if (opts.beneficiaryName) body.beneficiary_name = opts.beneficiaryName;
+
   return request<PixPayoutResponse>("/payouts/pix", {
     method: "POST",
-    body: JSON.stringify({
-      amount: opts.amount,
-      pix_key: opts.pixKey,
-      correlation_id: opts.correlationId,
-      description: opts.description ?? "Saque ViaX",
-    }),
+    body: JSON.stringify(body),
   });
 }
 
