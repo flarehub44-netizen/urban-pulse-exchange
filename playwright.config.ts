@@ -11,7 +11,13 @@ export default defineConfig({
     baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:4173",
     trace: "on-first-retry",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    {
+      name: "mobile-chrome",
+      use: { ...devices["iPhone 13"], defaultBrowserType: "chromium" },
+    },
+  ],
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {

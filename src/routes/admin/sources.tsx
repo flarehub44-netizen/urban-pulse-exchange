@@ -193,7 +193,7 @@ function AdminSourcesPage() {
             value={streamUrl}
             onChange={(e) => setStreamUrl(e.target.value)}
             placeholder={preset.placeholder}
-            className="min-w-[260px] flex-1 rounded-lg border bg-surface px-3 py-2 text-xs"
+            className="w-full min-w-0 flex-1 rounded-lg border bg-surface px-3 py-2 text-xs sm:min-w-[260px]"
           />
           <select
             value={regionId}

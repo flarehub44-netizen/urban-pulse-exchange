@@ -305,6 +305,13 @@ export const copy = {
     subtitle: "Saldo, movimentações e histórico de previsões.",
     predictionsTab: (count: number) => `Previsões (${count})`,
     stakeLabel: "Participação",
+    cpfRequiredTitle: "CPF necessário para Pix",
+    cpfRequiredBody:
+      "Para depositar ou sacar via Pix, informe o CPF da conta que fará o pagamento. Ele precisa ser o mesmo usado no seu banco.",
+    cpfPixHint:
+      "Use o CPF da conta que fará o Pix. Se o pagador usar outro CPF, o valor entra na carteira, mas a equipe recebe um alerta para revisão.",
+    cpfSaveContinue: "Salvar e continuar",
+    cpfSaved: "CPF cadastrado. Você já pode usar Pix.",
   },
 
   positions: {

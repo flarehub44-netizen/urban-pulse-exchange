@@ -16,6 +16,8 @@ import { getLastImpulseAmount, setLastImpulseAmount } from "@/lib/impulse-deposi
 import { getStoredPartnerRef } from "@/lib/partner-attribution";
 import { copy } from "@/copy/pt-BR";
 import { invalidateWalletQueries } from "@/lib/query-invalidation";
+import { CpfCaptureSheet } from "@/components/viax/cpf-capture-sheet";
+import { useEnsureCpfForPix } from "@/hooks/use-ensure-cpf-for-pix";
 
 interface QuickDepositSheetProps {
   open: boolean;
@@ -41,6 +43,7 @@ export function QuickDepositSheet({
   } | null>(null);
   const [done, setDone] = useState(false);
   const pollErrors = useRef(0);
+  const pixCpf = useEnsureCpfForPix();
 
   const depositMut = useMutation({
     mutationFn: (amt: number) => initiateDepositFn({ data: { amount: amt } }),
@@ -53,7 +56,14 @@ export function QuickDepositSheet({
         expiresAt: res.expiresAt,
       });
     },
-    onError: (err) => toast.error(err instanceof Error ? err.message : "Depósito falhou."),
+    onError: (err) => {
+      const msg = err instanceof Error ? err.message : "Depósito falhou.";
+      if (msg.toLowerCase().includes("cpf")) {
+        pixCpf.setSheetOpen(true);
+        return;
+      }
+      toast.error(msg);
+    },
   });
 
   // Poll for payment confirmation while QR is shown
@@ -110,7 +120,7 @@ export function QuickDepositSheet({
       return;
     }
     setLastImpulseAmount(amt);
-    depositMut.mutate(amt);
+    pixCpf.ensureCpf(() => depositMut.mutate(amt));
   };
 
   const partnerRef = getStoredPartnerRef();
@@ -232,6 +242,15 @@ export function QuickDepositSheet({
           </div>
         )}
       </SheetContent>
+
+      <CpfCaptureSheet
+        open={pixCpf.sheetOpen}
+        onOpenChange={(next) => {
+          if (next) pixCpf.setSheetOpen(true);
+          else pixCpf.closeSheet();
+        }}
+        onSaved={pixCpf.onCpfSaved}
+      />
     </Sheet>
   );
 }

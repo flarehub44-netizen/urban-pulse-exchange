@@ -16,6 +16,23 @@ function getServiceClient() {
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }
 
+async function requireUserCpfDigits(service: ReturnType<typeof getServiceClient>, userId: string) {
+  const { data: profile, error } = await service
+    .from("profiles")
+    .select("cpf")
+    .eq("id", userId)
+    .single();
+
+  if (error) throw new Error("Não foi possível validar CPF do cadastro");
+
+  const cpfDigits = String(profile?.cpf ?? "").replace(/\D/g, "");
+  if (cpfDigits.length !== 11) {
+    throw new Error("Cadastre um CPF válido no perfil para usar Pix.");
+  }
+
+  return cpfDigits;
+}
+
 const depositSchema = z.object({
   amount: z.number().positive().max(500_000),
 });
@@ -38,10 +55,18 @@ export const initiateDepositFn = createServerFn({ method: "POST" })
     const service = getServiceClient();
 
     try {
+      const cpfDigits = await requireUserCpfDigits(service, userId);
+
       // 1. Criar o intent no banco (status: pending)
       const { data: intent, error: intentErr } = await service
         .from("payment_intents")
-        .insert({ user_id: userId, type: "deposit", amount: data.amount, status: "pending" })
+        .insert({
+          user_id: userId,
+          type: "deposit",
+          amount: data.amount,
+          status: "pending",
+          meta: { cpf_last4: cpfDigits.slice(-4) },
+        })
         .select("id")
         .single();
 
@@ -104,6 +129,8 @@ export const initiateWithdrawFn = createServerFn({ method: "POST" })
     const service = getServiceClient();
 
     try {
+      await requireUserCpfDigits(service, userId);
+
       // RPC cria o intent + reserva o saldo + aplica KYC gate
       const { data: result, error } = await supabase.rpc("request_withdrawal", {
         p_amount: data.amount,

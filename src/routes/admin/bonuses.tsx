@@ -16,6 +16,7 @@ import {
 } from "@/hooks/use-admin-bonuses";
 import { useAdminPlatformSettings } from "@/hooks/use-admin-dashboard";
 import { formatBRL } from "@/lib/parimutuel";
+import { DesktopTableWrap, MobileDataList, MobileFieldRow } from "@/components/ui/responsive-table";
 
 export const Route = createFileRoute("/admin/bonuses")({
   component: AdminBonusesPage,
@@ -236,8 +237,8 @@ function AdminBonusesPage() {
               Salvar
             </button>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[420px] text-xs">
+        <div className="overflow-x-auto md:overflow-visible">
+          <table className="w-full text-xs md:min-w-[420px]">
               <thead className="text-[10px] uppercase text-muted-foreground">
                 <tr>
                   <th className="py-1 text-left">Prêmio</th>
@@ -303,6 +304,46 @@ function AdminBonusesPage() {
             {copy.admin.bonuses.ledgerTitle}
           </h2>
         </div>
+        <MobileDataList
+          items={ledger ?? []}
+          keyFn={(row) => `${row.kind}-${row.id}`}
+          emptyText="Nenhum lançamento."
+          renderCard={(row) => (
+            <div className="space-y-2">
+              <MobileFieldRow label="Quando">
+                <span className="text-muted-foreground">
+                  {formatDistanceToNow(new Date(row.created_at), {
+                    addSuffix: true,
+                    locale: ptBR,
+                  })}
+                </span>
+              </MobileFieldRow>
+              <MobileFieldRow label="Usuário">
+                <span className="font-medium">{row.username}</span>
+              </MobileFieldRow>
+              <MobileFieldRow label="Canal">
+                <span>{KIND_LABELS[row.kind] ?? row.kind}</span>
+              </MobileFieldRow>
+              <MobileFieldRow label="Detalhe">
+                <span className="text-muted-foreground">
+                  {row.label}
+                  {row.source ? ` · ${row.source}` : ""}
+                </span>
+              </MobileFieldRow>
+              <div className="flex justify-between gap-4 text-xs">
+                <span className="text-muted-foreground">Cash</span>
+                <span className="mono">
+                  {Number(row.cash_amount) > 0 ? formatBRL(Number(row.cash_amount)) : "—"}
+                </span>
+              </div>
+              <div className="flex justify-between gap-4 text-xs">
+                <span className="text-muted-foreground">XP</span>
+                <span className="mono">{Number(row.xp_amount) > 0 ? row.xp_amount : "—"}</span>
+              </div>
+            </div>
+          )}
+        />
+        <DesktopTableWrap>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[720px] text-xs">
             <thead className="border-b bg-surface/40 text-[10px] uppercase text-muted-foreground">
@@ -348,6 +389,7 @@ function AdminBonusesPage() {
             </tbody>
           </table>
         </div>
+        </DesktopTableWrap>
       </div>
     </div>
   );

@@ -36,7 +36,7 @@ export function CommunityMarketsList({ embedded = false }: { embedded?: boolean 
           <PageHeader
             title={<span className="text-highlight">{copy.community.listTitle}</span>}
             description={copy.community.listSubtitle}
-            className="flex-1 min-w-[200px]"
+            className="w-full min-w-0 flex-1 sm:min-w-[200px]"
           />
           <Link
             to="/markets/create"

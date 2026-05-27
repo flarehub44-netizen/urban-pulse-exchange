@@ -22,6 +22,7 @@ import {
   type AdminPlatformEvent,
   type AdminDailyPoll,
 } from "@/hooks/use-admin-events";
+import { DesktopTableWrap, MobileDataList, MobileFieldRow } from "@/components/ui/responsive-table";
 
 export const Route = createFileRoute("/admin/events")({
   component: AdminEventsPage,
@@ -471,6 +472,53 @@ function AdminEventsPage() {
           {!seasonal?.length && (
             <p className="text-sm text-muted-foreground">{copy.admin.events.emptySeasonal}</p>
           )}
+          <MobileDataList
+            items={seasonal ?? []}
+            keyFn={(e) => e.id}
+            emptyText={copy.admin.events.emptySeasonal}
+            renderCard={(e) => {
+              const status = platformEventStatus(e.starts_at, e.ends_at);
+              return (
+                <div
+                  className={cn("space-y-3", editingEventId === e.id && "rounded-lg ring-1 ring-primary/30")}
+                >
+                  <MobileFieldRow label="Evento">
+                    <span className="mr-2">{e.badge_icon}</span>
+                    <span className="font-medium">{e.name}</span>
+                  </MobileFieldRow>
+                  <MobileFieldRow label="Status">
+                    <span>{statusLabel(status)}</span>
+                  </MobileFieldRow>
+                  <MobileFieldRow label="Período">
+                    <span className="text-muted-foreground">
+                      {format(new Date(e.starts_at), "dd/MM/yy HH:mm", { locale: ptBR })} –{" "}
+                      {format(new Date(e.ends_at), "dd/MM/yy HH:mm", { locale: ptBR })}
+                    </span>
+                  </MobileFieldRow>
+                  <MobileFieldRow label="XP">
+                    <span className="mono">+{e.xp_boost}</span>
+                  </MobileFieldRow>
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <button
+                      type="button"
+                      onClick={() => loadEventForEdit(e)}
+                      className="min-h-[44px] rounded border px-3 py-2 text-xs"
+                    >
+                      {copy.admin.events.editEvent}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDeleteEvent(e.id)}
+                      className="min-h-[44px] rounded border px-3 py-2 text-xs text-destructive"
+                    >
+                      {copy.admin.events.deleteEvent}
+                    </button>
+                  </div>
+                </div>
+              );
+            }}
+          />
+          <DesktopTableWrap>
           <div className="overflow-x-auto rounded-xl border">
             <table className="w-full min-w-[640px] text-xs">
               <thead className="border-b bg-surface/60 text-[10px] uppercase text-muted-foreground">
@@ -527,6 +575,7 @@ function AdminEventsPage() {
               </tbody>
             </table>
           </div>
+          </DesktopTableWrap>
         </div>
       )}
 
@@ -592,6 +641,48 @@ function AdminEventsPage() {
           {!polls?.length && (
             <p className="text-sm text-muted-foreground">{copy.admin.events.emptyPolls}</p>
           )}
+          <MobileDataList
+            items={polls ?? []}
+            keyFn={(p) => p.id}
+            emptyText={copy.admin.events.emptyPolls}
+            renderCard={(p) => (
+              <div
+                className={cn("space-y-3", editingPollId === p.id && "rounded-lg ring-1 ring-primary/30")}
+              >
+                <MobileFieldRow label={copy.admin.events.pollDate}>
+                  <span className="mono">{p.poll_date}</span>
+                </MobileFieldRow>
+                <MobileFieldRow label={copy.admin.events.question}>
+                  <span>{p.question}</span>
+                </MobileFieldRow>
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">{copy.admin.events.votesYes}</span>
+                  <span className="mono">{p.yes_count}</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">{copy.admin.events.votesNo}</span>
+                  <span className="mono">{p.no_count}</span>
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={() => loadPollForEdit(p)}
+                    className="min-h-[44px] rounded border px-3 py-2 text-xs"
+                  >
+                    {copy.admin.events.editPoll}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onDeletePoll(p.id)}
+                    className="min-h-[44px] rounded border px-3 py-2 text-xs text-destructive"
+                  >
+                    {copy.admin.events.deleteEvent}
+                  </button>
+                </div>
+              </div>
+            )}
+          />
+          <DesktopTableWrap>
           <div className="overflow-x-auto rounded-xl border">
             <table className="w-full min-w-[560px] text-xs">
               <thead className="border-b bg-surface/60 text-[10px] uppercase text-muted-foreground">
@@ -639,6 +730,7 @@ function AdminEventsPage() {
               </tbody>
             </table>
           </div>
+          </DesktopTableWrap>
         </div>
       )}
 

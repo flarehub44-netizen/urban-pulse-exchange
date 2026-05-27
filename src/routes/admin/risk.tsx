@@ -16,6 +16,7 @@ import { copy } from "@/copy/pt-BR";
 import { InlineError } from "@/components/viax/inline-error";
 import { cn } from "@/lib/utils";
 import { formatBRL } from "@/lib/parimutuel";
+import { DesktopTableWrap, MobileDataList, MobileFieldRow } from "@/components/ui/responsive-table";
 
 const MIN_ACTION_NOTE = 8;
 
@@ -106,54 +107,137 @@ function ReferralRow({
         )}
       </td>
       <td className="px-3 py-2">
-        <div className="flex flex-wrap items-center gap-1">
-          <input
-            type="number"
-            min={0}
-            max={100}
-            placeholder="Risco"
-            value={riskInput[row.user_id] ?? ""}
-            onChange={(e) => onRiskChange(row.user_id, e.target.value)}
-            className="w-16 rounded border bg-surface px-1 py-0.5 mono text-[10px]"
-          />
-          <input
-            type="text"
-            placeholder={copy.admin.risk.actionNoteLabel}
-            value={noteInput[row.user_id] ?? ""}
-            onChange={(e) => onNoteChange(row.user_id, e.target.value)}
-            className="w-44 rounded border bg-surface px-1 py-0.5 text-[10px]"
-          />
+        <ReferralActions
+          row={row}
+          riskInput={riskInput}
+          noteInput={noteInput}
+          onRiskChange={onRiskChange}
+          onNoteChange={onNoteChange}
+          onTag={onTag}
+          tagging={tagging}
+          showConfirm={showConfirm}
+        />
+      </td>
+    </tr>
+  );
+}
+
+function ReferralActions({
+  row,
+  riskInput,
+  noteInput,
+  onRiskChange,
+  onNoteChange,
+  onTag,
+  tagging,
+  showConfirm,
+}: ReferralRowProps) {
+  return (
+    <div className="flex flex-col gap-2 md:flex-row md:flex-wrap md:items-center md:gap-1">
+      <input
+        type="number"
+        min={0}
+        max={100}
+        placeholder="Risco"
+        value={riskInput[row.user_id] ?? ""}
+        onChange={(e) => onRiskChange(row.user_id, e.target.value)}
+        className="w-full rounded border bg-surface px-2 py-1.5 mono text-xs md:w-16 md:px-1 md:py-0.5 md:text-[10px]"
+      />
+      <input
+        type="text"
+        placeholder={copy.admin.risk.actionNoteLabel}
+        value={noteInput[row.user_id] ?? ""}
+        onChange={(e) => onNoteChange(row.user_id, e.target.value)}
+        className="w-full rounded border bg-surface px-2 py-1.5 text-xs md:w-44 md:px-1 md:py-0.5 md:text-[10px]"
+      />
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          disabled={tagging}
+          onClick={() => onTag(row, "open")}
+          className="min-h-[44px] rounded border border-primary/40 px-3 py-2 text-xs text-primary disabled:opacity-50 md:min-h-0 md:px-2 md:py-0.5 md:text-[10px]"
+        >
+          {copy.admin.risk.tagFraud}
+        </button>
+        {showConfirm && (
           <button
             type="button"
             disabled={tagging}
-            onClick={() => onTag(row, "open")}
-            className="rounded border border-primary/40 px-2 py-0.5 text-[10px] text-primary disabled:opacity-50"
+            onClick={() => onTag(row, "confirmed")}
+            className="min-h-[44px] rounded border border-warn/40 bg-warn/10 px-3 py-2 text-xs text-warn disabled:opacity-50 md:min-h-0 md:px-2 md:py-0.5 md:text-[10px]"
           >
-            {copy.admin.risk.tagFraud}
+            {copy.admin.risk.tagConfirm}
           </button>
-          {showConfirm && (
-            <button
-              type="button"
-              disabled={tagging}
-              onClick={() => onTag(row, "confirmed")}
-              className="rounded border border-warn/40 bg-warn/10 px-2 py-0.5 text-[10px] text-warn disabled:opacity-50"
-            >
-              {copy.admin.risk.tagConfirm}
-            </button>
-          )}
-          {row.flagged && (
-            <button
-              type="button"
-              disabled={tagging}
-              onClick={() => onTag(row, "cleared")}
-              className="rounded border px-2 py-0.5 text-[10px] disabled:opacity-50"
-            >
-              {copy.admin.risk.tagClear}
-            </button>
-          )}
-        </div>
-      </td>
-    </tr>
+        )}
+        {row.flagged && (
+          <button
+            type="button"
+            disabled={tagging}
+            onClick={() => onTag(row, "cleared")}
+            className="min-h-[44px] rounded border px-3 py-2 text-xs disabled:opacity-50 md:min-h-0 md:px-2 md:py-0.5 md:text-[10px]"
+          >
+            {copy.admin.risk.tagClear}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ReferralStatusBadge({ row }: { row: AdminCpaReferral }) {
+  const flagStatus = row.flag_status ?? (row.flagged ? "open" : null);
+  if (!row.flagged) {
+    return <span className="text-[10px] text-muted-foreground">—</span>;
+  }
+  return (
+    <span
+      className={cn(
+        "rounded border px-2 py-0.5 text-[10px] font-medium",
+        statusBadgeClass(flagStatus ?? "open"),
+      )}
+    >
+      {statusLabel(flagStatus ?? "open")}
+    </span>
+  );
+}
+
+function ReferralMobileCard(props: ReferralRowProps) {
+  const { row } = props;
+  const flagStatus = row.flag_status ?? (row.flagged ? "open" : null);
+  return (
+    <div
+      className={cn(
+        "space-y-3",
+        rowAccentClass(flagStatus, row.flagged),
+        row.flagged && "rounded-lg p-1",
+      )}
+    >
+      <MobileFieldRow label="Usuário">
+        <div className="font-medium">{row.user_name}</div>
+        <div className="mono text-[10px] text-muted-foreground">@{row.user_handle}</div>
+        {row.cpf_last4 && (
+          <div className="text-[10px] text-muted-foreground">
+            {copy.admin.risk.cpfLast4}: •••{row.cpf_last4}
+            {row.cpf_duplicate && (
+              <span className="ml-1 text-warn">({copy.admin.risk.cpfDuplicate})</span>
+            )}
+          </div>
+        )}
+      </MobileFieldRow>
+      <MobileFieldRow label="Afiliado">
+        <div className="font-medium">{row.partner_handle ? `@${row.partner_handle}` : "—"}</div>
+        <div className="text-[10px] text-muted-foreground">{row.partner_slug ?? ""}</div>
+      </MobileFieldRow>
+      <MobileFieldRow label="Depósito qualificado">
+        <span className="mono">{formatBRL(Number(row.qualified_deposit_total ?? 0))}</span>
+      </MobileFieldRow>
+      <MobileFieldRow label="Status">
+        <ReferralStatusBadge row={row} />
+      </MobileFieldRow>
+      <MobileFieldRow label="Ações">
+        <ReferralActions {...props} />
+      </MobileFieldRow>
+    </div>
   );
 }
 
@@ -170,25 +254,67 @@ function ReferralTable({
   return (
     <div className="rounded-xl border bg-card/60 p-4">
       <h3 className="mb-3 text-sm font-semibold">{title}</h3>
-      <div className="overflow-x-auto rounded-lg border">
-        <table className="w-full min-w-[980px] text-xs">
-          <thead className="border-b bg-surface/60 text-[10px] uppercase text-muted-foreground">
-            <tr>
-              <th className="px-3 py-2 text-left">Usuário</th>
-              <th className="px-3 py-2 text-left">Afiliado</th>
-              <th className="px-3 py-2 text-right">Depósito qualificado</th>
-              <th className="px-3 py-2 text-left">Status</th>
-              <th className="px-3 py-2 text-left">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <ReferralRow key={r.user_id} row={r} {...rowProps} />
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {!rows.length && <p className="mt-3 text-xs text-muted-foreground">{emptyText}</p>}
+      <MobileDataList
+        items={rows}
+        keyFn={(r) => r.user_id}
+        emptyText={emptyText}
+        renderCard={(r) => <ReferralMobileCard row={r} {...rowProps} />}
+      />
+      <DesktopTableWrap>
+        <div className="overflow-x-auto rounded-lg border">
+          <table className="w-full min-w-[980px] text-xs">
+            <thead className="border-b bg-surface/60 text-[10px] uppercase text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 text-left">Usuário</th>
+                <th className="px-3 py-2 text-left">Afiliado</th>
+                <th className="px-3 py-2 text-right">Depósito qualificado</th>
+                <th className="px-3 py-2 text-left">Status</th>
+                <th className="px-3 py-2 text-left">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <ReferralRow key={r.user_id} row={r} {...rowProps} />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </DesktopTableWrap>
+      {!rows.length && <p className="mt-3 text-xs text-muted-foreground md:hidden">{emptyText}</p>}
+    </div>
+  );
+}
+
+function CaseMobileCard({ c }: { c: AdminCpaFraudCase }) {
+  return (
+    <div className={cn("space-y-3", rowAccentClass(c.status, true), "rounded-lg p-1")}>
+      <MobileFieldRow label="Usuário">
+        <div className="font-medium">{c.user_name}</div>
+        <div className="mono text-[10px] text-muted-foreground">@{c.user_handle}</div>
+      </MobileFieldRow>
+      <MobileFieldRow label="Afiliado">
+        <div className="font-medium">{c.partner_handle ? `@${c.partner_handle}` : "—"}</div>
+        <div className="text-[10px] text-muted-foreground">{c.partner_slug ?? ""}</div>
+      </MobileFieldRow>
+      <MobileFieldRow label="Status">
+        <span
+          className={cn(
+            "rounded border px-2 py-0.5 text-[10px] font-medium",
+            statusBadgeClass(c.status),
+          )}
+        >
+          {statusLabel(c.status)}
+        </span>
+        {c.is_cpa_counted && (
+          <span className="mt-1 block text-[10px] text-muted-foreground">CPA contando</span>
+        )}
+      </MobileFieldRow>
+      <MobileFieldRow label="Motivos">
+        <span className="text-muted-foreground">{(c.reasons ?? []).join(", ") || "—"}</span>
+      </MobileFieldRow>
+      <MobileFieldRow label="Nota">
+        <span className="text-muted-foreground">{c.notes ?? "—"}</span>
+      </MobileFieldRow>
     </div>
   );
 }
@@ -205,56 +331,64 @@ function CaseTable({
   return (
     <div className="rounded-xl border bg-card/60 p-4">
       <h3 className="mb-3 text-sm font-semibold">{title}</h3>
-      <div className="overflow-x-auto rounded-lg border">
-        <table className="w-full min-w-[720px] text-xs">
-          <thead className="border-b bg-surface/60 text-[10px] uppercase text-muted-foreground">
-            <tr>
-              <th className="px-3 py-2 text-left">Usuário</th>
-              <th className="px-3 py-2 text-left">Afiliado</th>
-              <th className="px-3 py-2 text-left">Status</th>
-              <th className="px-3 py-2 text-left">Motivos</th>
-              <th className="px-3 py-2 text-left">Nota</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cases.map((c) => (
-              <tr
-                key={c.flag_id}
-                className={cn("border-b border-border/40", rowAccentClass(c.status, true))}
-              >
-                <td className="px-3 py-2">
-                  <div className="font-medium">{c.user_name}</div>
-                  <div className="mono text-[10px] text-muted-foreground">@{c.user_handle}</div>
-                </td>
-                <td className="px-3 py-2">
-                  <div className="font-medium">
-                    {c.partner_handle ? `@${c.partner_handle}` : "—"}
-                  </div>
-                  <div className="text-[10px] text-muted-foreground">{c.partner_slug ?? ""}</div>
-                </td>
-                <td className="px-3 py-2">
-                  <span
-                    className={cn(
-                      "rounded border px-2 py-0.5 text-[10px] font-medium",
-                      statusBadgeClass(c.status),
-                    )}
-                  >
-                    {statusLabel(c.status)}
-                  </span>
-                  {c.is_cpa_counted && (
-                    <span className="ml-2 text-[10px] text-muted-foreground">CPA contando</span>
-                  )}
-                </td>
-                <td className="px-3 py-2 text-[10px] text-muted-foreground">
-                  {(c.reasons ?? []).join(", ") || "—"}
-                </td>
-                <td className="px-3 py-2 text-[10px] text-muted-foreground">{c.notes ?? "—"}</td>
+      <MobileDataList
+        items={cases}
+        keyFn={(c) => c.flag_id}
+        emptyText={emptyText}
+        renderCard={(c) => <CaseMobileCard c={c} />}
+      />
+      <DesktopTableWrap>
+        <div className="overflow-x-auto rounded-lg border">
+          <table className="w-full min-w-[720px] text-xs">
+            <thead className="border-b bg-surface/60 text-[10px] uppercase text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 text-left">Usuário</th>
+                <th className="px-3 py-2 text-left">Afiliado</th>
+                <th className="px-3 py-2 text-left">Status</th>
+                <th className="px-3 py-2 text-left">Motivos</th>
+                <th className="px-3 py-2 text-left">Nota</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {!cases.length && <p className="mt-3 text-xs text-muted-foreground">{emptyText}</p>}
+            </thead>
+            <tbody>
+              {cases.map((c) => (
+                <tr
+                  key={c.flag_id}
+                  className={cn("border-b border-border/40", rowAccentClass(c.status, true))}
+                >
+                  <td className="px-3 py-2">
+                    <div className="font-medium">{c.user_name}</div>
+                    <div className="mono text-[10px] text-muted-foreground">@{c.user_handle}</div>
+                  </td>
+                  <td className="px-3 py-2">
+                    <div className="font-medium">
+                      {c.partner_handle ? `@${c.partner_handle}` : "—"}
+                    </div>
+                    <div className="text-[10px] text-muted-foreground">{c.partner_slug ?? ""}</div>
+                  </td>
+                  <td className="px-3 py-2">
+                    <span
+                      className={cn(
+                        "rounded border px-2 py-0.5 text-[10px] font-medium",
+                        statusBadgeClass(c.status),
+                      )}
+                    >
+                      {statusLabel(c.status)}
+                    </span>
+                    {c.is_cpa_counted && (
+                      <span className="ml-2 text-[10px] text-muted-foreground">CPA contando</span>
+                    )}
+                  </td>
+                  <td className="px-3 py-2 text-[10px] text-muted-foreground">
+                    {(c.reasons ?? []).join(", ") || "—"}
+                  </td>
+                  <td className="px-3 py-2 text-[10px] text-muted-foreground">{c.notes ?? "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </DesktopTableWrap>
+      {!cases.length && <p className="mt-3 text-xs text-muted-foreground md:hidden">{emptyText}</p>}
     </div>
   );
 }

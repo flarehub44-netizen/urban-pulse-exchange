@@ -29,6 +29,8 @@ import { cn } from "@/lib/utils";
 import { trackDepositFunnel } from "@/lib/deposit-funnel";
 import { trackProductEvent } from "@/lib/product-analytics";
 import { AppLoadingSkeleton } from "@/components/viax/app-loading-skeleton";
+import { CpfCaptureSheet } from "@/components/viax/cpf-capture-sheet";
+import { useEnsureCpfForPix } from "@/hooks/use-ensure-cpf-for-pix";
 
 const WalletBalanceChart = lazy(() =>
   import("@/components/viax/wallet-balance-chart").then((m) => ({
@@ -74,6 +76,7 @@ export function WalletPanel({
   const [depositDone, setDepositDone] = useState(false);
   const { enabled: casinoEnabled } = useCasinoEnabled();
   const queryClient = useQueryClient();
+  const pixCpf = useEnsureCpfForPix();
 
   useEffect(() => {
     if (!initialTab) return;
@@ -108,7 +111,14 @@ export function WalletPanel({
         expiresAt: res.expiresAt,
       });
     },
-    onError: (err) => toast.error(err instanceof Error ? err.message : "Depósito falhou."),
+    onError: (err) => {
+      const msg = err instanceof Error ? err.message : "Depósito falhou.";
+      if (msg.toLowerCase().includes("cpf")) {
+        pixCpf.setSheetOpen(true);
+        return;
+      }
+      toast.error(msg);
+    },
   });
 
   const withdrawMut = useMutation({
@@ -125,6 +135,8 @@ export function WalletPanel({
         toast.error("Verificação necessária", {
           description: "Complete o KYC para sacar acima de 100 BRL.",
         });
+      } else if (msg.toLowerCase().includes("cpf")) {
+        pixCpf.setSheetOpen(true);
       } else {
         toast.error(msg);
       }
@@ -418,15 +430,18 @@ export function WalletPanel({
                     toast.error("Informe um valor válido.");
                     return;
                   }
-                  if (tab === "deposit") {
-                    depositMut.mutate(amount);
-                  } else {
-                    if (!pixKey.trim()) {
-                      toast.error("Informe sua chave Pix.");
-                      return;
+                  const runPix = () => {
+                    if (tab === "deposit") {
+                      depositMut.mutate(amount);
+                    } else {
+                      if (!pixKey.trim()) {
+                        toast.error("Informe sua chave Pix.");
+                        return;
+                      }
+                      withdrawMut.mutate({ amount, pixKey: pixKey.trim() });
                     }
-                    withdrawMut.mutate({ amount, pixKey: pixKey.trim() });
-                  }
+                  };
+                  pixCpf.ensureCpf(runPix);
                 }}
                 className={cn(
                   "w-full rounded-xl px-4 py-3 font-medium disabled:opacity-50",
@@ -443,6 +458,15 @@ export function WalletPanel({
           )}
         </div>
       )}
+
+      <CpfCaptureSheet
+        open={pixCpf.sheetOpen}
+        onOpenChange={(open) => {
+          if (open) pixCpf.setSheetOpen(true);
+          else pixCpf.closeSheet();
+        }}
+        onSaved={pixCpf.onCpfSaved}
+      />
     </div>
   );
 }

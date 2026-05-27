@@ -362,6 +362,31 @@ export const updateProfileFn = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+const saveProfileCpfSchema = z.object({
+  cpf: z.string().min(11).max(14),
+});
+
+export const saveProfileCpfFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(saveProfileCpfSchema)
+  .handler(async ({ data, context }) => {
+    const started = Date.now();
+    const { supabase } = getSupabaseCtx(context);
+    const { error } = await supabase.rpc("update_profile_cpf", { p_cpf: data.cpf });
+    if (error) {
+      const msg = error.message ?? "";
+      if (msg.includes("CPF_ALREADY_USED")) {
+        throw new AppError("CPF_ALREADY_USED", "Este CPF já está vinculado a outra conta.", 409);
+      }
+      if (msg.includes("CPF_INVALID")) {
+        throw new AppError("CPF_INVALID", "Informe um CPF válido.", 400);
+      }
+      throw error;
+    }
+    logApiMetric("bff.save_profile_cpf", { ok: true, durationMs: Date.now() - started });
+    return { ok: true };
+  });
+
 export const getEngagementSnapshotFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator(engagementSnapshotInput)

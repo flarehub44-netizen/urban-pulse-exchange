@@ -10,6 +10,7 @@ import {
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
 import { InlineError } from "@/components/viax/inline-error";
+import { DesktopTableWrap, MobileDataList, MobileFieldRow } from "@/components/ui/responsive-table";
 
 export const Route = createFileRoute("/admin/users")({
   component: AdminUsersPage,
@@ -51,6 +52,80 @@ function AdminUsersPage() {
         <p className="text-xs text-muted-foreground">Usuários · KYC · limites</p>
       </div>
 
+      <MobileDataList
+        items={users ?? []}
+        keyFn={(u) => u.id}
+        emptyText="Nenhum usuário."
+        renderCard={(u) => (
+          <div className="space-y-3">
+            <MobileFieldRow label="Usuário">
+              <span className="font-medium">{u.username}</span>
+              {u.is_admin && <span className="ml-2 text-[10px] text-primary">admin</span>}
+            </MobileFieldRow>
+            <MobileFieldRow label="Afiliado">
+              {u.is_partner ? (
+                <span className="text-[10px] text-primary">{copy.admin.partnerBadge}</span>
+              ) : (
+                <span className="text-[10px] text-muted-foreground">—</span>
+              )}
+            </MobileFieldRow>
+            <MobileFieldRow label="Volume">
+              <span className="mono">{formatBRL(Number(u.volume))}</span>
+            </MobileFieldRow>
+            <MobileFieldRow label="KYC">
+              <select
+                value={u.kyc_status}
+                onChange={async (e) => {
+                  try {
+                    await updateKyc({ userId: u.id, status: e.target.value });
+                    toast.success("KYC atualizado.");
+                  } catch (err: unknown) {
+                    toast.error(err instanceof Error ? err.message : "Erro");
+                  }
+                }}
+                className="w-full rounded border bg-surface px-2 py-2 text-xs"
+              >
+                {["none", "pending", "verified", "rejected"].map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+            </MobileFieldRow>
+            <MobileFieldRow label="Risco">
+              <span className="mono">{u.risk_score}</span>
+            </MobileFieldRow>
+            <MobileFieldRow label="Ações">
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => onFreeze(u.id, !u.frozen)}
+                  className="min-h-[44px] rounded border px-3 py-2 text-xs"
+                >
+                  {u.frozen ? copy.admin.users.unfreeze : copy.admin.users.freeze}
+                </button>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    placeholder="Limite"
+                    value={limitInput[u.id] ?? ""}
+                    onChange={(e) => setLimitInput((s) => ({ ...s, [u.id]: e.target.value }))}
+                    className="min-w-0 flex-1 rounded border bg-surface px-2 py-2 mono text-xs"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => onSetLimit(u.id)}
+                    className="min-h-[44px] shrink-0 rounded border border-primary/40 px-3 py-2 text-xs text-primary"
+                  >
+                    {copy.admin.users.betLimit}
+                  </button>
+                </div>
+              </div>
+            </MobileFieldRow>
+          </div>
+        )}
+      />
+      <DesktopTableWrap>
       <div className="overflow-x-auto rounded-xl border">
         <table className="w-full min-w-[640px] text-xs">
           <thead className="border-b bg-surface/60 text-[10px] uppercase text-muted-foreground">
@@ -129,6 +204,7 @@ function AdminUsersPage() {
           </tbody>
         </table>
       </div>
+      </DesktopTableWrap>
     </div>
   );
 }

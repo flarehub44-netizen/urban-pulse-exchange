@@ -185,7 +185,7 @@ function FootballHomepage() {
 
       <div className="space-y-2 rounded-xl border border-border/70 bg-card/40 p-3">
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex min-w-[220px] flex-1 items-center gap-2 rounded-md border px-2 py-1.5">
+          <div className="flex w-full min-w-0 flex-1 items-center gap-2 rounded-md border px-2 py-1.5 sm:min-w-[220px]">
             <Search className="size-4 text-muted-foreground" />
             <input
               value={search}

@@ -393,7 +393,7 @@ function MarketsList() {
           )}
 
           <div className="page-section flex flex-wrap items-end justify-between gap-4">
-            <p className="flex-1 min-w-[200px] text-sm text-muted-foreground">
+            <p className="w-full min-w-0 flex-1 text-sm text-muted-foreground sm:min-w-[200px]">
               <span className="font-medium text-foreground">{list.length} mercados</span> · pools
               atualizando ao vivo
             </p>

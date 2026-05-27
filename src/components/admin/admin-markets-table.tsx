@@ -12,6 +12,7 @@ import { formatBRL, probability, prizePool } from "@/lib/parimutuel";
 import { copy } from "@/copy/pt-BR";
 import { cn } from "@/lib/utils";
 import type { Market } from "@/store/viax-store";
+import { DesktopTableWrap, MobileDataList, MobileFieldRow } from "@/components/ui/responsive-table";
 
 export function AdminMarketsTable() {
   const { markets, isLoading } = useMarketsList();
@@ -68,7 +69,100 @@ export function AdminMarketsTable() {
 
   if (isLoading) return <p className="text-xs text-muted-foreground">Carregando mercados…</p>;
 
+  const renderActions = (m: Market) => (
+    <div className="flex flex-wrap gap-2">
+      <Link
+        to="/markets/$marketId"
+        params={{ marketId: m.id }}
+        className="min-h-[44px] rounded border px-3 py-2 text-xs hover:bg-surface-2 md:min-h-0 md:px-2 md:py-0.5 md:text-[10px]"
+      >
+        Ver
+      </Link>
+      {m.status === "draft" && (
+        <button
+          type="button"
+          onClick={() => onOpen(m.id)}
+          className="min-h-[44px] rounded border border-primary/40 px-3 py-2 text-xs text-primary md:min-h-0 md:px-2 md:py-0.5 md:text-[10px]"
+        >
+          {copy.settings.adminOpenBtn}
+        </button>
+      )}
+      {(m.status === "live" || m.status === "closing") && !m.frozen && (
+        <>
+          <button
+            type="button"
+            onClick={() => onExtend(m.id, 2)}
+            className="min-h-[44px] rounded border px-3 py-2 text-xs hover:bg-surface-2 md:min-h-0 md:px-2 md:py-0.5 md:text-[10px]"
+          >
+            +2h
+          </button>
+          <button
+            type="button"
+            onClick={() => onPause(m.id, m.acceptBets !== false)}
+            className="min-h-[44px] rounded border px-3 py-2 text-xs hover:bg-surface-2 md:min-h-0 md:px-2 md:py-0.5 md:text-[10px]"
+          >
+            {m.acceptBets === false ? "Retomar" : "Pausar"}
+          </button>
+          <button
+            type="button"
+            onClick={() => onFreeze(m, true)}
+            className="min-h-[44px] rounded border border-down/40 px-3 py-2 text-xs text-down md:min-h-0 md:px-2 md:py-0.5 md:text-[10px]"
+          >
+            {copy.settings.adminFreezeBtn}
+          </button>
+          <button
+            type="button"
+            onClick={() => onForceClose(m.id)}
+            className="min-h-[44px] rounded border border-warn/40 px-3 py-2 text-xs text-warn md:min-h-0 md:px-2 md:py-0.5 md:text-[10px]"
+          >
+            {copy.admin.markets.forceClose}
+          </button>
+        </>
+      )}
+      {m.frozen && (
+        <button
+          type="button"
+          onClick={() => onFreeze(m, false)}
+          className="min-h-[44px] rounded border px-3 py-2 text-xs md:min-h-0 md:px-2 md:py-0.5 md:text-[10px]"
+        >
+          {copy.settings.adminUnfreezeBtn}
+        </button>
+      )}
+    </div>
+  );
+
   return (
+    <>
+      <MobileDataList
+        items={markets}
+        keyFn={(m) => m.id}
+        emptyText="Nenhum mercado."
+        renderCard={(m) => {
+          const vol = prizePool(m.pool);
+          const pYes = probability(m.pool, "YES");
+          return (
+            <div className="space-y-3">
+              <MobileFieldRow label="Mercado">
+                <p className="font-medium">{m.question}</p>
+              </MobileFieldRow>
+              <MobileFieldRow label="Região">
+                <span className="text-muted-foreground">{m.region}</span>
+              </MobileFieldRow>
+              <MobileFieldRow label={copy.admin.markets.tableStatus}>
+                <StatusPill status={m.status} frozen={m.frozen} />
+              </MobileFieldRow>
+              <MobileFieldRow label={copy.admin.markets.tableVolume}>
+                <span className="mono">{formatBRL(vol)}</span>
+              </MobileFieldRow>
+              <MobileFieldRow label="SIM %">
+                <span className="mono text-up">{(pYes * 100).toFixed(0)}%</span>
+              </MobileFieldRow>
+              <MobileFieldRow label="Ações">{renderActions(m)}</MobileFieldRow>
+            </div>
+          );
+        }}
+      />
+      <DesktopTableWrap>
     <div className="overflow-x-auto rounded-xl border">
       <table className="w-full min-w-[720px] text-left text-xs">
         <thead className="border-b bg-surface/60 text-[10px] uppercase tracking-wider text-muted-foreground">
@@ -94,73 +188,15 @@ export function AdminMarketsTable() {
                 </td>
                 <td className="px-3 py-2 mono">{formatBRL(vol)}</td>
                 <td className="px-3 py-2 mono text-up">{(pYes * 100).toFixed(0)}%</td>
-                <td className="px-3 py-2">
-                  <div className="flex flex-wrap gap-1">
-                    <Link
-                      to="/markets/$marketId"
-                      params={{ marketId: m.id }}
-                      className="rounded border px-2 py-0.5 text-[10px] hover:bg-surface-2"
-                    >
-                      Ver
-                    </Link>
-                    {m.status === "draft" && (
-                      <button
-                        type="button"
-                        onClick={() => onOpen(m.id)}
-                        className="rounded border border-primary/40 px-2 py-0.5 text-[10px] text-primary"
-                      >
-                        {copy.settings.adminOpenBtn}
-                      </button>
-                    )}
-                    {(m.status === "live" || m.status === "closing") && !m.frozen && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => onExtend(m.id, 2)}
-                          className="rounded border px-2 py-0.5 text-[10px] hover:bg-surface-2"
-                        >
-                          +2h
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onPause(m.id, m.acceptBets !== false)}
-                          className="rounded border px-2 py-0.5 text-[10px] hover:bg-surface-2"
-                        >
-                          {m.acceptBets === false ? "Retomar" : "Pausar"}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onFreeze(m, true)}
-                          className="rounded border border-down/40 px-2 py-0.5 text-[10px] text-down"
-                        >
-                          {copy.settings.adminFreezeBtn}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onForceClose(m.id)}
-                          className="rounded border border-warn/40 px-2 py-0.5 text-[10px] text-warn"
-                        >
-                          {copy.admin.markets.forceClose}
-                        </button>
-                      </>
-                    )}
-                    {m.frozen && (
-                      <button
-                        type="button"
-                        onClick={() => onFreeze(m, false)}
-                        className="rounded border px-2 py-0.5 text-[10px]"
-                      >
-                        {copy.settings.adminUnfreezeBtn}
-                      </button>
-                    )}
-                  </div>
-                </td>
+                <td className="px-3 py-2">{renderActions(m)}</td>
               </tr>
             );
           })}
         </tbody>
       </table>
     </div>
+      </DesktopTableWrap>
+    </>
   );
 }
 

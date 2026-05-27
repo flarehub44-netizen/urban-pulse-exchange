@@ -15,6 +15,7 @@ import { formatBRL } from "@/lib/parimutuel";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { trackProductEvent } from "@/lib/product-analytics";
+import { DesktopTableWrap, MobileDataList, MobileFieldRow } from "@/components/ui/responsive-table";
 
 export const Route = createFileRoute("/admin/partners")({
   component: AdminPartnersPage,
@@ -311,6 +312,104 @@ function AdminPartnersPage() {
         {!active?.length && (
           <p className="text-sm text-muted-foreground">{copy.admin.partners.activeEmpty}</p>
         )}
+        <MobileDataList
+          items={(active ?? []).filter((p) => activeTerms[p.user_id])}
+          keyFn={(p) => p.user_id}
+          emptyText={copy.admin.partners.activeEmpty}
+          renderCard={(p) => {
+            const terms = activeTerms[p.user_id];
+            if (!terms) return null;
+            return (
+              <div className="space-y-3">
+                <MobileFieldRow label="Creator">
+                  <div className="font-medium">{p.name}</div>
+                  <div className="text-[10px] text-muted-foreground mono">@{p.handle}</div>
+                </MobileFieldRow>
+                <MobileFieldRow label={copy.admin.partners.referrals}>
+                  <span className="mono">{p.referrals_count}</span>
+                </MobileFieldRow>
+                <MobileFieldRow label="Saldo">
+                  <span className="mono">{formatBRL(Number(p.balance))}</span>
+                </MobileFieldRow>
+                <MobileFieldRow label={copy.admin.partners.revenueShare}>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min={0}
+                    max={1}
+                    value={terms.share}
+                    onChange={(e) =>
+                      setActiveTerms((prev) => ({
+                        ...prev,
+                        [p.user_id]: { ...terms, share: e.target.value },
+                      }))
+                    }
+                    className="w-full rounded border bg-surface px-2 py-2 mono text-xs"
+                  />
+                </MobileFieldRow>
+                <MobileFieldRow label={copy.admin.partners.cpaAmount}>
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <input
+                      type="checkbox"
+                      checked={terms.useDefault}
+                      onChange={(e) =>
+                        setActiveTerms((prev) => ({
+                          ...prev,
+                          [p.user_id]: { ...terms, useDefault: e.target.checked },
+                        }))
+                      }
+                    />
+                    {copy.admin.partners.cpaUseDefault}
+                  </label>
+                  {!terms.useDefault && (
+                    <input
+                      type="number"
+                      min={0}
+                      step="1"
+                      value={terms.cpa}
+                      onChange={(e) =>
+                        setActiveTerms((prev) => ({
+                          ...prev,
+                          [p.user_id]: { ...terms, cpa: e.target.value },
+                        }))
+                      }
+                      className="mt-2 w-full rounded border bg-surface px-2 py-2 mono text-xs"
+                    />
+                  )}
+                </MobileFieldRow>
+                <MobileFieldRow label="Link">
+                  <button
+                    type="button"
+                    onClick={() => onCopyReferral(p.slug)}
+                    className="min-h-[44px] w-full rounded border px-3 py-2 text-xs hover:bg-surface"
+                  >
+                    Copiar link
+                  </button>
+                </MobileFieldRow>
+                <MobileFieldRow label={copy.admin.partners.subCreatorsEnable}>
+                  <label className="flex items-center gap-2 text-xs">
+                    <input
+                      type="checkbox"
+                      checked={p.sub_creators_enabled === true}
+                      disabled={savingSubCreators}
+                      onChange={(e) => void onToggleSubCreators(p.user_id, e.target.checked)}
+                    />
+                    {p.sub_creators_enabled ? "Ativo" : "Off"}
+                  </label>
+                </MobileFieldRow>
+                <button
+                  type="button"
+                  disabled={savingTerms}
+                  onClick={() => onSaveActiveTerms(p.user_id)}
+                  className="min-h-[44px] w-full rounded border px-3 py-2 text-xs disabled:opacity-50"
+                >
+                  {copy.admin.partners.saveTerms}
+                </button>
+              </div>
+            );
+          }}
+        />
+        <DesktopTableWrap>
         <div className="overflow-x-auto rounded-xl border">
           <table className="w-full min-w-[720px] text-xs">
             <thead className="border-b bg-surface/60 text-[10px] uppercase text-muted-foreground">
@@ -425,6 +524,7 @@ function AdminPartnersPage() {
             </tbody>
           </table>
         </div>
+        </DesktopTableWrap>
       </section>
     </div>
   );

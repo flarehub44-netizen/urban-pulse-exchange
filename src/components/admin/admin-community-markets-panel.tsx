@@ -9,6 +9,7 @@ import {
 import { formatBRL } from "@/lib/parimutuel";
 import { copy } from "@/copy/pt-BR";
 import { InlineError } from "@/components/viax/inline-error";
+import { DesktopTableWrap, MobileDataList, MobileFieldRow } from "@/components/ui/responsive-table";
 
 type Filter = "all" | "open" | "private" | "reported";
 
@@ -111,6 +112,77 @@ export function AdminCommunityMarketsPanel() {
         </span>
       </div>
 
+      <MobileDataList
+        items={filtered}
+        keyFn={(m) => m.id}
+        emptyText={copy.admin.community.empty}
+        renderCard={(m) => (
+          <div className="space-y-3">
+            <MobileFieldRow label="Pergunta">
+              <p className="font-medium">{m.question}</p>
+            </MobileFieldRow>
+            <MobileFieldRow label="Criador">
+              <span>{m.creator_username ?? "—"}</span>
+            </MobileFieldRow>
+            <MobileFieldRow label="Visibilidade">
+              {m.visibility === "unlisted" ? (
+                <span className="rounded bg-warn/10 px-1.5 py-0.5 text-[10px] text-warn">
+                  {copy.community.privateBadge}
+                </span>
+              ) : (
+                "público"
+              )}
+            </MobileFieldRow>
+            <MobileFieldRow label="Status">
+              <span>{m.status}</span>
+            </MobileFieldRow>
+            <MobileFieldRow label="Volume">
+              <span className="mono">{formatBRL(Number(m.volume))}</span>
+            </MobileFieldRow>
+            <MobileFieldRow label={copy.admin.community.betsCount}>
+              <span className="mono">{m.bets_count ?? 0}</span>
+            </MobileFieldRow>
+            <MobileFieldRow label="Denúncias">
+              {(m.pending_reports ?? 0) > 0 ? (
+                <span className="text-warn">{m.pending_reports}</span>
+              ) : (
+                "0"
+              )}
+            </MobileFieldRow>
+            <MobileFieldRow label="Ações">
+              <div className="flex flex-wrap gap-2">
+                <Link
+                  to="/markets/$marketId"
+                  params={{ marketId: m.id }}
+                  className="min-h-[44px] rounded border px-3 py-2 text-xs hover:bg-surface"
+                >
+                  Ver
+                </Link>
+                {m.visibility === "unlisted" && m.access_token && (
+                  <button
+                    type="button"
+                    onClick={() => void onCopyInvite(m.id, m.access_token!)}
+                    className="min-h-[44px] rounded border px-3 py-2 text-xs hover:bg-surface"
+                  >
+                    {copy.admin.community.copyInvite}
+                  </button>
+                )}
+                {m.status !== "settled" && m.status !== "void" && (
+                  <button
+                    type="button"
+                    disabled={voiding}
+                    onClick={() => void onVoid(m.id)}
+                    className="min-h-[44px] rounded border border-down/40 px-3 py-2 text-xs text-down disabled:opacity-50"
+                  >
+                    {copy.community.adminVoidCommunity}
+                  </button>
+                )}
+              </div>
+            </MobileFieldRow>
+          </div>
+        )}
+      />
+      <DesktopTableWrap>
       <div className="overflow-x-auto rounded-xl border">
         <table className="w-full min-w-[800px] text-xs">
           <thead className="border-b bg-surface/60 text-[10px] uppercase text-muted-foreground">
@@ -184,11 +256,12 @@ export function AdminCommunityMarketsPanel() {
           </tbody>
         </table>
         {!isLoading && filtered.length === 0 && (
-          <p className="p-4 text-center text-xs text-muted-foreground">
+          <p className="hidden p-4 text-center text-xs text-muted-foreground md:block">
             {copy.admin.community.empty}
           </p>
         )}
       </div>
+      </DesktopTableWrap>
     </div>
   );
 }
