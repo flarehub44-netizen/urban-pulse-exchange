@@ -136,3 +136,20 @@ export function useAdminUpdateTrafficScheduler() {
     },
   });
 }
+
+export function useAdminDeleteTrafficTemplate() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (templateId: string) => {
+      const { data, error } = await supabase.rpc("admin_delete_traffic_template", {
+        p_template_id: templateId,
+      });
+      if (error) throw error;
+      return data as { ok: boolean; deleted_id: string };
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: TEMPLATES_KEY });
+      void qc.invalidateQueries({ queryKey: ["traffic-public-state"] });
+    },
+  });
+}

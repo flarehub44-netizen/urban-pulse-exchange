@@ -13,6 +13,7 @@ import {
   useAdminTestTrafficTemplate,
   useAdminSetTrafficTemplateReady,
   useAdminUpdateTrafficScheduler,
+  useAdminDeleteTrafficTemplate,
   type TrafficEventTemplate,
 } from "@/hooks/use-admin-traffic-events";
 import { CameraStreamPreview } from "@/components/admin/camera-stream-preview";
@@ -43,6 +44,7 @@ function AdminTrafficEventsPage() {
   const testCam = useAdminTestTrafficTemplate();
   const setReady = useAdminSetTrafficTemplateReady();
   const updateScheduler = useAdminUpdateTrafficScheduler();
+  const deleteTemplate = useAdminDeleteTrafficTemplate();
 
   const [form, setForm] = useState(emptyForm);
   const [testCameras, setTestCameras] = useState<
@@ -136,6 +138,21 @@ function AdminTrafficEventsPage() {
       toast.success(copy.admin.trafficEvents.schedulerSaved);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro");
+    }
+  };
+
+  const onDelete = async (templateId: string) => {
+    const confirmed = window.confirm(copy.admin.trafficEvents.deleteConfirm);
+    if (!confirmed) return;
+    try {
+      await deleteTemplate.mutateAsync(templateId);
+      if (form.id === templateId) {
+        setForm(emptyForm);
+        setTestCameras([]);
+      }
+      toast.success(copy.admin.trafficEvents.deleteDone);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao excluir");
     }
   };
 
@@ -416,6 +433,14 @@ function AdminTrafficEventsPage() {
                     {t.active
                       ? copy.admin.trafficEvents.deactivate
                       : copy.admin.trafficEvents.activate}
+                  </button>
+                  <button
+                    type="button"
+                    className="text-xs text-down hover:underline disabled:opacity-60"
+                    disabled={deleteTemplate.isPending}
+                    onClick={() => void onDelete(t.id)}
+                  >
+                    {copy.admin.trafficEvents.delete}
                   </button>
                 </div>
               </li>

@@ -3259,6 +3259,10 @@ export type Database = {
       admin_delete_daily_poll: { Args: { p_id: string }; Returns: Json }
       admin_delete_partner_event: { Args: { p_id: number }; Returns: Json }
       admin_delete_platform_event: { Args: { p_id: string }; Returns: Json }
+      admin_delete_traffic_template: {
+        Args: { p_template_id: string }
+        Returns: Json
+      }
       admin_extend_market: {
         Args: { p_extra_hours?: number; p_market_id: string }
         Returns: Json

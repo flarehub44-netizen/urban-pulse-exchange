@@ -870,6 +870,9 @@ export const copy = {
       categoryLabel: "Categoria",
       dataSourceLabel: "Fonte de dados",
       cameraLabel: "Câmera (opcional)",
+      delete: "Excluir",
+      deleteDone: "Template excluído.",
+      deleteConfirm: "Tem certeza que deseja excluir este template? Esta ação não pode ser desfeita.",
     },
     football: {
       title: "Futebol · API-Sports",
