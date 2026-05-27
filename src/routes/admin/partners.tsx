@@ -7,6 +7,7 @@ import {
   useAdminRejectPartner,
   useAdminActivePartners,
   useAdminUpdatePartnerTerms,
+  useAdminSetPartnerSubCreators,
 } from "@/hooks/use-admin-dashboard";
 import { copy } from "@/copy/pt-BR";
 import { InlineError } from "@/components/viax/inline-error";
@@ -25,9 +26,11 @@ function AdminPartnersPage() {
   const { mutateAsync: approve, isPending: approving } = useAdminApprovePartner();
   const { mutateAsync: reject, isPending: rejecting } = useAdminRejectPartner();
   const { mutateAsync: updateTerms, isPending: savingTerms } = useAdminUpdatePartnerTerms();
-  const [approveTerms, setApproveTerms] = useState<Record<string, { share: string; cpa: string }>>(
-    {},
-  );
+  const { mutateAsync: setSubCreators, isPending: savingSubCreators } =
+    useAdminSetPartnerSubCreators();
+  const [approveTerms, setApproveTerms] = useState<
+    Record<string, { share: string; cpa: string; subCreators: boolean }>
+  >({});
   const [activeTerms, setActiveTerms] = useState<
     Record<string, { share: string; cpa: string; useDefault: boolean }>
   >({});
@@ -60,7 +63,8 @@ function AdminPartnersPage() {
     );
   }
 
-  const getApproveTerms = (userId: string) => approveTerms[userId] ?? { share: "0.20", cpa: "" };
+  const getApproveTerms = (userId: string) =>
+    approveTerms[userId] ?? { share: "0.20", cpa: "", subCreators: false };
 
   const onApprove = async (userId: string, handle: string) => {
     const terms = getApproveTerms(userId);
@@ -76,7 +80,13 @@ function AdminPartnersPage() {
       return;
     }
     try {
-      await approve({ userId, slug: handle, revenueSharePct: share, cpaAmount });
+      await approve({
+        userId,
+        slug: handle,
+        revenueSharePct: share,
+        cpaAmount,
+        subCreatorsEnabled: terms.subCreators,
+      });
       toast.success("Creator aprovado");
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Erro");
@@ -95,6 +105,15 @@ function AdminPartnersPage() {
     try {
       await reject({ userId });
       toast.success("Candidatura rejeitada");
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Erro");
+    }
+  };
+
+  const onToggleSubCreators = async (userId: string, enabled: boolean) => {
+    try {
+      await setSubCreators({ userId, enabled });
+      toast.success(copy.admin.partners.subCreatorsSaved);
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Erro");
     }
@@ -210,6 +229,21 @@ function AdminPartnersPage() {
                 </div>
               </div>
               {step >= 2 && (
+                <label className="mt-3 flex items-center gap-2 text-xs">
+                  <input
+                    type="checkbox"
+                    checked={terms.subCreators}
+                    onChange={(e) =>
+                      setApproveTerms((prev) => ({
+                        ...prev,
+                        [a.user_id]: { ...terms, subCreators: e.target.checked },
+                      }))
+                    }
+                  />
+                  <span className="text-muted-foreground">{copy.admin.partners.subCreatorsEnable}</span>
+                </label>
+              )}
+              {step >= 2 && (
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <label className="block text-xs">
                     <span className="text-muted-foreground">
@@ -287,6 +321,7 @@ function AdminPartnersPage() {
                 <th className="px-3 py-2 text-left">{copy.admin.partners.revenueShare}</th>
                 <th className="px-3 py-2 text-left">{copy.admin.partners.cpaAmount}</th>
                 <th className="px-3 py-2 text-left">Link</th>
+                <th className="px-3 py-2 text-left">{copy.admin.partners.subCreatorsEnable}</th>
                 <th className="px-3 py-2 text-left">Ações</th>
               </tr>
             </thead>
@@ -360,6 +395,19 @@ function AdminPartnersPage() {
                           Copiar link
                         </button>
                       </div>
+                    </td>
+                    <td className="px-3 py-2">
+                      <label className="flex items-center gap-1.5 text-[10px]">
+                        <input
+                          type="checkbox"
+                          checked={p.sub_creators_enabled === true}
+                          disabled={savingSubCreators}
+                          onChange={(e) => void onToggleSubCreators(p.user_id, e.target.checked)}
+                        />
+                        <span className="text-muted-foreground">
+                          {p.sub_creators_enabled ? "Ativo" : "Off"}
+                        </span>
+                      </label>
                     </td>
                     <td className="px-3 py-2">
                       <button

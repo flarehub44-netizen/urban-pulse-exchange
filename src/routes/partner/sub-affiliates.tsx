@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { usePartnerSubAffiliates } from "@/hooks/use-partner";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { usePartnerOverview, usePartnerSubAffiliates } from "@/hooks/use-partner";
 import { copyShareUrl } from "@/lib/share-url";
 import { copy } from "@/copy/pt-BR";
 import { toast } from "sonner";
@@ -9,7 +9,21 @@ export const Route = createFileRoute("/partner/sub-affiliates")({
 });
 
 function PartnerSubAffiliatesPage() {
-  const { data } = usePartnerSubAffiliates();
+  const { data: overview } = usePartnerOverview();
+  const subCreatorsEnabled = overview?.sub_creators_enabled === true;
+  const { data } = usePartnerSubAffiliates(subCreatorsEnabled);
+
+  if (overview && !subCreatorsEnabled) {
+    return (
+      <div className="space-y-4 rounded-xl border bg-card/60 p-6">
+        <h1 className="text-lg font-semibold">{copy.partner.nav.subAffiliates}</h1>
+        <p className="text-sm text-muted-foreground">{copy.partner.subCreatorsDisabled}</p>
+        <Link to="/partner" className="text-xs text-primary hover:underline">
+          {copy.partner.backToOverview}
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

@@ -1,3 +1,5 @@
+import { assertPublishableSupabaseKey } from "@/lib/supabase-key-guard";
+
 /** Resolves Supabase URL and anon/publishable key for browser (Vite) and SSR/Worker. */
 export function resolveSupabasePublicEnv(): { url: string; publishableKey: string } {
   const serverEnv = typeof process !== "undefined" ? process.env : undefined;
@@ -16,6 +18,8 @@ export function resolveSupabasePublicEnv(): { url: string; publishableKey: strin
         "Copy .env.example to .env.local and fill in your project credentials.",
     );
   }
+
+  assertPublishableSupabaseKey(publishableKey);
 
   return { url, publishableKey };
 }

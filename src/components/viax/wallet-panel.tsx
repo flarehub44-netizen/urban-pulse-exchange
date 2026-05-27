@@ -75,10 +75,6 @@ export function WalletPanel({
   const { enabled: casinoEnabled } = useCasinoEnabled();
   const queryClient = useQueryClient();
 
-  if (!me) {
-    return <AppLoadingSkeleton />;
-  }
-
   useEffect(() => {
     if (!initialTab) return;
     setTab(initialTab);
@@ -167,7 +163,7 @@ export function WalletPanel({
   const balanceSeries = useBalanceSeries(tx);
   const balanceCurve = balanceSeries.length
     ? balanceSeries.map((p) => ({ d: p.label || String(p.d), v: p.v }))
-    : [{ d: "—", v: me.balance }];
+    : [{ d: "—", v: me?.balance ?? 0 }];
 
   const volumeMoved = useMemo(
     () =>
@@ -175,6 +171,10 @@ export function WalletPanel({
     [tx],
   );
   const marketsOperated = useMemo(() => new Set((bets ?? []).map((b) => b.marketId)).size, [bets]);
+
+  if (!me) {
+    return <AppLoadingSkeleton />;
+  }
 
   return (
     <div className="space-y-5">

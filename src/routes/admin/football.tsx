@@ -48,6 +48,7 @@ function AdminFootballPage() {
   const [syncDaysBack, setSyncDaysBack] = useState("1");
   const [syncDays, setSyncDays] = useState("7");
   const [closeMinutes, setCloseMinutes] = useState("5");
+  const [autoApprove, setAutoApprove] = useState(false);
 
   useEffect(() => {
     if (!settings) return;
@@ -56,6 +57,7 @@ function AdminFootballPage() {
     setSyncDaysBack(String(settings.syncDaysBack));
     setSyncDays(String(settings.syncDaysAhead));
     setCloseMinutes(String(settings.bettingCloseMinutes));
+    setAutoApprove(settings.autoApprove);
   }, [settings]);
 
   const tabs: { key: Tab; label: string }[] = [
@@ -246,6 +248,15 @@ function AdminFootballPage() {
             />
             <span>{copy.admin.football.enabledLabel}</span>
           </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={autoApprove}
+              onChange={(e) => setAutoApprove(e.target.checked)}
+            />
+            <span>{copy.admin.football.autoApproveLabel}</span>
+          </label>
+          <p className="text-[10px] text-muted-foreground">{copy.admin.football.autoApproveHint}</p>
 
           <label className="block">
             <span className="text-xs text-muted-foreground">
@@ -315,6 +326,7 @@ function AdminFootballPage() {
                   syncDaysBack: Number(syncDaysBack),
                   syncDaysAhead: Number(syncDays),
                   bettingCloseMinutes: Number(closeMinutes),
+                  autoApprove,
                 });
                 toast.success(copy.admin.football.settingsSaved);
               } catch (e) {
@@ -332,10 +344,31 @@ function AdminFootballPage() {
               disabled={syncNow.isPending}
               onClick={async () => {
                 try {
-                  const res = await syncNow.mutateAsync();
-                  toast.success(copy.admin.football.syncDone);
-                  void refetchPending();
+                  const res = (await syncNow.mutateAsync()) as {
+                    ok?: boolean;
+                    upserted?: number;
+                    errors?: string[];
+                  };
                   console.info("[FootballSync]", res);
+                  const errors = res.errors ?? [];
+                  const has403 = errors.some((e) => e.includes("403"));
+                  if (!res.ok || (errors.length > 0 && (res.upserted ?? 0) === 0)) {
+                    toast.error(
+                      has403 ? copy.admin.football.syncApi403 : copy.admin.football.syncFailed,
+                      {
+                        description: errors[0]?.slice(0, 160),
+                      },
+                    );
+                  } else if (errors.length > 0) {
+                    toast.warning(copy.admin.football.syncPartial, {
+                      description: `${res.upserted ?? 0} jogos · ${errors.length} erro(s)`,
+                    });
+                  } else {
+                    toast.success(copy.admin.football.syncDone, {
+                      description: `${res.upserted ?? 0} jogos sincronizados`,
+                    });
+                  }
+                  void refetchPending();
                 } catch (e) {
                   toast.error(e instanceof Error ? e.message : copy.admin.football.syncFailed);
                 }

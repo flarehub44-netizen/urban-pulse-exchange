@@ -19,30 +19,35 @@ export function useMyPartnerStatus(enabled = true) {
   };
 }
 
+export type PartnerOverview = {
+  balance: number;
+  tier: string;
+  slug: string;
+  referrals: number;
+  volume: number;
+  revenue: number;
+  clicks: number;
+  conversions: number;
+  conversion_rate: number;
+  revenue_share_pct: number;
+  cpa_amount: number;
+  cpa_uses_custom: boolean;
+  cpa_min_deposit_threshold: number;
+  sub_creators_enabled?: boolean;
+  admin_preview?: boolean;
+};
+
 export function usePartnerOverview(enabled = true) {
   return useQuery({
     queryKey: ["partner", "overview"],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("get_partner_overview");
       if (error) throw error;
-      return data as {
-        balance: number;
-        tier: string;
-        slug: string;
-        referrals: number;
-        volume: number;
-        revenue: number;
-        clicks: number;
-        conversions: number;
-        conversion_rate: number;
-        revenue_share_pct: number;
-        cpa_amount: number;
-        cpa_uses_custom: boolean;
-        cpa_min_deposit_threshold: number;
-      };
+      return data as PartnerOverview;
     },
     enabled,
     staleTime: 20_000,
+    retry: false,
   });
 }
 

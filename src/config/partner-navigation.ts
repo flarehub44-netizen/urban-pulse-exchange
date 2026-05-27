@@ -19,7 +19,7 @@ export type PartnerNavItem = {
   icon: LucideIcon;
 };
 
-export const partnerNav: PartnerNavItem[] = [
+const partnerNavAll: PartnerNavItem[] = [
   { to: "/partner", label: copy.partner.nav.overview, icon: LayoutDashboard },
   { to: "/partner/revenue", label: copy.partner.nav.revenue, icon: Wallet },
   { to: "/partner/invites", label: copy.partner.nav.invites, icon: UserPlus },
@@ -31,6 +31,15 @@ export const partnerNav: PartnerNavItem[] = [
   { to: "/partner/sub-affiliates", label: copy.partner.nav.subAffiliates, icon: Users },
   { to: "/partner/payouts", label: copy.partner.nav.payouts, icon: Banknote },
 ];
+
+/** Full nav (legacy); prefer {@link getPartnerNav}. */
+export const partnerNav = partnerNavAll;
+
+export function getPartnerNav(subCreatorsEnabled = false): PartnerNavItem[] {
+  return partnerNavAll.filter(
+    (item) => item.to !== "/partner/sub-affiliates" || subCreatorsEnabled,
+  );
+}
 
 export function isPartnerNavActive(path: string, item: PartnerNavItem): boolean {
   if (item.to === "/partner") return path === "/partner" || path === "/partner/";

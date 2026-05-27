@@ -27,7 +27,13 @@ function PartnerOverviewPage() {
 
   return (
     <div className="space-y-6">
-      {Number(o.referrals) === 0 && (
+      {o.admin_preview && (
+        <div className="rounded-xl border border-warn/30 bg-warn/10 p-4 text-xs text-muted-foreground">
+          <p className="font-medium text-foreground">{copy.partner.adminPreviewTitle}</p>
+          <p className="mt-1">{copy.partner.adminPreviewDesc}</p>
+        </div>
+      )}
+      {!o.admin_preview && Number(o.referrals) === 0 && (
         <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
           <h2 className="text-sm font-semibold">Checklist de ativação</h2>
           <ul className="mt-2 space-y-1 text-xs text-muted-foreground">

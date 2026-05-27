@@ -14,6 +14,23 @@
 
 Não commitar chaves reais. Rotacionar anon key no Supabase se o repositório foi público com fallbacks antigos.
 
+## DevTools → Network (é normal?)
+
+Em qualquer app Supabase no browser, ao estar logado você verá:
+
+| Header / dado | Risco |
+| ------------- | ----- |
+| `apikey` (JWT com `"role":"anon"`) | **Público por design** — vai no bundle (`VITE_SUPABASE_PUBLISHABLE_KEY`). Proteção = RLS + RPC, não esconder. |
+| `authorization: Bearer …` | **Sessão do usuário** — visível só no *seu* DevTools; se vazar (print, XSS), outra pessoa pode agir como você até expirar. |
+| `sb-project-ref`, URL do projeto | Não são segredos. |
+| `SUPABASE_SERVICE_ROLE_KEY` no Network | **Nunca** deve aparecer — só no Worker/servidor. |
+
+O app valida em runtime que a chave publicável não é `service_role` (`src/lib/supabase-key-guard.ts`).
+
+**Checklist local:** `npm run check:secrets` (imports e `SERVICE_ROLE` no `src/`). Após build opcional: `node scripts/check-client-bundle-secrets.mjs dist/client`.
+
+**Supabase Advisors:** no dashboard → Database → Advisors (security). O MCP do projeto pode exigir permissão extra; rode manualmente após migrations.
+
 ## RLS — tabelas lidas pelo cliente (`supabase.from`)
 
 Operações sensíveis (apostas, carteira, depósito) devem usar **RPC** ou **serverFn**; `.from()` abaixo depende de políticas RLS.

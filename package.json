@@ -26,6 +26,7 @@
     "db:tick": "npx supabase db query --linked",
     "db:types": "node scripts/gen-supabase-types.mjs",
     "check:realtime": "node scripts/check-realtime-private-channels.mjs",
+    "check:secrets": "node scripts/check-client-bundle-secrets.mjs",
     "db:test-sql": "echo Run: psql $DATABASE_URL -f supabase/tests/resolution_engine_acceptance.sql"
   },
   "dependencies": {

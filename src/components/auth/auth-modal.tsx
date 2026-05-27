@@ -1,6 +1,7 @@
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback, useRef, useState, type ReactNode } from "react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { useAuthModal } from "@/hooks/use-auth-modal";
 import { useDepositSheet } from "@/hooks/use-deposit-sheet";
 import { useHasDeposited } from "@/hooks/use-has-deposited";
@@ -13,6 +14,9 @@ import { getDefaultPostAuthPath } from "@/lib/post-auth-redirect";
 import { trackDepositFunnel } from "@/lib/deposit-funnel";
 import { copy } from "@/copy/pt-BR";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+
+const MOBILE_AUTH_MQ = "(max-width: 767px)";
 
 function parseRedirectPath(
   dest: string,
@@ -36,10 +40,79 @@ function parseRedirectPath(
   }
 }
 
+type AuthModalBodyProps = {
+  title: string;
+  subtitle: string | undefined;
+  mode: "login" | "signup" | "forgot";
+  Title: typeof DialogTitle;
+  Description: typeof DialogDescription;
+  onFinishAuth: () => void;
+  onForgot: () => void;
+  onSignup: () => void;
+  onLogin: () => void;
+  onNeedsVerify: () => void;
+};
+
+function AuthModalBody({
+  title,
+  subtitle,
+  mode,
+  Title,
+  Description,
+  onFinishAuth,
+  onForgot,
+  onSignup,
+  onLogin,
+  onNeedsVerify,
+}: AuthModalBodyProps) {
+  return (
+    <div className="p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+      <Title className="text-xl font-semibold">{title}</Title>
+      {subtitle && (
+        <Description className="mt-1 text-sm text-muted-foreground">{subtitle}</Description>
+      )}
+      <div className="mt-6">
+        {mode === "login" && (
+          <LoginForm onSuccess={onFinishAuth} onForgotPassword={onForgot} />
+        )}
+        {mode === "signup" && (
+          <SignupForm
+            onSuccess={() => {
+              trackDepositFunnel("signup_complete");
+              onFinishAuth();
+            }}
+            onNeedsVerify={onNeedsVerify}
+          />
+        )}
+        {mode === "forgot" && <ForgotPasswordForm onBackToLogin={onLogin} />}
+      </div>
+      {mode !== "forgot" && (
+        <div className="mt-6 border-t pt-4 text-center text-sm">
+          {mode === "login" ? (
+            <>
+              {copy.auth.noAccount}{" "}
+              <button type="button" onClick={onSignup} className="text-primary hover:underline">
+                {copy.auth.signupLink}
+              </button>
+            </>
+          ) : (
+            <>
+              {copy.auth.hasAccount}{" "}
+              <button type="button" onClick={onLogin} className="text-primary hover:underline">
+                {copy.auth.loginLink}
+              </button>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function AuthModal() {
   const navigate = useNavigate();
   const search = useRouterState({ select: (s) => s.location.search as Record<string, unknown> });
-  const { userId, isRegistered } = useAuth();
+  const { userId } = useAuth();
   const { data: hasDeposited } = useHasDeposited(userId);
   const { openDeposit } = useDepositSheet();
   const {
@@ -53,6 +126,16 @@ export function AuthModal() {
     setMode,
     close,
   } = useAuthModal();
+
+  const [useMobileSheet, setUseMobileSheet] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia(MOBILE_AUTH_MQ);
+    const sync = () => setUseMobileSheet(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   const urlAuth = parseAuthModalSearch(search);
   const urlWantDeposit = urlAuth.deposit === "1" || openDepositAfter;
@@ -131,63 +214,47 @@ export function AuthModal() {
         ? copy.auth.signupSubtitle
         : copy.auth.forgotSubtitle;
 
-  return (
-    <Dialog open={open} onOpenChange={(next) => !next && handleClose()}>
-      <DialogContent className="max-w-md gap-0 p-0">
-        <div className="p-6">
-          <DialogTitle className="text-xl font-semibold">{title}</DialogTitle>
-          {subtitle && (
-            <DialogDescription className="mt-1 text-sm text-muted-foreground">
-              {subtitle}
-            </DialogDescription>
+  const bodyProps = {
+    title,
+    subtitle,
+    mode,
+    onFinishAuth: finishAuth,
+    onForgot: () => setMode("forgot"),
+    onSignup: () => setMode("signup"),
+    onLogin: () => setMode("login"),
+    onNeedsVerify: () => {
+      handleClose();
+      navigate({ to: "/auth/verify" });
+    },
+  };
+
+  const shell = (children: ReactNode) =>
+    useMobileSheet ? (
+      <Sheet open={open} onOpenChange={(next) => !next && handleClose()}>
+        <SheetContent
+          side="bottom"
+          className={cn(
+            "max-h-[92dvh] gap-0 overflow-y-auto rounded-t-2xl p-0",
+            "data-[state=open]:slide-in-from-bottom",
           )}
-          <div className="mt-6">
-            {mode === "login" && (
-              <LoginForm onSuccess={finishAuth} onForgotPassword={() => setMode("forgot")} />
-            )}
-            {mode === "signup" && (
-              <SignupForm
-                onSuccess={() => {
-                  trackDepositFunnel("signup_complete");
-                  finishAuth();
-                }}
-                onNeedsVerify={() => {
-                  handleClose();
-                  navigate({ to: "/auth/verify" });
-                }}
-              />
-            )}
-            {mode === "forgot" && <ForgotPasswordForm onBackToLogin={() => setMode("login")} />}
-          </div>
-          {mode !== "forgot" && (
-            <div className="mt-6 border-t pt-4 text-center text-sm">
-              {mode === "login" ? (
-                <>
-                  {copy.auth.noAccount}{" "}
-                  <button
-                    type="button"
-                    onClick={() => setMode("signup")}
-                    className="text-primary hover:underline"
-                  >
-                    {copy.auth.signupLink}
-                  </button>
-                </>
-              ) : (
-                <>
-                  {copy.auth.hasAccount}{" "}
-                  <button
-                    type="button"
-                    onClick={() => setMode("login")}
-                    className="text-primary hover:underline"
-                  >
-                    {copy.auth.loginLink}
-                  </button>
-                </>
-              )}
-            </div>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+          data-testid="auth-modal-sheet"
+        >
+          {children}
+        </SheetContent>
+      </Sheet>
+    ) : (
+      <Dialog open={open} onOpenChange={(next) => !next && handleClose()}>
+        <DialogContent className="max-w-md gap-0 p-0" data-testid="auth-modal-dialog">
+          {children}
+        </DialogContent>
+      </Dialog>
+    );
+
+  return shell(
+    <AuthModalBody
+      {...bodyProps}
+      Title={useMobileSheet ? SheetTitle : DialogTitle}
+      Description={useMobileSheet ? SheetDescription : DialogDescription}
+    />,
   );
 }

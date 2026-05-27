@@ -201,10 +201,12 @@ export function OrderBox({
   }
 
   if (m.status === "closed") {
+    const closedDesc =
+      m.marketKind === "community" ? copy.bet.closedDescCommunity : copy.bet.closedDesc;
     return (
       <div className={cn("rounded-2xl border bg-card/60 p-5 backdrop-blur", className)}>
         <h4 className="text-sm font-medium">{copy.bet.closedTitle}</h4>
-        <p className="mt-2 text-sm text-muted-foreground">{copy.bet.closedDesc}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{closedDesc}</p>
       </div>
     );
   }

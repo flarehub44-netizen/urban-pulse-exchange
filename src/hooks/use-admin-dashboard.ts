@@ -1,6 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
+type OpsRunStatus = {
+  at: string;
+  ok: boolean;
+  processed?: number;
+  errorsCount?: number;
+  notes?: string;
+};
+
 export function useAdminDashboardMetrics(enabled = true) {
   return useQuery({
     queryKey: ["admin", "dashboard-metrics"],
@@ -173,6 +181,63 @@ export function useAdminPlatformSettings(enabled = true) {
   });
 }
 
+export function useAdminMarketOpsStatus(enabled = true) {
+  return useQuery({
+    queryKey: ["admin", "market-ops-status"],
+    queryFn: async () => {
+      const [{ data: settingsRows, error: settingsError }, { data: overview, error: overviewError }] =
+        await Promise.all([
+          supabase
+            .from("platform_settings")
+            .select("key, value")
+            .in("key", [
+              "football_enabled",
+              "football_betting_close_minutes",
+              "football_sync_days_back",
+              "football_sync_days_ahead",
+              "football_last_sync_run",
+              "football_last_resolve_run",
+            ]),
+          supabase.rpc("admin_get_events_hub_overview"),
+        ]);
+
+      if (settingsError) throw settingsError;
+      if (overviewError) throw overviewError;
+
+      const settings = Object.fromEntries((settingsRows ?? []).map((r) => [r.key, r.value]));
+      const footballSync = (settings.football_last_sync_run ?? null) as OpsRunStatus | null;
+      const footballResolve = (settings.football_last_resolve_run ?? null) as OpsRunStatus | null;
+      const eventsOverview = overview as {
+        markets: { live: number; dispute: number; draft: number };
+        football: { pending_fixtures: number };
+        community: { pending_reports: number };
+      };
+
+      return {
+        football: {
+          enabled: Boolean(settings.football_enabled ?? true),
+          closeMinutes: Number(settings.football_betting_close_minutes ?? 5),
+          syncDaysBack: Number(settings.football_sync_days_back ?? 1),
+          syncDaysAhead: Number(settings.football_sync_days_ahead ?? 1),
+          lastSyncRun: footballSync,
+          lastResolveRun: footballResolve,
+          pendingFixtures: eventsOverview.football.pending_fixtures ?? 0,
+        },
+        traffic: {
+          liveMarkets: eventsOverview.markets.live ?? 0,
+          disputeMarkets: eventsOverview.markets.dispute ?? 0,
+          draftMarkets: eventsOverview.markets.draft ?? 0,
+        },
+        community: {
+          pendingReports: eventsOverview.community.pending_reports ?? 0,
+        },
+      };
+    },
+    enabled,
+    refetchInterval: 30_000,
+  });
+}
+
 export function useAdminCameras(enabled = true) {
   return useQuery({
     queryKey: ["admin", "cameras"],
@@ -312,12 +377,14 @@ export function useAdminApprovePartner() {
       slug,
       revenueSharePct,
       cpaAmount,
+      subCreatorsEnabled,
     }: {
       userId: string;
       tier?: string;
       slug?: string;
       revenueSharePct?: number;
       cpaAmount?: number | null;
+      subCreatorsEnabled?: boolean;
     }) => {
       const { data, error } = await supabase.rpc("admin_approve_partner", {
         p_user_id: userId,
@@ -325,6 +392,7 @@ export function useAdminApprovePartner() {
         p_slug: slug ?? undefined,
         p_revenue_share_pct: revenueSharePct ?? undefined,
         p_cpa_amount: cpaAmount ?? undefined,
+        p_sub_creators_enabled: subCreatorsEnabled ?? false,
       });
       if (error) throw error;
       return data;
@@ -332,6 +400,7 @@ export function useAdminApprovePartner() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin", "partner-applications"] });
       qc.invalidateQueries({ queryKey: ["admin", "active-partners"] });
+      qc.invalidateQueries({ queryKey: ["partner", "overview"] });
     },
   });
 }
@@ -346,7 +415,32 @@ export type AdminActivePartner = {
   cpa_amount: number | null;
   balance: number;
   referrals_count: number;
+  sub_creators_enabled: boolean;
 };
+
+export function useAdminSetPartnerSubCreators() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      enabled,
+    }: {
+      userId: string;
+      enabled: boolean;
+    }) => {
+      const { data, error } = await supabase.rpc("admin_set_partner_sub_creators", {
+        p_user_id: userId,
+        p_enabled: enabled,
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "active-partners"] });
+      qc.invalidateQueries({ queryKey: ["partner", "overview"] });
+    },
+  });
+}
 
 export function useAdminActivePartners(enabled = true) {
   return useQuery({

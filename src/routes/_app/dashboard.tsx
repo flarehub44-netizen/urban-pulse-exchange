@@ -206,10 +206,6 @@ function Dashboard() {
   const { data: trendingTraders = [] } = useTrendingTraders(3);
   useWinToast();
 
-  if (!authReady || !isRegistered || !me) {
-    return <AppLoadingSkeleton />;
-  }
-
   useEffect(() => {
     const assigned = getOrAssignVariant(
       "dashboard_primary_cta",
@@ -224,13 +220,14 @@ function Dashboard() {
   }, [userId]);
 
   useEffect(() => {
+    if (!me) return;
     trackProductEvent("view_dashboard", {
       variant: ctaVariant,
       balance: me.balance,
       openPositions: openBets.length,
       liveMarkets: markets.length,
     });
-  }, [ctaVariant, me.balance, openBets.length, markets.length]);
+  }, [ctaVariant, me, openBets.length, markets.length]);
 
   useEffect(() => {
     if (topOpen.length > 0) {
@@ -260,6 +257,14 @@ function Dashboard() {
   );
 
   const primaryCta = useMemo(() => {
+    if (!me) {
+      return {
+        title: copy.common.loading,
+        description: "",
+        actionLabel: copy.common.loading,
+        onAction: () => {},
+      };
+    }
     if (me.balance < 80) {
       return {
         title: "Saldo baixo para operar",
@@ -296,7 +301,7 @@ function Dashboard() {
       actionLabel: "Apostar agora",
       onAction: () => navigate({ to: "/markets", search: { status: "live" } }),
     };
-  }, [ctaVariant, me.balance, navigate, openBets.length]);
+  }, [ctaVariant, me, navigate, openBets.length]);
 
   const todayStart = useMemo(() => {
     const d = new Date();
@@ -333,7 +338,11 @@ function Dashboard() {
       .reduce((acc, tx) => acc + (tx.type === "entry" ? -tx.amount : tx.amount), 0);
   }, [transactions, todayStart]);
 
-  const pnlTotal = pnlSeries.length ? pnlSeries[pnlSeries.length - 1].v : "pnl" in me ? me.pnl : 0;
+  const pnlTotal = pnlSeries.length
+    ? pnlSeries[pnlSeries.length - 1].v
+    : me && "pnl" in me
+      ? me.pnl
+      : 0;
   const pnlStart = pnlSeries.length > 1 ? pnlSeries[0].v : 0;
   const pnlDelta = pnlTotal - pnlStart;
   const pnlPct = pnlStart !== 0 ? ((pnlDelta / Math.abs(pnlStart)) * 100).toFixed(1) : null;
@@ -341,6 +350,10 @@ function Dashboard() {
   const chartData = pnlSeries.length
     ? pnlSeries.map((p) => ({ d: p.label, pnl: p.v }))
     : [{ d: "—", pnl: 0 }];
+
+  if (!authReady || !isRegistered || !me) {
+    return <AppLoadingSkeleton />;
+  }
 
   return (
     <div className="space-y-6">

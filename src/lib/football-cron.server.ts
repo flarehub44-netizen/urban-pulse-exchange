@@ -17,6 +17,20 @@ function getServiceClient(): SupabaseClient {
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }
 
+async function upsertOpsRun(
+  supabase: SupabaseClient,
+  key: "football_last_sync_run" | "football_last_resolve_run",
+  value: {
+    at: string;
+    ok: boolean;
+    processed?: number;
+    errorsCount?: number;
+    notes?: string;
+  },
+) {
+  await supabase.from("platform_settings").upsert({ key, value }, { onConflict: "key" });
+}
+
 async function upsertFixture(supabase: SupabaseClient, f: ApiFootballFixtureDto) {
   const { error } = await supabase.rpc("upsert_football_fixture", {
     p_api_fixture_id: f.api_fixture_id,
@@ -69,9 +83,15 @@ export async function runFootballSync(): Promise<unknown> {
       .select("value")
       .eq("key", "football_sync_days_back")
       .maybeSingle();
+    const { data: autoApproveRow } = await supabase
+      .from("platform_settings")
+      .select("value")
+      .eq("key", "football_auto_approve")
+      .maybeSingle();
 
     const daysAhead = Number(daysRow?.value ?? 1);
     const daysBack = Number(daysBackRow?.value ?? 1);
+    const autoApproveEnabled = autoApproveRow?.value === true;
     const dates: string[] = [];
     for (let i = -daysBack; i <= daysAhead; i++) {
       const d = new Date();
@@ -96,7 +116,7 @@ export async function runFootballSync(): Promise<unknown> {
           upserted++;
 
           const kickoffMs = new Date(f.kickoff_at).getTime();
-          if (kickoffMs > Date.now() + TWO_HOURS_MS) {
+          if (autoApproveEnabled && kickoffMs > Date.now() + TWO_HOURS_MS) {
             const { error: approveErr } = await supabase.rpc("admin_approve_football_fixture", {
               p_fixture_id: f.api_fixture_id,
             });
@@ -126,7 +146,16 @@ export async function runFootballSync(): Promise<unknown> {
       consecutiveSyncFailures = 0;
     }
 
-    return { ok: true, upserted, autoApproved, dates: dates.length, errors };
+    const syncOk = errors.length === 0 || upserted > 0;
+    const out = { ok: syncOk, upserted, autoApproved, dates: dates.length, errors };
+    await upsertOpsRun(supabase, "football_last_sync_run", {
+      at: new Date().toISOString(),
+      ok: syncOk,
+      processed: upserted,
+      errorsCount: errors.length,
+      notes: `autoApproveEnabled=${autoApproveEnabled}; autoApproved=${autoApproved}; window=-${daysBack}/+${daysAhead}`,
+    });
+    return out;
   });
 }
 
@@ -165,6 +194,16 @@ export async function runFootballResolve(): Promise<unknown> {
       }
     }
 
-    return { ok: true, processed: results.length, results };
+    const out = { ok: true, processed: results.length, results };
+    const errorsCount = results.filter(
+      (r) => typeof r === "object" && r !== null && "error" in r,
+    ).length;
+    await upsertOpsRun(supabase, "football_last_resolve_run", {
+      at: new Date().toISOString(),
+      ok: errorsCount === 0,
+      processed: results.length,
+      errorsCount,
+    });
+    return out;
   });
 }

@@ -7,6 +7,7 @@ import { AdminStatCard } from "@/components/admin/admin-stat-card";
 import { InlineError } from "@/components/viax/inline-error";
 import { copy } from "@/copy/pt-BR";
 import { cn } from "@/lib/utils";
+import { useAdminMarketOpsStatus } from "@/hooks/use-admin-dashboard";
 import {
   useAdminEventsOverview,
   useAdminPlatformEvents,
@@ -58,6 +59,7 @@ function AdminEventsPage() {
     isError: partnerError,
     refetch: refetchPartner,
   } = useAdminPartnerEventsFeed(partnerFilterApplied);
+  const { data: opsStatus } = useAdminMarketOpsStatus();
 
   const upsertEvent = useAdminUpsertPlatformEvent();
   const deleteEvent = useAdminDeletePlatformEvent();
@@ -269,6 +271,71 @@ function AdminEventsPage() {
             >
               {copy.admin.events.goPartners}
             </Link>
+          </div>
+
+          <div className="rounded-xl border bg-card/60 p-4 space-y-3">
+            <h2 className="text-sm font-semibold">{copy.admin.events.opsTitle}</h2>
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-lg border bg-background/40 p-3 text-xs space-y-1.5">
+                <div className="font-medium">{copy.admin.events.opsFootballTitle}</div>
+                <div className="text-muted-foreground">
+                  {copy.admin.events.opsAutoRules}:{" "}
+                  {opsStatus?.football.enabled ? copy.admin.events.opsEnabled : copy.admin.events.opsDisabled}
+                </div>
+                <div className="text-muted-foreground">
+                  Entradas fecham {opsStatus?.football.closeMinutes ?? 5} min antes · Janela sync -
+                  {opsStatus?.football.syncDaysBack ?? 1}/+{opsStatus?.football.syncDaysAhead ?? 1}
+                </div>
+                <div className="text-muted-foreground">
+                  {copy.admin.events.opsPendingFixtures}: {opsStatus?.football.pendingFixtures ?? 0}
+                </div>
+                <div className="text-muted-foreground">
+                  {copy.admin.events.opsLastRun}:{" "}
+                  {opsStatus?.football.lastSyncRun?.at
+                    ? format(new Date(opsStatus.football.lastSyncRun.at), "dd/MM HH:mm", { locale: ptBR })
+                    : copy.admin.events.opsNoRun}
+                </div>
+                <Link to="/admin/football" className="text-primary hover:underline">
+                  {copy.admin.events.opsOpenAdmin}
+                </Link>
+              </div>
+
+              <div className="rounded-lg border bg-background/40 p-3 text-xs space-y-1.5">
+                <div className="font-medium">{copy.admin.events.opsTrafficTitle}</div>
+                <div className="text-muted-foreground">
+                  {copy.admin.events.opsLiveMarkets}: {opsStatus?.traffic.liveMarkets ?? 0}
+                </div>
+                <div className="text-muted-foreground">
+                  {copy.admin.events.opsDisputeMarkets}: {opsStatus?.traffic.disputeMarkets ?? 0}
+                </div>
+                <div className="text-muted-foreground">
+                  {copy.admin.events.opsDraftMarkets}: {opsStatus?.traffic.draftMarkets ?? 0}
+                </div>
+                <Link to="/admin/markets" className="text-primary hover:underline">
+                  {copy.admin.events.opsOpenAdmin}
+                </Link>
+              </div>
+
+              <div className="rounded-lg border bg-background/40 p-3 text-xs space-y-1.5">
+                <div className="font-medium">{copy.admin.events.opsCommunityTitle}</div>
+                <div className="text-muted-foreground">
+                  {copy.admin.events.opsPendingReports}: {opsStatus?.community.pendingReports ?? 0}
+                </div>
+                <Link to="/admin/community" className="text-primary hover:underline">
+                  {copy.admin.events.opsOpenAdmin}
+                </Link>
+              </div>
+
+              <div className="rounded-lg border bg-background/40 p-3 text-xs space-y-1.5">
+                <div className="font-medium">{copy.admin.events.opsOtherTitle}</div>
+                <div className="text-muted-foreground">
+                  Lifecycle e rotinas de resolução seguem ativos via jobs/plataforma.
+                </div>
+                <Link to="/admin/system" className="text-primary hover:underline">
+                  {copy.admin.events.opsOpenAdmin}
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       )}
