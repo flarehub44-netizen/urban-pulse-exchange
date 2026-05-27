@@ -164,26 +164,11 @@ export function useFootballLeagueSettings() {
       const { data, error } = await supabase
         .from("platform_settings")
         .select("key, value")
-        .in("key", [
-          "football_enabled",
-          "football_league_ids",
-          "football_sync_days_back",
-          "football_sync_days_ahead",
-          "football_sync_base_date",
-          "football_betting_close_minutes",
-          "football_auto_approve",
-        ]);
+        .in("key", ["football_enabled"]);
       if (error) throw error;
       const map = Object.fromEntries((data ?? []).map((r) => [r.key, r.value]));
       return {
         enabled: Boolean(map.football_enabled ?? true),
-        leagueIds: (map.football_league_ids as number[] | undefined) ?? [71],
-        syncDaysBack: Number(map.football_sync_days_back ?? 1),
-        syncDaysAhead: Number(map.football_sync_days_ahead ?? 1),
-        syncBaseDate:
-          typeof map.football_sync_base_date === "string" ? map.football_sync_base_date : "",
-        bettingCloseMinutes: Number(map.football_betting_close_minutes ?? 5),
-        autoApprove: Boolean(map.football_auto_approve ?? false),
       };
     },
   });
@@ -216,25 +201,8 @@ export function useUpdateFootballSettings() {
   const update = useAdminUpdateSetting();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: {
-      enabled: boolean;
-      leagueIds: number[];
-      syncDaysBack: number;
-      syncDaysAhead: number;
-      syncBaseDate: string;
-      bettingCloseMinutes: number;
-      autoApprove: boolean;
-    }) => {
+    mutationFn: async (input: { enabled: boolean }) => {
       await update.mutateAsync({ key: "football_enabled", value: input.enabled });
-      await update.mutateAsync({ key: "football_league_ids", value: input.leagueIds });
-      await update.mutateAsync({ key: "football_sync_days_back", value: input.syncDaysBack });
-      await update.mutateAsync({ key: "football_sync_days_ahead", value: input.syncDaysAhead });
-      await update.mutateAsync({ key: "football_sync_base_date", value: input.syncBaseDate });
-      await update.mutateAsync({ key: "football_auto_approve", value: input.autoApprove });
-      await update.mutateAsync({
-        key: "football_betting_close_minutes",
-        value: input.bettingCloseMinutes,
-      });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["football-league-settings"] });

@@ -27,6 +27,12 @@ export type ApiFootballFixtureDto = {
   raw: Record<string, unknown>;
 };
 
+export type AllGamesFallbackResult = {
+  fixtures: ApiFootballFixtureDto[];
+  triedSeasons: number[];
+  seasonUsed: number | null;
+};
+
 type ApiFixtureItem = {
   fixture: {
     id: number;
@@ -191,6 +197,27 @@ export async function getFixturesByDateAll(
     });
   }
   return items.map(mapFixtureItem);
+}
+
+export async function getFixturesByDateAllWithFallback(
+  date: string,
+  preferredSeason: number,
+  fallbackSeasons: number[],
+): Promise<AllGamesFallbackResult> {
+  const candidates = [preferredSeason, ...fallbackSeasons]
+    .map((s) => Math.trunc(s))
+    .filter((s, i, arr) => Number.isFinite(s) && s > 1900 && arr.indexOf(s) === i);
+  const triedSeasons: number[] = [];
+
+  for (const season of candidates) {
+    triedSeasons.push(season);
+    const fixtures = await getFixturesByDateAll(date, season);
+    if (fixtures.length > 0) {
+      return { fixtures, triedSeasons, seasonUsed: season };
+    }
+  }
+
+  return { fixtures: [], triedSeasons, seasonUsed: null };
 }
 
 export async function getFixtureById(fixtureId: number): Promise<ApiFootballFixtureDto | null> {

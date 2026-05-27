@@ -2,15 +2,13 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import {
   formatDateYmd,
   getFixtureById,
-  getFixturesByDateAll,
+  getFixturesByDateAllWithFallback,
   type ApiFootballFixtureDto,
 } from "@/lib/api-football.server";
 import { withJobLog, logApiMetric } from "@/lib/structured-log.server";
 
 let consecutiveSyncFailures = 0;
 const CRON_ALERT_THRESHOLD = 3;
-
-const ISO_DATE_ONLY_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 function getServiceClient(): SupabaseClient {
   const url = process.env.SUPABASE_URL;
@@ -59,21 +57,6 @@ async function upsertFixture(supabase: SupabaseClient, f: ApiFootballFixtureDto)
   if (error) throw new Error(error.message);
 }
 
-function parseBaseDate(value: unknown): Date | null {
-  if (typeof value !== "string" || !ISO_DATE_ONLY_RE.test(value)) return null;
-  const parsed = new Date(`${value}T00:00:00.000Z`);
-  if (Number.isNaN(parsed.getTime())) return null;
-  return parsed;
-}
-
-export function computeSeasonFromBaseDate(baseDate: Date): number {
-  return baseDate.getUTCFullYear();
-}
-
-export function resolveSyncBaseDate(value: unknown, now = new Date()): Date {
-  return parseBaseDate(value) ?? now;
-}
-
 export async function runFootballSync(): Promise<unknown> {
   return withJobLog("football_sync", async () => {
     const supabase = getServiceClient();
@@ -81,20 +64,8 @@ export async function runFootballSync(): Promise<unknown> {
     const { data: enabled } = await supabase.rpc("is_football_enabled");
     if (enabled === false) return { ok: true, skipped: "football_disabled" };
 
-    const { data: autoApproveRow } = await supabase
-      .from("platform_settings")
-      .select("value")
-      .eq("key", "football_auto_approve")
-      .maybeSingle();
-    const { data: baseDateRow } = await supabase
-      .from("platform_settings")
-      .select("value")
-      .eq("key", "football_sync_base_date")
-      .maybeSingle();
-
-    const autoApproveEnabled = autoApproveRow?.value === true;
-    const effectiveBaseDate = resolveSyncBaseDate(baseDateRow?.value);
-    const syncSeason = computeSeasonFromBaseDate(effectiveBaseDate);
+    const autoApproveEnabled = false;
+    const currentYear = new Date().getUTCFullYear();
     const dates = [formatDateYmd(new Date())];
     let upserted = 0;
     const errors: string[] = [];
@@ -108,7 +79,11 @@ export async function runFootballSync(): Promise<unknown> {
 
     for (const date of dates) {
       try {
-        const fixtures = await getFixturesByDateAll(date, syncSeason);
+        const { fixtures, triedSeasons } = await getFixturesByDateAllWithFallback(
+          date,
+          currentYear,
+          [2024, 2023, 2022],
+        );
         for (const f of fixtures) {
           await upsertFixture(supabase, f);
           upserted++;
@@ -120,6 +95,9 @@ export async function runFootballSync(): Promise<unknown> {
             });
             if (!approveErr) autoApproved++;
           }
+        }
+        if (!fixtures.length) {
+          errors.push(`${date}: no-fixtures for seasons=${triedSeasons.join(",")}`);
         }
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
@@ -151,7 +129,7 @@ export async function runFootballSync(): Promise<unknown> {
       ok: syncOk,
       processed: upserted,
       errorsCount: errors.length,
-      notes: `autoApproveEnabled=${autoApproveEnabled}; autoApproved=${autoApproved}; window=today_only; baseDate=${formatDateYmd(effectiveBaseDate)}; season=${syncSeason}`,
+      notes: `autoApproveEnabled=${autoApproveEnabled}; autoApproved=${autoApproved}; window=today_only; preferredSeason=${currentYear}; fallbackSeasons=2024,2023,2022`,
     });
     return out;
   });

@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { getFixturesByDate, getFixturesByDateAll, mapFixtureItem } from "./api-football.server";
+import {
+  getFixturesByDate,
+  getFixturesByDateAll,
+  getFixturesByDateAllWithFallback,
+  mapFixtureItem,
+} from "./api-football.server";
 
 describe("api-football mapper", () => {
   it("maps fixture response shape", () => {
@@ -89,5 +94,40 @@ describe("api-football requests", () => {
     expect(firstUrl.searchParams.get("date")).toBe("2026-05-27");
     expect(firstUrl.searchParams.get("season")).toBe("2026");
     expect(firstUrl.searchParams.get("league")).toBeNull();
+  });
+
+  it("falls back when primary season returns empty list", async () => {
+    process.env.API_FOOTBALL_KEY = "test-key";
+    const fetchMock = vi
+      .spyOn(global, "fetch")
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ response: [] }),
+        headers: new Headers(),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          response: [
+            {
+              fixture: { id: 2, date: "2026-05-27T19:00:00+00:00", status: { short: "NS", elapsed: null } },
+              league: { id: 71, season: 2024, name: "Serie A", country: "Brazil" },
+              teams: { home: { id: 1, name: "A" }, away: { id: 2, name: "B" } },
+              goals: { home: null, away: null },
+            },
+          ],
+        }),
+        headers: new Headers(),
+      } as Response);
+
+    const out = await getFixturesByDateAllWithFallback("2026-05-27", 2026, [2024, 2023, 2022]);
+    expect(out.fixtures).toHaveLength(1);
+    expect(out.seasonUsed).toBe(2024);
+    expect(out.triedSeasons).toEqual([2026, 2024]);
+
+    const firstUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    const secondUrl = new URL(String(fetchMock.mock.calls[1]?.[0]));
+    expect(firstUrl.searchParams.get("season")).toBe("2026");
+    expect(secondUrl.searchParams.get("season")).toBe("2024");
   });
 });

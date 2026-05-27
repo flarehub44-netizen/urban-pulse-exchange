@@ -864,7 +864,7 @@ export const copy = {
       syncFailed: "Falha no sync (verifique API_FOOTBALL_KEY no servidor).",
       resolveFailed: "Falha na resolução.",
       cronHint:
-        "Produção: cron Cloudflare */30 sync e */5 resolve (wrangler.jsonc), respeitando dias para trás/à frente.",
+        "Produção: cron Cloudflare */30 sync e */5 resolve (wrangler.jsonc), com sync diário automático para Pendentes.",
       yes: "Sim",
       no: "Não",
     },

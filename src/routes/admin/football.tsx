@@ -44,22 +44,10 @@ function AdminFootballPage() {
   const saveSettings = useUpdateFootballSettings();
 
   const [enabled, setEnabled] = useState(true);
-  const [leagueIdsText, setLeagueIdsText] = useState("71");
-  const [syncDaysBack, setSyncDaysBack] = useState("1");
-  const [syncDays, setSyncDays] = useState("7");
-  const [syncBaseDate, setSyncBaseDate] = useState("");
-  const [closeMinutes, setCloseMinutes] = useState("5");
-  const [autoApprove, setAutoApprove] = useState(false);
 
   useEffect(() => {
     if (!settings) return;
     setEnabled(settings.enabled);
-    setLeagueIdsText(settings.leagueIds.join(", "));
-    setSyncDaysBack(String(settings.syncDaysBack));
-    setSyncDays(String(settings.syncDaysAhead));
-    setSyncBaseDate(settings.syncBaseDate || format(new Date(), "yyyy-MM-dd"));
-    setCloseMinutes(String(settings.bettingCloseMinutes));
-    setAutoApprove(settings.autoApprove);
   }, [settings]);
 
   const tabs: { key: Tab; label: string }[] = [
@@ -68,12 +56,6 @@ function AdminFootballPage() {
     { key: "published", label: copy.admin.football.tabPublished },
     { key: "settings", label: copy.admin.football.tabSettings },
   ];
-
-  const parseLeagueIds = () =>
-    leagueIdsText
-      .split(/[,\s]+/)
-      .map((s) => parseInt(s.trim(), 10))
-      .filter((n) => !Number.isNaN(n));
 
   return (
     <div className="space-y-6">
@@ -250,87 +232,6 @@ function AdminFootballPage() {
             />
             <span>{copy.admin.football.enabledLabel}</span>
           </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={autoApprove}
-              onChange={(e) => setAutoApprove(e.target.checked)}
-            />
-            <span>{copy.admin.football.autoApproveLabel}</span>
-          </label>
-          <p className="text-[10px] text-muted-foreground">{copy.admin.football.autoApproveHint}</p>
-
-          <label className="block">
-            <span className="text-xs text-muted-foreground">
-              {copy.admin.football.leaguesLabel}
-            </span>
-            <input
-              value={leagueIdsText}
-              onChange={(e) => setLeagueIdsText(e.target.value)}
-              placeholder="71, 2, 39"
-              className="mt-1 w-full rounded-lg border bg-surface px-3 py-2 text-sm"
-            />
-            <span className="text-[10px] text-muted-foreground">
-              {copy.admin.football.leaguesHint}
-            </span>
-          </label>
-
-          <label className="block">
-            <span className="text-xs text-muted-foreground">
-              {copy.admin.football.syncDaysBackLabel}
-            </span>
-            <input
-              type="number"
-              min={0}
-              max={30}
-              value={syncDaysBack}
-              onChange={(e) => setSyncDaysBack(e.target.value)}
-              className="mt-1 w-full rounded-lg border bg-surface px-3 py-2 text-sm"
-            />
-          </label>
-
-          <label className="block">
-            <span className="text-xs text-muted-foreground">
-              {copy.admin.football.syncDaysLabel}
-            </span>
-            <input
-              type="number"
-              min={0}
-              max={30}
-              value={syncDays}
-              onChange={(e) => setSyncDays(e.target.value)}
-              className="mt-1 w-full rounded-lg border bg-surface px-3 py-2 text-sm"
-            />
-          </label>
-
-          <label className="block">
-            <span className="text-xs text-muted-foreground">
-              {copy.admin.football.syncBaseDateLabel}
-            </span>
-            <input
-              type="date"
-              value={syncBaseDate}
-              onChange={(e) => setSyncBaseDate(e.target.value)}
-              className="mt-1 w-full rounded-lg border bg-surface px-3 py-2 text-sm"
-            />
-            <span className="text-[10px] text-muted-foreground">
-              {copy.admin.football.syncBaseDateHint}
-            </span>
-          </label>
-
-          <label className="block">
-            <span className="text-xs text-muted-foreground">
-              {copy.admin.football.closeMinutesLabel}
-            </span>
-            <input
-              type="number"
-              min={0}
-              max={120}
-              value={closeMinutes}
-              onChange={(e) => setCloseMinutes(e.target.value)}
-              className="mt-1 w-full rounded-lg border bg-surface px-3 py-2 text-sm"
-            />
-          </label>
 
           <button
             type="button"
@@ -339,12 +240,6 @@ function AdminFootballPage() {
               try {
                 await saveSettings.mutateAsync({
                   enabled,
-                  leagueIds: parseLeagueIds(),
-                  syncDaysBack: Number(syncDaysBack),
-                  syncDaysAhead: Number(syncDays),
-                  syncBaseDate,
-                  bettingCloseMinutes: Number(closeMinutes),
-                  autoApprove,
                 });
                 toast.success(copy.admin.football.settingsSaved);
               } catch (e) {
@@ -414,6 +309,9 @@ function AdminFootballPage() {
           </div>
 
           <p className="text-[10px] text-muted-foreground">{copy.admin.football.cronHint}</p>
+          <p className="text-[10px] text-muted-foreground">
+            Sync automático está fixo em hoje e envia jogos para Pendentes.
+          </p>
           <p className="text-[10px] text-muted-foreground">{copy.admin.football.regulationHint}</p>
         </div>
       )}
