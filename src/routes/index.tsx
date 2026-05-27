@@ -35,6 +35,7 @@ import { LandingSegmentPillars } from "@/components/viax/landing-segment-pillars
 import { usePublicCommunityMarkets } from "@/hooks/use-community-markets";
 import type { AuthModalSearch } from "@/lib/auth-modal-search";
 import { parseAuthModalSearch } from "@/lib/auth-modal-search";
+import { parseAuthSession } from "@/lib/auth";
 
 const CityHeatmap = lazy(() =>
   import("@/components/viax/city-heatmap").then((m) => ({ default: m.CityHeatmap })),
@@ -92,7 +93,8 @@ function Landing() {
     if (typeof window === "undefined") return;
     if (!localStorage.getItem("viax_onboarded")) return;
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) navigate({ to: "/dashboard", replace: true });
+      const state = parseAuthSession(session);
+      if (state.userId && state.isRegistered) navigate({ to: "/dashboard", replace: true });
     });
   }, [navigate]);
 

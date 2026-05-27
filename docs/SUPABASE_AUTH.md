@@ -12,14 +12,14 @@ Autenticação exclusivamente por **e-mail e senha** (`signUpWithEmail` / `signI
    - **Site URL**: `https://viax-urban-pulse.douglaspinheirosantos94.workers.dev`
    - **Redirect URLs**:
      - `https://viax-urban-pulse.douglaspinheirosantos94.workers.dev/**`
-     - `https://tanstack-start-app.douglaspinheirosantos94.workers.dev/**` (legado)
+     - `https://tanstack-start-app.douglaspinheirosantos94.workers.dev/**` (apenas legado, redirecionado)
 
 ## Fluxo no app
 
 - **Cadastro**: modal `?auth=signup` ou `/auth/signup`
 - **Login**: modal `?auth=login` ou `/auth/login`
 - **Callback**: `/auth/callback` (PKCE + confirmação de e-mail)
-- **Rotas protegidas** (`/_app/*`): exigem sessão via `requireAuth()`
+- **Rotas protegidas** (`/_app/*`): exigem cadastro confirmado via `requireRegistered()`
 
 ## Erros comuns
 

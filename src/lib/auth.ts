@@ -8,11 +8,18 @@ export type AuthSessionState = {
   email: string | null;
 };
 
+export function isFormalSessionUser(user: User | null): boolean {
+  if (!user) return false;
+  if (user.is_anonymous === true) return false;
+  const email = user.email?.trim();
+  return Boolean(email && user.email_confirmed_at);
+}
+
 export function parseAuthSession(session: Session | null): AuthSessionState {
   const user = session?.user ?? null;
   const userId = user?.id ?? null;
   const email = user?.email?.trim() || null;
-  const isRegistered = Boolean(email && user?.email_confirmed_at);
+  const isRegistered = isFormalSessionUser(user);
 
   return {
     userId,

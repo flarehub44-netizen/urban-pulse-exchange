@@ -17,10 +17,10 @@ export function useResolvedProfile() {
   const { data: profile, isLoading, isError } = useProfile(userId);
   const snapshotProfile = snapshot.data?.profile;
   const seed = useViaX((s) => s.me);
-  const me = pickDbOrSeed(snapshotProfile ?? profile, seed);
+  const me = pickDbOrSeed(snapshotProfile ?? profile, seed) ?? null;
   return {
     me,
-    profile: (snapshotProfile ?? profile) as typeof profile,
+    profile: (snapshotProfile ?? profile ?? null) as typeof profile | null,
     isLoading: snapshot.isLoading || isLoading,
     isError: snapshot.isError || isError,
   };

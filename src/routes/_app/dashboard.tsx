@@ -102,6 +102,7 @@ import { useDepositSheet } from "@/hooks/use-deposit-sheet";
 import { useFollowingActiveBets } from "@/hooks/use-following-active-bets";
 import { useWinToast } from "@/hooks/use-win-toast";
 import { getOrAssignVariant, trackProductEvent } from "@/lib/product-analytics";
+import { AppLoadingSkeleton } from "@/components/viax/app-loading-skeleton";
 
 function WidgetFallback({ className = "h-24" }: { className?: string }) {
   return <div className={cn("animate-pulse rounded-xl bg-surface/60", className)} />;
@@ -129,8 +130,7 @@ function Dashboard() {
   const casinoReady = useBelowFoldMount(2500);
   const { enabled: casinoEnabled } = useCasinoEnabled();
   const { from, highlight } = Route.useSearch();
-  const { userId } = useAuth();
-  const { isRegistered } = useAuth();
+  const { userId, isRegistered, authReady } = useAuth();
   const { me, profile: dbProfile } = useResolvedProfile();
   const { data: weeklyReport, shouldShow: showWeeklyReport, shouldShowMidweek } = useWeeklyReport();
   const [weeklyReportDismissed, setWeeklyReportDismissed] = useState(false);
@@ -205,6 +205,10 @@ function Dashboard() {
   const { data: myLeagues = [] } = useMyLeagues();
   const { data: trendingTraders = [] } = useTrendingTraders(3);
   useWinToast();
+
+  if (!authReady || !isRegistered || !me) {
+    return <AppLoadingSkeleton />;
+  }
 
   useEffect(() => {
     const assigned = getOrAssignVariant(
@@ -458,7 +462,9 @@ function Dashboard() {
             <KpiTile
               label="Saldo"
               icon={TrendingUp}
-              value={<AnimatedNumber value={me.balance} format={formatBRL} />}
+              value={
+                deferredReady ? <AnimatedNumber value={me.balance} format={formatBRL} /> : formatBRL(me.balance)
+              }
               interactive
             />
           </button>
@@ -468,7 +474,7 @@ function Dashboard() {
               icon={TrendingUp}
               value={
                 <span className={cn(pnlToday >= 0 ? "text-up" : "text-down")}>
-                  <AnimatedNumber value={pnlToday} format={formatBRL} />
+                  {deferredReady ? <AnimatedNumber value={pnlToday} format={formatBRL} /> : formatBRL(pnlToday)}
                 </span>
               }
               sub={pnlToday >= 0 ? "Acumulado hoje" : "Perda acumulada hoje"}
@@ -480,11 +486,15 @@ function Dashboard() {
               label={copy.dashboard.roi}
               value={
                 <span className={cn(("roi" in me ? me.roi : 0) >= 0 ? "text-up" : "text-down")}>
-                  <AnimatedNumber
-                    value={("roi" in me ? me.roi : 0) * 100}
-                    decimals={1}
-                    suffix="%"
-                  />
+                  {deferredReady ? (
+                    <AnimatedNumber
+                      value={("roi" in me ? me.roi : 0) * 100}
+                      decimals={1}
+                      suffix="%"
+                    />
+                  ) : (
+                    `${((("roi" in me ? me.roi : 0) * 100) as number).toFixed(1)}%`
+                  )}
                 </span>
               }
               sub="Retorno sobre capital"

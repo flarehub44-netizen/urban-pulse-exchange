@@ -9,7 +9,7 @@ import {
 } from "./helpers/auth";
 
 test.describe("C1 — Autenticação e sessão", () => {
-  test("dashboard sem login abre modal de autenticação", async ({ page }) => {
+  test("dashboard sem cadastro abre gate de autenticação", async ({ page }) => {
     await page.goto("/dashboard");
     await page.waitForTimeout(4000);
 
@@ -21,7 +21,7 @@ test.describe("C1 — Autenticação e sessão", () => {
         .getByRole("heading", { name: /entrar na viax|criar conta/i })
         .isVisible()
         .catch(() => false)) || /auth=login|auth=signup/i.test(url);
-    expect(hasAuthModal || /entrar|criar conta|login/i.test(body)).toBeTruthy();
+    expect(hasAuthModal || /criar conta|cadastro|entrar|login/i.test(body)).toBeTruthy();
   });
 });
 

@@ -16,9 +16,8 @@ export async function requireAuth() {
 }
 
 export async function requireRegistered() {
-  await requireAuth();
   const state = await ensureAuthSession();
-  if (!state.isRegistered) {
+  if (!state.userId || !state.isRegistered) {
     const redirectTo =
       typeof window !== "undefined"
         ? `${window.location.pathname}${window.location.search}`

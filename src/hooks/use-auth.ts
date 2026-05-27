@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { parseAuthSession, type AuthSessionState } from "@/lib/auth";
+import { isFormalSessionUser, parseAuthSession, type AuthSessionState } from "@/lib/auth";
 import { ensureAuthSession } from "@/lib/auth-session";
 import { getStoredPartnerRef, clearStoredPartnerRef } from "@/lib/partner-attribution";
 import { getBoundReferralSlug, markReferralBound } from "@/lib/referral-attribution-storage";
@@ -29,6 +29,13 @@ export function useAuth(): UseAuthResult {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user && !isFormalSessionUser(session.user)) {
+        void supabase.auth.signOut();
+        setState(parseAuthSession(null));
+        setAuthReady(true);
+        wasRegistered.current = false;
+        return;
+      }
       const next = parseAuthSession(session);
       setState(next);
       setAuthReady(true);

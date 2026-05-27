@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { parseAuthSession, type AuthSessionState } from "@/lib/auth";
+import { isFormalSessionUser, parseAuthSession, type AuthSessionState } from "@/lib/auth";
 
 /** Returns the current Supabase session (no auto sign-in). */
 export async function ensureAuthSession(): Promise<AuthSessionState> {
@@ -10,5 +10,12 @@ export async function ensureAuthSession(): Promise<AuthSessionState> {
   const {
     data: { session },
   } = await supabase.auth.getSession();
+
+  const user = session?.user ?? null;
+  if (user && !isFormalSessionUser(user)) {
+    await supabase.auth.signOut();
+    return parseAuthSession(null);
+  }
+
   return parseAuthSession(session);
 }

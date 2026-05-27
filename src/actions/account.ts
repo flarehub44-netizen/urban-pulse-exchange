@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireRegisteredAuth } from "@/integrations/supabase/require-registered-middleware";
 import { getSupabaseCtx, type SupabaseFnContext } from "@/integrations/supabase/context";
 import { callUntypedRpc } from "@/integrations/supabase/untyped-rpc";
 import type { Division, FeedPost, Side, Transaction, ViaXNotification } from "@/store/viax-store";
@@ -304,7 +305,7 @@ export const getWalletOverviewFn = createServerFn({ method: "GET" })
   });
 
 export const getDashboardSnapshotFn = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseAuth, requireRegisteredAuth])
   .handler(async ({ context }) => {
     const started = Date.now();
     const { supabase, userId } = getSupabaseCtx(context);
