@@ -16,6 +16,7 @@ import {
   Flag,
   Calendar,
   UsersRound,
+  TrafficCone,
 } from "lucide-react";
 
 export type AdminNavItem = {
@@ -30,6 +31,11 @@ export const adminNav: AdminNavItem[] = [
   { to: "/admin/markets", label: copy.admin.nav.markets, icon: Radio },
   { to: "/admin/community", label: copy.admin.nav.community, icon: UsersRound },
   { to: "/admin/football", label: copy.admin.nav.football, icon: Flag },
+  {
+    to: "/admin/traffic-events",
+    label: copy.admin.nav.trafficEvents,
+    icon: TrafficCone,
+  },
   { to: "/admin/settlement", label: copy.admin.nav.settlement, icon: Scale },
   { to: "/admin/intelligence", label: copy.admin.nav.intelligence, icon: Brain },
   { to: "/admin/sources", label: copy.admin.nav.sources, icon: Video },

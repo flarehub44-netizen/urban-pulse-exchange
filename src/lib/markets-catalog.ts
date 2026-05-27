@@ -31,6 +31,7 @@ export const MARKET_STATUS_FILTERS = [
   "closing",
   "dispute",
   "resolved",
+  "ended",
   "draft",
 ] as const;
 
@@ -54,6 +55,9 @@ export function matchesStatusFilter(
   if (key === "draft") return status === "draft";
   if (key === "resolved") {
     return status === "settled" || status === "void" || status === "resolved";
+  }
+  if (key === "ended") {
+    return status === "settled" || status === "void" || status === "dispute";
   }
   return true;
 }

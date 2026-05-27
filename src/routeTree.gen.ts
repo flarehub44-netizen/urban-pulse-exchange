@@ -42,6 +42,7 @@ import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AdminTrafficEventsRouteImport } from './routes/admin/traffic-events'
 import { Route as AdminSystemRouteImport } from './routes/admin/system'
 import { Route as AdminSourcesRouteImport } from './routes/admin/sources'
 import { Route as AdminSimulatorRouteImport } from './routes/admin/simulator'
@@ -237,6 +238,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminTrafficEventsRoute = AdminTrafficEventsRouteImport.update({
+  id: '/traffic-events',
+  path: '/traffic-events',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminSystemRoute = AdminSystemRouteImport.update({
   id: '/system',
   path: '/system',
@@ -424,6 +430,7 @@ export interface FileRoutesByFullPath {
   '/admin/simulator': typeof AdminSimulatorRoute
   '/admin/sources': typeof AdminSourcesRoute
   '/admin/system': typeof AdminSystemRoute
+  '/admin/traffic-events': typeof AdminTrafficEventsRoute
   '/admin/users': typeof AdminUsersRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -484,6 +491,7 @@ export interface FileRoutesByTo {
   '/admin/simulator': typeof AdminSimulatorRoute
   '/admin/sources': typeof AdminSourcesRoute
   '/admin/system': typeof AdminSystemRoute
+  '/admin/traffic-events': typeof AdminTrafficEventsRoute
   '/admin/users': typeof AdminUsersRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -550,6 +558,7 @@ export interface FileRoutesById {
   '/admin/simulator': typeof AdminSimulatorRoute
   '/admin/sources': typeof AdminSourcesRoute
   '/admin/system': typeof AdminSystemRoute
+  '/admin/traffic-events': typeof AdminTrafficEventsRoute
   '/admin/users': typeof AdminUsersRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -616,6 +625,7 @@ export interface FileRouteTypes {
     | '/admin/simulator'
     | '/admin/sources'
     | '/admin/system'
+    | '/admin/traffic-events'
     | '/admin/users'
     | '/auth/callback'
     | '/auth/forgot-password'
@@ -676,6 +686,7 @@ export interface FileRouteTypes {
     | '/admin/simulator'
     | '/admin/sources'
     | '/admin/system'
+    | '/admin/traffic-events'
     | '/admin/users'
     | '/auth/callback'
     | '/auth/forgot-password'
@@ -741,6 +752,7 @@ export interface FileRouteTypes {
     | '/admin/simulator'
     | '/admin/sources'
     | '/admin/system'
+    | '/admin/traffic-events'
     | '/admin/users'
     | '/auth/callback'
     | '/auth/forgot-password'
@@ -1026,6 +1038,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/traffic-events': {
+      id: '/admin/traffic-events'
+      path: '/traffic-events'
+      fullPath: '/admin/traffic-events'
+      preLoaderRoute: typeof AdminTrafficEventsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/system': {
       id: '/admin/system'
       path: '/system'
@@ -1253,6 +1272,7 @@ interface AdminRouteRouteChildren {
   AdminSimulatorRoute: typeof AdminSimulatorRoute
   AdminSourcesRoute: typeof AdminSourcesRoute
   AdminSystemRoute: typeof AdminSystemRoute
+  AdminTrafficEventsRoute: typeof AdminTrafficEventsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -1271,6 +1291,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminSimulatorRoute: AdminSimulatorRoute,
   AdminSourcesRoute: AdminSourcesRoute,
   AdminSystemRoute: AdminSystemRoute,
+  AdminTrafficEventsRoute: AdminTrafficEventsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }

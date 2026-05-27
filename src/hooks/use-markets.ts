@@ -32,6 +32,10 @@ function mapMarket(row: Record<string, unknown>): Market {
     marketKind: (row.market_kind as Market["marketKind"]) ?? "platform",
     visibility: row.visibility as Market["visibility"],
     createdBy: (row.created_by as string | null) ?? undefined,
+    isTrafficSlot: Boolean(row.is_traffic_slot),
+    comparisonOp: (row.comparison_op as string | null) ?? undefined,
+    resolutionMetric: (row.resolution_metric as string | null) ?? undefined,
+    startsAt: row.starts_at ? new Date(row.starts_at as string).getTime() : undefined,
   };
 }
 

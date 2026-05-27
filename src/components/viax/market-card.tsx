@@ -34,7 +34,11 @@ import { OrderBox } from "./order-box";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useWatchlist } from "@/hooks/use-watchlist";
 import { cn } from "@/lib/utils";
-import { statusLabel } from "@/lib/market-status";
+import {
+  canPlaceBets,
+  isMarketEndedForCatalog,
+  statusLabel,
+} from "@/lib/market-status";
 
 export function MarketCard({
   m,
@@ -52,8 +56,10 @@ export function MarketCard({
   const [quickBet, setQuickBet] = useState<Side | null>(null);
   const { ids: watchlist, toggle } = useWatchlist();
   const watched = watchlist.includes(m.id);
+  const canBet = canPlaceBets(m.status, m.acceptBets ?? true, m.endsAt);
+  const ended = isMarketEndedForCatalog(m.status);
   const minsLeft = m.endsAt > 0 ? (m.endsAt - Date.now()) / 60_000 : Infinity;
-  const isUrgent = minsLeft > 0 && minsLeft < 30;
+  const isUrgent = canBet && minsLeft > 0 && minsLeft < 30;
 
   return (
     <>
@@ -63,7 +69,11 @@ export function MarketCard({
         layout
         whileHover={{ y: -2 }}
         transition={{ type: "spring", stiffness: 260, damping: 22 }}
-        className={cn("surface-card-interactive group", isUrgent && "border-warn/40")}
+        className={cn(
+          "surface-card-interactive group",
+          isUrgent && "border-warn/40",
+          ended && "border-muted opacity-80",
+        )}
       >
         {m.marketKind === "community" && m.coverUrl && (
           <img src={m.coverUrl} alt="" className="mb-3 h-28 w-full rounded-lg object-cover" />
@@ -110,6 +120,11 @@ export function MarketCard({
                 )}
               >
                 {statusLabel(m.status)}
+              </span>
+            )}
+            {ended && m.status !== "void" && (
+              <span className="rounded-md border border-muted-foreground/30 bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                {copy.marketCard.endedBadge}
               </span>
             )}
           </div>
@@ -228,7 +243,7 @@ export function MarketCard({
           </div>
         )}
 
-        {!compact && (
+        {!compact && canBet && (
           <div className="mt-4 grid grid-cols-2 gap-2">
             <button
               type="button"

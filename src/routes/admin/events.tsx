@@ -39,6 +39,23 @@ const emptyEventForm = () => ({
   xpBoost: "0",
 });
 
+function isEventFormFilled(form: ReturnType<typeof emptyEventForm>) {
+  return Boolean(
+    form.name.trim() ||
+      form.slug.trim() ||
+      form.description.trim() ||
+      form.startsAt ||
+      form.endsAt ||
+      form.badgeIcon !== "🎉" ||
+      form.xpBoost !== "0",
+  );
+}
+
+const emptyPollState = () => ({
+  question: "",
+  pollDate: new Date().toISOString().slice(0, 10),
+});
+
 function AdminEventsPage() {
   const [tab, setTab] = useState<Tab>("overview");
   const {
@@ -70,8 +87,14 @@ function AdminEventsPage() {
   const [eventForm, setEventForm] = useState(emptyEventForm());
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [pollQuestion, setPollQuestion] = useState("");
-  const [pollDate, setPollDate] = useState(new Date().toISOString().slice(0, 10));
+  const [pollDate, setPollDate] = useState(() => emptyPollState().pollDate);
   const [editingPollId, setEditingPollId] = useState<string | null>(null);
+
+  const eventFormActive = editingEventId != null || isEventFormFilled(eventForm);
+  const pollFormActive =
+    editingPollId != null ||
+    Boolean(pollQuestion.trim()) ||
+    pollDate !== emptyPollState().pollDate;
 
   if (overviewError || seasonalError || pollsError || partnerError) {
     return (
@@ -96,6 +119,13 @@ function AdminEventsPage() {
   const resetEventForm = () => {
     setEventForm(emptyEventForm());
     setEditingEventId(null);
+  };
+
+  const resetPollForm = () => {
+    const empty = emptyPollState();
+    setPollQuestion(empty.question);
+    setPollDate(empty.pollDate);
+    setEditingPollId(null);
   };
 
   const loadEventForEdit = (e: AdminPlatformEvent) => {
@@ -151,9 +181,7 @@ function AdminEventsPage() {
         pollDate,
       });
       toast.success(copy.admin.events.pollSaved);
-      setPollQuestion("");
-      setPollDate(new Date().toISOString().slice(0, 10));
-      setEditingPollId(null);
+      resetPollForm();
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Erro");
     }
@@ -170,10 +198,7 @@ function AdminEventsPage() {
     try {
       await deletePoll.mutateAsync(id);
       toast.success(copy.admin.events.pollDeleted);
-      if (editingPollId === id) {
-        setEditingPollId(null);
-        setPollQuestion("");
-      }
+      if (editingPollId === id) resetPollForm();
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Erro");
     }
@@ -343,9 +368,23 @@ function AdminEventsPage() {
       {tab === "seasonal" && (
         <div className="space-y-4">
           <div className="rounded-xl border bg-card/60 p-4 space-y-3">
-            <h2 className="text-sm font-medium">
-              {editingEventId ? copy.admin.events.editEvent : copy.admin.events.createEvent}
-            </h2>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="text-sm font-medium">
+                {editingEventId ? copy.admin.events.editEvent : copy.admin.events.createEvent}
+              </h2>
+              {editingEventId && (
+                <button
+                  type="button"
+                  onClick={resetEventForm}
+                  className="rounded-lg border px-3 py-1.5 text-xs text-muted-foreground hover:bg-surface-2"
+                >
+                  {copy.admin.events.createEvent}
+                </button>
+              )}
+            </div>
+            {editingEventId && (
+              <p className="text-xs text-muted-foreground">{copy.admin.events.editingEventHint}</p>
+            )}
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="block text-xs">
                 <span className="text-muted-foreground">{copy.admin.events.name}</span>
@@ -409,24 +448,23 @@ function AdminEventsPage() {
                 />
               </label>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <button
                 type="button"
                 disabled={upsertEvent.isPending}
                 onClick={onSaveEvent}
                 className="rounded-lg bg-primary px-3 py-1.5 text-xs text-primary-foreground disabled:opacity-50"
               >
-                {copy.admin.events.save}
+                {editingEventId ? copy.admin.events.save : copy.admin.events.createEvent}
               </button>
-              {editingEventId && (
-                <button
-                  type="button"
-                  onClick={resetEventForm}
-                  className="rounded-lg border px-3 py-1.5 text-xs"
-                >
-                  Cancelar
-                </button>
-              )}
+              <button
+                type="button"
+                disabled={!eventFormActive}
+                onClick={resetEventForm}
+                className="rounded-lg border px-3 py-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {copy.admin.events.cancel}
+              </button>
             </div>
           </div>
 
@@ -448,7 +486,13 @@ function AdminEventsPage() {
                 {(seasonal ?? []).map((e) => {
                   const status = platformEventStatus(e.starts_at, e.ends_at);
                   return (
-                    <tr key={e.id} className="border-b border-border/40">
+                    <tr
+                      key={e.id}
+                      className={cn(
+                        "border-b border-border/40",
+                        editingEventId === e.id && "bg-primary/5",
+                      )}
+                    >
                       <td className="px-3 py-2">
                         <span className="mr-2">{e.badge_icon}</span>
                         <span className="font-medium">{e.name}</span>
@@ -489,9 +533,23 @@ function AdminEventsPage() {
       {tab === "polls" && (
         <div className="space-y-4">
           <div className="rounded-xl border bg-card/60 p-4 space-y-3">
-            <h2 className="text-sm font-medium">
-              {editingPollId ? copy.admin.events.editEvent : copy.admin.events.createPoll}
-            </h2>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="text-sm font-medium">
+                {editingPollId ? copy.admin.events.editPoll : copy.admin.events.createPoll}
+              </h2>
+              {editingPollId && (
+                <button
+                  type="button"
+                  onClick={resetPollForm}
+                  className="rounded-lg border px-3 py-1.5 text-xs text-muted-foreground hover:bg-surface-2"
+                >
+                  {copy.admin.events.createPoll}
+                </button>
+              )}
+            </div>
+            {editingPollId && (
+              <p className="text-xs text-muted-foreground">{copy.admin.events.editingPollHint}</p>
+            )}
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="block text-xs sm:col-span-2">
                 <span className="text-muted-foreground">{copy.admin.events.question}</span>
@@ -511,14 +569,24 @@ function AdminEventsPage() {
                 />
               </label>
             </div>
-            <button
-              type="button"
-              disabled={upsertPoll.isPending}
-              onClick={onSavePoll}
-              className="rounded-lg bg-primary px-3 py-1.5 text-xs text-primary-foreground disabled:opacity-50"
-            >
-              {copy.admin.events.save}
-            </button>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={upsertPoll.isPending}
+                onClick={onSavePoll}
+                className="rounded-lg bg-primary px-3 py-1.5 text-xs text-primary-foreground disabled:opacity-50"
+              >
+                {editingPollId ? copy.admin.events.save : copy.admin.events.createPoll}
+              </button>
+              <button
+                type="button"
+                disabled={!pollFormActive}
+                onClick={resetPollForm}
+                className="rounded-lg border px-3 py-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {copy.admin.events.cancel}
+              </button>
+            </div>
           </div>
 
           {!polls?.length && (
@@ -537,7 +605,13 @@ function AdminEventsPage() {
               </thead>
               <tbody>
                 {(polls ?? []).map((p) => (
-                  <tr key={p.id} className="border-b border-border/40">
+                  <tr
+                    key={p.id}
+                    className={cn(
+                      "border-b border-border/40",
+                      editingPollId === p.id && "bg-primary/5",
+                    )}
+                  >
                     <td className="px-3 py-2 mono">{p.poll_date}</td>
                     <td className="px-3 py-2">{p.question}</td>
                     <td className="px-3 py-2 text-right mono">{p.yes_count}</td>
@@ -549,7 +623,7 @@ function AdminEventsPage() {
                           onClick={() => loadPollForEdit(p)}
                           className="rounded border px-2 py-0.5 text-[10px]"
                         >
-                          {copy.admin.events.editEvent}
+                          {copy.admin.events.editPoll}
                         </button>
                         <button
                           type="button"

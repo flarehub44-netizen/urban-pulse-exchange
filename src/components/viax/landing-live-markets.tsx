@@ -7,6 +7,7 @@ import { MarketCard } from "@/components/viax/market-card";
 import { FootballMarketCard } from "@/components/football/football-market-card";
 import { FootballMarketsCarousel } from "@/components/football/football-markets-carousel";
 import { MobileMarketsCarousel } from "@/components/viax/mobile-markets-carousel";
+import { sortByCatalogTier } from "@/lib/market-status";
 import { copy } from "@/copy/pt-BR";
 
 function SegmentBlock({
@@ -61,11 +62,11 @@ export function LandingLiveMarkets() {
   const { data: football = [], isLoading: footballLoading } = useFootballMarkets();
   const { data: community = [], isLoading: communityLoading } = usePublicCommunityMarkets();
 
-  const urbanSlice = urban.slice(0, 3);
-  const footballSlice = football
+  const urbanSlice = sortByCatalogTier(urban).slice(0, 3);
+  const footballSlice = sortByCatalogTier(football)
     .filter((m) => m.status === "live" || m.status === "closing")
     .slice(0, 3);
-  const communitySlice = community.slice(0, 3);
+  const communitySlice = sortByCatalogTier(community).slice(0, 3);
 
   return (
     <section className="border-y border-border/60 bg-card/30">

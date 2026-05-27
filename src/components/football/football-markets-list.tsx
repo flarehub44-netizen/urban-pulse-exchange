@@ -1,4 +1,6 @@
+import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
+import { sortByCatalogTier } from "@/lib/market-status";
 import { useFootballMarkets } from "@/hooks/use-football-markets";
 import { useFootballEnabled } from "@/hooks/use-football-enabled";
 import { useFootballRealtime } from "@/hooks/use-football-realtime";
@@ -17,6 +19,7 @@ export function FootballMarketsList({ embedded = false }: FootballMarketsListPro
   useFootballRealtime();
   const { data: enabled, isLoading: enabledLoading } = useFootballEnabled();
   const { data: markets, isLoading, error, refetch } = useFootballMarkets();
+  const sortedMarkets = useMemo(() => (markets ? sortByCatalogTier(markets) : []), [markets]);
 
   if (!enabledLoading && enabled === false) {
     return <p className="text-sm text-muted-foreground">{copy.football.disabled}</p>;
@@ -41,15 +44,15 @@ export function FootballMarketsList({ embedded = false }: FootballMarketsListPro
 
       {error && <InlineError message={error.message} onRetry={() => void refetch()} />}
 
-      {!isLoading && !error && markets?.length === 0 && (
+      {!isLoading && !error && sortedMarkets.length === 0 && (
         <EmptyState title={copy.football.emptyTitle} description={copy.football.emptyDesc} />
       )}
 
-      {!isLoading && !error && markets && markets.length > 0 && (
+      {!isLoading && !error && sortedMarkets.length > 0 && (
         <>
-          <FootballMarketsCarousel markets={markets} className="md:hidden" />
+          <FootballMarketsCarousel markets={sortedMarkets} className="md:hidden" />
           <div className="hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-3">
-            {markets.map((m) => (
+            {sortedMarkets.map((m) => (
               <FootballMarketCard key={m.id} m={m} />
             ))}
           </div>

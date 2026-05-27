@@ -13,7 +13,7 @@ export type MarketsSearch = {
   /** @deprecated use segment=outros */
   view?: "urban" | "community";
   region?: string;
-  status?: "all" | "live" | "closing" | "dispute" | "resolved" | "draft";
+  status?: "all" | "live" | "closing" | "dispute" | "resolved" | "ended" | "draft";
   category?: MarketCategoryFilter;
   favorites?: "1";
   hasPosition?: "1";

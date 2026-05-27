@@ -8,7 +8,11 @@ import type { FootballMarketRow } from "@/hooks/use-football-markets";
 import type { FootballOutcome } from "@/lib/football-parimutuel";
 import { probability3, prizePool3, type FootballPool } from "@/lib/football-parimutuel";
 import { formatBRL, formatCompact, formatPct } from "@/lib/parimutuel";
-import { statusLabel, isSettledDisplay, canPlaceBets } from "@/lib/market-status";
+import {
+  canPlaceBets,
+  isMarketEndedForCatalog,
+  statusLabel,
+} from "@/lib/market-status";
 import { FootballProbBar } from "@/components/football/football-prob-bar";
 import { FootballOrderBox } from "@/components/football/football-order-box";
 import { AnimatedNumber } from "@/components/viax/animated-number";
@@ -25,9 +29,10 @@ export function FootballMarketCard({ m, compact }: { m: FootballMarketRow; compa
   const pAway = probability3(pool, "AWAY");
   const closesAt = new Date(m.betting_closes_at).getTime();
   const kickoff = new Date(m.fixture.kickoff_at);
-  const minsLeft = closesAt > 0 ? (closesAt - Date.now()) / 60_000 : Infinity;
-  const isUrgent = minsLeft > 0 && minsLeft < 30;
   const canBet = canPlaceBets(m.status, m.accept_bets, closesAt);
+  const ended = isMarketEndedForCatalog(m.status);
+  const minsLeft = closesAt > 0 ? (closesAt - Date.now()) / 60_000 : Infinity;
+  const isUrgent = canBet && minsLeft > 0 && minsLeft < 30;
   const [quickBet, setQuickBet] = useState<FootballOutcome | null>(null);
   const { ids: watchlist, toggle } = useWatchlist();
   const watched = watchlist.includes(m.id);
@@ -43,7 +48,11 @@ export function FootballMarketCard({ m, compact }: { m: FootballMarketRow; compa
         layout
         whileHover={{ y: -2 }}
         transition={{ type: "spring", stiffness: 260, damping: 22 }}
-        className={cn("surface-card-interactive group", isUrgent && canBet && "border-warn/40")}
+        className={cn(
+          "surface-card-interactive group",
+          isUrgent && "border-warn/40",
+          ended && "border-muted opacity-80",
+        )}
       >
         {isUrgent && canBet && (
           <div className="absolute inset-x-0 top-0 flex items-center justify-center gap-1.5 bg-warn/10 py-1.5 text-[11px] font-medium text-warn">
@@ -66,16 +75,20 @@ export function FootballMarketCard({ m, compact }: { m: FootballMarketRow; compa
             <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
               {copy.football.leagueLabel} {m.fixture.api_league_id}
             </span>
-            {(m.status === "dispute" || m.status === "void" || isSettledDisplay(m.status)) && (
+            {(m.status === "dispute" || m.status === "void") && (
               <span
                 className={cn(
                   "rounded-md px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider",
                   m.status === "dispute" && "border border-warn/40 bg-warn/10 text-warn",
                   m.status === "void" && "border border-down/30 bg-down/10 text-down",
-                  isSettledDisplay(m.status) && "bg-muted text-muted-foreground",
                 )}
               >
                 {statusLabel(m.status)}
+              </span>
+            )}
+            {ended && m.status !== "void" && (
+              <span className="rounded-md border border-muted-foreground/30 bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                {copy.marketCard.endedBadge}
               </span>
             )}
           </div>

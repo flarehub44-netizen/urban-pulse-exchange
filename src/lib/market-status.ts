@@ -64,4 +64,45 @@ export function isOpenBetStatus(status: string): boolean {
   return !isTerminalStatus(normalizeMarketStatus(status));
 }
 
+/** Catalog list: closed to new bets or awaiting / after resolution. */
+export function isMarketEndedForCatalog(status: MarketStatus): boolean {
+  return status === "closed" || status === "resolving" || isSettledDisplay(status);
+}
+
+export function compareCatalogSortTier(
+  a: { status: MarketStatus },
+  b: { status: MarketStatus },
+): number {
+  return marketCatalogSortTier(a.status) - marketCatalogSortTier(b.status);
+}
+
+/** Lower tier = higher on catalog lists (open markets first). */
+export function sortByCatalogTier<T extends { status: MarketStatus }>(items: T[]): T[] {
+  return [...items].sort(compareCatalogSortTier);
+}
+
+/** Lower tier = higher on traffic market list (open first). */
+export function marketCatalogSortTier(status: MarketStatus): number {
+  switch (status) {
+    case "live":
+      return 0;
+    case "closing":
+      return 1;
+    case "dispute":
+      return 2;
+    case "resolving":
+      return 3;
+    case "closed":
+      return 4;
+    case "settled":
+    case "void":
+    case "resolved":
+      return 5;
+    case "draft":
+      return 6;
+    default:
+      return 3;
+  }
+}
+
 export type { Side };

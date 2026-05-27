@@ -51,6 +51,20 @@ function isCatastrophicSsrErrorBody(body: string, responseStatus: number): boole
   );
 }
 
+/** Allowed origins for <img> (avatars, football logos, community covers, CET snapshots). */
+const CSP_IMG_SRC = [
+  "'self'",
+  "data:",
+  "blob:",
+  "https://storage.googleapis.com", // legacy / GCS assets
+  "https://media.api-sports.io", // API-Football team logos
+  "https://api.dicebear.com", // default avatars
+  "https://*.supabase.co", // Supabase Storage (community covers, uploads)
+  "https://cameras.cetsp.com.br", // CET-SP live snapshots
+  "https://cetsp.com.br",
+  "https://www.cetsp.com.br",
+].join(" ");
+
 function addSecurityHeaders(response: Response): Response {
   const headers = new Headers(response.headers);
   headers.set("X-Frame-Options", "DENY");
@@ -64,7 +78,7 @@ function addSecurityHeaders(response: Response): Response {
       "script-src 'self' 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src https://fonts.gstatic.com",
-      "img-src 'self' data: blob: https://storage.googleapis.com https://media.api-sports.io",
+      `img-src ${CSP_IMG_SRC}`,
       "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
       "frame-ancestors 'none'",
     ].join("; "),

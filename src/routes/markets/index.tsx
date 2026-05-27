@@ -26,7 +26,11 @@ import {
 import { EmptyState } from "@/components/viax/empty-state";
 import { cn } from "@/lib/utils";
 import { loadMarketsFilters, saveMarketsFilters } from "@/lib/markets-filter-persist";
-import { isOpenBetStatus, isSettledDisplay } from "@/lib/market-status";
+import {
+  isOpenBetStatus,
+  isSettledDisplay,
+  marketCatalogSortTier,
+} from "@/lib/market-status";
 import {
   MARKET_CATEGORY_FILTERS,
   matchesStatusFilter,
@@ -46,6 +50,11 @@ import type { MarketSegment } from "@/routes/markets";
 import { SeasonalEventsStrip } from "@/components/viax/seasonal-events-strip";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { trackProductEvent } from "@/lib/product-analytics";
+import { useTrafficPublicState } from "@/hooks/use-traffic-public-state";
+import { useTrafficEndedMarkets } from "@/hooks/use-traffic-ended-markets";
+import { TrafficLiveHero } from "@/components/viax/traffic-live-hero";
+import { TrafficSlotWaiting } from "@/components/viax/traffic-slot-waiting";
+import { TrafficEndedCard } from "@/components/viax/traffic-ended-card";
 
 export const Route = createFileRoute("/markets/")({
   head: () => ({
@@ -61,6 +70,7 @@ export const Route = createFileRoute("/markets/")({
       status === "closing" ||
       status === "dispute" ||
       status === "resolved" ||
+      status === "ended" ||
       status === "draft"
         ? status
         : undefined;
@@ -96,6 +106,7 @@ const baseStatusFilters = [
   { key: "resolved" as const, label: "Resolvidos" },
 ];
 const draftFilter = { key: "draft" as const, label: "Rascunhos" };
+const endedFilter = { key: "ended" as const, label: copy.traffic.endedTab };
 
 function MarketsList() {
   const navigate = useNavigate({ from: "/markets/" });
@@ -106,7 +117,6 @@ function MarketsList() {
   const markets = useCatalogMarkets();
   const { isLoading: marketsLoading, error: marketsError, refetch } = useMarkets();
   const queryClient = useQueryClient();
-  const statusFilters = profile?.isAdmin ? [...baseStatusFilters, draftFilter] : baseStatusFilters;
   const { ids: watchlist } = useWatchlist();
   const { data: bets } = useBets({ enabled: Boolean(userId) });
   const openMarketIds = useMemo(
@@ -117,6 +127,22 @@ function MarketsList() {
 
   const segment: MarketSegment = search.segment ?? "transito";
   const statusKey = search.status ?? "all";
+  const transitoStatusFilters = [
+    ...baseStatusFilters.filter((f) => f.key !== "resolved"),
+    endedFilter,
+  ];
+  const statusFiltersBase = profile?.isAdmin
+    ? [...baseStatusFilters, draftFilter]
+    : baseStatusFilters;
+  const statusFilters =
+    segment === "transito"
+      ? profile?.isAdmin
+        ? [...transitoStatusFilters, draftFilter]
+        : transitoStatusFilters
+      : statusFiltersBase;
+  const { data: trafficState, isLoading: trafficStateLoading } = useTrafficPublicState();
+  const isTrafficEndedTab = segment === "transito" && statusKey === "ended";
+  const { data: endedSlots, isLoading: endedSlotsLoading } = useTrafficEndedMarkets(50, isTrafficEndedTab);
   const category = search.category ?? null;
   const showFavorites = search.favorites === "1";
   const q = search.q ?? "";
@@ -211,6 +237,7 @@ function MarketsList() {
 
   const list = useMemo(() => {
     const filtered = markets.filter((m) => {
+      if (segment === "transito" && m.isTrafficSlot) return false;
       if (showFavorites) return watchlist.includes(m.id);
       if (hasPosition && !openMarketIds.has(m.id)) return false;
       if (regionFilter && !m.region.toLowerCase().includes(regionFilter.toLowerCase()))
@@ -227,6 +254,8 @@ function MarketsList() {
     });
     const now = Date.now();
     return [...filtered].sort((a, b) => {
+      const tierDiff = marketCatalogSortTier(a.status) - marketCatalogSortTier(b.status);
+      if (tierDiff !== 0) return tierDiff;
       if (sortKey === "edge")
         return Math.abs(getMarketEdge(b).edgePp) - Math.abs(getMarketEdge(a).edgePp);
       if (sortKey === "closing") {
@@ -250,6 +279,7 @@ function MarketsList() {
     openMarketIds,
     sortKey,
     aiPicks,
+    segment,
   ]);
 
   useEffect(() => {
@@ -313,6 +343,55 @@ function MarketsList() {
 
       {mounted && segment === "transito" && (
         <>
+          {!isTrafficEndedTab && !trafficStateLoading && trafficState?.activeMarket && (
+            <TrafficLiveHero market={trafficState.activeMarket} />
+          )}
+          {!isTrafficEndedTab &&
+            !trafficStateLoading &&
+            !trafficState?.activeMarket &&
+            trafficState?.nextStartsAt != null && (
+              <TrafficSlotWaiting
+                nextStartsAt={trafficState.nextStartsAt}
+                lastEndedAt={trafficState.lastEndedAt}
+              />
+            )}
+          {!isTrafficEndedTab &&
+            trafficState?.recentEnded &&
+            trafficState.recentEnded.length > 0 &&
+            statusKey !== "ended" && (
+              <section className="space-y-2">
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  {copy.traffic.recentEndedTitle}
+                </h2>
+                <div className="grid gap-2 md:grid-cols-2">
+                  {trafficState.recentEnded.slice(0, 3).map((m) => (
+                    <TrafficEndedCard key={m.id} market={m} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+          {isTrafficEndedTab && (
+            <div className="space-y-3">
+              {endedSlotsLoading && (
+                <div className="grid gap-3 md:grid-cols-2">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <MarketCardSkeleton key={`ended-sk-${i}`} />
+                  ))}
+                </div>
+              )}
+              {!endedSlotsLoading && (endedSlots?.length ?? 0) === 0 && (
+                <EmptyState
+                  icon={Clock}
+                  title="Nenhum evento encerrado"
+                  description="Slots finalizados aparecem aqui com o resultado medido."
+                />
+              )}
+              {!endedSlotsLoading &&
+                (endedSlots ?? []).map((m) => <TrafficEndedCard key={m.id} market={m} />)}
+            </div>
+          )}
+
           <div className="page-section flex flex-wrap items-end justify-between gap-4">
             <p className="flex-1 min-w-[200px] text-sm text-muted-foreground">
               <span className="font-medium text-foreground">{list.length} mercados</span> · pools
@@ -658,7 +737,7 @@ function MarketsList() {
             />
           )}
 
-          {!showFavorites && list.length === 0 && (
+          {!isTrafficEndedTab && !showFavorites && list.length === 0 && (
             <div className="space-y-4">
               <EmptyState
                 icon={Search}
@@ -751,7 +830,7 @@ function MarketsList() {
             </>
           )}
 
-          {!marketsLoading && !marketsError && (
+          {!isTrafficEndedTab && !marketsLoading && !marketsError && (
             <>
               <MobileMarketsCarousel
                 markets={list}

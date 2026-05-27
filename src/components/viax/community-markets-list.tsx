@@ -1,5 +1,7 @@
-﻿import { Link } from "@tanstack/react-router";
+﻿import { useMemo } from "react";
+import { Link } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
+import { sortByCatalogTier } from "@/lib/market-status";
 import { usePublicCommunityMarkets, useMyCommunityMarkets } from "@/hooks/use-community-markets";
 import { MarketCard } from "@/components/viax/market-card";
 import { MarketCardSkeleton } from "@/components/viax/market-card-skeleton";
@@ -13,6 +15,9 @@ export function CommunityMarketsList({ embedded = false }: { embedded?: boolean 
   const { isRegistered } = useAuth();
   const { data: publicMarkets = [], isLoading, isError, refetch } = usePublicCommunityMarkets();
   const { data: myMarkets = [] } = useMyCommunityMarkets(isRegistered);
+
+  const sortedMyMarkets = useMemo(() => sortByCatalogTier(myMarkets), [myMarkets]);
+  const sortedPublicMarkets = useMemo(() => sortByCatalogTier(publicMarkets), [publicMarkets]);
 
   return (
     <div className="space-y-5">
@@ -43,11 +48,11 @@ export function CommunityMarketsList({ embedded = false }: { embedded?: boolean 
         </div>
       )}
 
-      {isRegistered && myMarkets.length > 0 && (
+      {isRegistered && sortedMyMarkets.length > 0 && (
         <section className="space-y-3">
           <h2 className="text-sm font-semibold">{copy.community.myMarkets}</h2>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {myMarkets.map((m) => (
+            {sortedMyMarkets.map((m) => (
               <MarketCard key={`mine-${m.id}`} m={m} />
             ))}
           </div>
@@ -64,7 +69,7 @@ export function CommunityMarketsList({ embedded = false }: { embedded?: boolean 
         </div>
       )}
 
-      {!isLoading && !isError && publicMarkets.length === 0 && (
+      {!isLoading && !isError && sortedPublicMarkets.length === 0 && (
         <EmptyState
           title={copy.empty.markets.title}
           description={copy.community.listSubtitle}
@@ -72,11 +77,11 @@ export function CommunityMarketsList({ embedded = false }: { embedded?: boolean 
         />
       )}
 
-      {!isLoading && !isError && publicMarkets.length > 0 && (
+      {!isLoading && !isError && sortedPublicMarkets.length > 0 && (
         <section className="space-y-3">
           <h2 className="text-sm font-semibold text-muted-foreground">Públicos</h2>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {publicMarkets.map((m) => (
+            {sortedPublicMarkets.map((m) => (
               <MarketCard key={m.id} m={m} />
             ))}
           </div>

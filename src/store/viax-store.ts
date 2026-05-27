@@ -26,6 +26,10 @@ export interface Market {
   visibility?: "public" | "unlisted";
   createdBy?: string | null;
   coverUrl?: string | null;
+  isTrafficSlot?: boolean;
+  comparisonOp?: string | null;
+  resolutionMetric?: string | null;
+  startsAt?: number;
 }
 
 export interface FeedPost {

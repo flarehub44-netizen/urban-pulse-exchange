@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils";
 import { isSettledDisplay, statusLabel } from "@/lib/market-status";
 import { MarketAuditPanel } from "@/components/viax/market-audit-panel";
 import { LiveCameraStrip } from "@/components/viax/live-camera-strip";
+import { TrafficOutcomeSection } from "@/components/viax/traffic-outcome-section";
 import { MarketSocialProofLite } from "@/components/viax/market-social-proof-lite";
 import { MarketAlertButton } from "@/components/viax/market-alert-button";
 import {
@@ -430,6 +431,8 @@ function MarketDetail() {
       )}
 
       {clientReady && <OpenPositionStrip marketId={marketId} />}
+
+      {m.isTrafficSlot && <TrafficOutcomeSection market={m} />}
 
       {!isCommunity && (m.status === "live" || m.status === "closing") && (
         <LiveCameraStrip regionId={m.regionId} />
