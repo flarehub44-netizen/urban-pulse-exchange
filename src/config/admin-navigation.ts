@@ -7,6 +7,7 @@ import {
   Brain,
   Video,
   Coins,
+  Gift,
   Users,
   ShieldAlert,
   Settings,
@@ -14,6 +15,7 @@ import {
   Sparkles,
   Flag,
   Calendar,
+  UsersRound,
 } from "lucide-react";
 
 export type AdminNavItem = {
@@ -26,11 +28,13 @@ export type AdminNavItem = {
 export const adminNav: AdminNavItem[] = [
   { to: "/admin", label: copy.admin.nav.overview, icon: LayoutDashboard },
   { to: "/admin/markets", label: copy.admin.nav.markets, icon: Radio },
+  { to: "/admin/community", label: copy.admin.nav.community, icon: UsersRound },
   { to: "/admin/football", label: copy.admin.nav.football, icon: Flag },
   { to: "/admin/settlement", label: copy.admin.nav.settlement, icon: Scale },
   { to: "/admin/intelligence", label: copy.admin.nav.intelligence, icon: Brain },
   { to: "/admin/sources", label: copy.admin.nav.sources, icon: Video },
   { to: "/admin/finance", label: copy.admin.nav.finance, icon: Coins },
+  { to: "/admin/bonuses", label: copy.admin.nav.bonuses, icon: Gift },
   { to: "/admin/users", label: copy.admin.nav.users, icon: Users },
   { to: "/admin/partners", label: copy.admin.nav.partners, icon: Sparkles },
   { to: "/admin/events", label: copy.admin.nav.events, icon: Calendar },

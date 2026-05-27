@@ -53,6 +53,8 @@ import { Route as AdminIntelligenceRouteImport } from './routes/admin/intelligen
 import { Route as AdminFootballRouteImport } from './routes/admin/football'
 import { Route as AdminFinanceRouteImport } from './routes/admin/finance'
 import { Route as AdminEventsRouteImport } from './routes/admin/events'
+import { Route as AdminCommunityRouteImport } from './routes/admin/community'
+import { Route as AdminBonusesRouteImport } from './routes/admin/bonuses'
 import { Route as AppWalletRouteImport } from './routes/_app/wallet'
 import { Route as AppUrbanmindRouteImport } from './routes/_app/urbanmind'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
@@ -290,6 +292,16 @@ const AdminEventsRoute = AdminEventsRouteImport.update({
   path: '/events',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminCommunityRoute = AdminCommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminBonusesRoute = AdminBonusesRouteImport.update({
+  id: '/bonuses',
+  path: '/bonuses',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AppWalletRoute = AppWalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
@@ -399,6 +411,8 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AppSettingsRoute
   '/urbanmind': typeof AppUrbanmindRoute
   '/wallet': typeof AppWalletRoute
+  '/admin/bonuses': typeof AdminBonusesRoute
+  '/admin/community': typeof AdminCommunityRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/football': typeof AdminFootballRoute
@@ -457,6 +471,8 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRoute
   '/urbanmind': typeof AppUrbanmindRoute
   '/wallet': typeof AppWalletRoute
+  '/admin/bonuses': typeof AdminBonusesRoute
+  '/admin/community': typeof AdminCommunityRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/football': typeof AdminFootballRoute
@@ -521,6 +537,8 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRoute
   '/_app/urbanmind': typeof AppUrbanmindRoute
   '/_app/wallet': typeof AppWalletRoute
+  '/admin/bonuses': typeof AdminBonusesRoute
+  '/admin/community': typeof AdminCommunityRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/football': typeof AdminFootballRoute
@@ -585,6 +603,8 @@ export interface FileRouteTypes {
     | '/settings'
     | '/urbanmind'
     | '/wallet'
+    | '/admin/bonuses'
+    | '/admin/community'
     | '/admin/events'
     | '/admin/finance'
     | '/admin/football'
@@ -643,6 +663,8 @@ export interface FileRouteTypes {
     | '/settings'
     | '/urbanmind'
     | '/wallet'
+    | '/admin/bonuses'
+    | '/admin/community'
     | '/admin/events'
     | '/admin/finance'
     | '/admin/football'
@@ -706,6 +728,8 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/_app/urbanmind'
     | '/_app/wallet'
+    | '/admin/bonuses'
+    | '/admin/community'
     | '/admin/events'
     | '/admin/finance'
     | '/admin/football'
@@ -1079,6 +1103,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEventsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/community': {
+      id: '/admin/community'
+      path: '/community'
+      fullPath: '/admin/community'
+      preLoaderRoute: typeof AdminCommunityRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/bonuses': {
+      id: '/admin/bonuses'
+      path: '/bonuses'
+      fullPath: '/admin/bonuses'
+      preLoaderRoute: typeof AdminBonusesRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/_app/wallet': {
       id: '/_app/wallet'
       path: '/wallet'
@@ -1202,6 +1240,8 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteRouteChildren {
+  AdminBonusesRoute: typeof AdminBonusesRoute
+  AdminCommunityRoute: typeof AdminCommunityRoute
   AdminEventsRoute: typeof AdminEventsRoute
   AdminFinanceRoute: typeof AdminFinanceRoute
   AdminFootballRoute: typeof AdminFootballRoute
@@ -1218,6 +1258,8 @@ interface AdminRouteRouteChildren {
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminBonusesRoute: AdminBonusesRoute,
+  AdminCommunityRoute: AdminCommunityRoute,
   AdminEventsRoute: AdminEventsRoute,
   AdminFinanceRoute: AdminFinanceRoute,
   AdminFootballRoute: AdminFootballRoute,

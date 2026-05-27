@@ -173,3 +173,16 @@ export const getAdminCommunityReportsFn = createServerFn({ method: "GET" })
     const { supabase } = getSupabaseCtx(context);
     return adminRpc(() => supabase.rpc("get_admin_community_reports", { p_limit: 50 }));
   });
+
+export const adminVoidCommunityMarketFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ marketId: z.string(), reason: z.string().optional() }))
+  .handler(async ({ data, context }) => {
+    const { supabase } = getSupabaseCtx(context);
+    return adminRpc(() =>
+      supabase.rpc("admin_void_community_market", {
+        p_market_id: data.marketId,
+        p_reason: data.reason ?? "admin_moderation",
+      }),
+    );
+  });

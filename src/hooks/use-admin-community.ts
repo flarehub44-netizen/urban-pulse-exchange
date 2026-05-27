@@ -1,7 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getAdminCommunityMarketsFn,
   getAdminCommunityReportsFn,
+  adminVoidCommunityMarketFn,
 } from "@/actions/community-markets";
 
 export type AdminCommunityMarketRow = {
@@ -15,6 +16,8 @@ export type AdminCommunityMarketRow = {
   creator_username: string | null;
   created_by: string;
   pending_reports: number;
+  bets_count?: number;
+  access_token?: string | null;
 };
 
 export type AdminCommunityReportRow = {
@@ -23,6 +26,7 @@ export type AdminCommunityReportRow = {
   reason: string;
   created_at: string;
   question: string;
+  visibility?: string;
   reporter_username: string;
 };
 
@@ -42,6 +46,19 @@ export function useAdminCommunityReports() {
     queryFn: async () => {
       const data = await getAdminCommunityReportsFn();
       return (Array.isArray(data) ? data : []) as AdminCommunityReportRow[];
+    },
+  });
+}
+
+export function useAdminVoidCommunityMarket() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { marketId: string; reason?: string }) =>
+      adminVoidCommunityMarketFn({ data: input }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "community-markets"] });
+      qc.invalidateQueries({ queryKey: ["admin", "community-reports"] });
+      qc.invalidateQueries({ queryKey: ["markets"] });
     },
   });
 }
