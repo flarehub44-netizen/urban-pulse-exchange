@@ -48,6 +48,9 @@ export function Topbar() {
 
   const { openDeposit } = useDepositSheet();
   const queryClient = useQueryClient();
+  if (!me) {
+    return <header className="sticky top-0 z-30 h-14 border-b border-border/60 bg-background/70 backdrop-blur" />;
+  }
   const xpPct = (me.xp / ("xpToNext" in me ? me.xpToNext : 2000)) * 100;
   const unread = notifications.filter((n) => !n.read).length;
 

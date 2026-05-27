@@ -4,6 +4,7 @@ import { AppShell } from "@/components/viax/app-shell";
 import { RouteErrorBoundary } from "@/components/viax/route-error-boundary";
 import { AppLoadingSkeleton } from "@/components/viax/app-loading-skeleton";
 import { useAuth } from "@/hooks/use-auth";
+import { useProfile } from "@/hooks/use-profile";
 
 export const Route = createFileRoute("/_app")({
   beforeLoad: () => requireRegistered(),
@@ -11,9 +12,10 @@ export const Route = createFileRoute("/_app")({
 });
 
 function AppLayout() {
-  const { authReady } = useAuth();
+  const { authReady, userId } = useAuth();
+  const { data: profile, isLoading: profileLoading } = useProfile(userId);
 
-  if (!authReady) {
+  if (!authReady || !userId || profileLoading || !profile) {
     return <AppLoadingSkeleton />;
   }
 

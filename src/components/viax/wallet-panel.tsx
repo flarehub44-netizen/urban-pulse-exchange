@@ -28,6 +28,7 @@ import { EmptyState } from "@/components/viax/empty-state";
 import { cn } from "@/lib/utils";
 import { trackDepositFunnel } from "@/lib/deposit-funnel";
 import { trackProductEvent } from "@/lib/product-analytics";
+import { AppLoadingSkeleton } from "@/components/viax/app-loading-skeleton";
 
 const WalletBalanceChart = lazy(() =>
   import("@/components/viax/wallet-balance-chart").then((m) => ({
@@ -73,6 +74,10 @@ export function WalletPanel({
   const [depositDone, setDepositDone] = useState(false);
   const { enabled: casinoEnabled } = useCasinoEnabled();
   const queryClient = useQueryClient();
+
+  if (!me) {
+    return <AppLoadingSkeleton />;
+  }
 
   useEffect(() => {
     if (!initialTab) return;

@@ -38,6 +38,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { EmptyState } from "@/components/viax/empty-state";
 import { MessageSquare } from "lucide-react";
 import { PageHeader } from "@/components/viax/page-header";
+import { AppLoadingSkeleton } from "@/components/viax/app-loading-skeleton";
 
 export type FeedSearch = { post?: string };
 
@@ -81,6 +82,10 @@ function Feed() {
     Record<string, { likes: number; comments: number; reposts: number }>
   >({});
   const [feedBet, setFeedBet] = useState<{ market: Market; side: Side } | null>(null);
+
+  if (!me) {
+    return <AppLoadingSkeleton />;
+  }
 
   const { data: threadComments, isLoading: commentsLoading } = useFeedComments(commentPostId);
 

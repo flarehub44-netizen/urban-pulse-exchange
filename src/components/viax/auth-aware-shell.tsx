@@ -3,6 +3,7 @@ import { AppShell } from "@/components/viax/app-shell";
 import { PublicShell } from "@/components/viax/public-shell";
 import { AppLoadingSkeleton } from "@/components/viax/app-loading-skeleton";
 import { useAuthPublic } from "@/hooks/use-auth-public";
+import { useProfile } from "@/hooks/use-profile";
 
 type AuthAwareShellProps = {
   children: ReactNode;
@@ -10,7 +11,8 @@ type AuthAwareShellProps = {
 
 export function AuthAwareShell({ children }: AuthAwareShellProps) {
   const [mounted, setMounted] = useState(false);
-  const { userId, authReady } = useAuthPublic();
+  const { userId, authReady, isRegistered } = useAuthPublic();
+  const { data: profile, isLoading: profileLoading } = useProfile(userId);
 
   useEffect(() => {
     setMounted(true);
@@ -25,7 +27,10 @@ export function AuthAwareShell({ children }: AuthAwareShellProps) {
     return <AppLoadingSkeleton />;
   }
 
-  if (userId) {
+  if (userId && isRegistered) {
+    if (profileLoading || !profile) {
+      return <AppLoadingSkeleton />;
+    }
     return <AppShell>{children}</AppShell>;
   }
 

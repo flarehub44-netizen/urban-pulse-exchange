@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import {
-  dateRangeDays,
+  formatDateYmd,
   getFixtureById,
   getFixturesByDate,
   type ApiFootballFixtureDto,
@@ -64,8 +64,20 @@ export async function runFootballSync(): Promise<unknown> {
       .eq("key", "football_sync_days_ahead")
       .maybeSingle();
 
-    const daysAhead = Number(daysRow?.value ?? 7);
-    const dates = dateRangeDays(new Date(), daysAhead);
+    const { data: daysBackRow } = await supabase
+      .from("platform_settings")
+      .select("value")
+      .eq("key", "football_sync_days_back")
+      .maybeSingle();
+
+    const daysAhead = Number(daysRow?.value ?? 1);
+    const daysBack = Number(daysBackRow?.value ?? 1);
+    const dates: string[] = [];
+    for (let i = -daysBack; i <= daysAhead; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() + i);
+      dates.push(formatDateYmd(d));
+    }
     let upserted = 0;
     const errors: string[] = [];
 

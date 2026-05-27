@@ -45,6 +45,7 @@ function AdminFootballPage() {
 
   const [enabled, setEnabled] = useState(true);
   const [leagueIdsText, setLeagueIdsText] = useState("71");
+  const [syncDaysBack, setSyncDaysBack] = useState("1");
   const [syncDays, setSyncDays] = useState("7");
   const [closeMinutes, setCloseMinutes] = useState("5");
 
@@ -52,6 +53,7 @@ function AdminFootballPage() {
     if (!settings) return;
     setEnabled(settings.enabled);
     setLeagueIdsText(settings.leagueIds.join(", "));
+    setSyncDaysBack(String(settings.syncDaysBack));
     setSyncDays(String(settings.syncDaysAhead));
     setCloseMinutes(String(settings.bettingCloseMinutes));
   }, [settings]);
@@ -262,11 +264,25 @@ function AdminFootballPage() {
 
           <label className="block">
             <span className="text-xs text-muted-foreground">
+              {copy.admin.football.syncDaysBackLabel}
+            </span>
+            <input
+              type="number"
+              min={0}
+              max={30}
+              value={syncDaysBack}
+              onChange={(e) => setSyncDaysBack(e.target.value)}
+              className="mt-1 w-full rounded-lg border bg-surface px-3 py-2 text-sm"
+            />
+          </label>
+
+          <label className="block">
+            <span className="text-xs text-muted-foreground">
               {copy.admin.football.syncDaysLabel}
             </span>
             <input
               type="number"
-              min={1}
+              min={0}
               max={30}
               value={syncDays}
               onChange={(e) => setSyncDays(e.target.value)}
@@ -296,6 +312,7 @@ function AdminFootballPage() {
                 await saveSettings.mutateAsync({
                   enabled,
                   leagueIds: parseLeagueIds(),
+                  syncDaysBack: Number(syncDaysBack),
                   syncDaysAhead: Number(syncDays),
                   bettingCloseMinutes: Number(closeMinutes),
                 });

@@ -31,6 +31,7 @@ import {
 } from "recharts";
 import { cn } from "@/lib/utils";
 import { parseAuthModalSearch, type AuthModalSearch } from "@/lib/auth-modal-search";
+import { AppLoadingSkeleton } from "@/components/viax/app-loading-skeleton";
 
 export type ProfileSearch = {
   tab?: "visao" | "favoritos" | "badges" | "atividade" | "mercados";
@@ -97,6 +98,9 @@ function Profile() {
   const regionPerf = useRegionPerformance(allBets);
   const { markets } = useResolvedMarkets();
   const { ids: watchlist } = useWatchlist();
+  if (!me) {
+    return <AppLoadingSkeleton />;
+  }
   const favMarkets = markets.filter((m) => watchlist.includes(m.id));
   const chartData =
     pnl.length > 0
