@@ -39,19 +39,19 @@ insert into public.football_markets (
     'fb-999999002', 999999002,
     'Flamengo x Palmeiras — quem vence?',
     'live', true, now() + interval '2 days',
-    4200, 1800, 3500, 28
+    42317, 18149, 35263, 28
   ),
   (
     'fb-999999004', 999999004,
     'Grêmio x Internacional — clássico gaúcho: resultado final',
     'live', true, now() + interval '4 days',
-    2100, 900, 2400, 15
+    21183, 9174, 24156, 15
   ),
   (
     'fb-999999005', 999999005,
     'Atlético-MG x Fluminense — resultado (90 min)',
     'live', true, now() + interval '5 days',
-    1500, 1100, 1300, 11
+    15142, 11097, 13188, 11
   )
 on conflict (fixture_id) do update set
   status = 'live',
