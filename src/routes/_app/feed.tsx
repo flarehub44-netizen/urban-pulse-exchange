@@ -83,22 +83,22 @@ function Feed() {
   >({});
   const [feedBet, setFeedBet] = useState<{ market: Market; side: Side } | null>(null);
 
-  if (!me) {
-    return <AppLoadingSkeleton />;
-  }
-
   const { data: threadComments, isLoading: commentsLoading } = useFeedComments(commentPostId);
-
-  const getCounts = (p: { id: string; likes: number; comments: number; reposts: number }) =>
-    counts[p.id] ?? { likes: p.likes, comments: p.comments, reposts: p.reposts };
-
-  const activePost = commentPostId ? feed.find((x) => x.id === commentPostId) : null;
 
   useEffect(() => {
     if (postFromUrl && feed.some((p) => p.id === postFromUrl)) {
       setCommentPostId(postFromUrl);
     }
   }, [postFromUrl, feed]);
+
+  if (!me) {
+    return <AppLoadingSkeleton />;
+  }
+
+  const getCounts = (p: { id: string; likes: number; comments: number; reposts: number }) =>
+    counts[p.id] ?? { likes: p.likes, comments: p.comments, reposts: p.reposts };
+
+  const activePost = commentPostId ? feed.find((x) => x.id === commentPostId) : null;
 
   const openComments = (postId: string) => {
     setCommentPostId(postId);
