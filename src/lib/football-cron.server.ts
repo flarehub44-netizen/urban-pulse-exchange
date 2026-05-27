@@ -2,7 +2,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import {
   formatDateYmd,
   getFixtureById,
-  getFixturesByDate,
+  getFixturesByDateAll,
   type ApiFootballFixtureDto,
 } from "@/lib/api-football.server";
 import { withJobLog, logApiMetric } from "@/lib/structured-log.server";
@@ -81,14 +81,6 @@ export async function runFootballSync(): Promise<unknown> {
     const { data: enabled } = await supabase.rpc("is_football_enabled");
     if (enabled === false) return { ok: true, skipped: "football_disabled" };
 
-    const { data: leagueIdsRow } = await supabase
-      .from("platform_settings")
-      .select("value")
-      .eq("key", "football_league_ids")
-      .maybeSingle();
-
-    const leagueIds = (leagueIdsRow?.value as number[] | undefined) ?? [71];
-
     const { data: autoApproveRow } = await supabase
       .from("platform_settings")
       .select("value")
@@ -116,7 +108,7 @@ export async function runFootballSync(): Promise<unknown> {
 
     for (const date of dates) {
       try {
-        const fixtures = await getFixturesByDate(date, leagueIds, syncSeason);
+        const fixtures = await getFixturesByDateAll(date, syncSeason);
         for (const f of fixtures) {
           await upsertFixture(supabase, f);
           upserted++;

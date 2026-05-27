@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { getFixturesByDate, mapFixtureItem } from "./api-football.server";
+import { getFixturesByDate, getFixturesByDateAll, mapFixtureItem } from "./api-football.server";
 
 describe("api-football mapper", () => {
   it("maps fixture response shape", () => {
@@ -73,5 +73,21 @@ describe("api-football requests", () => {
     const secondUrl = new URL(String(fetchMock.mock.calls[1]?.[0]));
     expect(firstUrl.searchParams.get("season")).toBe("2026");
     expect(secondUrl.searchParams.get("season")).toBe("2024");
+  });
+
+  it("loads all games by date without league filter", async () => {
+    process.env.API_FOOTBALL_KEY = "test-key";
+    const fetchMock = vi.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({ response: [] }),
+      headers: new Headers(),
+    } as Response);
+
+    await getFixturesByDateAll("2026-05-27", 2026);
+
+    const firstUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(firstUrl.searchParams.get("date")).toBe("2026-05-27");
+    expect(firstUrl.searchParams.get("season")).toBe("2026");
+    expect(firstUrl.searchParams.get("league")).toBeNull();
   });
 });

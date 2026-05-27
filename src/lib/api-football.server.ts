@@ -162,6 +162,37 @@ export async function getFixturesByDate(
   return out;
 }
 
+export async function getFixturesByDateAll(
+  date: string,
+  season: number,
+): Promise<ApiFootballFixtureDto[]> {
+  const requestedSeason = Math.trunc(season);
+  let items: ApiFixtureItem[];
+  try {
+    items = await apiGet<ApiFixtureItem>("/fixtures", {
+      date,
+      season: String(requestedSeason),
+    });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    const fallbackSeason = parsePlanSeasonFallback(msg);
+    if (fallbackSeason == null || fallbackSeason === requestedSeason) {
+      throw error;
+    }
+    console.warn("[API-Football] season fallback", {
+      requestedSeason,
+      fallbackSeason,
+      date,
+      mode: "all_games",
+    });
+    items = await apiGet<ApiFixtureItem>("/fixtures", {
+      date,
+      season: String(fallbackSeason),
+    });
+  }
+  return items.map(mapFixtureItem);
+}
+
 export async function getFixtureById(fixtureId: number): Promise<ApiFootballFixtureDto | null> {
   const items = await apiGet<ApiFixtureItem>("/fixtures", { id: String(fixtureId) });
   if (!items.length) return null;
