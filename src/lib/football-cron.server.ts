@@ -89,17 +89,6 @@ export async function runFootballSync(): Promise<unknown> {
 
     const leagueIds = (leagueIdsRow?.value as number[] | undefined) ?? [71];
 
-    const { data: daysRow } = await supabase
-      .from("platform_settings")
-      .select("value")
-      .eq("key", "football_sync_days_ahead")
-      .maybeSingle();
-
-    const { data: daysBackRow } = await supabase
-      .from("platform_settings")
-      .select("value")
-      .eq("key", "football_sync_days_back")
-      .maybeSingle();
     const { data: autoApproveRow } = await supabase
       .from("platform_settings")
       .select("value")
@@ -111,17 +100,10 @@ export async function runFootballSync(): Promise<unknown> {
       .eq("key", "football_sync_base_date")
       .maybeSingle();
 
-    const daysAhead = Number(daysRow?.value ?? 1);
-    const daysBack = Number(daysBackRow?.value ?? 1);
     const autoApproveEnabled = autoApproveRow?.value === true;
     const effectiveBaseDate = resolveSyncBaseDate(baseDateRow?.value);
     const syncSeason = computeSeasonFromBaseDate(effectiveBaseDate);
-    const dates: string[] = [];
-    for (let i = -daysBack; i <= daysAhead; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() + i);
-      dates.push(formatDateYmd(d));
-    }
+    const dates = [formatDateYmd(new Date())];
     let upserted = 0;
     const errors: string[] = [];
 
@@ -177,7 +159,7 @@ export async function runFootballSync(): Promise<unknown> {
       ok: syncOk,
       processed: upserted,
       errorsCount: errors.length,
-      notes: `autoApproveEnabled=${autoApproveEnabled}; autoApproved=${autoApproved}; window=-${daysBack}/+${daysAhead}; baseDate=${formatDateYmd(effectiveBaseDate)}; season=${syncSeason}`,
+      notes: `autoApproveEnabled=${autoApproveEnabled}; autoApproved=${autoApproved}; window=today_only; baseDate=${formatDateYmd(effectiveBaseDate)}; season=${syncSeason}`,
     });
     return out;
   });

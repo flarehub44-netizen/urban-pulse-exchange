@@ -83,6 +83,14 @@ async function apiGet<T>(path: string, params: Record<string, string>): Promise<
   return body.response ?? [];
 }
 
+function parsePlanSeasonFallback(errorMessage: string): number | null {
+  const match = errorMessage.match(/from\s+(\d{4})\s+to\s+(\d{4})/i);
+  if (!match) return null;
+  const upper = Number.parseInt(match[2] ?? "", 10);
+  if (!Number.isFinite(upper) || upper < 1900) return null;
+  return upper;
+}
+
 export function mapFixtureItem(item: ApiFixtureItem): ApiFootballFixtureDto {
   const ft = item.score?.fulltime;
   const ht = item.score?.halftime;
@@ -119,13 +127,33 @@ export async function getFixturesByDate(
   season: number,
 ): Promise<ApiFootballFixtureDto[]> {
   const out: ApiFootballFixtureDto[] = [];
-  const seasonParam = String(Math.trunc(season));
+  const requestedSeason = Math.trunc(season);
   for (const leagueId of leagueIds) {
-    const items = await apiGet<ApiFixtureItem>("/fixtures", {
-      date,
-      league: String(leagueId),
-      season: seasonParam,
-    });
+    let items: ApiFixtureItem[];
+    try {
+      items = await apiGet<ApiFixtureItem>("/fixtures", {
+        date,
+        league: String(leagueId),
+        season: String(requestedSeason),
+      });
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      const fallbackSeason = parsePlanSeasonFallback(msg);
+      if (fallbackSeason == null || fallbackSeason === requestedSeason) {
+        throw error;
+      }
+      console.warn("[API-Football] season fallback", {
+        requestedSeason,
+        fallbackSeason,
+        leagueId,
+        date,
+      });
+      items = await apiGet<ApiFixtureItem>("/fixtures", {
+        date,
+        league: String(leagueId),
+        season: String(fallbackSeason),
+      });
+    }
     for (const item of items) {
       out.push(mapFixtureItem(item));
     }

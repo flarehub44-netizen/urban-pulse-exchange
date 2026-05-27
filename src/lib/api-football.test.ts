@@ -44,4 +44,34 @@ describe("api-football requests", () => {
     expect(requestUrl.searchParams.get("league")).toBe("71");
     expect(requestUrl.searchParams.get("season")).toBe("2026");
   });
+
+  it("falls back to allowed season range when plan rejects requested season", async () => {
+    process.env.API_FOOTBALL_KEY = "test-key";
+    vi.spyOn(global, "setTimeout").mockImplementation((handler: TimerHandler) => {
+      if (typeof handler === "function") handler();
+      return 0 as unknown as ReturnType<typeof setTimeout>;
+    });
+    const fetchMock = vi
+      .spyOn(global, "fetch")
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          response: [],
+          errors: { plan: "Free plans do not have access to this season, try from 2022 to 2024." },
+        }),
+        headers: new Headers(),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ response: [] }),
+        headers: new Headers(),
+      } as Response);
+
+    await getFixturesByDate("2026-05-27", [71], 2026);
+
+    const firstUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    const secondUrl = new URL(String(fetchMock.mock.calls[1]?.[0]));
+    expect(firstUrl.searchParams.get("season")).toBe("2026");
+    expect(secondUrl.searchParams.get("season")).toBe("2024");
+  });
 });
