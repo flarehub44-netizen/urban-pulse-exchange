@@ -31,7 +31,6 @@ import { Route as PartnerPendingRouteImport } from './routes/partner/pending'
 import { Route as PartnerPayoutsRouteImport } from './routes/partner/payouts'
 import { Route as PartnerLeaderboardRouteImport } from './routes/partner/leaderboard'
 import { Route as PartnerInvitesRouteImport } from './routes/partner/invites'
-import { Route as PartnerCreativesRouteImport } from './routes/partner/creatives'
 import { Route as PartnerCampaignsRouteImport } from './routes/partner/campaigns'
 import { Route as PartnerAnalyticsRouteImport } from './routes/partner/analytics'
 import { Route as MarketsMarketIdRouteImport } from './routes/markets/$marketId'
@@ -181,11 +180,6 @@ const PartnerLeaderboardRoute = PartnerLeaderboardRouteImport.update({
 const PartnerInvitesRoute = PartnerInvitesRouteImport.update({
   id: '/invites',
   path: '/invites',
-  getParentRoute: () => PartnerRouteRoute,
-} as any)
-const PartnerCreativesRoute = PartnerCreativesRouteImport.update({
-  id: '/creatives',
-  path: '/creatives',
   getParentRoute: () => PartnerRouteRoute,
 } as any)
 const PartnerCampaignsRoute = PartnerCampaignsRouteImport.update({
@@ -441,7 +435,6 @@ export interface FileRoutesByFullPath {
   '/markets/$marketId': typeof MarketsMarketIdRoute
   '/partner/analytics': typeof PartnerAnalyticsRoute
   '/partner/campaigns': typeof PartnerCampaignsRoute
-  '/partner/creatives': typeof PartnerCreativesRoute
   '/partner/invites': typeof PartnerInvitesRoute
   '/partner/leaderboard': typeof PartnerLeaderboardRoute
   '/partner/payouts': typeof PartnerPayoutsRoute
@@ -502,7 +495,6 @@ export interface FileRoutesByTo {
   '/markets/$marketId': typeof MarketsMarketIdRoute
   '/partner/analytics': typeof PartnerAnalyticsRoute
   '/partner/campaigns': typeof PartnerCampaignsRoute
-  '/partner/creatives': typeof PartnerCreativesRoute
   '/partner/invites': typeof PartnerInvitesRoute
   '/partner/leaderboard': typeof PartnerLeaderboardRoute
   '/partner/payouts': typeof PartnerPayoutsRoute
@@ -569,7 +561,6 @@ export interface FileRoutesById {
   '/markets/$marketId': typeof MarketsMarketIdRoute
   '/partner/analytics': typeof PartnerAnalyticsRoute
   '/partner/campaigns': typeof PartnerCampaignsRoute
-  '/partner/creatives': typeof PartnerCreativesRoute
   '/partner/invites': typeof PartnerInvitesRoute
   '/partner/leaderboard': typeof PartnerLeaderboardRoute
   '/partner/payouts': typeof PartnerPayoutsRoute
@@ -636,7 +627,6 @@ export interface FileRouteTypes {
     | '/markets/$marketId'
     | '/partner/analytics'
     | '/partner/campaigns'
-    | '/partner/creatives'
     | '/partner/invites'
     | '/partner/leaderboard'
     | '/partner/payouts'
@@ -697,7 +687,6 @@ export interface FileRouteTypes {
     | '/markets/$marketId'
     | '/partner/analytics'
     | '/partner/campaigns'
-    | '/partner/creatives'
     | '/partner/invites'
     | '/partner/leaderboard'
     | '/partner/payouts'
@@ -763,7 +752,6 @@ export interface FileRouteTypes {
     | '/markets/$marketId'
     | '/partner/analytics'
     | '/partner/campaigns'
-    | '/partner/creatives'
     | '/partner/invites'
     | '/partner/leaderboard'
     | '/partner/payouts'
@@ -959,13 +947,6 @@ declare module '@tanstack/react-router' {
       path: '/invites'
       fullPath: '/partner/invites'
       preLoaderRoute: typeof PartnerInvitesRouteImport
-      parentRoute: typeof PartnerRouteRoute
-    }
-    '/partner/creatives': {
-      id: '/partner/creatives'
-      path: '/creatives'
-      fullPath: '/partner/creatives'
-      preLoaderRoute: typeof PartnerCreativesRouteImport
       parentRoute: typeof PartnerRouteRoute
     }
     '/partner/campaigns': {
@@ -1323,7 +1304,6 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 interface PartnerRouteRouteChildren {
   PartnerAnalyticsRoute: typeof PartnerAnalyticsRoute
   PartnerCampaignsRoute: typeof PartnerCampaignsRoute
-  PartnerCreativesRoute: typeof PartnerCreativesRoute
   PartnerInvitesRoute: typeof PartnerInvitesRoute
   PartnerLeaderboardRoute: typeof PartnerLeaderboardRoute
   PartnerPayoutsRoute: typeof PartnerPayoutsRoute
@@ -1337,7 +1317,6 @@ interface PartnerRouteRouteChildren {
 const PartnerRouteRouteChildren: PartnerRouteRouteChildren = {
   PartnerAnalyticsRoute: PartnerAnalyticsRoute,
   PartnerCampaignsRoute: PartnerCampaignsRoute,
-  PartnerCreativesRoute: PartnerCreativesRoute,
   PartnerInvitesRoute: PartnerInvitesRoute,
   PartnerLeaderboardRoute: PartnerLeaderboardRoute,
   PartnerPayoutsRoute: PartnerPayoutsRoute,
