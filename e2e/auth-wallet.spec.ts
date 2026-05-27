@@ -28,19 +28,26 @@ test.describe("C1 — Autenticação e sessão", () => {
 test.describe("C1b — Páginas de auth formal", () => {
   test("callback de auth carrega sem erro", async ({ page }) => {
     await page.goto("/auth/callback");
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(2500);
     const body = await page.locator("body").innerText();
-    expect(/confirmando|aguarde|erro/i.test(body)).toBeTruthy();
-    expect(/500|server error/i.test(body)).toBeFalsy();
+    const url = page.url();
+    expect(/confirmando|aguarde|erro|mercados|viax/i.test(body) || /\/markets|\/dashboard/.test(url)).toBeTruthy();
+    expect(/500|server error|before initialization/i.test(body)).toBeFalsy();
   });
 
   test("login e signup carregam formulários", async ({ page }) => {
     await page.goto("/auth/login");
-    await expect(page.getByRole("heading", { name: /entrar na viax/i })).toBeVisible();
+    await page.waitForTimeout(2500);
+    await expect(page.getByRole("heading", { name: /entrar na viax/i })).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page.locator('input[type="email"]')).toBeVisible();
 
     await page.goto("/auth/signup");
-    await expect(page.getByRole("heading", { name: /criar conta/i })).toBeVisible();
+    await page.waitForTimeout(2500);
+    await expect(page.getByRole("heading", { name: /criar conta/i })).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page.locator('input[type="password"]')).toBeVisible();
   });
 

@@ -5,9 +5,9 @@ import { expectProtectedRoute, hasPlaywrightCredentials, loginWithTestUser } fro
 test.describe("deposit funnel", () => {
   test.describe.configure({ timeout: 60_000 });
 
-  test("public shell shows Depositar e jogar CTA", async ({ page }) => {
+  test("public shell shows Criar conta CTA", async ({ page }) => {
     await page.goto("/markets?status=live");
-    await expect(page.getByRole("button", { name: /Depositar e jogar/i }).first()).toBeVisible({
+    await expect(page.getByRole("button", { name: /criar conta|entrar/i }).first()).toBeVisible({
       timeout: 15_000,
     });
   });

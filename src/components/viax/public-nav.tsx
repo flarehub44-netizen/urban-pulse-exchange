@@ -23,7 +23,7 @@ export function PublicNav({ variant = "shell" }: PublicNavProps) {
           <span className="font-semibold tracking-tight">ViaX</span>
         </Link>
         <nav className="hidden gap-6 text-sm text-muted-foreground md:flex">
-          <Link to="/markets" search={{ segment: "transito" }} className="hover:text-foreground">
+          <Link to="/markets" search={{ segment: "transito" }} preload="intent" className="hover:text-foreground">
             {copy.markets.transitoTab}
           </Link>
           <Link to="/markets" search={{ segment: "futebol" }} className="hover:text-foreground">

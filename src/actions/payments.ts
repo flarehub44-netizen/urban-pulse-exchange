@@ -79,6 +79,7 @@ export const initiateDepositFn = createServerFn({ method: "POST" })
       logApiMetric("bff.initiate_deposit", { ok: true, durationMs: Date.now() - started });
       return {
         intentId: intent.id,
+        providerId: charge.id,
         qrCode: charge.qr_code,
         qrCodeImg: charge.qr_code_base64,
         expiresAt: charge.expiration,

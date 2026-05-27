@@ -43,6 +43,33 @@ const PrecisionReportCard = lazy(() =>
     default: m.PrecisionReportCard,
   })),
 );
+const DailyPulse = lazy(() =>
+  import("@/components/viax/daily-pulse").then((m) => ({ default: m.DailyPulse })),
+);
+const DailyMissions = lazy(() =>
+  import("@/components/viax/daily-missions").then((m) => ({ default: m.DailyMissions })),
+);
+const DailyPoll = lazy(() =>
+  import("@/components/viax/daily-poll").then((m) => ({ default: m.DailyPoll })),
+);
+const EventsBanner = lazy(() =>
+  import("@/components/viax/events-banner").then((m) => ({ default: m.EventsBanner })),
+);
+const ComebackBanner = lazy(() =>
+  import("@/components/viax/comeback-banner").then((m) => ({ default: m.ComebackBanner })),
+);
+const StreakRiskBanner = lazy(() =>
+  import("@/components/viax/streak-risk-banner").then((m) => ({ default: m.StreakRiskBanner })),
+);
+const TomorrowPreview = lazy(() =>
+  import("@/components/viax/tomorrow-preview").then((m) => ({ default: m.TomorrowPreview })),
+);
+const NeighborhoodWidget = lazy(() =>
+  import("@/components/viax/neighborhood-widget").then((m) => ({ default: m.NeighborhoodWidget })),
+);
+const InviteFriendsCard = lazy(() =>
+  import("@/components/viax/invite-friends-card").then((m) => ({ default: m.InviteFriendsCard })),
+);
 
 function ChartFallback() {
   return <div className="h-[140px] animate-pulse rounded-xl bg-surface/60" />;
@@ -60,27 +87,22 @@ import { EmptyState } from "@/components/viax/empty-state";
 import { buildActionNowItems } from "@/lib/action-now";
 import { buildDailyMission } from "@/lib/urbanmind-coach";
 import { DEFAULT_FEATURED_MARKET_ID } from "@/config/markets";
-import { DailyPulse } from "@/components/viax/daily-pulse";
-import { StreakRiskBanner } from "@/components/viax/streak-risk-banner";
-import { ComebackBanner } from "@/components/viax/comeback-banner";
-import { InviteFriendsCard } from "@/components/viax/invite-friends-card";
 import { useRecommendedMarkets } from "@/hooks/use-recommended-markets";
 import { useMyLeagues } from "@/hooks/use-leagues";
 import { useTrendingTraders } from "@/hooks/use-trending-traders";
 import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
-import { DailyMissions } from "@/components/viax/daily-missions";
 import { WeeklyReportModal } from "@/components/viax/weekly-report-modal";
 import { useWeeklyReport } from "@/hooks/use-weekly-report";
 import { scheduleDailyPush } from "@/lib/push-scheduler";
-import { EventsBanner } from "@/components/viax/events-banner";
-import { TomorrowPreview } from "@/components/viax/tomorrow-preview";
-import { NeighborhoodWidget } from "@/components/viax/neighborhood-widget";
-import { DailyPoll } from "@/components/viax/daily-poll";
 import { DivisionUpModal } from "@/components/viax/division-up-modal";
 import { useDepositSheet } from "@/hooks/use-deposit-sheet";
 import { useFollowingActiveBets } from "@/hooks/use-following-active-bets";
 import { useWinToast } from "@/hooks/use-win-toast";
 import { getOrAssignVariant, trackProductEvent } from "@/lib/product-analytics";
+
+function WidgetFallback({ className = "h-24" }: { className?: string }) {
+  return <div className={cn("animate-pulse rounded-xl bg-surface/60", className)} />;
+}
 
 export type DashboardSearch = { from?: string; highlight?: "position" };
 
@@ -343,9 +365,21 @@ function Dashboard() {
           </span>
         </Link>
       )}
-      <ComebackBanner newMarketsCount={markets.length} />
-      <EventsBanner />
-      <StreakRiskBanner />
+      {deferredReady && (
+        <Suspense fallback={<WidgetFallback className="h-12" />}>
+          <ComebackBanner newMarketsCount={markets.length} />
+        </Suspense>
+      )}
+      {deferredReady && (
+        <Suspense fallback={<WidgetFallback className="h-14" />}>
+          <EventsBanner />
+        </Suspense>
+      )}
+      {deferredReady && (
+        <Suspense fallback={<WidgetFallback className="h-12" />}>
+          <StreakRiskBanner />
+        </Suspense>
+      )}
 
       <div className="rounded-2xl border border-primary/25 bg-primary/5 p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -699,9 +733,15 @@ function Dashboard() {
         </div>
       </div>
 
-      <DailyPulse />
-      {isRegistered && dbProfile?.handle && (
-        <InviteFriendsCard handle={dbProfile.handle} />
+      {deferredReady && (
+        <Suspense fallback={<WidgetFallback />}>
+          <DailyPulse />
+        </Suspense>
+      )}
+      {deferredReady && isRegistered && dbProfile?.handle && (
+        <Suspense fallback={<WidgetFallback />}>
+          <InviteFriendsCard handle={dbProfile.handle} />
+        </Suspense>
       )}
 
       {isRegistered && (
@@ -749,7 +789,11 @@ function Dashboard() {
         )
       )}
 
-      <DailyMissions />
+      {deferredReady && (
+        <Suspense fallback={<WidgetFallback />}>
+          <DailyMissions />
+        </Suspense>
+      )}
 
       {/* Fold 3 — performance + posições abertas */}
       <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
@@ -875,14 +919,22 @@ function Dashboard() {
         </>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <DailyPoll />
-        <TomorrowPreview markets={markets} />
-        <NeighborhoodWidget
-          neighborhood={dbProfile?.neighborhood ?? null}
-          city={dbProfile?.city ?? "São Paulo"}
-        />
-      </div>
+      {deferredReady && (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <Suspense fallback={<WidgetFallback />}>
+            <DailyPoll />
+          </Suspense>
+          <Suspense fallback={<WidgetFallback />}>
+            <TomorrowPreview markets={markets} />
+          </Suspense>
+          <Suspense fallback={<WidgetFallback />}>
+            <NeighborhoodWidget
+              neighborhood={dbProfile?.neighborhood ?? null}
+              city={dbProfile?.city ?? "São Paulo"}
+            />
+          </Suspense>
+        </div>
+      )}
 
       {casinoEnabled && deferredReady && (
         <Suspense fallback={<ChartFallback />}>

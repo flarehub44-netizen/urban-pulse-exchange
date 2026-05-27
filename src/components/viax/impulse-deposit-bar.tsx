@@ -11,7 +11,7 @@ import {
   setLastImpulseAmount,
 } from "@/lib/impulse-deposit";
 import { cn } from "@/lib/utils";
-import { SimulatedMoneyBanner } from "@/components/viax/simulated-money-banner";
+import { PaymentInfoBanner } from "@/components/viax/simulated-money-banner";
 
 type ImpulseDepositBarProps = {
   balance: number;
@@ -48,7 +48,7 @@ export function ImpulseDepositBar({
 
   return (
     <div className={cn("space-y-2", className)}>
-      <SimulatedMoneyBanner />
+      <PaymentInfoBanner context="casino" />
       <div
         className={cn(
           "flex flex-wrap items-center justify-between gap-3 rounded-xl border border-warn/35 bg-warn/10 px-4 py-3 animate-pulse",

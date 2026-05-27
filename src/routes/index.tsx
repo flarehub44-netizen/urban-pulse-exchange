@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, lazy, Suspense, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   ArrowRight,
@@ -23,21 +23,36 @@ import { MobileMarketsCarousel } from "@/components/viax/mobile-markets-carousel
 import { Ticker } from "@/components/viax/ticker";
 import { AnimatedNumber } from "@/components/viax/animated-number";
 import { Sparkline } from "@/components/viax/sparkline";
-import { CityHeatmap } from "@/components/viax/city-heatmap";
 import { Logo } from "@/components/viax/sidebar";
 import { KpiTile } from "@/components/viax/kpi-tile";
 import { DivisionBadge } from "@/components/viax/division-badge";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL, formatCompact, probability, prizePool } from "@/lib/parimutuel";
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
 import { PublicNav } from "@/components/viax/public-nav";
 import { PublicMobileNav } from "@/components/viax/public-mobile-nav";
 import { LandingSegmentPillars } from "@/components/viax/landing-segment-pillars";
-import { LandingLiveMarkets } from "@/components/viax/landing-live-markets";
 import { usePublicCommunityMarkets } from "@/hooks/use-community-markets";
 import type { AuthModalSearch } from "@/lib/auth-modal-search";
 import { parseAuthModalSearch } from "@/lib/auth-modal-search";
+
+const CityHeatmap = lazy(() =>
+  import("@/components/viax/city-heatmap").then((m) => ({ default: m.CityHeatmap })),
+);
+const LandingLiveMarkets = lazy(() =>
+  import("@/components/viax/landing-live-markets").then((m) => ({
+    default: m.LandingLiveMarkets,
+  })),
+);
+const LandingAiAccuracyChart = lazy(() =>
+  import("@/components/viax/landing-ai-accuracy-chart").then((m) => ({
+    default: m.LandingAiAccuracyChart,
+  })),
+);
+
+function SectionFallback({ className = "h-48" }: { className?: string }) {
+  return <div className={`animate-pulse rounded-2xl bg-surface/60 ${className}`} />;
+}
 
 export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>): AuthModalSearch =>
@@ -56,6 +71,17 @@ export const Route = createFileRoute("/")({
 function Landing() {
   const navigate = useNavigate();
   useRealtimeTick();
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const link = document.createElement("link");
+    link.rel = "prefetch";
+    link.href = "/markets?status=live";
+    document.head.appendChild(link);
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -246,7 +272,9 @@ function Landing() {
         </div>
       </section>
 
-      <LandingLiveMarkets />
+      <Suspense fallback={<SectionFallback className="h-64" />}>
+        <LandingLiveMarkets />
+      </Suspense>
 
       {/* AI vs HUMANS */}
       <section className="mx-auto max-w-7xl px-6 py-24">
@@ -270,70 +298,9 @@ function Landing() {
               <KpiTile label="Volume movimentado" value="18,4 mi BRL" />
             </div>
           </div>
-          <div className="surface-card-featured">
-            <div className="mb-3 flex items-center justify-between">
-              <div className="text-sm font-medium">{copy.landing.chartTitle}</div>
-              <div className="flex items-center gap-3 text-[10px] uppercase tracking-wider">
-                <span className="flex items-center gap-1.5 text-primary">
-                  <span className="size-2 rounded-full bg-primary" /> UrbanMind
-                </span>
-                <span className="flex items-center gap-1.5 text-muted-foreground">
-                  <span className="size-2 rounded-full bg-muted-foreground" /> Comunidade
-                </span>
-              </div>
-            </div>
-            <div style={{ width: "100%", height: 280 }}>
-              <ResponsiveContainer>
-                <LineChart
-                  data={aiAcc.map((d) => ({
-                    t: new Date(d.t).toLocaleDateString("pt-BR", {
-                      day: "2-digit",
-                      month: "2-digit",
-                    }),
-                    AI: +(d.ai * 100).toFixed(1),
-                    H: +(d.human * 100).toFixed(1),
-                  }))}
-                >
-                  <XAxis
-                    dataKey="t"
-                    tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }}
-                    axisLine={false}
-                    tickLine={false}
-                    minTickGap={32}
-                  />
-                  <YAxis
-                    domain={[50, 90]}
-                    tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }}
-                    axisLine={false}
-                    tickLine={false}
-                    width={30}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      background: "var(--color-popover)",
-                      border: "1px solid var(--color-border)",
-                      borderRadius: 12,
-                      fontSize: 12,
-                    }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="AI"
-                    stroke="var(--color-primary)"
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="H"
-                    stroke="var(--color-muted-foreground)"
-                    strokeWidth={1.6}
-                    dot={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+          <Suspense fallback={<SectionFallback className="h-[280px]" />}>
+            <LandingAiAccuracyChart data={aiAcc} />
+          </Suspense>
         </div>
       </section>
 
@@ -349,7 +316,9 @@ function Landing() {
             }
           />
           <div className="mt-10 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+          <Suspense fallback={<SectionFallback className="h-[460px]" />}>
             <CityHeatmap height={460} />
+          </Suspense>
             <div className="space-y-3">
               {markets.slice(0, 4).map((m) => (
                 <div

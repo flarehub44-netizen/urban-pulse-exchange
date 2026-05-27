@@ -290,8 +290,12 @@ export const copy = {
     withdraw: "Saque",
     refund: "Reembolso",
     winsPayouts: "Vitórias e ganhos",
-    simulatedTitle: "Saldo simulado",
-    simulatedDepositNote: "Sem Pix ou cartão real — valores são fictícios para demonstração.",
+    simulatedTitle: "Créditos promocionais",
+    simulatedDepositNote:
+      "Recargas rápidas da roleta são créditos de entretenimento — não substituem depósitos Pix.",
+    pixTitle: "Depósitos via Pix",
+    pixDepositNote:
+      "Pagamentos processados com segurança. O saldo é creditado após confirmação bancária.",
     subtitle: "Saldo, movimentações e histórico de previsões.",
     predictionsTab: (count: number) => `Previsões (${count})`,
     stakeLabel: "Participação",
@@ -581,7 +585,7 @@ export const copy = {
     },
     wallet: {
       title: "Sem movimentações",
-      description: "Depósitos simulados e ganhos de mercados resolvidos aparecem aqui.",
+      description: "Depósitos Pix e ganhos de mercados resolvidos aparecem aqui.",
       cta: "Ver mercados",
     },
     dashboardFeed: {
@@ -699,7 +703,7 @@ export const copy = {
 
   responsiblePlay: {
     disclaimerShort:
-      "Saldo simulado. Giros e recargas rápidas são para entretenimento — defina limites e use com moderação.",
+      "Recargas rápidas da roleta usam créditos promocionais — depósitos reais são via Pix na carteira.",
     understood: "Entendi",
     settingsTitle: "Modo intenso (roleta e recargas)",
     settingsDesc:

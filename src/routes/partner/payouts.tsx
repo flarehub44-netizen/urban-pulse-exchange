@@ -6,7 +6,7 @@ import {
   usePartnerPayouts,
   usePartnerPayoutRequest,
 } from "@/hooks/use-partner";
-import { SimulatedMoneyBanner } from "@/components/viax/simulated-money-banner";
+import { PaymentInfoBanner } from "@/components/viax/simulated-money-banner";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
 import { formatDistanceToNow } from "date-fns";
@@ -34,7 +34,7 @@ function PartnerPayoutsPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-lg font-semibold">{copy.partner.nav.payouts}</h1>
-      <SimulatedMoneyBanner />
+      <PaymentInfoBanner context="partner" />
       <p className="text-xs text-muted-foreground">{copy.partner.simulatedPayout}</p>
       <div className="rounded-xl border bg-card/60 p-4">
         <div className="text-xs text-muted-foreground">Saldo creator</div>

@@ -13,6 +13,7 @@ import { copy } from "@/copy/pt-BR";
 import { useBalanceSeries } from "@/hooks/use-balance-series";
 import { useAuth } from "@/hooks/use-auth";
 import { RegisterRequiredCta } from "@/components/auth/register-required-cta";
+import { PaymentInfoBanner } from "@/components/viax/simulated-money-banner";
 import { useBets } from "@/hooks/use-bets";
 import {
   useResolvedProfile,
@@ -66,6 +67,7 @@ export function WalletPanel({
     qrCode: string;
     qrCodeImg: string;
     intentId: string;
+    providerId: string;
     expiresAt: string;
   } | null>(null);
   const [depositDone, setDepositDone] = useState(false);
@@ -94,6 +96,7 @@ export function WalletPanel({
         qrCode: res.qrCode,
         qrCodeImg: res.qrCodeImg,
         intentId: res.intentId,
+        providerId: res.providerId,
         expiresAt: res.expiresAt,
       });
     },
@@ -298,6 +301,13 @@ export function WalletPanel({
           {/* QR Code exibido após gerar o depósito */}
           {depositQr && tab === "deposit" ? (
             <div className="space-y-4 text-center">
+              <span
+                data-testid="deposit-intent-id"
+                data-provider-id={depositQr.providerId}
+                className="sr-only"
+              >
+                {depositQr.intentId}
+              </span>
               <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                 <Clock className="size-3" />
                 <span>Escaneie o QR Code no app do seu banco</span>
@@ -336,6 +346,8 @@ export function WalletPanel({
             </div>
           ) : (
             <>
+              {tab === "deposit" && <PaymentInfoBanner context="wallet" className="mb-1" />}
+
               {tab === "deposit" && casinoEnabled && (
                 <div className="space-y-2">
                   <p className="text-xs font-medium">{copy.casino.impulseDepositTitle}</p>
