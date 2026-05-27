@@ -10,20 +10,36 @@ export async function signInWithEmail(email: string, password: string) {
   return data;
 }
 
-export async function signUpWithEmail(email: string, password: string, displayName: string) {
+export async function signUpWithEmail(
+  email: string,
+  password: string,
+  displayName: string,
+  cpf: string,
+  phone: string,
+) {
   const trimmedEmail = email.trim();
+  const trimmedName = displayName.trim();
+  const cpfDigits = cpf.replace(/\D/g, "");
+  const phoneDigits = phone.replace(/\D/g, "");
 
   const { data, error } = await supabase.auth.signUp({
     email: trimmedEmail,
     password,
     options: {
-      data: { display_name: displayName.trim() },
+      data: {
+        display_name: trimmedName,
+        cpf: cpfDigits,
+        phone: phoneDigits,
+      },
       emailRedirectTo: `${window.location.origin}/auth/callback`,
     },
   });
   if (error) throw new Error(authErrorMessage(error));
-  if (displayName.trim().length >= 2 && data.user?.id) {
-    await supabase.from("profiles").update({ name: displayName.trim() }).eq("id", data.user.id);
+  if (trimmedName.length >= 2 && data.user?.id) {
+    await supabase
+      .from("profiles")
+      .update({ name: trimmedName, cpf: cpfDigits, phone: phoneDigits })
+      .eq("id", data.user.id);
   }
   return {
     data,

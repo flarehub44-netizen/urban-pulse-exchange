@@ -2169,6 +2169,7 @@ export type Database = {
           banned_at: string | null;
           casino_opt_out: boolean;
           city: string;
+          cpf: string | null;
           created_at: string;
           deleted_at: string | null;
           deposit_nudge_sent_at: string | null;
@@ -2185,6 +2186,7 @@ export type Database = {
           name: string;
           neighborhood: string;
           notification_prefs: Json;
+          phone: string | null;
           pix_key: string | null;
           pnl: number;
           recovery_days_left: number;
@@ -2204,6 +2206,7 @@ export type Database = {
           balance?: number;
           casino_opt_out?: boolean;
           city?: string;
+          cpf?: string | null;
           created_at?: string;
           deposit_nudge_sent_at?: string | null;
           division?: Database["public"]["Enums"]["division_tier"];
@@ -2219,6 +2222,7 @@ export type Database = {
           name?: string;
           neighborhood?: string;
           notification_prefs?: Json;
+          phone?: string | null;
           pix_key?: string | null;
           pnl?: number;
           recovery_days_left?: number;
@@ -2238,6 +2242,7 @@ export type Database = {
           balance?: number;
           casino_opt_out?: boolean;
           city?: string;
+          cpf?: string | null;
           created_at?: string;
           deposit_nudge_sent_at?: string | null;
           division?: Database["public"]["Enums"]["division_tier"];
@@ -2253,6 +2258,7 @@ export type Database = {
           name?: string;
           neighborhood?: string;
           notification_prefs?: Json;
+          phone?: string | null;
           pix_key?: string | null;
           pnl?: number;
           recovery_days_left?: number;
