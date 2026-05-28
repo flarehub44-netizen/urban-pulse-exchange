@@ -221,7 +221,10 @@ export function useApplyPartner() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["partner"] }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["partner"] });
+      void qc.invalidateQueries({ queryKey: ["account", "context"] });
+    },
   });
 }
 

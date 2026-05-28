@@ -14,14 +14,21 @@ import { useAuth } from "@/hooks/use-auth";
 import { useMyPartnerStatus, useApplyPartner } from "@/hooks/use-partner";
 import { useQueryClient } from "@tanstack/react-query";
 import { copy } from "@/copy/pt-BR";
+import { getErrorMessage } from "@/lib/get-error-message";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+
+type ApplyPartnerResult = { ok?: boolean; reason?: string };
 
 const benefitIcons = [BarChart3, Wallet, Link2, Users] as const;
 
 export function PartnerProgramLanding() {
   const { userId, isRegistered, authReady } = useAuth();
-  const { data: partnerStatus, isLoading: statusLoading } = useMyPartnerStatus(!!userId);
+  const {
+    data: partnerStatus,
+    isLoading: statusLoading,
+    refetch: refetchPartnerStatus,
+  } = useMyPartnerStatus(!!userId);
   const { mutateAsync: applyPartner, isPending: applying } = useApplyPartner();
   const qc = useQueryClient();
   const [bio, setBio] = useState("");
@@ -29,6 +36,10 @@ export function PartnerProgramLanding() {
   const [focusCity, setFocusCity] = useState("São Paulo");
   const [instagram, setInstagram] = useState("");
   const [tiktok, setTiktok] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  const formComplete =
+    bio.trim().length >= 20 && !!promotionChannels.trim() && !!instagram.trim();
 
   const isActivePartner =
     partnerStatus?.role === "partner" && partnerStatus?.status === "active";
@@ -36,7 +47,20 @@ export function PartnerProgramLanding() {
   const canApply =
     authReady && userId && isRegistered && !isActivePartner && !isApplicant;
 
+  const validateApply = (): string | null => {
+    if (bio.trim().length < 20) return copy.partner.landing.bioMinHint;
+    if (!promotionChannels.trim()) return copy.partner.landing.promotionRequiredHint;
+    if (!instagram.trim()) return copy.partner.landing.instagramRequiredHint;
+    return null;
+  };
+
   const handleApply = async () => {
+    const validationError = validateApply();
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+
     try {
       const res = await applyPartner({
         bio,
@@ -45,15 +69,35 @@ export function PartnerProgramLanding() {
         tiktok: tiktok.trim() || undefined,
         focusCity: focusCity.trim() || undefined,
       });
-      const payload = res as { ok?: boolean; reason?: string };
-      if (payload?.reason === "registration_required") {
-        toast.error(copy.auth.registerRequired);
+      const payload = res as ApplyPartnerResult;
+
+      if (payload?.ok === false) {
+        if (payload.reason === "registration_required") {
+          toast.error(copy.auth.registerRequired);
+          return;
+        }
+        if (payload.reason === "pending_application") {
+          toast.info(copy.partner.landing.applyAlreadyPending);
+          setSubmitted(true);
+          await qc.invalidateQueries({ queryKey: ["account", "context"] });
+          await refetchPartnerStatus();
+          return;
+        }
+        if (payload.reason === "already_partner") {
+          toast.info(copy.partner.landing.applyAlreadyPartner);
+          await refetchPartnerStatus();
+          return;
+        }
+        toast.error(copy.errors.generic);
         return;
       }
+
+      setSubmitted(true);
       await qc.invalidateQueries({ queryKey: ["account", "context"] });
-      toast.success(copy.partner.applyPending);
+      await refetchPartnerStatus();
+      toast.success(copy.partner.landing.applySuccess);
     } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : copy.errors.generic);
+      toast.error(getErrorMessage(e));
     }
   };
 
@@ -131,7 +175,7 @@ export function PartnerProgramLanding() {
             <CheckCircle2 className="size-5 shrink-0" />
             <span>{copy.partner.landing.alreadyPartner}</span>
           </div>
-        ) : isApplicant ? (
+        ) : isApplicant || submitted ? (
           <div className="mt-4 space-y-2">
             <p className="text-sm text-warn">{copy.partner.applyPending}</p>
             <Link
@@ -170,7 +214,13 @@ export function PartnerProgramLanding() {
             </AuthModalTrigger>
           </div>
         ) : (
-          <div className="mt-4 space-y-4">
+          <form
+            className="mt-4 space-y-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void handleApply();
+            }}
+          >
             <div>
               <label htmlFor="partner-bio" className="text-xs font-medium text-muted-foreground">
                 {copy.partner.landing.bioLabel}
@@ -260,24 +310,24 @@ export function PartnerProgramLanding() {
                 />
               </div>
             </div>
+            {!formComplete && !applying && (
+              <p className="text-[10px] text-muted-foreground">
+                Preencha motivação (20+ caracteres), onde vai divulgar e Instagram para enviar.
+              </p>
+            )}
             <button
-              type="button"
-              disabled={
-                applying ||
-                bio.trim().length < 20 ||
-                !promotionChannels.trim() ||
-                !instagram.trim()
-              }
-              onClick={() => void handleApply()}
+              type="submit"
+              disabled={applying}
               className={cn(
                 "inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground",
                 "hover:bg-primary/90 disabled:opacity-50 sm:w-auto",
+                !formComplete && !applying && "opacity-70",
               )}
             >
               {applying ? copy.common.loading : copy.partner.applyCta}
               {!applying && <ArrowRight className="size-4" />}
             </button>
-          </div>
+          </form>
         )}
 
         <p className="mt-4 text-[10px] text-muted-foreground">
