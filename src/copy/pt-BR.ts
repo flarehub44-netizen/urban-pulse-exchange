@@ -825,7 +825,7 @@ export const copy = {
         "Monetize sua audiência com revenue share e CPA. Candidate-se ao programa Creator ViaX.",
       heroTitle: "Monetize sua audiência com o trânsito de São Paulo",
       heroSubtitle:
-        "Indique traders para a ViaX e ganhe comissão sobre o rake gerado pelos seus indicados — modelo de revenue share, transparente e sem marketing multinível.",
+        "Indique traders para a ViaX e ganhe comissão sobre o rake (house fee) das apostas dos seus indicados — não sobre o pool inteiro do mercado.",
       ctaApply: "Quero me candidatar",
       ctaPortal: "Abrir Creator Hub",
       ctaLogin: "Entrar para candidatar",
@@ -896,7 +896,7 @@ export const copy = {
       referrals: "Traders indicados",
       volume: "Volume gerado",
       conversion: "Conversão",
-      commissionHint: "do rake da plataforma",
+      commissionHint: "do rake das apostas dos indicados",
       cpaHint: "CPA · qualifica com depósito de",
       cpaPending: "CPA pendente (dia 8)",
       cpaNextRelease: "Próxima liberação CPA",
@@ -1136,6 +1136,8 @@ export const copy = {
       activeTitle: "Afiliados ativos",
       activeEmpty: "Nenhum afiliado ativo.",
       revenueShare: "Comissão (0–1)",
+      revenueShareHint:
+        "Fração do rake (house fee) gerado pelas apostas dos indicados na liquidação do mercado.",
       cpaAmount: "CPA (BRL)",
       cpaUseDefault: "Padrão global",
       saveTerms: "Salvar termos",

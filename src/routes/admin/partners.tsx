@@ -292,6 +292,9 @@ function AdminPartnersPage() {
                     <span className="text-muted-foreground">
                       {copy.admin.partners.revenueShare}
                     </span>
+                    <p className="mt-0.5 text-[10px] text-muted-foreground">
+                      {copy.admin.partners.revenueShareHint}
+                    </p>
                     <input
                       type="number"
                       step="0.01"
