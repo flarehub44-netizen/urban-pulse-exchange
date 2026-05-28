@@ -2295,13 +2295,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "partner_commission_ledger_market_id_fkey"
-            columns: ["market_id"]
-            isOneToOne: false
-            referencedRelation: "markets"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "partner_commission_ledger_partner_id_fkey"
             columns: ["partner_id"]
             isOneToOne: false
@@ -2596,15 +2589,7 @@ export type Database = {
           market_id?: string
           meta?: Json
         }
-        Relationships: [
-          {
-            foreignKeyName: "platform_ledger_market_id_fkey"
-            columns: ["market_id"]
-            isOneToOne: false
-            referencedRelation: "markets"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       platform_settings: {
         Row: {
@@ -4207,7 +4192,7 @@ export type Database = {
         Returns: Json
       }
       allocate_partner_commissions: {
-        Args: { p_house_fee: number; p_market_id: string }
+        Args: { p_house_fee: number; p_market_id: string; p_source?: string }
         Returns: undefined
       }
       apply_partner_program: {

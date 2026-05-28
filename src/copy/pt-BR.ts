@@ -896,7 +896,7 @@ export const copy = {
       referrals: "Traders indicados",
       volume: "Volume gerado",
       conversion: "Conversão",
-      commissionHint: "do rake das apostas dos indicados",
+      commissionHint: "do rake das apostas dos indicados (urbanos e futebol)",
       cpaHint: "CPA · qualifica com depósito de",
       cpaPending: "CPA pendente (dia 8)",
       cpaNextRelease: "Próxima liberação CPA",

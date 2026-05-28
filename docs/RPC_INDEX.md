@@ -58,7 +58,7 @@ Gerado por `scripts/gen-rpc-index.mjs`.
 - `public.admin_upsert_daily_poll` � supabase/migrations/20260710000000_admin_events_hub.sql
 - `public.admin_upsert_platform_event` � supabase/migrations/20260710000000_admin_events_hub.sql
 - `public.admin_void_football_market` � supabase/migrations/20260701000000_football_markets.sql
-- `public.allocate_partner_commissions` � supabase/migrations/20260530000000_partner_program.sql
+- `public.allocate_partner_commissions(text, numeric, text)` — urban via settle_market, football via settle_football_market; supabase/migrations/20260902120000_partner_commission_all_markets.sql
 - `public.apply_partner_program` � supabase/migrations/20260530000000_partner_program.sql
 - `public.apply_partner_program` � supabase/migrations/20260705000000_account_hierarchy.sql
 - `public.apply_user_progress` � supabase/migrations/20260528000000_retention_habits.sql
@@ -572,3 +572,5 @@ Após `20260826020000_harden_rpc_execute_and_search_path.sql`, toda RPC `admin_*
 
 - Validação: `npm run check:admin-rpc`
 - Detalhes: [SECURITY.md](./SECURITY.md) (seção Admin RPC grants)
+
+
