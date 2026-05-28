@@ -169,6 +169,27 @@
   - grants mínimos por role;
   - migração gradual para canal server-only quando aplicável.
 
+## CPF HMAC secret (`platform_settings`)
+
+- `hash_cpf_document` lê o secret da chave `cpf_hmac_secret` em `public.platform_settings` (migration `20260827040000_cpf_hmac_secret_platform_settings.sql`).
+- **Não** usar `ALTER DATABASE ... SET app.cpf_hmac_secret` no Supabase hospedado (erro `42501`).
+- **Não** expor via `admin_update_setting` (evita vazar o secret no audit log).
+- Configuração recomendada (SQL Editor):
+
+```sql
+insert into public.platform_settings (key, value)
+values ('cpf_hmac_secret', to_jsonb('<64-char-random-secret>'::text))
+on conflict (key) do update
+  set value = excluded.value,
+      updated_at = now();
+```
+
+- Validação:
+
+```sql
+select public.hash_cpf_document('12345678909');
+```
+
 ## Critério de conclusão (estado atual)
 
 - `function_search_path_mutable`: `0`.
