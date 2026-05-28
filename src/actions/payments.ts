@@ -21,16 +21,16 @@ function logFinancialReconciliationIssue(input: {
 
 function mapSyncPayDepositError(error: unknown): Error {
   if (error instanceof SyncPayHttpError) {
-    const looksLikeHtml = error.contentType.includes("text/html") || error.responseSnippet.includes("<html");
-    if (error.status === 404 && looksLikeHtml) {
-      console.error("[SyncPayConfigIssue] syncpay_endpoint_misconfigured", {
+    const looksLikeHtml = error.contentType.includes("text/html") || error.responseSnippet.includes("<!DOCTYPE");
+    if (looksLikeHtml) {
+      console.error("[SyncPayConfigIssue] syncpay_html_error_page", {
         status: error.status,
         contentType: error.contentType,
         requestUrl: error.requestUrl,
         bodySnippet: error.responseSnippet,
       });
       return new Error(
-        "syncpay_endpoint_misconfigured: endpoint/base URL da API SyncPay inválidos para este ambiente",
+        `syncpay_credentials_error: SyncPay retornou página HTML (${error.status}) — verifique SYNCPAY_CLIENT_ID e SYNCPAY_CLIENT_SECRET no Wrangler`,
       );
     }
   }

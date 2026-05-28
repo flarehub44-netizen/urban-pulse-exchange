@@ -43,8 +43,13 @@ async function getAuthToken(): Promise<string> {
       body: JSON.stringify({ client_id: CLIENT_ID, client_secret: CLIENT_SECRET }),
     });
     if (!res.ok) {
-      const snippet = compactText(await res.text().catch(() => "(empty)"));
-      throw new Error(`SyncPay auth token failed ${res.status}: ${snippet}`);
+      const body = await res.text().catch(() => "(empty)");
+      const snippet = compactText(body);
+      const looksLikeHtml = res.headers.get("content-type")?.includes("text/html") || body.includes("<!DOCTYPE");
+      const msg = looksLikeHtml
+        ? `syncpay_auth_html_error: token endpoint retornou HTML (${res.status}) — verifique SYNCPAY_CLIENT_ID e SYNCPAY_CLIENT_SECRET`
+        : `SyncPay auth token failed ${res.status}: ${snippet}`;
+      throw new Error(msg);
     }
     const json = (await res.json()) as { access_token: string; expires_in?: number };
     const expiresInMs = (json.expires_in ?? 3600) * 1000;
