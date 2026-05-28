@@ -191,14 +191,32 @@ export function usePartnerPayouts(enabled = true) {
   });
 }
 
+function normalizeSocialHandle(value: string): string {
+  return value.trim().replace(/^@+/, "");
+}
+
 export function useApplyPartner() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { bio: string; focusCity?: string }) => {
+    mutationFn: async (input: {
+      bio: string;
+      focusCity?: string;
+      promotionChannels: string;
+      instagram: string;
+      tiktok?: string;
+    }) => {
+      const instagram = normalizeSocialHandle(input.instagram);
+      const tiktok = input.tiktok ? normalizeSocialHandle(input.tiktok) : "";
+      const p_social: Record<string, string> = {
+        promotion_channels: input.promotionChannels.trim(),
+        instagram,
+      };
+      if (tiktok) p_social.tiktok = tiktok;
+
       const { data, error } = await supabase.rpc("apply_partner_program", {
-        p_bio: input.bio,
-        p_focus_city: input.focusCity ?? undefined,
-        p_social: {},
+        p_bio: input.bio.trim(),
+        p_focus_city: input.focusCity?.trim() || undefined,
+        p_social,
       });
       if (error) throw error;
       return data;

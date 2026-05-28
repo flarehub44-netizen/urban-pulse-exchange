@@ -35,8 +35,10 @@ import { cn } from "@/lib/utils";
 import { trackDepositFunnel } from "@/lib/deposit-funnel";
 import { trackProductEvent } from "@/lib/product-analytics";
 import { AppLoadingSkeleton } from "@/components/viax/app-loading-skeleton";
+import { CpfCaptureForm } from "@/components/viax/cpf-capture-form";
 import { CpfCaptureSheet } from "@/components/viax/cpf-capture-sheet";
 import { useEnsureCpfForPix } from "@/hooks/use-ensure-cpf-for-pix";
+import { getErrorMessage } from "@/lib/get-error-message";
 import { PIX_MIN_AMOUNT_BRL } from "@/lib/pix-payments";
 
 const WalletBalanceChart = lazy(() =>
@@ -125,9 +127,9 @@ export function WalletPanel({
       });
     },
     onError: (err) => {
-      const msg = err instanceof Error ? err.message : "Depósito falhou.";
+      const msg = getErrorMessage(err, "Depósito falhou.");
       if (msg.toLowerCase().includes("cpf")) {
-        pixCpf.setSheetOpen(true);
+        void pixCpf.cpfQuery.refetch();
         return;
       }
       toast.error(msg);
@@ -148,7 +150,7 @@ export function WalletPanel({
       toast.success(copy.wallet.withdrawPending);
     },
     onError: (err) => {
-      const msg = err instanceof Error ? err.message : "Saque falhou.";
+      const msg = getErrorMessage(err, "Saque falhou.");
       if (msg.includes("kyc_required")) {
         toast.error(copy.wallet.withdrawKycTitle, {
           description: copy.wallet.withdrawKycBody,
@@ -165,15 +167,14 @@ export function WalletPanel({
     if (tab !== "withdraw" || !userId || pixPrefilledRef.current) return;
     let cancelled = false;
     void (async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("profiles")
-        .select("pix_key, cpf")
+        .select("cpf")
         .eq("id", userId)
         .maybeSingle();
-      if (cancelled || !data) return;
-      const saved = String(data.pix_key ?? "").trim();
+      if (cancelled || error || !data) return;
       const cpf = String(data.cpf ?? "").replace(/\D/g, "");
-      setPixKey((prev) => prev.trim() || saved || (cpf.length === 11 ? cpf : ""));
+      setPixKey((prev) => prev.trim() || (cpf.length === 11 ? cpf : ""));
       pixPrefilledRef.current = true;
     })();
     return () => {
@@ -444,6 +445,8 @@ export function WalletPanel({
               <p className="text-sm text-muted-foreground">{copy.wallet.withdrawPending}</p>
               <p className="text-[11px] text-muted-foreground">{copy.wallet.pixWithdrawNote}</p>
             </div>
+          ) : tab === "deposit" && !pixCpf.hasCpf && !pixCpf.cpfLoading ? (
+            <CpfCaptureForm onSaved={pixCpf.onCpfSaved} />
           ) : (
             <>
               {tab === "deposit" && <PaymentInfoBanner context="wallet" className="mb-1" />}

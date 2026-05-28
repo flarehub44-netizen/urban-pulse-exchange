@@ -1,6 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { adminBanCpaFraudUsersFn } from "@/actions/admin-risk";
+export {
+  getAdminRpcErrorMessage,
+  isAdminRpcForbiddenError,
+  isCpaRiskRpcMissingError,
+} from "@/lib/admin-rpc-errors";
 
 type OpsRunStatus = {
   at: string;
@@ -210,20 +215,6 @@ export type AdminCpaReferral = {
   cpf_last4: string | null;
   cpf_duplicate: boolean;
 };
-
-/** PostgREST 404 / PGRST202 when CPA RPCs were never applied on the remote database. */
-export function isCpaRiskRpcMissingError(error: unknown): boolean {
-  if (!error || typeof error !== "object") return false;
-  const e = error as { code?: string; message?: string; status?: number };
-  if (e.code === "PGRST202") return true;
-  if (e.status === 404) return true;
-  const msg = String(e.message ?? "").toLowerCase();
-  return (
-    msg.includes("pgrst202") ||
-    msg.includes("could not find the function") ||
-    msg.includes("not found")
-  );
-}
 
 export function useAdminCpaFraudCases(status?: string) {
   return useQuery({
@@ -552,6 +543,10 @@ export function useAdminPartnerApplications(enabled = true) {
         bio: string;
         focus_city: string | null;
         created_at: string;
+        social_links?: Record<string, string | null>;
+        promotion_channels: string | null;
+        instagram: string | null;
+        tiktok: string | null;
       }[];
     },
     enabled,

@@ -30,11 +30,22 @@ function mapSyncPayDepositError(error: unknown): Error {
         bodySnippet: error.responseSnippet,
       });
       return new Error(
-        `syncpay_credentials_error: SyncPay retornou página HTML (${error.status}) — verifique SYNCPAY_CLIENT_ID e SYNCPAY_CLIENT_SECRET no Wrangler`,
+        "Pagamento Pix temporariamente indisponível. Nossa equipe foi alertada — tente novamente em alguns minutos.",
+      );
+    }
+    if (error.message.includes("syncpay_dns_error")) {
+      return new Error(
+        "Pagamento Pix temporariamente indisponível. Nossa equipe foi alertada — tente novamente em alguns minutos.",
       );
     }
   }
-  return error instanceof Error ? error : new Error("Falha ao criar cobrança no provedor Pix");
+  const raw = error instanceof Error ? error.message : "";
+  if (raw.includes("syncpay_auth_html_error") || raw.includes("SyncPay: configure")) {
+    return new Error(
+      "Pagamento Pix temporariamente indisponível. Nossa equipe foi alertada — tente novamente em alguns minutos.",
+    );
+  }
+  return error instanceof Error ? error : new Error("Falha ao criar cobrança Pix. Tente novamente.");
 }
 
 

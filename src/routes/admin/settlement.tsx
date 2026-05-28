@@ -4,7 +4,7 @@ import { useAdminSettlementQueue, useAdminReprocess } from "@/hooks/use-admin-da
 import { useAdminResolveMarket } from "@/hooks/use-admin-resolve";
 import { PoolBreakdown } from "@/components/admin/pool-breakdown";
 import { copy } from "@/copy/pt-BR";
-import { InlineError } from "@/components/viax/inline-error";
+import { AdminInlineError } from "@/components/admin/admin-inline-error";
 import type { Side } from "@/store/viax-store";
 import { cn } from "@/lib/utils";
 
@@ -13,11 +13,11 @@ export const Route = createFileRoute("/admin/settlement")({
 });
 
 function AdminSettlementPage() {
-  const { data: queue, isError, refetch } = useAdminSettlementQueue();
+  const { data: queue, isError, error, refetch } = useAdminSettlementQueue();
   const { mutateAsync: reprocess } = useAdminReprocess();
   const { mutateAsync: resolve, isPending } = useAdminResolveMarket();
 
-  if (isError) return <InlineError onRetry={() => refetch()} />;
+  if (isError) return <AdminInlineError error={error} onRetry={() => refetch()} />;
 
   const onReprocess = async (id: string) => {
     try {

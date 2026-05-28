@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import { AdminStatCard } from "@/components/admin/admin-stat-card";
-import { InlineError } from "@/components/viax/inline-error";
+import { AdminInlineError } from "@/components/admin/admin-inline-error";
 import { copy } from "@/copy/pt-BR";
 import { cn } from "@/lib/utils";
 import { useAdminMarketOpsStatus } from "@/hooks/use-admin-dashboard";
@@ -62,19 +62,27 @@ function AdminEventsPage() {
   const {
     data: overview,
     isError: overviewError,
+    error: overviewQueryError,
     refetch: refetchOverview,
   } = useAdminEventsOverview();
   const {
     data: seasonal,
     isError: seasonalError,
+    error: seasonalQueryError,
     refetch: refetchSeasonal,
   } = useAdminPlatformEvents();
-  const { data: polls, isError: pollsError, refetch: refetchPolls } = useAdminDailyPolls();
+  const {
+    data: polls,
+    isError: pollsError,
+    error: pollsQueryError,
+    refetch: refetchPolls,
+  } = useAdminDailyPolls();
   const [partnerFilter, setPartnerFilter] = useState("");
   const [partnerFilterApplied, setPartnerFilterApplied] = useState<string | null>(null);
   const {
     data: partnerEvents,
     isError: partnerError,
+    error: partnerQueryError,
     refetch: refetchPartner,
   } = useAdminPartnerEventsFeed(partnerFilterApplied);
   const { data: opsStatus } = useAdminMarketOpsStatus();
@@ -99,7 +107,8 @@ function AdminEventsPage() {
 
   if (overviewError || seasonalError || pollsError || partnerError) {
     return (
-      <InlineError
+      <AdminInlineError
+        error={overviewQueryError ?? seasonalQueryError ?? pollsQueryError ?? partnerQueryError}
         onRetry={() => {
           void refetchOverview();
           void refetchSeasonal();

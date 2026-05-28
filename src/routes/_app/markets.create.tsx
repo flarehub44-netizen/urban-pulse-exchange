@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CommunityMarketCreateForm } from "@/components/viax/community-market-create-form";
+import { ImpactProgramBanner } from "@/components/viax/impact-program-banner";
 import { requireAuth } from "@/lib/auth-guards";
 import { copy } from "@/copy/pt-BR";
 import { ArrowLeft } from "lucide-react";
@@ -26,6 +27,7 @@ function CreateCommunityMarketPage() {
         <ArrowLeft className="size-4" />
         {copy.community.backToList}
       </Link>
+      <ImpactProgramBanner />
       <CommunityMarketCreateForm />
     </div>
   );

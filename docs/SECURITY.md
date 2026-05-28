@@ -79,6 +79,18 @@ Canais privados (`config: { private: true }`) em `src/hooks/*`. Políticas em `2
 - `balance` visível a admin só via RPC; risco de conta admin comprometida mitigado com allowlist + rotação de invites.
 - Pix de saque: `payment_intents.pix_key` + `request_withdrawal` RPC; nunca coluna em `profiles`.
 
+### Grants `EXECUTE` em RPCs admin (403 no browser)
+
+A migration `20260826020000_harden_rpc_execute_and_search_path.sql` revoga `EXECUTE` de todas as funções `SECURITY DEFINER` para `authenticated` e só reconcede uma allowlist de RPCs de usuário final. RPCs `admin_*` e `get_admin_*` **não** entram nessa lista.
+
+**Regras:**
+
+1. Toda nova RPC `admin_*` / `get_admin_*` deve incluir `GRANT EXECUTE ... TO authenticated` na **mesma** migration que cria a função (ou na migration de repair `20260830120000_restore_admin_rpc_execute_grants.sql`, que re-concede em lote por prefixo).
+2. `GRANT` em migrations antigas **não** sobrevive ao hardening de 26/08 se a função já existia — use a migration de repair ou um novo bloco explícito após criar a RPC.
+3. HTTP **403** em `/rest/v1/rpc/get_admin_*` = falta de `EXECUTE` para `authenticated`, **não** “usuário não é admin”. Autorização de negócio continua em `assert_admin()` dentro da função.
+4. Validação local: `node scripts/check-admin-rpc-grants.mjs` (RPCs usadas no `src/` vs grants no SQL das migrations).
+5. Validação remota (SQL): listar funções `admin_%` / `get_admin_%` sem `has_function_privilege('authenticated', oid, 'EXECUTE')` — resultado esperado: 0 linhas.
+
 ## Funções `SECURITY DEFINER`
 
 - `REVOKE` de `PUBLIC` em todas as funções `public` (`20260717000002_revoke_public_function_execute.sql`).
@@ -97,6 +109,8 @@ Canais privados (`config: { private: true }`) em `src/hooks/*`. Políticas em `2
 
 - `/api/public/webhooks/syncpay`: janela curta por IP + assinatura obrigatória.
 - `/api/public/cron/football-*`: `CRON_SECRET` + rate limit por IP.
+- `/api/public/cron/impact-xp-credit`: processa fila de XP de impacto (6h pós-settle); `CRON_SECRET` + rate limit.
+- `/api/public/cron/impact-monthly-finalize`: fecha Top 3 mensal e notifica vencedores; agendar dia 1 ~00:15 BRT.
 - `/api/public/hls-proxy/*` e `/api/public/snapshot-proxy/*`: rate limit por IP para reduzir abuso.
 
 ## Governança SQL

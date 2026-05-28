@@ -9,7 +9,7 @@ import {
 } from "@/hooks/use-admin-dashboard";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
-import { InlineError } from "@/components/viax/inline-error";
+import { AdminInlineError } from "@/components/admin/admin-inline-error";
 import { DesktopTableWrap, MobileDataList, MobileFieldRow } from "@/components/ui/responsive-table";
 
 export const Route = createFileRoute("/admin/users")({
@@ -17,13 +17,13 @@ export const Route = createFileRoute("/admin/users")({
 });
 
 function AdminUsersPage() {
-  const { data: users, isError, refetch } = useAdminUsers();
+  const { data: users, isError, error, refetch } = useAdminUsers();
   const { mutateAsync: freeze } = useAdminFreezeAccount();
   const { mutateAsync: setLimit } = useAdminSetBetLimit();
   const { mutateAsync: updateKyc } = useAdminUpdateKyc();
   const [limitInput, setLimitInput] = useState<Record<string, string>>({});
 
-  if (isError) return <InlineError onRetry={() => refetch()} />;
+  if (isError) return <AdminInlineError error={error} onRetry={() => refetch()} />;
 
   const onFreeze = async (userId: string, frozen: boolean) => {
     try {

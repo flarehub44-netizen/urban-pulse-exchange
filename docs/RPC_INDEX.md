@@ -565,3 +565,10 @@ Gerado por `scripts/gen-rpc-index.mjs`.
   - src/hooks/use-wallet-rpc.ts
 - `wallet_withdraw`
   - src/hooks/use-wallet-rpc.ts
+
+## Admin RPC grants (403)
+
+Após `20260826020000_harden_rpc_execute_and_search_path.sql`, toda RPC `admin_*` / `get_admin_*` precisa de `GRANT EXECUTE TO authenticated` na mesma migration ou via `20260830120000_restore_admin_rpc_execute_grants.sql`.
+
+- Validação: `npm run check:admin-rpc`
+- Detalhes: [SECURITY.md](./SECURITY.md) (seção Admin RPC grants)

@@ -12,7 +12,7 @@ import {
 import { useRegions } from "@/hooks/use-regions";
 import { useAdminOracleHealth } from "@/hooks/use-admin-dashboard";
 import { copy } from "@/copy/pt-BR";
-import { InlineError } from "@/components/viax/inline-error";
+import { AdminInlineError } from "@/components/admin/admin-inline-error";
 import { cn } from "@/lib/utils";
 import { CameraLineEditor } from "@/components/admin/camera-line-editor";
 import { CameraStreamPreview } from "@/components/admin/camera-stream-preview";
@@ -26,7 +26,8 @@ export const Route = createFileRoute("/admin/sources")({
 });
 
 function AdminSourcesPage() {
-  const { data: cameras, isError: camErr, refetch: refetchCam } = useAdminCameras();
+  const { data: cameras, isError: camErr, error: camError, refetch: refetchCam } =
+    useAdminCameras();
   const { data: healthRows } = useAdminCameraHealth();
   const { data: workerStatus } = useVisionWorkerStatus();
   const healthById = useMemo(() => new Map((healthRows ?? []).map((h) => [h.id, h])), [healthRows]);
@@ -96,7 +97,7 @@ function AdminSourcesPage() {
     }
   };
 
-  if (camErr) return <InlineError onRetry={() => refetchCam()} />;
+  if (camErr) return <AdminInlineError error={camError} onRetry={() => refetchCam()} />;
 
   return (
     <div className="space-y-6">

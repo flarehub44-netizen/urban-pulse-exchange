@@ -1,5 +1,14 @@
 # Jobs agendados — ViaX
 
+## Impacto (XP de eventos comunidade)
+
+| Schedule | Ação |
+|----------|------|
+| `0 * * * *` (a cada hora) | `runImpactXpCredit` — fila pós-settle (6h) |
+| `15 3 1 * *` (dia 1, 03:15 UTC ≈ 00:15 BRT) | `runImpactMonthlyFinalize` — Top 3 mensal |
+
+HTTP manual (com `CRON_SECRET` / HMAC): `POST /api/public/cron/impact-xp-credit`, `POST /api/public/cron/impact-monthly-finalize`.
+
 ## Política de execução (futebol)
 
 **Produção:** o trigger primário é o handler `scheduled` em [`src/server.ts`](../src/server.ts) (Cloudflare Worker crons em [`wrangler.jsonc`](../wrangler.jsonc)).
@@ -24,6 +33,8 @@ As rotas também aplicam rate limiting por IP no Worker.
 | Demo markets refresh    | 6 h            | Supabase `pg_cron` | ver [OPS_MARKETS.md](./OPS_MARKETS.md) | —                                                     |
 | Football sync           | `*/30 * * * *` | Worker `scheduled` | `runFootballSync()`                    | `SUPABASE_SERVICE_ROLE_KEY`, `API_FOOTBALL_KEY`       |
 | Football resolve        | `*/5 * * * *`  | Worker `scheduled` | `runFootballResolve()`                 | idem                                                  |
+| Impact XP credit        | `0 * * * *`    | Worker `scheduled` | `runImpactXpCredit()`                  | `SUPABASE_SERVICE_ROLE_KEY`                           |
+| Impact monthly Top 3    | `15 3 1 * *`   | Worker `scheduled` | `runImpactMonthlyFinalize()`           | idem                                                  |
 | SyncPay webhook         | sob demanda    | Worker HTTP        | `/api/public/webhooks/syncpay`         | `SUPABASE_SERVICE_ROLE_KEY`, `SYNCPAY_WEBHOOK_SECRET` |
 
 ## Futebol — manual

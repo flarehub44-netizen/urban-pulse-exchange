@@ -10,7 +10,7 @@ import {
   useAdminSetPartnerSubCreators,
 } from "@/hooks/use-admin-dashboard";
 import { copy } from "@/copy/pt-BR";
-import { InlineError } from "@/components/viax/inline-error";
+import { AdminInlineError } from "@/components/admin/admin-inline-error";
 import { formatBRL } from "@/lib/parimutuel";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -22,8 +22,13 @@ export const Route = createFileRoute("/admin/partners")({
 });
 
 function AdminPartnersPage() {
-  const { data: apps, isError, refetch } = useAdminPartnerApplications();
-  const { data: active, isError: activeError, refetch: refetchActive } = useAdminActivePartners();
+  const { data: apps, isError, error: appsError, refetch } = useAdminPartnerApplications();
+  const {
+    data: active,
+    isError: activeError,
+    error: activePartnersError,
+    refetch: refetchActive,
+  } = useAdminActivePartners();
   const { mutateAsync: approve, isPending: approving } = useAdminApprovePartner();
   const { mutateAsync: reject, isPending: rejecting } = useAdminRejectPartner();
   const { mutateAsync: updateTerms, isPending: savingTerms } = useAdminUpdatePartnerTerms();
@@ -55,7 +60,8 @@ function AdminPartnersPage() {
 
   if (isError || activeError) {
     return (
-      <InlineError
+      <AdminInlineError
+        error={appsError ?? activePartnersError}
         onRetry={() => {
           void refetch();
           void refetchActive();
@@ -201,6 +207,42 @@ function AdminPartnersPage() {
                 </span>
               </div>
               <p className="mt-2 text-sm text-muted-foreground line-clamp-3">{a.bio}</p>
+              {(a.promotion_channels || a.instagram || a.tiktok) && (
+                <div className="mt-3 space-y-2 rounded-lg border bg-surface/40 p-3 text-xs">
+                  {a.promotion_channels && (
+                    <div>
+                      <span className="font-medium text-foreground">Onde divulga: </span>
+                      <span className="text-muted-foreground">{a.promotion_channels}</span>
+                    </div>
+                  )}
+                  {a.instagram && (
+                    <div>
+                      <span className="font-medium text-foreground">Instagram: </span>
+                      <a
+                        href={`https://instagram.com/${a.instagram.replace(/^@+/, "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        @{a.instagram.replace(/^@+/, "")}
+                      </a>
+                    </div>
+                  )}
+                  {a.tiktok && (
+                    <div>
+                      <span className="font-medium text-foreground">TikTok: </span>
+                      <a
+                        href={`https://tiktok.com/@${a.tiktok.replace(/^@+/, "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        @{a.tiktok.replace(/^@+/, "")}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              )}
               <div className="mt-3 rounded-lg border bg-surface/40 p-3 text-xs">
                 <div className="mb-2 text-muted-foreground">Wizard de aprovação</div>
                 <div className="flex items-center gap-2">

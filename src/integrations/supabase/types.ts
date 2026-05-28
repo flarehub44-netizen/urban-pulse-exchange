@@ -3293,6 +3293,18 @@ export type Database = {
       get_urbanmind_digest: { Args: never; Returns: Json };
       get_user_achievements: { Args: { p_user_id?: string }; Returns: Json };
       get_weekly_pulse_report: { Args: never; Returns: Json };
+      get_monthly_impact_leaderboard: {
+        Args: { p_month?: string; p_limit?: number };
+        Returns: Json;
+      };
+      get_my_event_impact_summary: { Args: never; Returns: Json };
+      admin_list_monthly_impact_winners: { Args: { p_month?: string }; Returns: Json };
+      admin_mark_impact_prize_fulfilled: {
+        Args: { p_winner_id: string; p_notes?: string };
+        Returns: Json;
+      };
+      service_credit_pending_event_impact_xp: { Args: { p_limit?: number }; Returns: Json };
+      service_finalize_monthly_impact: { Args: { p_month?: string }; Returns: Json };
       grant_email_link_bonus: { Args: never; Returns: Json };
       ingest_camera_metrics: {
         Args: {

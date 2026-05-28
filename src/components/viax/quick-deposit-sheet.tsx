@@ -17,8 +17,9 @@ import { trackDepositFunnel } from "@/lib/deposit-funnel";
 import { getLastImpulseAmount, setLastImpulseAmount } from "@/lib/impulse-deposit";
 import { getStoredPartnerRef } from "@/lib/partner-attribution";
 import { invalidateWalletQueries } from "@/lib/query-invalidation";
-import { CpfCaptureSheet } from "@/components/viax/cpf-capture-sheet";
+import { CpfCaptureForm } from "@/components/viax/cpf-capture-form";
 import { useEnsureCpfForPix } from "@/hooks/use-ensure-cpf-for-pix";
+import { getErrorMessage } from "@/lib/get-error-message";
 
 interface QuickDepositSheetProps {
   open: boolean;
@@ -58,9 +59,9 @@ export function QuickDepositSheet({
       });
     },
     onError: (err) => {
-      const msg = err instanceof Error ? err.message : "Depósito falhou.";
+      const msg = getErrorMessage(err, "Depósito falhou.");
       if (msg.toLowerCase().includes("cpf")) {
-        pixCpf.setSheetOpen(true);
+        void pixCpf.cpfQuery.refetch();
         return;
       }
       toast.error(msg);
@@ -176,6 +177,12 @@ export function QuickDepositSheet({
               Cancelar e gerar novo código
             </button>
           </div>
+        ) : !pixCpf.hasCpf && !pixCpf.cpfLoading ? (
+          <CpfCaptureForm
+            onSaved={() => {
+              pixCpf.onCpfSaved();
+            }}
+          />
         ) : (
           <div className="space-y-4">
             {hasDeposited === false && (
@@ -243,15 +250,6 @@ export function QuickDepositSheet({
           </div>
         )}
       </SheetContent>
-
-      <CpfCaptureSheet
-        open={pixCpf.sheetOpen}
-        onOpenChange={(next) => {
-          if (next) pixCpf.setSheetOpen(true);
-          else pixCpf.closeSheet();
-        }}
-        onSaved={pixCpf.onCpfSaved}
-      />
     </Sheet>
   );
 }

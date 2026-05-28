@@ -1,12 +1,12 @@
 import { useAdminActionsLog } from "@/hooks/use-admin-dashboard";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { InlineError } from "@/components/viax/inline-error";
+import { AdminInlineError } from "@/components/admin/admin-inline-error";
 
 export function AdminAuditLog({ limit = 30 }: { limit?: number }) {
-  const { data: rows, isError, refetch, isLoading } = useAdminActionsLog(true);
+  const { data: rows, isError, error, refetch, isLoading } = useAdminActionsLog(true);
 
-  if (isError) return <InlineError onRetry={() => refetch()} />;
+  if (isError) return <AdminInlineError error={error} onRetry={() => refetch()} />;
 
   const list = (rows ?? []).slice(0, limit);
 

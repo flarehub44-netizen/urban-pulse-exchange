@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { AdminStatCard } from "@/components/admin/admin-stat-card";
-import { InlineError } from "@/components/viax/inline-error";
+import { AdminInlineError } from "@/components/admin/admin-inline-error";
 import { copy } from "@/copy/pt-BR";
 import { useAdminUsers } from "@/hooks/use-admin-dashboard";
 import {
@@ -33,7 +33,7 @@ const KIND_LABELS: Record<string, string> = {
 
 function AdminBonusesPage() {
   const [periodDays, setPeriodDays] = useState<(typeof PERIOD_OPTIONS)[number]>(30);
-  const { data: overview, isLoading, isError, refetch } = useAdminBonusOverview(periodDays);
+  const { data: overview, isLoading, isError, error, refetch } = useAdminBonusOverview(periodDays);
   const { data: ledger, refetch: refetchLedger } = useAdminBonusLedger();
   const { data: users } = useAdminUsers();
   const { data: settings } = useAdminPlatformSettings();
@@ -58,7 +58,7 @@ function AdminBonusesPage() {
     }
   }, [settings]);
 
-  if (isError) return <InlineError onRetry={() => refetch()} />;
+  if (isError) return <AdminInlineError error={error} onRetry={() => refetch()} />;
 
   const totalCash =
     Number(overview?.bonus_cash_total ?? 0) +

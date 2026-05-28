@@ -27,7 +27,9 @@ export function CommunityMarketResolvePanel({
   const onResolve = async (side: "YES" | "NO") => {
     try {
       await resolve({ marketId: market.id, winningSide: side });
-      toast.success(copy.community.resolveSuccess);
+      toast.success(copy.community.resolveSuccess, {
+        description: copy.impact.pendingCreditHint,
+      });
       setConfirmSide(null);
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : copy.errors.generic);

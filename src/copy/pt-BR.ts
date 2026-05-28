@@ -523,6 +523,49 @@ export const copy = {
     defaultSort: "Os melhores previsores da comunidade.",
     precision: "Precisão",
     return: "Retorno",
+    impactTab: "Impacto",
+    impactTabDesc:
+      "Criadores de eventos com mais movimentação no mês. Os 3 primeiros ganham prêmios exclusivos ViaX.",
+  },
+
+  impact: {
+    programTitle: "Programa de impacto ViaX",
+    programSubtitle:
+      "Crie previsões da comunidade que movimentem a plataforma. Você ganha XP de impacto no seu total — e os 3 maiores do mês recebem prêmios exclusivos.",
+    howItWorksTitle: "Como funciona",
+    howItWorksSteps: [
+      "Publique um mercado Sim/Não na comunidade e convide apostadores.",
+      "Quanto mais volume qualificado e participantes únicos, mais XP de impacto ao encerrar o evento.",
+      "O XP entra no seu progresso geral (divisão e barra de XP).",
+      "No fim de cada mês, os 3 criadores com mais XP de impacto ganham prêmios exclusivos da plataforma.",
+    ],
+    leaderboardTitle: "Ranking de impacto",
+    leaderboardMonth: (label: string) => `Competição · ${label}`,
+    myRank: (rank: number) => `Sua posição: #${rank}`,
+    myRankPending: "Sua posição: — (ainda sem XP de impacto este mês)",
+    myXpMonth: (xp: number) => `${xp} XP de impacto neste mês`,
+    daysLeftInMonth: (days: number) =>
+      days <= 0
+        ? "Encerramento do mês hoje"
+        : `Faltam ${days} dia${days !== 1 ? "s" : ""} para o fechamento`,
+    top3Title: "Top 3 do mês",
+    top3Subtitle: "Prêmios exclusivos ViaX para os criadores com mais XP de impacto.",
+    exclusivePrizeDisclaimer:
+      "Prêmios exclusivos são benefícios da plataforma (itens, destaque, experiências ViaX). Não representam saldo em dinheiro, salvo quando indicado em campanha oficial.",
+    prizeTier1: "1º lugar — Prêmio exclusivo ViaX",
+    prizeTier2: "2º lugar — Prêmio exclusivo ViaX",
+    prizeTier3: "3º lugar — Prêmio exclusivo ViaX",
+    viewRankingCta: "Ver ranking de impacto",
+    createEventCta: "Criar previsão",
+    pendingCreditHint:
+      "XP de impacto é creditado até 6 horas após a liquidação do evento (janela de moderação).",
+    minEligibilityHint:
+      "Mínimo para ganhar XP: R$ 1.500 em volume qualificado e 12 participantes únicos por evento.",
+    eventCreditedToast: (xp: number) => `+${xp} XP de impacto creditados no seu total`,
+    eventsCount: (n: number) => `${n} evento${n !== 1 ? "s" : ""} creditado${n !== 1 ? "s" : ""}`,
+    regulationLinkLabel: "Regras do programa",
+    fulfilledBadge: "Prêmio entregue",
+    pendingPrizeBadge: "Prêmio pendente",
   },
 
   urbanmind: {
@@ -821,6 +864,14 @@ export const copy = {
         "Ex.: tenho audiência em SP, produzo conteúdo sobre mobilidade e quero monetizar com dados reais de trânsito…",
       cityLabel: "Cidade de foco (opcional)",
       cityPlaceholder: "São Paulo",
+      promotionLabel: "Onde você vai divulgar a ViaX?",
+      promotionPlaceholder:
+        "Ex.: stories no Instagram, grupos de WhatsApp, canal no YouTube, comunidade no Discord…",
+      instagramLabel: "Instagram (@) — obrigatório",
+      instagramPlaceholder: "seu_usuario",
+      tiktokLabel: "TikTok (@) (opcional)",
+      tiktokPlaceholder: "seu_usuario",
+      instagramRequiredHint: "Informe seu @ do Instagram para enviar a candidatura.",
       bioMinHint: "Mínimo de 20 caracteres.",
       alreadyPartner: "Você já é creator ativo.",
       settingsLink: "Também disponível em Configurações",
@@ -885,6 +936,8 @@ export const copy = {
     subtitle: "Trading & Urban Intelligence",
     backToApp: "Voltar ao app",
     accessDenied: "Acesso restrito a operadores.",
+    rpcExecuteForbidden:
+      "Permissão de RPC admin ausente no banco (403). Aplique a migration restore_admin_rpc_execute_grants ou contate o time técnico.",
     partnerBadge: "Afiliado",
     nav: {
       overview: "Overview",
@@ -1213,6 +1266,13 @@ export const copy = {
     community: {
       title: "Moderação · Comunidade",
       subtitle: "Eventos criados por usuários comuns — públicos e privados",
+      impactWinnersTitle: "Top 3 mensal · Impacto",
+      impactWinnersSubtitle:
+        "Prêmios exclusivos ViaX — marque como entregue após contato com o vencedor.",
+      impactWinnersEmpty: "Nenhum vencedor registrado para este mês.",
+      markPrizeFulfilled: "Marcar prêmio entregue",
+      prizeFulfilled: "Prêmio marcado como entregue.",
+      impactMonthLabel: "Mês da competição",
       filterAll: "Todos",
       filterOpen: "Abertos",
       filterPrivate: "Privados",

@@ -46,7 +46,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold">{copy.root.errorTitle}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{displayError.message}</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {displayError.message?.trim() || copy.root.errorDesc}
+        </p>
         <div className="mt-6 flex justify-center gap-2">
           <button
             onClick={() => {

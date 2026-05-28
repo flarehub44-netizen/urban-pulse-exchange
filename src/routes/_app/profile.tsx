@@ -18,6 +18,7 @@ import { useRegionPerformance } from "@/hooks/use-region-performance";
 import { TraderArchetypeCard } from "@/components/viax/trader-archetype-card";
 import { EmptyState } from "@/components/viax/empty-state";
 import { useMyCommunityMarkets } from "@/hooks/use-community-markets";
+import { useMyEventImpactSummary } from "@/hooks/use-impact-leaderboard";
 import {
   Area,
   AreaChart,
@@ -426,9 +427,31 @@ function Profile() {
 
 function ProfileMyMarketsTab({ isRegistered }: { isRegistered: boolean }) {
   const { data: myMarkets = [], isLoading } = useMyCommunityMarkets(isRegistered);
+  const { data: impactSummary } = useMyEventImpactSummary(isRegistered);
 
   return (
     <div className="space-y-4">
+      {impactSummary && (
+        <div className="rounded-xl border border-primary/25 bg-primary/5 px-4 py-3 text-sm flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p>{copy.impact.myXpMonth(impactSummary.my_xp ?? 0)}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {impactSummary.my_rank != null
+                ? copy.impact.myRank(impactSummary.my_rank)
+                : copy.impact.myRankPending}
+              {" · "}
+              {copy.impact.daysLeftInMonth(Math.max(0, impactSummary.days_left ?? 0))}
+            </p>
+          </div>
+          <Link
+            to="/ranking"
+            search={{ tab: "impacto" }}
+            className="text-xs text-primary hover:underline"
+          >
+            {copy.impact.viewRankingCta}
+          </Link>
+        </div>
+      )}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm text-muted-foreground">{copy.community.listSubtitle}</p>
         <Link

@@ -13,12 +13,15 @@ import { Crown, Medal, Trophy, Users } from "lucide-react";
 import { EmptyState } from "@/components/viax/empty-state";
 import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/viax/page-header";
+import { ImpactLeaderboardSection } from "@/components/viax/impact-leaderboard-section";
+import { ImpactProgramBanner } from "@/components/viax/impact-program-banner";
 
 const tabs = [
   { key: "global" as const, label: "Global" },
   { key: "cidade" as const, label: "Cidade" },
   { key: "bairro" as const, label: "Bairro" },
   { key: "amigos" as const, label: "Destaques" },
+  { key: "impacto" as const, label: copy.ranking.impactTab },
 ];
 
 export function RankingPage() {
@@ -65,8 +68,16 @@ export function RankingPage() {
     <div className="space-y-5">
       <PageHeader
         title={<span className="text-highlight">Ranking</span>}
-        description={tab === "amigos" ? copy.ranking.followingSort : copy.ranking.defaultSort}
+        description={
+          tab === "impacto"
+            ? copy.ranking.impactTabDesc
+            : tab === "amigos"
+              ? copy.ranking.followingSort
+              : copy.ranking.defaultSort
+        }
       />
+
+      {tab === "impacto" && <ImpactProgramBanner compact />}
 
       {!isRegistered && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3">
@@ -87,7 +98,15 @@ export function RankingPage() {
             key={t.key}
             type="button"
             onClick={() =>
-              navigate({ search: { tab: t.key === "global" ? undefined : t.key }, replace: true })
+              navigate({
+                search: {
+                  tab:
+                    t.key === "global"
+                      ? undefined
+                      : (t.key as "cidade" | "bairro" | "amigos" | "impacto"),
+                },
+                replace: true,
+              })
             }
             className={cn(
               "rounded-full border px-3 py-1.5 text-xs",
@@ -101,6 +120,10 @@ export function RankingPage() {
         ))}
       </div>
 
+      {tab === "impacto" ? (
+        <ImpactLeaderboardSection />
+      ) : (
+        <>
       {me && myIndex >= 0 && <RankBar trader={me} rank={myIndex + 1} />}
 
       {isEmpty && (
@@ -229,6 +252,8 @@ export function RankingPage() {
               </tbody>
             </table>
           </div>
+        </>
+      )}
         </>
       )}
     </div>

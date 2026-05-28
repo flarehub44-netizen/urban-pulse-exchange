@@ -13,7 +13,7 @@ import { formatBRL } from "@/lib/parimutuel";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { InlineError } from "@/components/viax/inline-error";
+import { AdminInlineError } from "@/components/admin/admin-inline-error";
 import { AdminRegionVolumeChart } from "@/components/admin/admin-region-volume";
 
 export const Route = createFileRoute("/admin/")({
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/admin/")({
 });
 
 function AdminOverviewPage() {
-  const { data: metrics, isLoading, isError, refetch } = useAdminDashboardMetrics();
+  const { data: metrics, isLoading, isError, error, refetch } = useAdminDashboardMetrics();
   const { data: volumeHour } = useAdminVolumeByHour();
   const { data: feed } = useAdminLiveFeed();
   const { data: settlementQueue } = useAdminSettlementQueue();
@@ -29,7 +29,7 @@ function AdminOverviewPage() {
   const { data: funnel } = useAdminDepositFunnelMetrics(7);
 
   if (isError) {
-    return <InlineError onRetry={() => refetch()} />;
+    return <AdminInlineError error={error} onRetry={() => refetch()} />;
   }
 
   const lifecycle = metrics?.lifecycle as

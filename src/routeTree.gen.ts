@@ -71,6 +71,8 @@ import { Route as AppFeedPostIdRouteImport } from './routes/_app/feed.$postId'
 import { Route as ApiPublicWebhooksSyncpayRouteImport } from './routes/api/public/webhooks/syncpay'
 import { Route as ApiPublicSnapshotProxySplatRouteImport } from './routes/api/public/snapshot-proxy/$'
 import { Route as ApiPublicHlsProxySplatRouteImport } from './routes/api/public/hls-proxy/$'
+import { Route as ApiPublicCronImpactXpCreditRouteImport } from './routes/api/public/cron/impact-xp-credit'
+import { Route as ApiPublicCronImpactMonthlyFinalizeRouteImport } from './routes/api/public/cron/impact-monthly-finalize'
 import { Route as ApiPublicCronFootballSyncRouteImport } from './routes/api/public/cron/football-sync'
 import { Route as ApiPublicCronFootballResolveRouteImport } from './routes/api/public/cron/football-resolve'
 
@@ -385,6 +387,18 @@ const ApiPublicHlsProxySplatRoute = ApiPublicHlsProxySplatRouteImport.update({
   path: '/api/public/hls-proxy/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCronImpactXpCreditRoute =
+  ApiPublicCronImpactXpCreditRouteImport.update({
+    id: '/api/public/cron/impact-xp-credit',
+    path: '/api/public/cron/impact-xp-credit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicCronImpactMonthlyFinalizeRoute =
+  ApiPublicCronImpactMonthlyFinalizeRouteImport.update({
+    id: '/api/public/cron/impact-monthly-finalize',
+    path: '/api/public/cron/impact-monthly-finalize',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicCronFootballSyncRoute =
   ApiPublicCronFootballSyncRouteImport.update({
     id: '/api/public/cron/football-sync',
@@ -459,6 +473,8 @@ export interface FileRoutesByFullPath {
   '/profile/$userId': typeof AppProfileUserIdRoute
   '/api/public/cron/football-resolve': typeof ApiPublicCronFootballResolveRoute
   '/api/public/cron/football-sync': typeof ApiPublicCronFootballSyncRoute
+  '/api/public/cron/impact-monthly-finalize': typeof ApiPublicCronImpactMonthlyFinalizeRoute
+  '/api/public/cron/impact-xp-credit': typeof ApiPublicCronImpactXpCreditRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
   '/api/public/snapshot-proxy/$': typeof ApiPublicSnapshotProxySplatRoute
   '/api/public/webhooks/syncpay': typeof ApiPublicWebhooksSyncpayRoute
@@ -520,6 +536,8 @@ export interface FileRoutesByTo {
   '/profile/$userId': typeof AppProfileUserIdRoute
   '/api/public/cron/football-resolve': typeof ApiPublicCronFootballResolveRoute
   '/api/public/cron/football-sync': typeof ApiPublicCronFootballSyncRoute
+  '/api/public/cron/impact-monthly-finalize': typeof ApiPublicCronImpactMonthlyFinalizeRoute
+  '/api/public/cron/impact-xp-credit': typeof ApiPublicCronImpactXpCreditRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
   '/api/public/snapshot-proxy/$': typeof ApiPublicSnapshotProxySplatRoute
   '/api/public/webhooks/syncpay': typeof ApiPublicWebhooksSyncpayRoute
@@ -587,6 +605,8 @@ export interface FileRoutesById {
   '/_app/profile/$userId': typeof AppProfileUserIdRoute
   '/api/public/cron/football-resolve': typeof ApiPublicCronFootballResolveRoute
   '/api/public/cron/football-sync': typeof ApiPublicCronFootballSyncRoute
+  '/api/public/cron/impact-monthly-finalize': typeof ApiPublicCronImpactMonthlyFinalizeRoute
+  '/api/public/cron/impact-xp-credit': typeof ApiPublicCronImpactXpCreditRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
   '/api/public/snapshot-proxy/$': typeof ApiPublicSnapshotProxySplatRoute
   '/api/public/webhooks/syncpay': typeof ApiPublicWebhooksSyncpayRoute
@@ -654,6 +674,8 @@ export interface FileRouteTypes {
     | '/profile/$userId'
     | '/api/public/cron/football-resolve'
     | '/api/public/cron/football-sync'
+    | '/api/public/cron/impact-monthly-finalize'
+    | '/api/public/cron/impact-xp-credit'
     | '/api/public/hls-proxy/$'
     | '/api/public/snapshot-proxy/$'
     | '/api/public/webhooks/syncpay'
@@ -715,6 +737,8 @@ export interface FileRouteTypes {
     | '/profile/$userId'
     | '/api/public/cron/football-resolve'
     | '/api/public/cron/football-sync'
+    | '/api/public/cron/impact-monthly-finalize'
+    | '/api/public/cron/impact-xp-credit'
     | '/api/public/hls-proxy/$'
     | '/api/public/snapshot-proxy/$'
     | '/api/public/webhooks/syncpay'
@@ -781,6 +805,8 @@ export interface FileRouteTypes {
     | '/_app/profile/$userId'
     | '/api/public/cron/football-resolve'
     | '/api/public/cron/football-sync'
+    | '/api/public/cron/impact-monthly-finalize'
+    | '/api/public/cron/impact-xp-credit'
     | '/api/public/hls-proxy/$'
     | '/api/public/snapshot-proxy/$'
     | '/api/public/webhooks/syncpay'
@@ -801,6 +827,8 @@ export interface RootRouteChildren {
   RSlugRoute: typeof RSlugRoute
   ApiPublicCronFootballResolveRoute: typeof ApiPublicCronFootballResolveRoute
   ApiPublicCronFootballSyncRoute: typeof ApiPublicCronFootballSyncRoute
+  ApiPublicCronImpactMonthlyFinalizeRoute: typeof ApiPublicCronImpactMonthlyFinalizeRoute
+  ApiPublicCronImpactXpCreditRoute: typeof ApiPublicCronImpactXpCreditRoute
   ApiPublicHlsProxySplatRoute: typeof ApiPublicHlsProxySplatRoute
   ApiPublicSnapshotProxySplatRoute: typeof ApiPublicSnapshotProxySplatRoute
   ApiPublicWebhooksSyncpayRoute: typeof ApiPublicWebhooksSyncpayRoute
@@ -1242,6 +1270,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHlsProxySplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/cron/impact-xp-credit': {
+      id: '/api/public/cron/impact-xp-credit'
+      path: '/api/public/cron/impact-xp-credit'
+      fullPath: '/api/public/cron/impact-xp-credit'
+      preLoaderRoute: typeof ApiPublicCronImpactXpCreditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/cron/impact-monthly-finalize': {
+      id: '/api/public/cron/impact-monthly-finalize'
+      path: '/api/public/cron/impact-monthly-finalize'
+      fullPath: '/api/public/cron/impact-monthly-finalize'
+      preLoaderRoute: typeof ApiPublicCronImpactMonthlyFinalizeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cron/football-sync': {
       id: '/api/public/cron/football-sync'
       path: '/api/public/cron/football-sync'
@@ -1444,6 +1486,9 @@ const rootRouteChildren: RootRouteChildren = {
   RSlugRoute: RSlugRoute,
   ApiPublicCronFootballResolveRoute: ApiPublicCronFootballResolveRoute,
   ApiPublicCronFootballSyncRoute: ApiPublicCronFootballSyncRoute,
+  ApiPublicCronImpactMonthlyFinalizeRoute:
+    ApiPublicCronImpactMonthlyFinalizeRoute,
+  ApiPublicCronImpactXpCreditRoute: ApiPublicCronImpactXpCreditRoute,
   ApiPublicHlsProxySplatRoute: ApiPublicHlsProxySplatRoute,
   ApiPublicSnapshotProxySplatRoute: ApiPublicSnapshotProxySplatRoute,
   ApiPublicWebhooksSyncpayRoute: ApiPublicWebhooksSyncpayRoute,

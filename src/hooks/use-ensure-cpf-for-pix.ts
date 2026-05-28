@@ -56,6 +56,7 @@ export function useEnsureCpfForPix() {
   return {
     hasCpf,
     cpfLoading: cpfQuery.isLoading,
+    cpfQuery,
     sheetOpen,
     setSheetOpen,
     ensureCpf,

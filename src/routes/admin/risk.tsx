@@ -9,12 +9,11 @@ import {
   useAdminClearCpaFraudCases,
   useAdminSuspendCpaFraudPartners,
   useAdminBanCpaFraudUsers,
-  isCpaRiskRpcMissingError,
   type AdminCpaFraudCase,
   type AdminCpaReferral,
 } from "@/hooks/use-admin-dashboard";
 import { copy } from "@/copy/pt-BR";
-import { InlineError } from "@/components/viax/inline-error";
+import { AdminInlineError } from "@/components/admin/admin-inline-error";
 import { cn } from "@/lib/utils";
 import { formatBRL } from "@/lib/parimutuel";
 import { DesktopTableWrap, MobileDataList, MobileFieldRow } from "@/components/ui/responsive-table";
@@ -416,7 +415,7 @@ function AdminRiskPage() {
   const [noteInput, setNoteInput] = useState<Record<string, string>>({});
   const [bulkActionNote, setBulkActionNote] = useState("");
 
-  const { data: alerts, isError, refetch } = useAdminRiskAlerts(tab === "alerts");
+  const { data: alerts, isError, error: alertsError, refetch } = useAdminRiskAlerts(tab === "alerts");
   const {
     data: allCases,
     isError: isCpaCasesError,
@@ -459,13 +458,11 @@ function AdminRiskPage() {
   const bulkNoteOk = bulkActionNote.trim().length >= MIN_ACTION_NOTE;
   const canRunDestructive = bulkNoteOk && confirmedCases.length > 0;
 
-  const cpaRpcMissing =
-    isCpaRiskRpcMissingError(cpaCasesError) || isCpaRiskRpcMissingError(cpaReferralsError);
-
   if (isError || isCpaCasesError || isReferralsError) {
+    const displayError = alertsError ?? cpaCasesError ?? cpaReferralsError;
     return (
-      <InlineError
-        message={cpaRpcMissing ? copy.admin.risk.cpaRpcNotInstalled : undefined}
+      <AdminInlineError
+        error={displayError}
         onRetry={() => {
           void refetch();
           void refetchCases();

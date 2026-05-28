@@ -3,7 +3,7 @@ import { useAdminFinance, useAdminOpenExposure } from "@/hooks/use-admin-dashboa
 import { AdminStatCard } from "@/components/admin/admin-stat-card";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL } from "@/lib/parimutuel";
-import { InlineError } from "@/components/viax/inline-error";
+import { AdminInlineError } from "@/components/admin/admin-inline-error";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 export const Route = createFileRoute("/admin/finance")({
@@ -11,10 +11,10 @@ export const Route = createFileRoute("/admin/finance")({
 });
 
 function AdminFinancePage() {
-  const { data, isLoading, isError, refetch } = useAdminFinance();
+  const { data, isLoading, isError, error, refetch } = useAdminFinance();
   const { data: exposure } = useAdminOpenExposure();
 
-  if (isError) return <InlineError onRetry={() => refetch()} />;
+  if (isError) return <AdminInlineError error={error} onRetry={() => refetch()} />;
 
   const summary = data?.summary;
   const byRegion = data?.by_region ?? [];

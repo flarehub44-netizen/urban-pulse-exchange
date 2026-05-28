@@ -3,6 +3,7 @@ import "./lib/error-capture";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 import { runFootballResolve, runFootballSync } from "./lib/football-cron.server";
+import { runImpactMonthlyFinalize, runImpactXpCredit } from "./lib/impact-cron.server";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -154,9 +155,13 @@ export default {
             await runFootballSync();
           } else if (cron === "*/5 * * * *") {
             await runFootballResolve();
+          } else if (cron === "0 * * * *") {
+            await runImpactXpCredit(50);
+          } else if (cron === "15 3 1 * *") {
+            await runImpactMonthlyFinalize();
           }
         } catch (e) {
-          console.error("[FootballCron]", cron, e);
+          console.error("[ScheduledCron]", cron, e);
         }
       })(),
     );

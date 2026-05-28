@@ -8,6 +8,7 @@ import { MarketCardSkeleton } from "@/components/viax/market-card-skeleton";
 import { InlineError } from "@/components/viax/inline-error";
 import { EmptyState } from "@/components/viax/empty-state";
 import { PageHeader } from "@/components/viax/page-header";
+import { ImpactProgramBanner } from "@/components/viax/impact-program-banner";
 import { copy } from "@/copy/pt-BR";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -47,6 +48,8 @@ export function CommunityMarketsList({ embedded = false }: { embedded?: boolean 
           </Link>
         </div>
       )}
+
+      <ImpactProgramBanner compact className="page-section" />
 
       {isRegistered && sortedMyMarkets.length > 0 && (
         <section className="space-y-3">

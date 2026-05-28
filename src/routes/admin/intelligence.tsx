@@ -4,7 +4,7 @@ import { useAdminOracleHealth, useAdminTriggerLifecycle } from "@/hooks/use-admi
 import { toast } from "sonner";
 import { AdminOpsPanel } from "@/components/viax/admin-ops-panel";
 import { copy } from "@/copy/pt-BR";
-import { InlineError } from "@/components/viax/inline-error";
+import { AdminInlineError } from "@/components/admin/admin-inline-error";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -20,11 +20,11 @@ const MODEL_CARDS = [
 ];
 
 function AdminIntelligencePage() {
-  const { data, isError, refetch } = useAdminOracleHealth();
+  const { data, isError, error, refetch } = useAdminOracleHealth();
   const { mutateAsync: triggerLifecycle, isPending: ticking } = useAdminTriggerLifecycle();
   const [yoloRunning, setYoloRunning] = useState(false);
 
-  if (isError) return <InlineError onRetry={() => refetch()} />;
+  if (isError) return <AdminInlineError error={error} onRetry={() => refetch()} />;
 
   return (
     <div className="space-y-6">

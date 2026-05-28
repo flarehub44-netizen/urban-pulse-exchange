@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useAdminPlatformSettings, useAdminUpdateSetting } from "@/hooks/use-admin-dashboard";
 import { copy } from "@/copy/pt-BR";
-import { InlineError } from "@/components/viax/inline-error";
+import { AdminInlineError } from "@/components/admin/admin-inline-error";
 import { AdminAuditLog } from "@/components/admin/admin-audit-log";
 
 export const Route = createFileRoute("/admin/system")({
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/admin/system")({
 });
 
 function AdminSystemPage() {
-  const { data: settings, isError, refetch } = useAdminPlatformSettings();
+  const { data: settings, isError, error, refetch } = useAdminPlatformSettings();
   const { mutateAsync: update, isPending } = useAdminUpdateSetting();
   const [fee, setFee] = useState("0.10");
   const [maxStake, setMaxStake] = useState("100000");
@@ -52,7 +52,7 @@ function AdminSystemPage() {
     }
   }, [settings]);
 
-  if (isError) return <InlineError onRetry={() => refetch()} />;
+  if (isError) return <AdminInlineError error={error} onRetry={() => refetch()} />;
 
   const onSave = async () => {
     try {

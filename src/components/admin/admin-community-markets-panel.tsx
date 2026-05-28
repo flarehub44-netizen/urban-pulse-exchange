@@ -8,7 +8,7 @@ import {
 } from "@/hooks/use-admin-community";
 import { formatBRL } from "@/lib/parimutuel";
 import { copy } from "@/copy/pt-BR";
-import { InlineError } from "@/components/viax/inline-error";
+import { AdminInlineError } from "@/components/admin/admin-inline-error";
 import { DesktopTableWrap, MobileDataList, MobileFieldRow } from "@/components/ui/responsive-table";
 
 type Filter = "all" | "open" | "private" | "reported";
@@ -16,7 +16,7 @@ type Filter = "all" | "open" | "private" | "reported";
 const OPEN_STATUSES = new Set(["live", "closing", "closed"]);
 
 export function AdminCommunityMarketsPanel() {
-  const { data: markets = [], isError, refetch, isLoading } = useAdminCommunityMarkets();
+  const { data: markets = [], isError, error, refetch, isLoading } = useAdminCommunityMarkets();
   const { data: reports = [] } = useAdminCommunityReports();
   const { mutateAsync: voidMarket, isPending: voiding } = useAdminVoidCommunityMarket();
   const [filter, setFilter] = useState<Filter>("all");
@@ -30,7 +30,7 @@ export function AdminCommunityMarketsPanel() {
     });
   }, [markets, filter]);
 
-  if (isError) return <InlineError onRetry={() => refetch()} />;
+  if (isError) return <AdminInlineError error={error} onRetry={() => refetch()} />;
 
   const onVoid = async (marketId: string) => {
     if (!window.confirm(copy.community.voidConfirm)) return;

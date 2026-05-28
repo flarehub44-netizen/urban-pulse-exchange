@@ -6,7 +6,7 @@ import type { AuthModalSearch } from "@/lib/auth-modal-search";
 import { parseAuthModalSearch } from "@/lib/auth-modal-search";
 
 export type RankingSearch = {
-  tab?: "global" | "cidade" | "bairro" | "amigos";
+  tab?: "global" | "cidade" | "bairro" | "amigos" | "impacto";
 } & AuthModalSearch;
 
 export const Route = createFileRoute("/ranking")({
@@ -21,7 +21,10 @@ export const Route = createFileRoute("/ranking")({
   }),
   validateSearch: (search: Record<string, unknown>): RankingSearch => {
     const t = search.tab;
-    const tab = t === "cidade" || t === "bairro" || t === "amigos" ? t : ("global" as const);
+    const tab =
+      t === "cidade" || t === "bairro" || t === "amigos" || t === "impacto"
+        ? t
+        : ("global" as const);
     return { tab, ...parseAuthModalSearch(search) };
   },
   component: RankingRoute,

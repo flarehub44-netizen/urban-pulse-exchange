@@ -25,7 +25,10 @@ export function PartnerProgramLanding() {
   const { mutateAsync: applyPartner, isPending: applying } = useApplyPartner();
   const qc = useQueryClient();
   const [bio, setBio] = useState("");
+  const [promotionChannels, setPromotionChannels] = useState("");
   const [focusCity, setFocusCity] = useState("São Paulo");
+  const [instagram, setInstagram] = useState("");
+  const [tiktok, setTiktok] = useState("");
 
   const isActivePartner =
     partnerStatus?.role === "partner" && partnerStatus?.status === "active";
@@ -37,6 +40,9 @@ export function PartnerProgramLanding() {
     try {
       const res = await applyPartner({
         bio,
+        promotionChannels,
+        instagram,
+        tiktok: tiktok.trim() || undefined,
         focusCity: focusCity.trim() || undefined,
       });
       const payload = res as { ok?: boolean; reason?: string };
@@ -181,6 +187,21 @@ export function PartnerProgramLanding() {
               </p>
             </div>
             <div>
+              <label
+                htmlFor="partner-promotion"
+                className="text-xs font-medium text-muted-foreground"
+              >
+                {copy.partner.landing.promotionLabel}
+              </label>
+              <textarea
+                id="partner-promotion"
+                value={promotionChannels}
+                onChange={(e) => setPromotionChannels(e.target.value)}
+                placeholder={copy.partner.landing.promotionPlaceholder}
+                className="mt-1.5 w-full min-h-[80px] rounded-lg border bg-surface px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
               <label htmlFor="partner-city" className="text-xs font-medium text-muted-foreground">
                 {copy.partner.landing.cityLabel}
               </label>
@@ -193,9 +214,60 @@ export function PartnerProgramLanding() {
                 className="mt-1.5 w-full rounded-lg border bg-surface px-3 py-2 text-sm"
               />
             </div>
+            <div>
+              <label
+                htmlFor="partner-instagram"
+                className="text-xs font-medium text-muted-foreground"
+              >
+                {copy.partner.landing.instagramLabel}
+              </label>
+              <div className="mt-1.5 flex rounded-lg border bg-surface">
+                <span className="flex items-center border-r px-3 text-sm text-muted-foreground">
+                  @
+                </span>
+                <input
+                  id="partner-instagram"
+                  type="text"
+                  value={instagram}
+                  onChange={(e) => setInstagram(e.target.value.replace(/^@+/, ""))}
+                  placeholder={copy.partner.landing.instagramPlaceholder}
+                  className="min-w-0 flex-1 bg-transparent px-3 py-2 text-sm outline-none"
+                  autoComplete="username"
+                />
+              </div>
+              {!instagram.trim() && (
+                <p className="mt-1 text-[10px] text-muted-foreground">
+                  {copy.partner.landing.instagramRequiredHint}
+                </p>
+              )}
+            </div>
+            <div>
+              <label htmlFor="partner-tiktok" className="text-xs font-medium text-muted-foreground">
+                {copy.partner.landing.tiktokLabel}
+              </label>
+              <div className="mt-1.5 flex rounded-lg border bg-surface">
+                <span className="flex items-center border-r px-3 text-sm text-muted-foreground">
+                  @
+                </span>
+                <input
+                  id="partner-tiktok"
+                  type="text"
+                  value={tiktok}
+                  onChange={(e) => setTiktok(e.target.value.replace(/^@+/, ""))}
+                  placeholder={copy.partner.landing.tiktokPlaceholder}
+                  className="min-w-0 flex-1 bg-transparent px-3 py-2 text-sm outline-none"
+                  autoComplete="username"
+                />
+              </div>
+            </div>
             <button
               type="button"
-              disabled={applying || bio.trim().length < 20}
+              disabled={
+                applying ||
+                bio.trim().length < 20 ||
+                !promotionChannels.trim() ||
+                !instagram.trim()
+              }
               onClick={() => void handleApply()}
               className={cn(
                 "inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground",
