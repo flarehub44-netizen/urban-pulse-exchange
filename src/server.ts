@@ -65,9 +65,12 @@ const CSP_IMG_SRC = [
   "https://www.cetsp.com.br",
 ].join(" ");
 
-// F07: per-request nonce for both script-src and style-src.
+// F07: per-request nonce for script-src.
 // For HTML responses the function buffers the body and injects nonce="" into
-// every <style> and <script> tag. Non-HTML responses (JSON, streams) skip buffering.
+// every <script> tag. Non-HTML responses (JSON, streams) skip buffering.
+// style-src uses 'unsafe-inline' only — combining a nonce with 'unsafe-inline'
+// in style-src causes browsers to silently ignore 'unsafe-inline' (CSP Level 3 spec),
+// which blocks inline style="" attributes from @floating-ui/react-dom (Radix UI).
 async function addSecurityHeaders(response: Response): Promise<Response> {
   const nonce = Array.from(crypto.getRandomValues(new Uint8Array(16)))
     .map((b) => b.toString(16).padStart(2, "0"))
@@ -86,9 +89,7 @@ async function addSecurityHeaders(response: Response): Promise<Response> {
       // 'strict-dynamic' propagates trust to scripts loaded by nonce'd scripts (dynamic imports).
       // 'self' is kept as fallback for browsers that don't support 'strict-dynamic'.
       `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
-      // 'unsafe-inline' is needed for inline style="" attributes (e.g. Radix UI positioning).
-      // Nonces cover <style> elements; 'unsafe-inline' is low-risk for styles (no script execution).
-      `style-src 'self' 'nonce-${nonce}' 'unsafe-inline' https://fonts.googleapis.com`,
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src https://fonts.gstatic.com",
       `img-src ${CSP_IMG_SRC}`,
       "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
@@ -101,12 +102,10 @@ async function addSecurityHeaders(response: Response): Promise<Response> {
     return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
   }
 
-  // Buffer HTML, inject nonce into <style> and <script> tags (skips tags that already have one).
+  // Buffer HTML, inject nonce into <script> tags (skips tags that already have one).
   // This covers TanStack Start's hydration inline scripts whose hash changes every request.
   const text = await response.text();
-  const patched = text
-    .replace(/<style(?![^>]*\bnonce\b)(\b[^>]*)>/gi, `<style$1 nonce="${nonce}">`)
-    .replace(/<script(?![^>]*\bnonce\b)(\b[^>]*)>/gi, `<script$1 nonce="${nonce}">`);
+  const patched = text.replace(/<script(?![^>]*\bnonce\b)(\b[^>]*)>/gi, `<script$1 nonce="${nonce}">`);
   return new Response(patched, { status: response.status, statusText: response.statusText, headers });
 }
 
