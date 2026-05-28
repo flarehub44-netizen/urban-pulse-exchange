@@ -17,7 +17,13 @@ import { FootballProbBar } from "@/components/football/football-prob-bar";
 import { FootballOrderBox } from "@/components/football/football-order-box";
 import { AnimatedNumber } from "@/components/viax/animated-number";
 import { Countdown } from "@/components/viax/countdown";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useWatchlist } from "@/hooks/use-watchlist";
 import { cn } from "@/lib/utils";
 import { copy } from "@/copy/pt-BR";
@@ -225,7 +231,9 @@ export function FootballMarketCard({ m, compact }: { m: FootballMarketRow; compa
             <DialogTitle className="line-clamp-2 text-sm font-medium leading-snug">
               {m.fixture.home_team_name} x {m.fixture.away_team_name}
             </DialogTitle>
-            <p className="text-xs text-muted-foreground">{copy.football.placeBet}</p>
+            <DialogDescription className="text-xs text-muted-foreground">
+              {copy.football.placeBet}
+            </DialogDescription>
           </DialogHeader>
           <div className="p-4">
             <FootballOrderBox

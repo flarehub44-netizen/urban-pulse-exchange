@@ -26,7 +26,13 @@ import {
 import { copyShareUrl } from "@/lib/share-url";
 import type { Market, Side } from "@/store/viax-store";
 import { OrderBox } from "@/components/viax/order-box";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { copy } from "@/copy/pt-BR";
 import { EdgeBadge } from "@/components/viax/edge-badge";
 import { probability, formatBRL, prizePool } from "@/lib/parimutuel";
@@ -450,7 +456,9 @@ function Feed() {
             <DialogTitle className="text-sm font-medium leading-snug line-clamp-2">
               {feedBet?.market.question}
             </DialogTitle>
-            <p className="text-xs text-muted-foreground">{feedBet?.market.region}</p>
+            <DialogDescription className="text-xs text-muted-foreground">
+              {feedBet?.market.region}
+            </DialogDescription>
           </DialogHeader>
           <div className="p-4">
             {feedBet && (

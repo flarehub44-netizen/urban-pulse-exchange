@@ -1,11 +1,17 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { lazy, Suspense, useMemo, useState } from "react";
 import { useResolvedMarkets } from "@/hooks/use-resolved-data";
 import { useViaX } from "@/store/viax-store";
 import type { Market, Side } from "@/store/viax-store";
 import { AnimatedNumber } from "@/components/viax/animated-number";
 import { OrderBox } from "@/components/viax/order-box";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { copy } from "@/copy/pt-BR";
 import { formatBRL, formatPct, probability } from "@/lib/parimutuel";
 import { EdgeBadge } from "@/components/viax/edge-badge";
@@ -17,6 +23,7 @@ import { useUrbanMindDigest } from "@/hooks/use-urbanmind-digest";
 import { coachContinuityLine } from "@/lib/urbanmind-coach";
 import { SurfaceCard } from "@/components/viax/surface-card";
 import { KpiTile } from "@/components/viax/kpi-tile";
+import { URBANMIND_UI_ENABLED } from "@/config/features";
 const UrbanMindAccuracyChart = lazy(() =>
   import("@/components/viax/urbanmind-accuracy-chart").then((m) => ({
     default: m.UrbanMindAccuracyChart,
@@ -26,6 +33,11 @@ const UrbanMindAccuracyChart = lazy(() =>
 export type UrbanMindSearch = { marketId?: string };
 
 export const Route = createFileRoute("/_app/urbanmind")({
+  beforeLoad: () => {
+    if (!URBANMIND_UI_ENABLED) {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   head: () => ({
     meta: [
       { title: "UrbanMind AI · ViaX" },
@@ -252,7 +264,9 @@ function UrbanMind() {
             <DialogTitle className="text-sm font-medium leading-snug line-clamp-2">
               {betTarget?.market.question}
             </DialogTitle>
-            <p className="text-xs text-muted-foreground">{betTarget?.market.region}</p>
+            <DialogDescription className="text-xs text-muted-foreground">
+              {betTarget?.market.region}
+            </DialogDescription>
           </DialogHeader>
           <div className="p-4">
             {betTarget && (

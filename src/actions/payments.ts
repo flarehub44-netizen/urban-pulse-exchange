@@ -4,10 +4,38 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireRegisteredAuth } from "@/integrations/supabase/require-registered-middleware";
 import { getSupabaseCtx } from "@/integrations/supabase/context";
 import { createClient } from "@supabase/supabase-js";
-import { createPixCharge, createPixPayout } from "@/lib/syncpay";
+import { createPixCharge, createPixPayout, SyncPayHttpError } from "@/lib/syncpay";
 import { PIX_MIN_AMOUNT_BRL } from "@/lib/pix-payments";
 import { formatBRL } from "@/lib/parimutuel";
 import { logApiMetric } from "@/lib/structured-log.server";
+
+function logFinancialReconciliationIssue(input: {
+  stage: string;
+  userId: string;
+  intentId: string;
+  amount: number;
+  error: string;
+}) {
+  console.error("[FinancialReconciliationIssue]", input);
+}
+
+function mapSyncPayDepositError(error: unknown): Error {
+  if (error instanceof SyncPayHttpError) {
+    const looksLikeHtml = error.contentType.includes("text/html") || error.responseSnippet.includes("<html");
+    if (error.status === 404 && looksLikeHtml) {
+      console.error("[SyncPayConfigIssue] syncpay_endpoint_misconfigured", {
+        status: error.status,
+        contentType: error.contentType,
+        requestUrl: error.requestUrl,
+        bodySnippet: error.responseSnippet,
+      });
+      return new Error(
+        "syncpay_endpoint_misconfigured: endpoint/base URL da API SyncPay inválidos para este ambiente",
+      );
+    }
+  }
+  return error instanceof Error ? error : new Error("Falha ao criar cobrança no provedor Pix");
+}
 
 // Service-role client para escrita nas tabelas de pagamento
 function getServiceClient() {
@@ -20,7 +48,7 @@ function getServiceClient() {
 async function requireUserPixProfile(service: ReturnType<typeof getServiceClient>, userId: string) {
   const { data: profile, error } = await service
     .from("profiles")
-    .select("cpf, name")
+    .select("cpf, name, phone")
     .eq("id", userId)
     .single();
 
@@ -34,6 +62,7 @@ async function requireUserPixProfile(service: ReturnType<typeof getServiceClient
   return {
     cpfDigits,
     name: String(profile?.name ?? "").trim() || "ViaX",
+    phoneDigits: String(profile?.phone ?? "").replace(/\D/g, ""),
   };
 }
 
@@ -59,7 +88,9 @@ export const initiateDepositFn = createServerFn({ method: "POST" })
     const service = getServiceClient();
 
     try {
-      const { cpfDigits } = await requireUserPixProfile(service, userId);
+      const { cpfDigits, name, phoneDigits } = await requireUserPixProfile(service, userId);
+      const { data: authUserData } = await service.auth.admin.getUserById(userId);
+      const email = String(authUserData?.user?.email ?? "").trim();
 
       // 1. Criar o intent no banco (status: pending)
       const { data: intent, error: intentErr } = await service
@@ -79,12 +110,34 @@ export const initiateDepositFn = createServerFn({ method: "POST" })
       }
 
       // 2. Chamar SyncPay para gerar QR Code Pix
-      const charge = await createPixCharge({
-        amount: data.amount,
-        correlationId: intent.id,
-        description: `Depósito ViaX — ${formatBRL(data.amount)}`,
-        expiresInMinutes: 30,
-      });
+      let charge;
+      try {
+        charge = await createPixCharge({
+          amount: data.amount,
+          correlationId: intent.id,
+          description: `Depósito ViaX — ${formatBRL(data.amount)}`,
+          expiresInMinutes: 30,
+        client: {
+          name,
+          cpf: cpfDigits,
+          email: email || undefined,
+          phone: phoneDigits || undefined,
+        },
+        });
+      } catch (error) {
+        const mappedError = mapSyncPayDepositError(error);
+        await service
+          .from("payment_intents")
+          .update({
+            status: "failed",
+            meta: {
+              reason: "provider_charge_init_failed",
+              message: mappedError.message,
+            },
+          })
+          .eq("id", intent.id);
+        throw mappedError;
+      }
       console.info("[SyncPay] deposit charge created", {
         intentId: intent.id,
         providerId: charge.id,
@@ -92,7 +145,7 @@ export const initiateDepositFn = createServerFn({ method: "POST" })
       });
 
       // 3. Atualizar intent com dados do provider
-      await service
+      const { error: updateIntentErr } = await service
         .from("payment_intents")
         .update({
           provider_id: charge.id,
@@ -104,6 +157,27 @@ export const initiateDepositFn = createServerFn({ method: "POST" })
           meta: charge as unknown as Record<string, unknown>,
         })
         .eq("id", intent.id);
+      if (updateIntentErr) {
+        logFinancialReconciliationIssue({
+          stage: "deposit.intent_update_after_provider_create",
+          userId,
+          intentId: intent.id,
+          amount: data.amount,
+          error: updateIntentErr.message,
+        });
+        await service
+          .from("payment_intents")
+          .update({
+            status: "failed",
+            meta: {
+              reason: "intent_update_failed_after_charge_created",
+              message: updateIntentErr.message,
+              provider_id: charge.id,
+            },
+          })
+          .eq("id", intent.id);
+        throw new Error("Falha ao consolidar intenção de depósito. Tente novamente.");
+      }
 
       logApiMetric("bff.initiate_deposit", { ok: true, durationMs: Date.now() - started });
       return {
@@ -176,11 +250,20 @@ export const initiateWithdrawFn = createServerFn({ method: "POST" })
         providerId = payout.id;
       } catch (payoutErr) {
         // Se falhar ao criar payout no provider, estorna a reserva imediatamente.
-        await service.rpc("service_refund_withdrawal", {
+        const { error: refundErr } = await service.rpc("service_refund_withdrawal", {
           p_user_id: userId,
           p_amount: data.amount,
           p_intent_id: parsed.intent_id,
         });
+        if (refundErr) {
+          logFinancialReconciliationIssue({
+            stage: "withdraw.refund_after_payout_failure",
+            userId,
+            intentId: parsed.intent_id,
+            amount: data.amount,
+            error: refundErr.message,
+          });
+        }
         await service
           .from("payment_intents")
           .update({
@@ -188,6 +271,8 @@ export const initiateWithdrawFn = createServerFn({ method: "POST" })
             meta: {
               reason: "payout_init_failed",
               message: payoutErr instanceof Error ? payoutErr.message : "unknown_error",
+              refund_error: refundErr?.message ?? null,
+              needs_manual_reconciliation: Boolean(refundErr),
             },
           })
           .eq("id", parsed.intent_id);

@@ -1,4 +1,5 @@
 import { copy } from "@/copy/pt-BR";
+import { URBANMIND_UI_ENABLED } from "@/config/features";
 import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
@@ -38,7 +39,7 @@ export const sidebarNav: NavItem[] = [
   { to: "/live", label: copy.nav.live, icon: Map },
   { to: "/ranking", label: copy.nav.ranking, icon: Trophy },
   { to: "/feed", label: copy.nav.feed, icon: MessageSquare },
-  { to: "/urbanmind", label: copy.nav.urbanmind, icon: Brain },
+  ...(URBANMIND_UI_ENABLED ? [{ to: "/urbanmind", label: copy.nav.urbanmind, icon: Brain }] : []),
   { to: "/leagues", label: "Ligas", icon: Shield },
   { to: "/profile", label: copy.nav.account, icon: User, matchPrefix: true },
 ];
@@ -71,7 +72,7 @@ export const bottomNavMore: NavItem[] = [
   { to: "/feed", label: copy.nav.feed, icon: MessageSquare },
   { to: "/notifications", label: copy.nav.notifications, icon: Bell },
   { to: "/wallet", label: copy.nav.wallet, icon: Wallet },
-  { to: "/urbanmind", label: copy.nav.urbanmind, icon: Brain },
+  ...(URBANMIND_UI_ENABLED ? [{ to: "/urbanmind", label: copy.nav.urbanmind, icon: Brain }] : []),
 ];
 
 const LAST_MORE_KEY = "viax_last_more_nav";

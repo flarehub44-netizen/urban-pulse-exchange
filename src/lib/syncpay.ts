@@ -1,24 +1,69 @@
 // SyncPay client wrapper — Pix In / Pix Out
 // Docs: configure SYNCPAY_API_URL, SYNCPAY_API_KEY, SYNCPAY_WEBHOOK_SECRET no .env
 
-const API_URL = process.env.SYNCPAY_API_URL ?? "https://api.syncpay.com.br/v1";
+const API_URL = process.env.SYNCPAY_API_URL ?? "https://api.syncpay.com.br";
 const API_KEY = process.env.SYNCPAY_API_KEY ?? "";
 const WEBHOOK_SECRET = process.env.SYNCPAY_WEBHOOK_SECRET ?? "";
-const IS_PROD = process.env.NODE_ENV === "production";
+const CASHIN_PATH = process.env.SYNCPAY_CASHIN_PATH ?? "/api/partner/v1/cash-in";
+const CASHOUT_PATH = process.env.SYNCPAY_CASHOUT_PATH ?? "/api/partner/v1/cash-out";
+const WEBHOOK_URL = process.env.SYNCPAY_WEBHOOK_URL ?? "";
 const REQUEST_TIMEOUT_MS = 10_000;
 const MAX_RETRIES = 2;
+const ERROR_BODY_SNIPPET_MAX = 240;
+
+function normalizeApiUrl(url: string): string {
+  return url.replace(/\/+$/, "");
+}
+
+function sanitizeApiUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    return `${parsed.origin}${parsed.pathname.replace(/\/+$/, "")}`;
+  } catch {
+    return "(invalid SYNCPAY_API_URL)";
+  }
+}
+
+function getContentType(res: Response): string {
+  return res.headers.get("content-type")?.toLowerCase() ?? "";
+}
+
+function compactText(input: string): string {
+  return input.replace(/\s+/g, " ").trim().slice(0, ERROR_BODY_SNIPPET_MAX);
+}
+
+function getRequestHost(url: string): string {
+  try {
+    return new URL(url).host;
+  } catch {
+    return "(invalid-host)";
+  }
+}
+
+export class SyncPayHttpError extends Error {
+  constructor(
+    message: string,
+    public status: number,
+    public contentType: string,
+    public responseSnippet: string,
+    public requestUrl: string,
+  ) {
+    super(message);
+    this.name = "SyncPayHttpError";
+  }
+}
 
 export type PixChargeResponse = {
-  id: string; // provider_id
+  id: string; // provider_id / identifier
   qr_code: string; // EMV Pix Copia e Cola
-  qr_code_base64: string;
+  qr_code_base64?: string;
   expiration: string; // ISO 8601
-  status: "ACTIVE" | "COMPLETED" | "EXPIRED" | "CANCELLED";
+  status: "ACTIVE" | "PENDING" | "COMPLETED" | "EXPIRED" | "CANCELLED";
 };
 
 export type PixPayoutResponse = {
   id: string;
-  status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
+  status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED" | "SUBMITTED";
 };
 
 export type SyncPayWebhookPayload = {
@@ -44,6 +89,21 @@ export type SyncPayWebhookPayload = {
   };
 };
 
+type SyncPayCashInRaw = {
+  identifier?: string;
+  pix_code?: string;
+  qr_code?: string;
+  qr_code_base64?: string;
+  expiration?: string;
+  status?: string;
+};
+
+type SyncPayCashOutRaw = {
+  reference_id?: string;
+  id?: string;
+  status?: string;
+};
+
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -51,13 +111,18 @@ function sleep(ms: number) {
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (!API_KEY) throw new Error("SYNCPAY_API_KEY not configured");
 
+  const baseUrl = normalizeApiUrl(API_URL);
+  const sanitizedBaseUrl = sanitizeApiUrl(baseUrl);
+  const requestUrl = `${baseUrl}${path}`;
+  const requestHost = getRequestHost(requestUrl);
+
   let lastError: Error | null = null;
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt += 1) {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
     try {
       const startedAt = Date.now();
-      const res = await fetch(`${API_URL}${path}`, {
+      const res = await fetch(requestUrl, {
         ...init,
         signal: ctrl.signal,
         headers: {
@@ -69,7 +134,28 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
       if (!res.ok) {
         const body = await res.text().catch(() => "(empty)");
-        const err = new Error(`SyncPay ${res.status}: ${body}`);
+        const contentType = getContentType(res);
+        const snippet = compactText(body);
+        const err = new SyncPayHttpError(
+          `SyncPay ${res.status}: ${snippet}`,
+          res.status,
+          contentType,
+          snippet,
+          requestUrl,
+        );
+        console.error("[SyncPay] request failed", {
+          apiBaseUrl: sanitizedBaseUrl,
+          requestHost,
+          path,
+          method: init.method ?? "GET",
+          status: res.status,
+          contentType: contentType || "(missing)",
+          bodySnippet: snippet,
+          looksLikeCloudflare1016:
+            res.status === 530 &&
+            (snippet.includes("1016") || snippet.toLowerCase().includes("origin dns error")),
+          attempt,
+        });
         const retryable = res.status >= 500 || res.status === 429;
         if (!retryable || attempt === MAX_RETRIES) {
           throw err;
@@ -88,6 +174,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
       const durationMs = Date.now() - startedAt;
       console.info("[SyncPay] request ok", {
+        apiBaseUrl: sanitizedBaseUrl,
+        requestHost,
         path,
         method: init.method ?? "GET",
         durationMs,
@@ -121,16 +209,31 @@ export async function createPixCharge(opts: {
   correlationId: string; // payment_intent.id
   description?: string;
   expiresInMinutes?: number;
+  client?: {
+    name: string;
+    cpf: string;
+    email?: string;
+    phone?: string;
+  };
 }): Promise<PixChargeResponse> {
-  return request<PixChargeResponse>("/charges/pix", {
+  const raw = await request<SyncPayCashInRaw>(CASHIN_PATH, {
     method: "POST",
     body: JSON.stringify({
       amount: opts.amount,
-      correlation_id: opts.correlationId,
       description: opts.description ?? "Depósito ViaX",
-      expiration_minutes: opts.expiresInMinutes ?? 30,
+      metadata: { correlation_id: opts.correlationId },
+      webhook_url: WEBHOOK_URL || undefined,
+      expires_in_minutes: opts.expiresInMinutes ?? 30,
+      client: opts.client,
     }),
   });
+  return {
+    id: raw.identifier ?? opts.correlationId,
+    qr_code: raw.pix_code ?? raw.qr_code ?? "",
+    qr_code_base64: raw.qr_code_base64,
+    expiration: raw.expiration ?? new Date(Date.now() + 30 * 60_000).toISOString(),
+    status: (raw.status?.toUpperCase() as PixChargeResponse["status"]) ?? "PENDING",
+  };
 }
 
 /**
@@ -144,19 +247,31 @@ export async function createPixPayout(opts: {
   document?: string;
   beneficiaryName?: string;
 }): Promise<PixPayoutResponse> {
+  const isCpf = /^\d{11}$/.test(opts.pixKey.replace(/\D/g, ""));
   const body: Record<string, unknown> = {
     amount: opts.amount,
-    pix_key: opts.pixKey,
-    correlation_id: opts.correlationId,
     description: opts.description ?? "Saque ViaX",
+    pix_key_type: isCpf ? "CPF" : "EVP",
+    pix_key: opts.pixKey,
+    metadata: { correlation_id: opts.correlationId },
   };
-  if (opts.document) body.document = opts.document;
+  if (opts.document) {
+    const digits = opts.document.replace(/\D/g, "");
+    body.document = {
+      type: digits.length > 11 ? "cnpj" : "cpf",
+      number: digits,
+    };
+  }
   if (opts.beneficiaryName) body.beneficiary_name = opts.beneficiaryName;
 
-  return request<PixPayoutResponse>("/payouts/pix", {
+  const raw = await request<SyncPayCashOutRaw>(CASHOUT_PATH, {
     method: "POST",
     body: JSON.stringify(body),
   });
+  return {
+    id: raw.reference_id ?? raw.id ?? opts.correlationId,
+    status: (raw.status?.toUpperCase() as PixPayoutResponse["status"]) ?? "SUBMITTED",
+  };
 }
 
 /**
@@ -168,12 +283,8 @@ export async function validateWebhookSignature(
   signatureHeader: string,
 ): Promise<boolean> {
   if (!WEBHOOK_SECRET) {
-    if (IS_PROD) {
-      console.error("[SyncPay] Missing SYNCPAY_WEBHOOK_SECRET in production");
-      return false;
-    }
-    console.warn("[SyncPay] SYNCPAY_WEBHOOK_SECRET not set — allowing only in non-production");
-    return true;
+    console.error("[SyncPay] SYNCPAY_WEBHOOK_SECRET não configurado — rejeitando webhook");
+    return false;
   }
 
   try {

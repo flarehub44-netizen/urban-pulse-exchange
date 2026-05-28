@@ -21,7 +21,7 @@ export const Route = createFileRoute("/api/public/webhooks/syncpay")({
     handlers: {
       POST: async ({ request }) => {
         const ip = request.headers.get("cf-connecting-ip") ?? "unknown";
-        const limited = assertRateLimit(`syncpay:${ip}`, { max: 60, windowMs: 60_000 });
+        const limited = await assertRateLimit(`syncpay:${ip}`, { max: 60, windowMs: 60_000 });
         if (limited) return limited;
 
         const rawBody = await request.text();
@@ -29,13 +29,7 @@ export const Route = createFileRoute("/api/public/webhooks/syncpay")({
         const providerEventId =
           request.headers.get("x-syncpay-event-id") ?? request.headers.get("x-event-id") ?? null;
 
-        if (!providerEventId) {
-          // DB-level deduplication via service_process_syncpay_webhook still applies,
-          // but traceability is reduced without a stable event id.
-          console.warn(
-            "[SyncPay Webhook] missing x-syncpay-event-id header — deduplication relies on DB-level idempotency",
-          );
-        }
+        if (!providerEventId) return json({ error: "missing_provider_event_id" }, 400);
 
         const valid = await validateWebhookSignature(rawBody, signature);
         if (!valid) {

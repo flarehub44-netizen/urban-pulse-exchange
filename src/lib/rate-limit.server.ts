@@ -1,22 +1,45 @@
-const memoryBuckets = new Map<string, number[]>();
+import { createClient } from "@supabase/supabase-js";
 
-/** Simple in-memory sliding-window rate limiter for edge handlers. */
-export function assertRateLimit(
+type RateLimitResult = {
+  limited?: boolean;
+  retry_after_seconds?: number;
+};
+
+function getServiceClient() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+}
+
+/** Distributed sliding-window rate limiter backed by Postgres. */
+export async function assertRateLimit(
   key: string,
   options: { max: number; windowMs: number },
-): Response | null {
-  const now = Date.now();
-  const windowStart = now - options.windowMs;
-  const recent = (memoryBuckets.get(key) ?? []).filter((ts) => ts >= windowStart);
+): Promise<Response | null> {
+  const service = getServiceClient();
+  if (!service) return null;
 
-  if (recent.length >= options.max) {
-    return new Response(JSON.stringify({ error: "rate_limited" }), {
-      status: 429,
-      headers: { "Content-Type": "application/json", "Retry-After": "60" },
-    });
+  const windowSeconds = Math.max(1, Math.floor(options.windowMs / 1000));
+  const { data, error } = await service.rpc("service_assert_rate_limit", {
+    p_key: key,
+    p_max: options.max,
+    p_window_seconds: windowSeconds,
+  });
+  if (error) {
+    console.error("[RateLimit] distributed check failed", { key, error: error.message });
+    return null;
   }
 
-  recent.push(now);
-  memoryBuckets.set(key, recent);
+  const result = (data ?? {}) as RateLimitResult;
+  if (result.limited) {
+    return new Response(JSON.stringify({ error: "rate_limited" }), {
+      status: 429,
+      headers: {
+        "Content-Type": "application/json",
+        "Retry-After": String(result.retry_after_seconds ?? windowSeconds),
+      },
+    });
+  }
   return null;
 }

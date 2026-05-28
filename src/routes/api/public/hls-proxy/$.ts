@@ -135,7 +135,7 @@ export const Route = createFileRoute("/api/public/hls-proxy/$")({
 
       GET: async ({ request, params }) => {
         const ip = request.headers.get("cf-connecting-ip") ?? "unknown";
-        const limited = assertRateLimit(`hls-proxy:${ip}`, { max: 240, windowMs: 60_000 });
+        const limited = await assertRateLimit(`hls-proxy:${ip}`, { max: 240, windowMs: 60_000 });
         if (limited) return limited;
 
         const splat = (params as { _splat?: string })._splat ?? "";

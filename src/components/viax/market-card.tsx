@@ -31,7 +31,13 @@ import { ProbBar } from "./prob-bar";
 import { Countdown } from "./countdown";
 import { Sparkline } from "./sparkline";
 import { OrderBox } from "./order-box";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useWatchlist } from "@/hooks/use-watchlist";
 import { cn } from "@/lib/utils";
 import {
@@ -274,7 +280,7 @@ export function MarketCard({
             <DialogTitle className="text-sm font-medium leading-snug line-clamp-2">
               {m.question}
             </DialogTitle>
-            <p className="text-xs text-muted-foreground">{m.region}</p>
+            <DialogDescription className="text-xs text-muted-foreground">{m.region}</DialogDescription>
           </DialogHeader>
           <div className="p-4">
             <OrderBox m={m} initialSide={quickBet ?? "YES"} onSuccess={() => setQuickBet(null)} />

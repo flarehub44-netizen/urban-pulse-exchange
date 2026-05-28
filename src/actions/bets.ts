@@ -2,15 +2,14 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getSupabaseCtx } from "@/integrations/supabase/context";
-import { supabase } from "@/integrations/supabase/client";
 import { mapSupabaseBusinessError } from "@/lib/server-errors";
 import { logApiMetric } from "@/lib/structured-log.server";
 
-const placeBetSchema = z.object({
+export const placeBetSchema = z.object({
   marketId: z.string(),
   side: z.enum(["YES", "NO"]),
   stake: z.number().positive().max(100_000),
-  idempotencyKey: z.string().uuid().optional(),
+  idempotencyKey: z.string().uuid(),
 });
 
 export const placeBetFn = createServerFn({ method: "POST" })
@@ -23,7 +22,7 @@ export const placeBetFn = createServerFn({ method: "POST" })
       p_market_id: data.marketId,
       p_side: data.side,
       p_stake: data.stake,
-      p_idempotency_key: data.idempotencyKey ?? null,
+      p_idempotency_key: data.idempotencyKey,
     });
     if (error) {
       logApiMetric("bff.place_bet", { ok: false, durationMs: Date.now() - started });
@@ -48,11 +47,13 @@ export const placeBetFn = createServerFn({ method: "POST" })
 export const saveBetNoteFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(z.object({ bet_id: z.string().uuid(), note: z.string().max(280) }))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = getSupabaseCtx(context);
     const { error } = await supabase
       .from("bets")
       .update({ note: data.note.trim().slice(0, 280) })
-      .eq("id", data.bet_id);
+      .eq("id", data.bet_id)
+      .eq("user_id", userId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

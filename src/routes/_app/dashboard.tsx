@@ -103,6 +103,7 @@ import { useFollowingActiveBets } from "@/hooks/use-following-active-bets";
 import { useWinToast } from "@/hooks/use-win-toast";
 import { getOrAssignVariant, trackProductEvent } from "@/lib/product-analytics";
 import { AppLoadingSkeleton } from "@/components/viax/app-loading-skeleton";
+import { URBANMIND_UI_ENABLED } from "@/config/features";
 
 function WidgetFallback({ className = "h-24" }: { className?: string }) {
   return <div className={cn("animate-pulse rounded-xl bg-surface/60", className)} />;
@@ -241,7 +242,9 @@ function Dashboard() {
     dbProfile,
     openBets,
   );
-  const urbanMindMarket = markets.find((m) => m.id === DEFAULT_FEATURED_MARKET_ID) ?? markets[0];
+  const urbanMindMarket = URBANMIND_UI_ENABLED
+    ? (markets.find((m) => m.id === DEFAULT_FEATURED_MARKET_ID) ?? markets[0])
+    : undefined;
   const dailyMission = buildDailyMission(
     markets,
     dbProfile?.neighborhood ?? null,
@@ -255,6 +258,9 @@ function Dashboard() {
     traders,
     dailyMission,
   );
+  const actionNowVisible = URBANMIND_UI_ENABLED
+    ? actionNow
+    : actionNow.filter((item) => item.type !== "urbanmind");
 
   const primaryCta = useMemo(() => {
     if (!me) {
@@ -535,13 +541,13 @@ function Dashboard() {
         </div>
       </div>
 
-      {actionNow.length > 0 && (
+      {actionNowVisible.length > 0 && (
         <div className="rounded-2xl border border-primary/25 bg-primary/5 p-4">
           <h2 className="heading-subsection">
             <span className="text-highlight">Ação</span> agora
           </h2>
           <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-            {actionNow.slice(0, 3).map((item) => {
+            {actionNowVisible.slice(0, 3).map((item) => {
               if (item.type === "position") {
                 return (
                   <Link
@@ -931,7 +937,7 @@ function Dashboard() {
         </div>
       </div>
 
-      {deferredReady && (
+      {deferredReady && URBANMIND_UI_ENABLED && (
         <>
           <div className="grid gap-4 lg:grid-cols-2">
             <Suspense fallback={<ChartFallback />}>
