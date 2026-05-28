@@ -3,16 +3,21 @@ import { getSnapshotUpstream } from "@/lib/snapshot-upstream-map.server";
 import { assertRateLimit } from "@/lib/rate-limit.server";
 import { isAllowedUpstreamUrl } from "@/lib/proxy-utils.server";
 
+// F05: fail-closed — wildcard CORS would let any site read live camera frames.
+// Without PUBLIC_DOMAIN no CORS headers are emitted; same-origin app requests
+// still work without CORS headers.
 const CORS_ORIGIN = process.env.PUBLIC_DOMAIN
   ? `https://${process.env.PUBLIC_DOMAIN}`
-  : "*";
+  : null;
 
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": CORS_ORIGIN,
-  "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Accept",
-  "Access-Control-Max-Age": "86400",
-};
+const CORS_HEADERS: Record<string, string> = CORS_ORIGIN
+  ? {
+      "Access-Control-Allow-Origin": CORS_ORIGIN,
+      "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Accept",
+      "Access-Control-Max-Age": "86400",
+    }
+  : {};
 
 export const Route = createFileRoute("/api/public/snapshot-proxy/$")({
   server: {

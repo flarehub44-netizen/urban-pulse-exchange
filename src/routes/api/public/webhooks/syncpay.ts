@@ -20,8 +20,9 @@ export const Route = createFileRoute("/api/public/webhooks/syncpay")({
 
         const rawBody = await request.text();
         const signature = request.headers.get("x-syncpay-signature") ?? "";
-        const providerEventId =
-          request.headers.get("x-syncpay-event-id") ?? request.headers.get("x-event-id") ?? null;
+        // F06: accept only the canonical header; the x-event-id fallback was a
+        // footgun that could confuse deduplication if the provider changes headers.
+        const providerEventId = request.headers.get("x-syncpay-event-id");
 
         if (!providerEventId) return json({ error: "missing_provider_event_id" }, 400);
 

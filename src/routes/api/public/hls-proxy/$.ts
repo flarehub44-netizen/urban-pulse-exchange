@@ -3,17 +3,22 @@ import { getUpstream } from "@/lib/hls-upstream-map.server";
 import { assertRateLimit } from "@/lib/rate-limit.server";
 import { isAllowedUpstreamUrl } from "@/lib/proxy-utils.server";
 
+// F05: fail-closed — wildcard CORS would let any site proxy live streams.
+// Without PUBLIC_DOMAIN no CORS headers are emitted; same-origin app requests
+// still work without CORS headers.
 const CORS_ORIGIN = process.env.PUBLIC_DOMAIN
   ? `https://${process.env.PUBLIC_DOMAIN}`
-  : "*";
+  : null;
 
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": CORS_ORIGIN,
-  "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
-  "Access-Control-Allow-Headers": "Range, Content-Type, Accept",
-  "Access-Control-Expose-Headers": "Content-Length, Content-Range, Accept-Ranges",
-  "Access-Control-Max-Age": "86400",
-};
+const CORS_HEADERS: Record<string, string> = CORS_ORIGIN
+  ? {
+      "Access-Control-Allow-Origin": CORS_ORIGIN,
+      "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+      "Access-Control-Allow-Headers": "Range, Content-Type, Accept",
+      "Access-Control-Expose-Headers": "Content-Length, Content-Range, Accept-Ranges",
+      "Access-Control-Max-Age": "86400",
+    }
+  : {};
 
 function b64urlEncode(s: string): string {
   return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");

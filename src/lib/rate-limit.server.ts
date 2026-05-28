@@ -14,7 +14,16 @@ export async function assertRateLimit(
   try {
     service = getServiceClient();
   } catch {
-    return null; // service role not configured — soft fail
+    // F03: fail-closed in production — a missing service role disables all rate
+    // limiting, which is a silent DoS vector on high-traffic endpoints.
+    if (process.env.NODE_ENV === "production") {
+      console.error("[RateLimit] FATAL: SUPABASE_SERVICE_ROLE_KEY not configured in production — refusing request to protect the system");
+      return new Response(JSON.stringify({ error: "service_unavailable" }), {
+        status: 503,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    return null; // soft fail only in non-production environments
   }
 
   const windowSeconds = Math.max(1, Math.floor(options.windowMs / 1000));

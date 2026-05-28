@@ -65,7 +65,14 @@ const CSP_IMG_SRC = [
   "https://www.cetsp.com.br",
 ].join(" ");
 
-function addSecurityHeaders(response: Response): Response {
+// F07: per-request style nonce eliminates 'unsafe-inline' from style-src.
+// For HTML responses the function buffers the body and injects nonce="" into
+// every <style> tag. Non-HTML responses (JSON, streams) skip buffering.
+async function addSecurityHeaders(response: Response): Promise<Response> {
+  const nonce = Array.from(crypto.getRandomValues(new Uint8Array(16)))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+
   const headers = new Headers(response.headers);
   headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
   headers.set("X-Frame-Options", "DENY");
@@ -77,14 +84,23 @@ function addSecurityHeaders(response: Response): Response {
     [
       "default-src 'self'",
       "script-src 'self' 'sha256-IlBMqZFDe0MAWOyRZASsffMFCeHUSc6O/6HYUq1e6uY='",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      `style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com`,
       "font-src https://fonts.gstatic.com",
       `img-src ${CSP_IMG_SRC}`,
       "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
       "frame-ancestors 'none'",
     ].join("; "),
   );
-  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.includes("text/html")) {
+    return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+  }
+
+  // Buffer HTML, inject nonce into <style> tags (skips tags that already have one)
+  const text = await response.text();
+  const patched = text.replace(/<style(?![^>]*\bnonce\b)(\b[^>]*)>/gi, `<style$1 nonce="${nonce}">`);
+  return new Response(patched, { status: response.status, statusText: response.statusText, headers });
 }
 
 // h3 swallows in-handler throws into a normal 500 Response with body
@@ -111,10 +127,10 @@ export default {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       const normalized = await normalizeCatastrophicSsrResponse(response);
-      return addSecurityHeaders(normalized);
+      return await addSecurityHeaders(normalized);
     } catch (error) {
       console.error(error);
-      return addSecurityHeaders(brandedErrorResponse());
+      return await addSecurityHeaders(brandedErrorResponse());
     }
   },
 
