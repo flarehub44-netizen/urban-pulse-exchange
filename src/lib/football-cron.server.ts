@@ -1,4 +1,5 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { type SupabaseClient } from "@supabase/supabase-js";
+import { getServiceClient } from "@/lib/supabase-service.server";
 import {
   formatDateYmd,
   getFixtureById,
@@ -11,12 +12,6 @@ let consecutiveSyncFailures = 0;
 const CRON_ALERT_THRESHOLD = 3;
 const DATE_YMD_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-function getServiceClient(): SupabaseClient {
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error("Supabase service role not configured");
-  return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
-}
 
 async function upsertOpsRun(
   supabase: SupabaseClient,

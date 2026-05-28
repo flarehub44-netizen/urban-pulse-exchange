@@ -5,7 +5,7 @@ import { getSupabaseCtx } from "@/integrations/supabase/context";
 
 const createPostSchema = z.object({
   text: z.string().min(1).max(280),
-  marketId: z.string().optional(),
+  marketId: z.string().uuid().optional(),
   tag: z.enum(["Alerta", "Análise", "Previsão", "Insight"]).optional(),
 });
 

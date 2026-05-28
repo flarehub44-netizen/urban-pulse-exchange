@@ -15,7 +15,10 @@ export function usePlaceFootballBet() {
       marketId: string;
       outcome: FootballOutcome;
       stake: number;
-    }) => placeFootballBetFn({ data: { marketId, outcome, stake } }),
+    }) =>
+      placeFootballBetFn({
+        data: { marketId, outcome, stake, idempotencyKey: crypto.randomUUID() },
+      }),
 
     onSuccess: (_, { marketId }) => {
       queryClient.invalidateQueries({ queryKey: ["football-markets"] });

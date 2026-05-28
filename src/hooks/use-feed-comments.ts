@@ -15,7 +15,7 @@ export interface FeedComment {
 }
 
 function mapComment(row: Record<string, unknown>): FeedComment {
-  const profile = row.profiles as Record<string, unknown> | null;
+  const profile = (row.profile_public ?? row.profiles) as Record<string, unknown> | null;
   return {
     id: row.id as string,
     text: row.text as string,
@@ -35,7 +35,7 @@ export function useFeedComments(postId: string | null) {
     queryFn: async () => {
       const { data, error } = (await supabase
         .from("feed_comments")
-        .select("id, text, created_at, profiles(name, handle, avatar, division)")
+        .select("id, text, created_at, profile_public(name, handle, avatar, division)")
         .eq("post_id", postId!)
         .order("created_at", { ascending: true })
         .limit(50)) as { data: Record<string, unknown>[] | null; error: Error | null };

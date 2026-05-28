@@ -3,8 +3,8 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireRegisteredAuth } from "@/integrations/supabase/require-registered-middleware";
 import { getSupabaseCtx } from "@/integrations/supabase/context";
-import { createClient } from "@supabase/supabase-js";
 import { createPixCharge, createPixPayout, SyncPayHttpError } from "@/lib/syncpay";
+import { getServiceClient } from "@/lib/supabase-service.server";
 import { PIX_MIN_AMOUNT_BRL } from "@/lib/pix-payments";
 import { formatBRL } from "@/lib/parimutuel";
 import { logApiMetric } from "@/lib/structured-log.server";
@@ -37,13 +37,6 @@ function mapSyncPayDepositError(error: unknown): Error {
   return error instanceof Error ? error : new Error("Falha ao criar cobrança no provedor Pix");
 }
 
-// Service-role client para escrita nas tabelas de pagamento
-function getServiceClient() {
-  const url = process.env.SUPABASE_URL!;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-  if (!url || !key) throw new Error("Supabase service role not configured");
-  return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
-}
 
 async function requireUserPixProfile(service: ReturnType<typeof getServiceClient>, userId: string) {
   const { data: profile, error } = await service
@@ -88,6 +81,15 @@ export const initiateDepositFn = createServerFn({ method: "POST" })
     const service = getServiceClient();
 
     try {
+      const { data: rl } = await service.rpc("service_assert_rate_limit", {
+        p_key: `deposit:user:${userId}`,
+        p_max: 10,
+        p_window_seconds: 3600,
+      });
+      if ((rl as { limited?: boolean } | null)?.limited) {
+        throw new Error("rate_limit: máximo 10 depósitos por hora. Tente novamente mais tarde.");
+      }
+
       const { cpfDigits, name, phoneDigits } = await requireUserPixProfile(service, userId);
       const { data: authUserData } = await service.auth.admin.getUserById(userId);
       const email = String(authUserData?.user?.email ?? "").trim();

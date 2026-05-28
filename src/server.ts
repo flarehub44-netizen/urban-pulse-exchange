@@ -67,6 +67,7 @@ const CSP_IMG_SRC = [
 
 function addSecurityHeaders(response: Response): Response {
   const headers = new Headers(response.headers);
+  headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
   headers.set("X-Frame-Options", "DENY");
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
@@ -75,7 +76,7 @@ function addSecurityHeaders(response: Response): Response {
     "Content-Security-Policy",
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline'",
+      "script-src 'self' 'sha256-IlBMqZFDe0MAWOyRZASsffMFCeHUSc6O/6HYUq1e6uY='",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src https://fonts.gstatic.com",
       `img-src ${CSP_IMG_SRC}`,

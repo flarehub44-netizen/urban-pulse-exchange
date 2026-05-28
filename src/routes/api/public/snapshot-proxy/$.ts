@@ -1,9 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getSnapshotUpstream } from "@/lib/snapshot-upstream-map.server";
 import { assertRateLimit } from "@/lib/rate-limit.server";
+import { isAllowedUpstreamUrl } from "@/lib/proxy-utils.server";
+
+const CORS_ORIGIN = process.env.PUBLIC_DOMAIN
+  ? `https://${process.env.PUBLIC_DOMAIN}`
+  : "*";
 
 const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": CORS_ORIGIN,
   "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Accept",
   "Access-Control-Max-Age": "86400",
@@ -32,6 +37,10 @@ export const Route = createFileRoute("/api/public/snapshot-proxy/$")({
             status: 404,
             headers: CORS_HEADERS,
           });
+        }
+
+        if (!isAllowedUpstreamUrl(upstream.allowedHosts, upstream.imageUrl)) {
+          return new Response("Upstream not allowed", { status: 403, headers: CORS_HEADERS });
         }
 
         const url = `${upstream.imageUrl}${

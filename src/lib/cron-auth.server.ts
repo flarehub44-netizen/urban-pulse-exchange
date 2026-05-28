@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { getServiceClient } from "@/lib/supabase-service.server";
 
 const MAX_CLOCK_SKEW_SECONDS = 300;
 
@@ -26,16 +26,13 @@ async function signHmacSha256(secret: string, payload: string): Promise<string> 
     .join("");
 }
 
-function getServiceClient() {
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return null;
-  return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
-}
-
 async function assertNonceNotReplayed(nonce: string): Promise<boolean> {
-  const service = getServiceClient();
-  if (!service) return true;
+  let service: ReturnType<typeof getServiceClient>;
+  try {
+    service = getServiceClient();
+  } catch {
+    return true; // soft fail if not configured
+  }
   const { data, error } = await service.rpc("service_assert_rate_limit", {
     p_key: `cron-nonce:${nonce}`,
     p_max: 1,
@@ -108,7 +105,7 @@ export async function assertCronAuth(request: Request): Promise<Response | null>
 
   const auth = request.headers.get("authorization") ?? "";
   const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
-  if (token !== legacySecret) {
+  if (!timingSafeEqual(token, legacySecret ?? "")) {
     return new Response(JSON.stringify({ error: "unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },

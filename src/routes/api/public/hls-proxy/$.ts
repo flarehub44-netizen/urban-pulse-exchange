@@ -1,9 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getUpstream } from "@/lib/hls-upstream-map.server";
 import { assertRateLimit } from "@/lib/rate-limit.server";
+import { isAllowedUpstreamUrl } from "@/lib/proxy-utils.server";
+
+const CORS_ORIGIN = process.env.PUBLIC_DOMAIN
+  ? `https://${process.env.PUBLIC_DOMAIN}`
+  : "*";
 
 const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": CORS_ORIGIN,
   "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
   "Access-Control-Allow-Headers": "Range, Content-Type, Accept",
   "Access-Control-Expose-Headers": "Content-Length, Content-Range, Accept-Ranges",
@@ -19,15 +24,6 @@ function b64urlDecode(s: string): string {
   return atob(padded);
 }
 
-function isAllowedUpstreamUrl(allowedHosts: string[], urlStr: string): boolean {
-  try {
-    const parsed = new URL(urlStr);
-    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return false;
-    return allowedHosts.includes(parsed.hostname);
-  } catch {
-    return false;
-  }
-}
 
 function rewritePlaylist(playlist: string, slug: string, playlistUrl: string): string {
   const base = new URL(playlistUrl);

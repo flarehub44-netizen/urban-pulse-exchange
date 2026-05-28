@@ -7,6 +7,7 @@ const placeFootballBetSchema = z.object({
   marketId: z.string(),
   outcome: z.enum(["HOME", "DRAW", "AWAY"]),
   stake: z.number().positive().max(100_000),
+  idempotencyKey: z.string().uuid(),
 });
 
 export const placeFootballBetFn = createServerFn({ method: "POST" })
@@ -18,6 +19,7 @@ export const placeFootballBetFn = createServerFn({ method: "POST" })
       p_market_id: data.marketId,
       p_outcome: data.outcome,
       p_stake: data.stake,
+      p_idempotency_key: data.idempotencyKey,
     });
     if (error) throw new Error(error.message);
     return result as {

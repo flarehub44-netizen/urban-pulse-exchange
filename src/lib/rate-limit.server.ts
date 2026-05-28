@@ -1,24 +1,21 @@
-import { createClient } from "@supabase/supabase-js";
+import { getServiceClient } from "@/lib/supabase-service.server";
 
 type RateLimitResult = {
   limited?: boolean;
   retry_after_seconds?: number;
 };
 
-function getServiceClient() {
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return null;
-  return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
-}
-
 /** Distributed sliding-window rate limiter backed by Postgres. */
 export async function assertRateLimit(
   key: string,
   options: { max: number; windowMs: number },
 ): Promise<Response | null> {
-  const service = getServiceClient();
-  if (!service) return null;
+  let service: ReturnType<typeof getServiceClient>;
+  try {
+    service = getServiceClient();
+  } catch {
+    return null; // service role not configured — soft fail
+  }
 
   const windowSeconds = Math.max(1, Math.floor(options.windowMs / 1000));
   const { data, error } = await service.rpc("service_assert_rate_limit", {

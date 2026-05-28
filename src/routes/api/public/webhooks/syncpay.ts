@@ -1,13 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { createClient } from "@supabase/supabase-js";
 import { validateWebhookSignature, type SyncPayWebhookPayload } from "@/lib/syncpay";
 import { assertRateLimit } from "@/lib/rate-limit.server";
-
-function getServiceClient() {
-  return createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-}
+import { getServiceClient } from "@/lib/supabase-service.server";
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {

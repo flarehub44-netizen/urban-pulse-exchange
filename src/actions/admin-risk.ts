@@ -1,15 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getSupabaseCtx } from "@/integrations/supabase/context";
-
-function getServiceClient() {
-  const url = process.env.SUPABASE_URL!;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-  if (!url || !key) throw new Error("Supabase service role not configured");
-  return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
-}
+import { getServiceClient } from "@/lib/supabase-service.server";
 
 const banSchema = z.object({
   actionNote: z.string().min(8),
@@ -19,7 +12,13 @@ export const adminBanCpaFraudUsersFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(banSchema)
   .handler(async ({ data, context }) => {
-    const { supabase } = getSupabaseCtx(context);
+    const { supabase, userId } = getSupabaseCtx(context);
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("is_admin")
+      .eq("id", userId)
+      .single();
+    if (!profile?.is_admin) throw new Error("Admin only");
     const service = getServiceClient();
 
     const { data: rpcData, error } = await supabase.rpc("admin_ban_cpa_fraud_users", {

@@ -141,7 +141,7 @@ function mapOpenBet(row: Record<string, unknown>): OpenBetSnapshot {
 }
 
 function mapFeedPost(row: Record<string, unknown>): FeedPost {
-  const profile = row.profiles as Record<string, unknown> | null;
+  const profile = (row.profile_public ?? row.profiles) as Record<string, unknown> | null;
   return {
     id: row.id as string,
     user: {
@@ -220,7 +220,7 @@ async function loadFeed(
   let query = supabase
     .from("feed_posts")
     .select(
-      "id,text,market_id,likes,comments,reposts,tag,created_at,profiles(id, name, handle, avatar, division, accuracy, roi, streak, volume_24h, city, neighborhood)",
+      "id,text,market_id,likes,comments,reposts,tag,created_at,profile_public(id, name, handle, avatar, division, accuracy, roi, streak, volume_24h, city, neighborhood)",
     )
     .order("created_at", { ascending: false })
     .limit(options?.limit ?? 40);
