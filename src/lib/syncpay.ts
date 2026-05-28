@@ -1,15 +1,60 @@
 // SyncPay client wrapper — Pix In / Pix Out
-// Docs: configure SYNCPAY_API_URL, SYNCPAY_API_KEY, SYNCPAY_WEBHOOK_SECRET no .env
+// Docs: configure SYNCPAY_CLIENT_ID, SYNCPAY_CLIENT_SECRET, SYNCPAY_WEBHOOK_SECRET no Wrangler.
+// SYNCPAY_API_KEY (legacy static token) still accepted as fallback.
 
 const API_URL = process.env.SYNCPAY_API_URL ?? "https://api.syncpay.com.br";
-const API_KEY = process.env.SYNCPAY_API_KEY ?? "";
+const CLIENT_ID = process.env.SYNCPAY_CLIENT_ID ?? "";
+const CLIENT_SECRET = process.env.SYNCPAY_CLIENT_SECRET ?? "";
+const LEGACY_API_KEY = process.env.SYNCPAY_API_KEY ?? "";
 const WEBHOOK_SECRET = process.env.SYNCPAY_WEBHOOK_SECRET ?? "";
 const CASHIN_PATH = process.env.SYNCPAY_CASHIN_PATH ?? "/api/partner/v1/cash-in";
 const CASHOUT_PATH = process.env.SYNCPAY_CASHOUT_PATH ?? "/api/partner/v1/cash-out";
 const WEBHOOK_URL = process.env.SYNCPAY_WEBHOOK_URL ?? "";
+const AUTH_TOKEN_PATH = "/api/partner/v1/auth-token";
 const REQUEST_TIMEOUT_MS = 10_000;
 const MAX_RETRIES = 2;
 const ERROR_BODY_SNIPPET_MAX = 240;
+const TOKEN_SAFETY_MARGIN_MS = 60_000;
+
+let _cachedToken: { token: string; expiresAt: number } | null = null;
+
+async function getAuthToken(): Promise<string> {
+  if (!CLIENT_SECRET) {
+    if (LEGACY_API_KEY) {
+      console.warn("[SyncPay] usando SYNCPAY_API_KEY legado — migre para SYNCPAY_CLIENT_ID + SYNCPAY_CLIENT_SECRET");
+      return LEGACY_API_KEY;
+    }
+    throw new Error("SyncPay: configure SYNCPAY_CLIENT_ID + SYNCPAY_CLIENT_SECRET (ou SYNCPAY_API_KEY legado)");
+  }
+
+  const now = Date.now();
+  if (_cachedToken && _cachedToken.expiresAt - TOKEN_SAFETY_MARGIN_MS > now) {
+    return _cachedToken.token;
+  }
+
+  const baseUrl = normalizeApiUrl(API_URL);
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const res = await fetch(`${baseUrl}${AUTH_TOKEN_PATH}`, {
+      method: "POST",
+      signal: ctrl.signal,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ client_id: CLIENT_ID, client_secret: CLIENT_SECRET }),
+    });
+    if (!res.ok) {
+      const snippet = compactText(await res.text().catch(() => "(empty)"));
+      throw new Error(`SyncPay auth token failed ${res.status}: ${snippet}`);
+    }
+    const json = (await res.json()) as { access_token: string; expires_in?: number };
+    const expiresInMs = (json.expires_in ?? 3600) * 1000;
+    _cachedToken = { token: json.access_token, expiresAt: now + expiresInMs };
+    console.info("[SyncPay] token refreshed", { expiresInSeconds: json.expires_in ?? 3600 });
+    return json.access_token;
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 function normalizeApiUrl(url: string): string {
   return url.replace(/\/+$/, "");
@@ -109,8 +154,7 @@ function sleep(ms: number) {
 }
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
-  if (!API_KEY) throw new Error("SYNCPAY_API_KEY not configured");
-
+  const token = await getAuthToken();
   const baseUrl = normalizeApiUrl(API_URL);
   const sanitizedBaseUrl = sanitizeApiUrl(baseUrl);
   const requestUrl = `${baseUrl}${path}`;
@@ -127,7 +171,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
         signal: ctrl.signal,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${API_KEY}`,
+          Authorization: `Bearer ${token}`,
           ...init.headers,
         },
       });
@@ -136,13 +180,13 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
         const body = await res.text().catch(() => "(empty)");
         const contentType = getContentType(res);
         const snippet = compactText(body);
-        const err = new SyncPayHttpError(
-          `SyncPay ${res.status}: ${snippet}`,
-          res.status,
-          contentType,
-          snippet,
-          requestUrl,
-        );
+        const looksLikeCloudflare1016 =
+          res.status === 530 &&
+          (snippet.includes("1016") || snippet.toLowerCase().includes("origin dns error"));
+        const message = looksLikeCloudflare1016
+          ? `syncpay_dns_error: Workers não resolve ${requestHost} — verifique SYNCPAY_API_URL no Wrangler`
+          : `SyncPay ${res.status}: ${snippet}`;
+        const err = new SyncPayHttpError(message, res.status, contentType, snippet, requestUrl);
         console.error("[SyncPay] request failed", {
           apiBaseUrl: sanitizedBaseUrl,
           requestHost,
@@ -151,9 +195,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
           status: res.status,
           contentType: contentType || "(missing)",
           bodySnippet: snippet,
-          looksLikeCloudflare1016:
-            res.status === 530 &&
-            (snippet.includes("1016") || snippet.toLowerCase().includes("origin dns error")),
+          looksLikeCloudflare1016,
           attempt,
         });
         const retryable = res.status >= 500 || res.status === 429;
