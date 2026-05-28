@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RankingRouteImport } from './routes/ranking'
+import { Route as ParceirosRouteImport } from './routes/parceiros'
 import { Route as MarketsRouteImport } from './routes/markets'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as FootballRouteImport } from './routes/football'
@@ -81,6 +82,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const RankingRoute = RankingRouteImport.update({
   id: '/ranking',
   path: '/ranking',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParceirosRoute = ParceirosRouteImport.update({
+  id: '/parceiros',
+  path: '/parceiros',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketsRoute = MarketsRouteImport.update({
@@ -400,6 +406,7 @@ export interface FileRoutesByFullPath {
   '/football': typeof FootballRouteWithChildren
   '/live': typeof LiveRoute
   '/markets': typeof MarketsRouteWithChildren
+  '/parceiros': typeof ParceirosRoute
   '/ranking': typeof RankingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AppDashboardRoute
@@ -460,6 +467,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
   '/live': typeof LiveRoute
+  '/parceiros': typeof ParceirosRoute
   '/ranking': typeof RankingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AppDashboardRoute
@@ -526,6 +534,7 @@ export interface FileRoutesById {
   '/football': typeof FootballRouteWithChildren
   '/live': typeof LiveRoute
   '/markets': typeof MarketsRouteWithChildren
+  '/parceiros': typeof ParceirosRoute
   '/ranking': typeof RankingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_app/dashboard': typeof AppDashboardRoute
@@ -592,6 +601,7 @@ export interface FileRouteTypes {
     | '/football'
     | '/live'
     | '/markets'
+    | '/parceiros'
     | '/ranking'
     | '/sitemap.xml'
     | '/dashboard'
@@ -652,6 +662,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/live'
+    | '/parceiros'
     | '/ranking'
     | '/sitemap.xml'
     | '/dashboard'
@@ -717,6 +728,7 @@ export interface FileRouteTypes {
     | '/football'
     | '/live'
     | '/markets'
+    | '/parceiros'
     | '/ranking'
     | '/sitemap.xml'
     | '/_app/dashboard'
@@ -783,6 +795,7 @@ export interface RootRouteChildren {
   FootballRoute: typeof FootballRouteWithChildren
   LiveRoute: typeof LiveRoute
   MarketsRoute: typeof MarketsRouteWithChildren
+  ParceirosRoute: typeof ParceirosRoute
   RankingRoute: typeof RankingRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   RSlugRoute: typeof RSlugRoute
@@ -807,6 +820,13 @@ declare module '@tanstack/react-router' {
       path: '/ranking'
       fullPath: '/ranking'
       preLoaderRoute: typeof RankingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parceiros': {
+      id: '/parceiros'
+      path: '/parceiros'
+      fullPath: '/parceiros'
+      preLoaderRoute: typeof ParceirosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/markets': {
@@ -1418,6 +1438,7 @@ const rootRouteChildren: RootRouteChildren = {
   FootballRoute: FootballRouteWithChildren,
   LiveRoute: LiveRoute,
   MarketsRoute: MarketsRouteWithChildren,
+  ParceirosRoute: ParceirosRoute,
   RankingRoute: RankingRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   RSlugRoute: RSlugRoute,

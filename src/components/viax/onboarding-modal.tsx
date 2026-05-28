@@ -169,7 +169,7 @@ export function OnboardingModal() {
         if (!o) close();
       }}
     >
-      <DialogContent className="max-w-sm overflow-hidden p-0">
+      <DialogContent showCloseButton={false} className="max-w-sm overflow-hidden p-0">
         <VisuallyHidden.Root>
           <DialogTitle>{current.title}</DialogTitle>
           <DialogDescription>{current.body}</DialogDescription>

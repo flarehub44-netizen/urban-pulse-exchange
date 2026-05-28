@@ -776,6 +776,55 @@ export const copy = {
       "Monetize sua audiência com revenue share sobre o rake — estilo trading network, não marketing multinível.",
     applyCta: "Enviar candidatura",
     applyPending: "Candidatura em análise. Avisaremos quando aprovado.",
+    landing: {
+      metaTitle: "Programa de Afiliados · ViaX",
+      metaDescription:
+        "Monetize sua audiência com revenue share e CPA. Candidate-se ao programa Creator ViaX.",
+      heroTitle: "Monetize sua audiência com o trânsito de São Paulo",
+      heroSubtitle:
+        "Indique traders para a ViaX e ganhe comissão sobre o rake gerado pelos seus indicados — modelo de revenue share, transparente e sem marketing multinível.",
+      ctaApply: "Quero me candidatar",
+      ctaPortal: "Abrir Creator Hub",
+      ctaLogin: "Entrar para candidatar",
+      ctaSignup: "Criar conta e candidatar",
+      benefitsTitle: "Por que ser creator ViaX?",
+      benefits: [
+        {
+          title: "Revenue share real",
+          body: "Você recebe uma fatia do rake dos traders que indicou, enquanto eles apostam nos mercados ao vivo.",
+        },
+        {
+          title: "CPA por depósito qualificado",
+          body: "Bônus por indicado que deposita e se qualifica — com regras claras de liberação.",
+        },
+        {
+          title: "Hub exclusivo",
+          body: "Acompanhe cliques, conversões, receita e campanhas com link rastreável (/r/seu-slug).",
+        },
+        {
+          title: "Mercados ao vivo",
+          body: "Divulgue previsões sobre trânsito, futebol e eventos urbanos — conteúdo nativo para redes sociais.",
+        },
+      ],
+      howTitle: "Como funciona",
+      steps: [
+        "Crie sua conta na ViaX e complete o cadastro.",
+        "Envie a candidatura contando por que quer ser creator.",
+        "Após aprovação, receba seu link e comece a divulgar.",
+        "Acompanhe métricas e solicite pagamentos no Creator Hub.",
+      ],
+      formTitle: "Formulário de candidatura",
+      formDesc:
+        "Conte em poucas linhas sua experiência com conteúdo, comunidade ou tráfego. Analisamos em até alguns dias úteis.",
+      bioLabel: "Por que você quer ser creator na ViaX?",
+      bioPlaceholder:
+        "Ex.: tenho audiência em SP, produzo conteúdo sobre mobilidade e quero monetizar com dados reais de trânsito…",
+      cityLabel: "Cidade de foco (opcional)",
+      cityPlaceholder: "São Paulo",
+      bioMinHint: "Mínimo de 20 caracteres.",
+      alreadyPartner: "Você já é creator ativo.",
+      settingsLink: "Também disponível em Configurações",
+    },
     pendingPageTitle: "Candidatura em análise",
     pendingPageDesc:
       "Nossa equipe está revisando seu perfil de creator. Você receberá acesso ao hub assim que for aprovado.",

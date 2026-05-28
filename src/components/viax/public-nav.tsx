@@ -40,6 +40,9 @@ export function PublicNav({ variant = "shell" }: PublicNavProps) {
           <Link to="/live" className="hover:text-foreground">
             Mapa
           </Link>
+          <Link to="/parceiros" className="hover:text-foreground">
+            Afiliados
+          </Link>
           <Link
             to="/ranking"
             search={{ auth: "signup", deposit: "1" }}

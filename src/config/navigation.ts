@@ -16,6 +16,7 @@ import {
   Shield,
   Flag,
   PlusCircle,
+  Sparkles,
 } from "lucide-react";
 
 export type NavSearch = Record<string, string>;
@@ -67,6 +68,7 @@ export const bottomNavPrimary: NavItem[] = [
 
 /** Secondary routes in mobile "Mais" sheet */
 export const bottomNavMore: NavItem[] = [
+  { to: "/parceiros", label: "Afiliados", icon: Sparkles },
   { to: "/positions", label: copy.nav.positions, icon: Briefcase },
   { to: "/ranking", label: copy.nav.ranking, icon: Trophy },
   { to: "/feed", label: copy.nav.feed, icon: MessageSquare },

@@ -30,15 +30,31 @@ export function parseAuthSession(session: Session | null): AuthSessionState {
   };
 }
 
-export function authErrorMessage(error: { message: string } | null): string {
+/** Maps Supabase Auth errors (HTTP 400 on /auth/v1/token, etc.) to user-facing PT messages. */
+export function authErrorMessage(
+  error: { message: string; code?: string; status?: number } | null,
+): string {
   if (!error) return "Erro desconhecido";
+  const code = (error.code ?? "").toLowerCase();
   const m = error.message.toLowerCase();
-  if (m.includes("invalid login credentials")) return "E-mail ou senha incorretos.";
+
+  if (
+    code === "invalid_credentials" ||
+    code === "invalid_grant" ||
+    m.includes("invalid login credentials")
+  ) {
+    return "E-mail ou senha incorretos.";
+  }
   if (m.includes("user already registered")) return "Este e-mail já está cadastrado.";
   if (m.includes("password")) return "Senha inválida (mínimo 6 caracteres).";
-  if (m.includes("email not confirmed")) return "Confirme seu e-mail antes de entrar.";
+  if (code === "email_not_confirmed" || m.includes("email not confirmed")) {
+    return "Confirme seu e-mail antes de entrar.";
+  }
   if (m.includes("signup_disabled") || m.includes("signups not allowed")) {
     return "Cadastro desativado no Supabase. Habilite signups em Authentication → Providers → Email.";
+  }
+  if (error.status === 400 && m.includes("email")) {
+    return "Verifique o e-mail informado.";
   }
   return error.message;
 }

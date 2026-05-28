@@ -25,7 +25,13 @@ export function useTrafficPublicState() {
     queryKey: TRAFFIC_PUBLIC_STATE_KEY,
     queryFn: async () => {
       const { data, error } = await supabase.rpc("get_traffic_public_state");
-      if (error) throw error;
+      if (error) {
+        const msg = error.message?.toLowerCase() ?? "";
+        if (error.code === "PGRST301" || msg.includes("jwt")) {
+          await supabase.auth.signOut();
+        }
+        throw error;
+      }
       const raw = data as {
         scheduler: TrafficPublicState["scheduler"];
         active_market: Record<string, unknown> | null;

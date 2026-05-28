@@ -15,6 +15,7 @@ import { trackDepositFunnel } from "@/lib/deposit-funnel";
 import { copy } from "@/copy/pt-BR";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
 const MOBILE_AUTH_MQ = "(max-width: 767px)";
 
@@ -42,10 +43,9 @@ function parseRedirectPath(
 
 type AuthModalBodyProps = {
   title: string;
-  subtitle: string | undefined;
+  subtitle: string;
   mode: "login" | "signup" | "forgot";
-  Title: typeof DialogTitle;
-  Description: typeof DialogDescription;
+  variant: "dialog" | "sheet";
   onFinishAuth: () => void;
   onForgot: () => void;
   onSignup: () => void;
@@ -57,8 +57,7 @@ function AuthModalBody({
   title,
   subtitle,
   mode,
-  Title,
-  Description,
+  variant,
   onFinishAuth,
   onForgot,
   onSignup,
@@ -67,9 +66,16 @@ function AuthModalBody({
 }: AuthModalBodyProps) {
   return (
     <div className="p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-      <Title className="text-xl font-semibold">{title}</Title>
-      {subtitle && (
-        <Description className="mt-1 text-sm text-muted-foreground">{subtitle}</Description>
+      {variant === "sheet" ? (
+        <>
+          <SheetTitle className="text-xl font-semibold">{title}</SheetTitle>
+          <SheetDescription className="mt-1 text-sm text-muted-foreground">{subtitle}</SheetDescription>
+        </>
+      ) : (
+        <>
+          <h2 className="text-xl font-semibold">{title}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
+        </>
       )}
       <div className="mt-6">
         {mode === "login" && (
@@ -245,6 +251,10 @@ export function AuthModal() {
     ) : (
       <Dialog open={open} onOpenChange={(next) => !next && handleClose()}>
         <DialogContent className="max-w-md gap-0 p-0" data-testid="auth-modal-dialog">
+          <VisuallyHidden.Root>
+            <DialogTitle>{title}</DialogTitle>
+            <DialogDescription>{subtitle}</DialogDescription>
+          </VisuallyHidden.Root>
           {children}
         </DialogContent>
       </Dialog>
@@ -253,8 +263,7 @@ export function AuthModal() {
   return shell(
     <AuthModalBody
       {...bodyProps}
-      Title={useMobileSheet ? SheetTitle : DialogTitle}
-      Description={useMobileSheet ? SheetDescription : DialogDescription}
+      variant={useMobileSheet ? "sheet" : "dialog"}
     />,
   );
 }

@@ -3,7 +3,7 @@ import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
 import { useAuthModal } from "@/hooks/use-auth-modal";
 import { Bell, Moon, Sun, Shield, Info, Scale, Sparkles, UserPen } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useMyPartnerStatus, useApplyPartner } from "@/hooks/use-partner";
+import { useMyPartnerStatus } from "@/hooks/use-partner";
 import { useTheme } from "@/hooks/use-theme";
 import { cn } from "@/lib/utils";
 import { copy } from "@/copy/pt-BR";
@@ -25,8 +25,6 @@ export function SettingsPanel() {
   const { data: profile } = useProfile(userId);
   const { data: accountCtx } = useAccountContext(!!userId);
   const { data: partnerStatus } = useMyPartnerStatus(!!userId);
-  const { mutateAsync: applyPartner, isPending: applying } = useApplyPartner();
-  const [bio, setBio] = useState("");
   const { theme, setTheme, isDark } = useTheme();
   const { data: casinoStatus, refetch: refetchCasino } = useCasinoSpinStatus();
   const qc = useQueryClient();
@@ -154,25 +152,15 @@ export function SettingsPanel() {
       )}
       <Section icon={<Sparkles className="size-4" />} title={copy.partner.applyTitle}>
         <p className="text-xs text-muted-foreground">{copy.partner.applyDesc}</p>
-        {!isRegistered ? (
-          <div className="mt-2 space-y-2">
-            <p className="text-sm text-warn">{copy.auth.registerRequired}</p>
-            <AuthModalTrigger
-              mode="signup"
-              className="inline-flex rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground"
-            >
-              {copy.auth.registerCta}
-            </AuthModalTrigger>
-          </div>
-        ) : partnerStatus?.role === "partner" && partnerStatus.status === "active" ? (
+        {partnerStatus?.role === "partner" && partnerStatus.status === "active" ? (
           <Link
             to="/partner"
-            className="inline-flex rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground"
+            className="mt-2 inline-flex rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground"
           >
             {copy.partner.portalCta}
           </Link>
         ) : partnerStatus?.role === "applicant" ? (
-          <div className="space-y-2">
+          <div className="mt-2 space-y-2">
             <p className="text-sm text-warn">{copy.partner.applyPending}</p>
             <Link
               to="/partner/pending"
@@ -182,34 +170,12 @@ export function SettingsPanel() {
             </Link>
           </div>
         ) : (
-          <>
-            <textarea
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              placeholder="Por que você quer ser analista urbano na ViaX?"
-              className="mt-2 w-full rounded-lg border bg-surface px-3 py-2 text-sm min-h-[80px]"
-            />
-            <button
-              type="button"
-              disabled={applying || bio.length < 20}
-              onClick={async () => {
-                try {
-                  const res = await applyPartner({ bio });
-                  const payload = res as { ok?: boolean; reason?: string };
-                  if (payload?.reason === "registration_required") {
-                    toast.error(copy.auth.registerRequired);
-                    return;
-                  }
-                  toast.success(copy.partner.applyPending);
-                } catch (e: unknown) {
-                  toast.error(e instanceof Error ? e.message : copy.errors.generic);
-                }
-              }}
-              className="mt-2 rounded-lg border border-primary/40 bg-primary/15 px-4 py-2 text-sm text-primary disabled:opacity-50"
-            >
-              {copy.partner.applyCta}
-            </button>
-          </>
+          <Link
+            to="/parceiros"
+            className="mt-2 inline-flex rounded-lg border border-primary/40 bg-primary/15 px-4 py-2 text-sm text-primary hover:bg-primary/20"
+          >
+            {copy.partner.landing.ctaApply}
+          </Link>
         )}
       </Section>
 
