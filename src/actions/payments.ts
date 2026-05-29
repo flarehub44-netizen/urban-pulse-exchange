@@ -9,6 +9,7 @@ import { PIX_MIN_AMOUNT_BRL } from "@/lib/pix-payments";
 import { formatBRL } from "@/lib/parimutuel";
 import { logApiMetric } from "@/lib/structured-log.server";
 import { assertActionVelocity } from "@/lib/velocity.server";
+import type { Json } from "@/integrations/supabase/types";
 
 function logFinancialReconciliationIssue(input: {
   stage: string;
@@ -171,8 +172,8 @@ export const initiateDepositFn = createServerFn({ method: "POST" })
           qr_code_img: charge.qr_code_base64,
           expires_at: charge.expiration,
           status: "pending",
-          provider_payload: charge as unknown as Record<string, unknown>,
-          meta: charge as unknown as Record<string, unknown>,
+          provider_payload: charge as unknown as Json,
+          meta: charge as unknown as Json,
         })
         .eq("id", intent.id);
       if (updateIntentErr) {
@@ -259,8 +260,8 @@ export const initiateWithdrawFn = createServerFn({ method: "POST" })
           .update({
             provider_id: payout.id,
             status: "pending",
-            provider_payload: payout as unknown as Record<string, unknown>,
-            meta: payout as unknown as Record<string, unknown>,
+            provider_payload: payout as unknown as Json,
+            meta: payout as unknown as Json,
           })
           .eq("id", parsed.intent_id);
 
