@@ -86,3 +86,101 @@ def grab_frame(url: str) -> np.ndarray | None:
         return frame if ok else None
     finally:
         cap.release()
+
+
+def grab_frames_ffmpeg(url: str, count: int = 8, fps: int = 4) -> list[np.ndarray]:
+    """Capture a short burst of consecutive frames at `fps` for motion analysis."""
+    cmd = [
+        "ffmpeg",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-i",
+        url,
+        "-vf",
+        f"fps={fps}",
+        "-frames:v",
+        str(count),
+        "-f",
+        "image2pipe",
+        "-vcodec",
+        "mjpeg",
+        "pipe:1",
+    ]
+    try:
+        proc = subprocess.run(cmd, capture_output=True, timeout=TIMEOUT_SEC + 10, check=False)
+    except subprocess.TimeoutExpired:
+        log.warning("ffmpeg burst timeout for %s", url[:80])
+        return []
+    except FileNotFoundError:
+        log.error("ffmpeg not found on PATH")
+        return []
+
+    if proc.returncode != 0 or not proc.stdout:
+        log.warning("ffmpeg burst rc=%s stderr=%s", proc.returncode, proc.stderr[:200])
+        return []
+
+    # Split concatenated MJPEG stream by SOI/EOI markers.
+    data = proc.stdout
+    frames: list[np.ndarray] = []
+    start = 0
+    while True:
+        soi = data.find(b"\xff\xd8", start)
+        if soi < 0:
+            break
+        eoi = data.find(b"\xff\xd9", soi + 2)
+        if eoi < 0:
+            break
+        chunk = data[soi : eoi + 2]
+        arr = np.frombuffer(chunk, dtype=np.uint8)
+        img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+        if img is not None:
+            frames.append(img)
+        start = eoi + 2
+    return frames
+
+
+def grab_frames(url: str, count: int = 8, fps: int = 4) -> list[np.ndarray]:
+    """Burst capture. For snapshot URLs, polls the endpoint sequentially."""
+    if _is_image_url(url):
+        import time as _time
+
+        import httpx
+
+        out: list[np.ndarray] = []
+        delay = 1.0 / max(fps, 1)
+        try:
+            with httpx.Client(timeout=TIMEOUT_SEC, follow_redirects=True) as c:
+                for _ in range(count):
+                    try:
+                        r = c.get(url)
+                        r.raise_for_status()
+                        arr = np.frombuffer(r.content, dtype=np.uint8)
+                        img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+                        if img is not None:
+                            out.append(img)
+                    except Exception as e:
+                        log.warning("snapshot poll failed: %s", e)
+                    _time.sleep(delay)
+        except Exception as e:
+            log.warning("snapshot burst failed: %s", e)
+        return out
+
+    frames = grab_frames_ffmpeg(url, count=count, fps=fps)
+    if frames:
+        return frames
+
+    # Fallback: OpenCV VideoCapture sequential reads.
+    cap = cv2.VideoCapture(url)
+    out: list[np.ndarray] = []
+    try:
+        if not cap.isOpened():
+            return []
+        for _ in range(count):
+            ok, fr = cap.read()
+            if not ok or fr is None:
+                break
+            out.append(fr)
+    finally:
+        cap.release()
+    return out
