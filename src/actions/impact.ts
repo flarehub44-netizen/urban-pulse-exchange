@@ -106,7 +106,7 @@ export const adminMarkImpactPrizeFulfilledFn = createServerFn({ method: "POST" }
     const { supabase } = getSupabaseCtx(context);
     const { data: res, error } = await supabase.rpc("admin_mark_impact_prize_fulfilled", {
       p_winner_id: data.winner_id,
-      p_notes: data.notes ?? null,
+      p_notes: data.notes ?? undefined,
     });
     if (error) throw mapSupabaseBusinessError(error.message);
     return res as { ok: boolean };
