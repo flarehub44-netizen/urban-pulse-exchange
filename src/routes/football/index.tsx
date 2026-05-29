@@ -245,9 +245,8 @@ function FootballHomepage() {
 
       {error && (
         <InlineError
-          title="Não foi possível carregar os jogos"
-          description={error instanceof Error ? error.message : "Erro inesperado"}
-          action={{ label: "Tentar novamente", onClick: () => void refetch() }}
+          message={error instanceof Error ? error.message : "Não foi possível carregar os jogos"}
+          onRetry={() => void refetch()}
         />
       )}
 

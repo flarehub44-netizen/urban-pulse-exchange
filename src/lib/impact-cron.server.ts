@@ -12,7 +12,7 @@ export async function runImpactXpCredit(limit = 50) {
 export async function runImpactMonthlyFinalize(month?: string) {
   const supabase = getServiceClient();
   const { data, error } = await supabase.rpc("service_finalize_monthly_impact", {
-    p_month: month ?? null,
+    p_month: month ?? undefined,
   });
   if (error) throw new Error(error.message);
   return data as {

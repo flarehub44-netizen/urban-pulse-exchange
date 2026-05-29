@@ -49,7 +49,7 @@ export function useAdminFootballPending(date?: string) {
     queryFn: async () => {
       const { data, error } = await supabase.rpc("admin_list_football_pending", {
         p_limit: 100,
-        p_date: date ?? null,
+        p_date: date ?? undefined,
       });
       if (error) throw error;
       return (data ?? []) as FootballPendingRow[];

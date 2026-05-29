@@ -90,16 +90,16 @@ export async function assertActionVelocity(
 
   await service.rpc("service_record_velocity_event", {
     p_action: action,
-    p_user_id: userId ?? null,
+    p_user_id: userId ?? undefined,
     p_ip_hash: ipHash,
-    p_device_hash: deviceHash,
+    p_device_hash: deviceHash ?? undefined,
     p_meta: { cf_ray: cfRay },
   });
 
   const { data, error } = await service.rpc("service_assert_velocity_limit", {
     p_action: action,
     p_ip_hash: ipHash,
-    p_device_hash: deviceHash,
+    p_device_hash: deviceHash ?? undefined,
   });
 
   if (error) {
@@ -113,14 +113,16 @@ export async function assertActionVelocity(
   const result = (data ?? {}) as VelocityLimitResult;
   if (result.limited) {
     if (userId) {
-      await service
-        .rpc("record_user_risk_alert", {
+      try {
+        await service.rpc("record_user_risk_alert", {
           p_user_id: userId,
           p_alert_type: "velocity_ip_exceeded",
           p_detail: `Limite de ${action} por IP excedido.`,
           p_meta: { action, ip_hash_prefix: ipHash.slice(0, 8) },
-        })
-        .catch(() => undefined);
+        });
+      } catch {
+        // ignore alert failures
+      }
     }
 
     throw new Error(

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 
 export type TrafficEventTemplate = {
   id: string;
@@ -75,7 +76,7 @@ export function useAdminUpsertTrafficTemplate() {
   return useMutation({
     mutationFn: async (payload: Record<string, unknown>) => {
       const { data, error } = await supabase.rpc("admin_upsert_traffic_template", {
-        p_payload: payload,
+        p_payload: payload as unknown as Json,
       });
       if (error) throw error;
       return data as { ok: boolean; id: string };
@@ -125,7 +126,7 @@ export function useAdminUpdateTrafficScheduler() {
   return useMutation({
     mutationFn: async (payload: Record<string, unknown>) => {
       const { data, error } = await supabase.rpc("admin_update_traffic_scheduler", {
-        p_payload: payload,
+        p_payload: payload as unknown as Json,
       });
       if (error) throw error;
       return data as TrafficScheduler;

@@ -143,7 +143,7 @@ function FootballMarketPage() {
 
             <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
               <span>
-                Encerra em <Countdown to={new Date(m.betting_closes_at)} className="text-foreground" />
+                Encerra em <Countdown to={new Date(m.betting_closes_at).getTime()} className="text-foreground" />
               </span>
               <span className="inline-flex items-center gap-1">
                 <Users className="size-3" /> {m.participants} participantes

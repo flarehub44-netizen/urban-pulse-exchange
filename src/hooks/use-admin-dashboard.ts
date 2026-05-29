@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import { adminBanCpaFraudUsersFn } from "@/actions/admin-risk";
 export {
   getAdminRpcErrorMessage,
@@ -268,7 +269,7 @@ export function useAdminCpaFraudCases(status?: string) {
     queryKey: ["admin", "cpa-fraud-cases", status ?? "all"],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("admin_list_cpa_fraud_cases", {
-        p_status: status ?? null,
+        p_status: status ?? undefined,
         p_limit: 250,
       });
       if (error) throw error;
@@ -341,11 +342,11 @@ export function useAdminTagCpaFraudCase() {
     }) => {
       const { data, error } = await supabase.rpc("admin_tag_cpa_fraud_case", {
         p_user_id: userId,
-        p_partner_id: partnerId ?? null,
+        p_partner_id: partnerId ?? undefined,
         p_status: status ?? "open",
         p_risk_score: riskScore ?? 60,
         p_reasons: reasons ?? [],
-        p_notes: notes ?? null,
+        p_notes: notes ?? undefined,
       });
       if (error) throw error;
       return data;
@@ -390,7 +391,7 @@ export function useAdminSuspendCpaFraudPartners() {
     }) => {
       const { data, error } = await supabase.rpc("admin_suspend_cpa_fraud_partners", {
         p_action_note: actionNote,
-        p_partner_id: partnerId ?? null,
+        p_partner_id: partnerId ?? undefined,
       });
       if (error) throw error;
       return data as { ok: boolean; updated_partners: number };
@@ -725,7 +726,7 @@ export function useAdminUpdatePartnerTerms() {
       const { data, error } = await supabase.rpc("admin_update_partner_terms", {
         p_user_id: userId,
         p_revenue_share_pct: revenueSharePct,
-        p_cpa_amount: cpaAmount,
+        p_cpa_amount: cpaAmount ?? undefined,
       });
       if (error) throw error;
       return data;
@@ -755,7 +756,7 @@ export function useAdminUpdateSetting() {
     mutationFn: async ({ key, value }: { key: string; value: unknown }) => {
       const { data, error } = await supabase.rpc("admin_update_setting", {
         p_key: key,
-        p_value: value,
+        p_value: value as Json,
       });
       if (error) throw error;
       return data;
@@ -954,13 +955,13 @@ export function useAdminUpsertCamera() {
       p_count_line?: unknown;
     }) => {
       const { data, error } = await supabase.rpc("admin_upsert_camera", {
-        p_id: args.p_id,
+        p_id: (args.p_id ?? undefined) as string,
         p_region_id: args.p_region_id,
         p_name: args.p_name,
         p_location: args.p_location ?? undefined,
         p_status: args.p_status ?? "offline",
         p_stream_url: args.p_stream_url ?? undefined,
-        p_count_line: args.p_count_line ?? undefined,
+        p_count_line: (args.p_count_line ?? undefined) as Json | undefined,
       });
       if (error) throw error;
       return data;
