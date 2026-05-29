@@ -82,10 +82,31 @@ async function resolveIsAdmin(): Promise<boolean> {
   return profile?.is_admin === true;
 }
 
+async function isAdminMfaRequired(): Promise<boolean> {
+  const { data, error } = await supabase.rpc("is_admin_mfa_required");
+  if (error) return false;
+  return data === true;
+}
+
 export async function requireAdminRoute() {
   await requireRegistered();
   const isAdmin = await resolveIsAdmin();
   if (!isAdmin) {
     throw redirect({ to: "/dashboard" });
+  }
+
+  if (await isAdminMfaRequired()) {
+    const { data: aal, error: aalError } =
+      await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (
+      !aalError &&
+      aal?.currentLevel === "aal1" &&
+      aal?.nextLevel === "aal2"
+    ) {
+      throw redirect({
+        to: "/settings",
+        search: { mfa: "required" },
+      });
+    }
   }
 }

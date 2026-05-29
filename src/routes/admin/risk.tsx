@@ -873,6 +873,12 @@ function AdminRiskPage() {
         <p className="text-xs text-muted-foreground">
           Heurísticas automáticas · CPA + Revenue Share · governança manual
         </p>
+        <p className="mt-2 rounded-lg border border-border/60 bg-surface/40 px-3 py-2 text-xs text-muted-foreground">
+          Sweep automático de clusters: cron{" "}
+          <code className="mono">/api/public/cron/fraud-cluster-sweep</code>. Enquanto{" "}
+          <code className="mono">fraud_cluster_sweep_dry_run</code> estiver ativo em Sistema, partners
+          não são suspensos automaticamente.
+        </p>
       </div>
 
       <div className="flex flex-wrap gap-2">

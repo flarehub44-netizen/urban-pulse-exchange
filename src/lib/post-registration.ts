@@ -1,5 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { grantEmailLinkBonusFn } from "@/actions/retention";
+import { recordSignupVelocityFn } from "@/actions/account";
+import { getOrCreateDeviceId } from "@/lib/device-id";
 
 const DONE_KEY = "viax_post_registration_done";
 
@@ -10,6 +12,13 @@ export async function runPostRegistrationFlow(displayName?: string | null) {
   if (sessionStorage.getItem(`${DONE_KEY}:${uid}`) === "1") return;
 
   try {
+    try {
+      await recordSignupVelocityFn({ data: { deviceId: getOrCreateDeviceId() } });
+    } catch (velocityErr) {
+      console.warn("[auth] signup velocity:", velocityErr);
+      return;
+    }
+
     const { data, error } = await supabase.rpc("complete_registration", {
       p_display_name: displayName?.trim() || undefined,
     });

@@ -34,6 +34,12 @@ export async function assertRateLimit(
   });
   if (error) {
     console.error("[RateLimit] distributed check failed", { key, error: error.message });
+    if (process.env.NODE_ENV === "production") {
+      return new Response(JSON.stringify({ error: "service_unavailable" }), {
+        status: 503,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     return null;
   }
 

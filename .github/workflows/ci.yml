@@ -31,6 +31,9 @@ jobs:
       - run: npm run format:check
       - run: npm run lint
       - run: npm run test
+      - run: npm run check:secrets
+      - run: npm run check:admin-rpc
+      - run: npm run check:realtime
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
@@ -41,6 +44,7 @@ jobs:
         run: |
           psql "$DATABASE_URL" -f supabase/tests/resolution_engine_acceptance.sql
           psql "$DATABASE_URL" -f supabase/tests/football_markets_acceptance.sql
+          psql "$DATABASE_URL" -f supabase/tests/financial_hardening_acceptance.sql
 
   lighthouse:
     runs-on: ubuntu-latest

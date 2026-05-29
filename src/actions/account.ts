@@ -7,6 +7,7 @@ import { callUntypedRpc } from "@/integrations/supabase/untyped-rpc";
 import type { Division, FeedPost, Side, Transaction, ViaXNotification } from "@/store/viax-store";
 import { AppError } from "@/lib/server-errors";
 import { logApiMetric } from "@/lib/structured-log.server";
+import { assertActionVelocity } from "@/lib/velocity.server";
 import { normalizeMarketStatus, type MarketStatus } from "@/lib/market-status";
 import {
   accountContextSnapshotSchema,
@@ -365,6 +366,15 @@ export const updateProfileFn = createServerFn({ method: "POST" })
 const saveProfileCpfSchema = z.object({
   cpf: z.string().min(11).max(14),
 });
+
+export const recordSignupVelocityFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ deviceId: z.string().max(128).optional() }))
+  .handler(async ({ data, context }) => {
+    const { userId } = getSupabaseCtx(context);
+    await assertActionVelocity("signup", userId, data.deviceId);
+    return { ok: true };
+  });
 
 export const saveProfileCpfFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

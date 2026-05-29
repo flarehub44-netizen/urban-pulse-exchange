@@ -105,6 +105,23 @@ A migration `20260826020000_harden_rpc_execute_and_search_path.sql` revoga `EXEC
 3. `npm run db:types` e revisar chamadas `.from()` no `src/`.
 4. Testes SQL em `supabase/tests/` quando tocar resolução ou apostas.
 
+## KYC saque (cross-CPF)
+
+- Gate V08 em `request_withdrawal`: limite cumulativo de **R$ 100/mês por documento** (hash CPF), não apenas por `user_id`.
+- Migration: `20260910120000_kyc_cross_cpf_withdrawal_gate.sql`.
+
+## Velocity e cluster sweep
+
+- `security_velocity_events` + `service_assert_velocity_limit` (migration `20260910130000`).
+- BFF: `src/lib/velocity.server.ts` — env `VELOCITY_HMAC_SECRET`.
+- Cron: `POST /api/public/cron/fraud-cluster-sweep` — `service_fraud_cluster_sweep` (dry-run via `fraud_cluster_sweep_dry_run`).
+- Cloudflare: ver `docs/CLOUDFLARE_WAF.md`.
+
+## Admin MFA
+
+- `assert_admin_mfa()` quando `platform_settings.admin_mfa_required = true`.
+- Enrollment: painel em `/admin/system`.
+
 ## Rate limiting (edge)
 
 - `/api/public/webhooks/syncpay`: janela curta por IP + assinatura obrigatória.

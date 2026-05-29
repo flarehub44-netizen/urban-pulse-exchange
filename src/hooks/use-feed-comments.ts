@@ -42,7 +42,7 @@ export function useFeedComments(postId: string | null) {
       if (error) throw error;
       return (data ?? []).map(mapComment);
     },
-    enabled: !!postId && !postId.startsWith("seed-"),
+    enabled: !!postId,
     staleTime: 10_000,
   });
 }

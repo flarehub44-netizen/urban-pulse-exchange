@@ -89,7 +89,6 @@ import { copy } from "@/copy/pt-BR";
 import { EmptyState } from "@/components/viax/empty-state";
 import { buildActionNowItems } from "@/lib/action-now";
 import { buildDailyMission } from "@/lib/urbanmind-coach";
-import { DEFAULT_FEATURED_MARKET_ID } from "@/config/markets";
 import { useRecommendedMarkets } from "@/hooks/use-recommended-markets";
 import { useMyLeagues } from "@/hooks/use-leagues";
 import { useTrendingTraders } from "@/hooks/use-trending-traders";
@@ -243,7 +242,7 @@ function Dashboard() {
     openBets,
   );
   const urbanMindMarket = URBANMIND_UI_ENABLED
-    ? (markets.find((m) => m.id === DEFAULT_FEATURED_MARKET_ID) ?? markets[0])
+    ? (markets.find((m) => m.status === "live" || m.status === "closing") ?? markets[0])
     : undefined;
   const dailyMission = buildDailyMission(
     markets,

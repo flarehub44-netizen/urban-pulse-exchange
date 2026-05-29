@@ -1,6 +1,8 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useResolvedMarkets, useResolvedRegions } from "@/hooks/use-resolved-data";
-import { LIVE_EVENTS } from "@/store/viax-store";
+import { useActiveEvents } from "@/hooks/use-active-events";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { CityHeatmap } from "@/components/viax/city-heatmap";
 import { AnimatedNumber } from "@/components/viax/animated-number";
 import { findTopMarketForRegion } from "@/lib/region-market";
@@ -19,7 +21,12 @@ export function LivePageContent({ refreshRegions = false }: LivePageContentProps
   const { markets } = useResolvedMarkets();
   const { regions } = useResolvedRegions(refreshRegions ? { refetchInterval: 15_000 } : undefined);
   const navigate = useNavigate();
-  const events = LIVE_EVENTS;
+  const { data: platformEvents } = useActiveEvents();
+  const events = (platformEvents ?? []).map((e) => ({
+    text: e.name,
+    time: formatDistanceToNow(new Date(e.ends_at), { locale: ptBR, addSuffix: true }),
+    marketId: undefined as string | undefined,
+  }));
 
   return (
     <div className="space-y-5">
@@ -116,6 +123,14 @@ export function LivePageContent({ refreshRegions = false }: LivePageContentProps
               <span className="text-highlight">Eventos</span> detectados
             </h2>
             <ul className="space-y-2 text-sm">
+              {events.length === 0 && (
+                <EmptyState
+                  icon={AlertTriangle}
+                  title={copy.empty.live.events.title}
+                  description={copy.empty.live.events.description}
+                  compact
+                />
+              )}
               {events.map((e, i) => (
                 <li
                   key={i}

@@ -73,6 +73,7 @@ import { Route as ApiPublicSnapshotProxySplatRouteImport } from './routes/api/pu
 import { Route as ApiPublicHlsProxySplatRouteImport } from './routes/api/public/hls-proxy/$'
 import { Route as ApiPublicCronImpactXpCreditRouteImport } from './routes/api/public/cron/impact-xp-credit'
 import { Route as ApiPublicCronImpactMonthlyFinalizeRouteImport } from './routes/api/public/cron/impact-monthly-finalize'
+import { Route as ApiPublicCronFraudClusterSweepRouteImport } from './routes/api/public/cron/fraud-cluster-sweep'
 import { Route as ApiPublicCronFootballSyncRouteImport } from './routes/api/public/cron/football-sync'
 import { Route as ApiPublicCronFootballResolveRouteImport } from './routes/api/public/cron/football-resolve'
 
@@ -399,6 +400,12 @@ const ApiPublicCronImpactMonthlyFinalizeRoute =
     path: '/api/public/cron/impact-monthly-finalize',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicCronFraudClusterSweepRoute =
+  ApiPublicCronFraudClusterSweepRouteImport.update({
+    id: '/api/public/cron/fraud-cluster-sweep',
+    path: '/api/public/cron/fraud-cluster-sweep',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicCronFootballSyncRoute =
   ApiPublicCronFootballSyncRouteImport.update({
     id: '/api/public/cron/football-sync',
@@ -473,6 +480,7 @@ export interface FileRoutesByFullPath {
   '/profile/$userId': typeof AppProfileUserIdRoute
   '/api/public/cron/football-resolve': typeof ApiPublicCronFootballResolveRoute
   '/api/public/cron/football-sync': typeof ApiPublicCronFootballSyncRoute
+  '/api/public/cron/fraud-cluster-sweep': typeof ApiPublicCronFraudClusterSweepRoute
   '/api/public/cron/impact-monthly-finalize': typeof ApiPublicCronImpactMonthlyFinalizeRoute
   '/api/public/cron/impact-xp-credit': typeof ApiPublicCronImpactXpCreditRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
@@ -536,6 +544,7 @@ export interface FileRoutesByTo {
   '/profile/$userId': typeof AppProfileUserIdRoute
   '/api/public/cron/football-resolve': typeof ApiPublicCronFootballResolveRoute
   '/api/public/cron/football-sync': typeof ApiPublicCronFootballSyncRoute
+  '/api/public/cron/fraud-cluster-sweep': typeof ApiPublicCronFraudClusterSweepRoute
   '/api/public/cron/impact-monthly-finalize': typeof ApiPublicCronImpactMonthlyFinalizeRoute
   '/api/public/cron/impact-xp-credit': typeof ApiPublicCronImpactXpCreditRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
@@ -605,6 +614,7 @@ export interface FileRoutesById {
   '/_app/profile/$userId': typeof AppProfileUserIdRoute
   '/api/public/cron/football-resolve': typeof ApiPublicCronFootballResolveRoute
   '/api/public/cron/football-sync': typeof ApiPublicCronFootballSyncRoute
+  '/api/public/cron/fraud-cluster-sweep': typeof ApiPublicCronFraudClusterSweepRoute
   '/api/public/cron/impact-monthly-finalize': typeof ApiPublicCronImpactMonthlyFinalizeRoute
   '/api/public/cron/impact-xp-credit': typeof ApiPublicCronImpactXpCreditRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
@@ -674,6 +684,7 @@ export interface FileRouteTypes {
     | '/profile/$userId'
     | '/api/public/cron/football-resolve'
     | '/api/public/cron/football-sync'
+    | '/api/public/cron/fraud-cluster-sweep'
     | '/api/public/cron/impact-monthly-finalize'
     | '/api/public/cron/impact-xp-credit'
     | '/api/public/hls-proxy/$'
@@ -737,6 +748,7 @@ export interface FileRouteTypes {
     | '/profile/$userId'
     | '/api/public/cron/football-resolve'
     | '/api/public/cron/football-sync'
+    | '/api/public/cron/fraud-cluster-sweep'
     | '/api/public/cron/impact-monthly-finalize'
     | '/api/public/cron/impact-xp-credit'
     | '/api/public/hls-proxy/$'
@@ -805,6 +817,7 @@ export interface FileRouteTypes {
     | '/_app/profile/$userId'
     | '/api/public/cron/football-resolve'
     | '/api/public/cron/football-sync'
+    | '/api/public/cron/fraud-cluster-sweep'
     | '/api/public/cron/impact-monthly-finalize'
     | '/api/public/cron/impact-xp-credit'
     | '/api/public/hls-proxy/$'
@@ -827,6 +840,7 @@ export interface RootRouteChildren {
   RSlugRoute: typeof RSlugRoute
   ApiPublicCronFootballResolveRoute: typeof ApiPublicCronFootballResolveRoute
   ApiPublicCronFootballSyncRoute: typeof ApiPublicCronFootballSyncRoute
+  ApiPublicCronFraudClusterSweepRoute: typeof ApiPublicCronFraudClusterSweepRoute
   ApiPublicCronImpactMonthlyFinalizeRoute: typeof ApiPublicCronImpactMonthlyFinalizeRoute
   ApiPublicCronImpactXpCreditRoute: typeof ApiPublicCronImpactXpCreditRoute
   ApiPublicHlsProxySplatRoute: typeof ApiPublicHlsProxySplatRoute
@@ -1284,6 +1298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCronImpactMonthlyFinalizeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/cron/fraud-cluster-sweep': {
+      id: '/api/public/cron/fraud-cluster-sweep'
+      path: '/api/public/cron/fraud-cluster-sweep'
+      fullPath: '/api/public/cron/fraud-cluster-sweep'
+      preLoaderRoute: typeof ApiPublicCronFraudClusterSweepRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cron/football-sync': {
       id: '/api/public/cron/football-sync'
       path: '/api/public/cron/football-sync'
@@ -1486,6 +1507,7 @@ const rootRouteChildren: RootRouteChildren = {
   RSlugRoute: RSlugRoute,
   ApiPublicCronFootballResolveRoute: ApiPublicCronFootballResolveRoute,
   ApiPublicCronFootballSyncRoute: ApiPublicCronFootballSyncRoute,
+  ApiPublicCronFraudClusterSweepRoute: ApiPublicCronFraudClusterSweepRoute,
   ApiPublicCronImpactMonthlyFinalizeRoute:
     ApiPublicCronImpactMonthlyFinalizeRoute,
   ApiPublicCronImpactXpCreditRoute: ApiPublicCronImpactXpCreditRoute,

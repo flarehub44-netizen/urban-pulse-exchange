@@ -8,6 +8,7 @@ import { getServiceClient } from "@/lib/supabase-service.server";
 import { PIX_MIN_AMOUNT_BRL } from "@/lib/pix-payments";
 import { formatBRL } from "@/lib/parimutuel";
 import { logApiMetric } from "@/lib/structured-log.server";
+import { assertActionVelocity } from "@/lib/velocity.server";
 
 function logFinancialReconciliationIssue(input: {
   stage: string;
@@ -72,11 +73,13 @@ async function requireUserPixProfile(service: ReturnType<typeof getServiceClient
 
 const depositSchema = z.object({
   amount: z.number().min(PIX_MIN_AMOUNT_BRL).max(500_000),
+  deviceId: z.string().max(128).optional(),
 });
 
 const withdrawSchema = z.object({
   amount: z.number().min(PIX_MIN_AMOUNT_BRL).max(500_000),
   pixKey: z.string().min(1),
+  deviceId: z.string().max(128).optional(),
 });
 
 /**
@@ -92,6 +95,8 @@ export const initiateDepositFn = createServerFn({ method: "POST" })
     const service = getServiceClient();
 
     try {
+      await assertActionVelocity("deposit", userId, data.deviceId);
+
       const { data: rl } = await service.rpc("service_assert_rate_limit", {
         p_key: `deposit:user:${userId}`,
         p_max: 10,
@@ -220,6 +225,8 @@ export const initiateWithdrawFn = createServerFn({ method: "POST" })
     const service = getServiceClient();
 
     try {
+      await assertActionVelocity("withdraw", userId, data.deviceId);
+
       const { cpfDigits, name } = await requireUserPixProfile(service, userId);
 
       // RPC cria o intent + reserva o saldo + aplica KYC gate

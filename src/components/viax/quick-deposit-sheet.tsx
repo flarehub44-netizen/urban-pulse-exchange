@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Copy, QrCode, Clock, Wallet, Gift } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { initiateDepositFn, getDepositStatusFn } from "@/actions/payments";
+import { getOrCreateDeviceId } from "@/lib/device-id";
 import { PIX_MIN_AMOUNT_BRL } from "@/lib/pix-payments";
 import { copy } from "@/copy/pt-BR";
 import { ImpulseDepositChips } from "@/components/viax/impulse-deposit-bar";
@@ -48,7 +49,8 @@ export function QuickDepositSheet({
   const pixCpf = useEnsureCpfForPix();
 
   const depositMut = useMutation({
-    mutationFn: (amt: number) => initiateDepositFn({ data: { amount: amt } }),
+    mutationFn: (amt: number) =>
+      initiateDepositFn({ data: { amount: amt, deviceId: getOrCreateDeviceId() } }),
     onSuccess: (res) => {
       trackDepositFunnel("deposit_qr_shown");
       setQr({

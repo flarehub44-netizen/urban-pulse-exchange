@@ -144,6 +144,36 @@ end;
 $$;
 
 -- ---------------------------------------------------------------------------
+-- 6b) V08 cross-CPF KYC gate markers
+-- ---------------------------------------------------------------------------
+do $$
+declare
+  v_fn text;
+begin
+  select pg_get_functiondef(p.oid)
+  into v_fn
+  from pg_proc p
+  join pg_namespace n on n.oid = p.pronamespace
+  where n.nspname = 'public'
+    and p.proname = 'request_withdrawal'
+  limit 1;
+
+  assert v_fn ilike '%monthly_withdrawn_brl_for_cpf_hash%',
+    'request_withdrawal must use cross-CPF monthly withdrawal helper (V08)';
+
+  assert v_fn ilike '%cpf_required_for_withdrawal%',
+    'request_withdrawal must require CPF hash before withdrawal (V08)';
+
+  assert exists (
+    select 1 from pg_proc p
+    join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public'
+      and p.proname = 'monthly_withdrawn_brl_for_cpf_hash'
+  ), 'monthly_withdrawn_brl_for_cpf_hash function must exist (V08)';
+end;
+$$;
+
+-- ---------------------------------------------------------------------------
 -- 7) Semana 2 / F02: hash_cpf_document must not use hardcoded fallback
 -- ---------------------------------------------------------------------------
 do $$

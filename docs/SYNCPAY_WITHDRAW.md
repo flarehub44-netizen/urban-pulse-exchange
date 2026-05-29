@@ -31,7 +31,8 @@ npx wrangler secret put SYNCPAY_WEBHOOK_SECRET
 - Mínimo R$ 10, máximo R$ 5.000
 - Cadastro completo (`registration_required`)
 - CPF válido no perfil (validado no BFF antes da RPC)
-- Saques > R$ 100 exigem `kyc_status = approved`
+- Sem KYC aprovado: limite **R$ 100/mês por CPF** (soma de todas as contas com o mesmo documento), via `monthly_withdrawn_brl_for_cpf_hash` / gate V08
+- CPF obrigatório no perfil antes de qualquer saque (`cpf_required_for_withdrawal`)
 - Chave Pix tipo CPF deve coincidir com CPF do perfil
 - `profiles.pix_key` atualizada a cada saque
 
@@ -45,7 +46,8 @@ npx wrangler secret put SYNCPAY_WEBHOOK_SECRET
 |---------|----------------|
 | `SYNCPAY_API_KEY not configured` | Secret ausente no Worker |
 | `Saldo insuficiente` | Saldo menor que o valor solicitado |
-| `kyc_required` | Saque > R$ 100 sem KYC aprovado (admin em `/admin/users`) |
+| `kyc_required_cumulative` | Limite mensal R$ 100 por CPF sem KYC (todas as contas vinculadas) |
+| `cpf_required_for_withdrawal` | CPF não cadastrado no perfil |
 | `unknown_provider_id` no webhook | `provider_id` não gravado no intent; fallback por `correlation_id` na migration `20260824000000` |
 | Saque pendente eterno | Webhook não chegou ou assinatura inválida — conferir painel SyncPay e logs do Worker |
 

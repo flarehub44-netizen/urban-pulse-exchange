@@ -662,6 +662,10 @@ export const copy = {
         description: "Novos mercados urbanos aparecem aqui quando abrirem.",
         cta: "Lista de mercados",
       },
+      events: {
+        title: "Nenhum evento no mapa",
+        description: "Alertas e eventos sazonais aparecem aqui quando estiverem ativos.",
+      },
     },
     positions: {
       title: "Nenhuma previsão aberta",

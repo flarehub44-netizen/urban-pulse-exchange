@@ -13,6 +13,7 @@ import {
   getDepositStatusFn,
   getWithdrawStatusFn,
 } from "@/actions/payments";
+import { getOrCreateDeviceId } from "@/lib/device-id";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Copy, QrCode, Clock } from "lucide-react";
@@ -111,7 +112,8 @@ export function WalletPanel({
   };
 
   const depositMut = useMutation({
-    mutationFn: (amount: number) => initiateDepositFn({ data: { amount } }),
+    mutationFn: (amount: number) =>
+      initiateDepositFn({ data: { amount, deviceId: getOrCreateDeviceId() } }),
     onSuccess: (res) => {
       trackDepositFunnel("deposit_qr_shown", { amount: Number(walletAmount) || 0 });
       trackProductEvent("deposit_qr_generated", {
@@ -138,7 +140,7 @@ export function WalletPanel({
 
   const withdrawMut = useMutation({
     mutationFn: ({ amount, pixKey: pk }: { amount: number; pixKey: string }) =>
-      initiateWithdrawFn({ data: { amount, pixKey: pk } }),
+      initiateWithdrawFn({ data: { amount, pixKey: pk, deviceId: getOrCreateDeviceId() } }),
     onSuccess: (res, vars) => {
       setWithdrawPending({
         intentId: res.intentId,

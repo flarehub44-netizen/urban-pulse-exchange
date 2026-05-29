@@ -279,14 +279,6 @@ function Feed() {
                         liked && "text-down",
                       )}
                       onClick={async () => {
-                        if (p.id.startsWith("seed-")) {
-                          setLikedIds((s) => new Set(s).add(p.id));
-                          setCounts((prev) => ({
-                            ...prev,
-                            [p.id]: { ...getCounts(p), likes: getCounts(p).likes + 1 },
-                          }));
-                          return;
-                        }
                         try {
                           const res = await likeFeedPostFn({ data: { postId: p.id } });
                           setLikedIds((s) => new Set(s).add(p.id));
@@ -315,14 +307,6 @@ function Feed() {
                       type="button"
                       className="inline-flex items-center gap-1.5 hover:text-up"
                       onClick={async () => {
-                        if (p.id.startsWith("seed-")) {
-                          setCounts((prev) => ({
-                            ...prev,
-                            [p.id]: { ...getCounts(p), reposts: getCounts(p).reposts + 1 },
-                          }));
-                          toast.success("Repostado no feed!");
-                          return;
-                        }
                         try {
                           const res = await repostFeedPostFn({ data: { postId: p.id } });
                           setCounts((prev) => ({
@@ -367,11 +351,6 @@ function Feed() {
           )}
           <ul className="mt-3 max-h-48 space-y-3 overflow-auto">
             {commentsLoading && <li className="text-sm text-muted-foreground">Carregando...</li>}
-            {!commentsLoading && commentPostId?.startsWith("seed-") && (
-              <li className="text-sm text-muted-foreground">
-                Comentários disponíveis após login com conta real.
-              </li>
-            )}
             {!commentsLoading &&
               threadComments?.map((c) => (
                 <li key={c.id} className="flex gap-2 text-sm">
@@ -390,9 +369,7 @@ function Feed() {
                   </div>
                 </li>
               ))}
-            {!commentsLoading &&
-              !commentPostId?.startsWith("seed-") &&
-              threadComments?.length === 0 && (
+            {!commentsLoading && threadComments?.length === 0 && (
                 <li className="text-sm text-muted-foreground">
                   Nenhum comentário ainda. Seja o primeiro!
                 </li>
@@ -413,16 +390,6 @@ function Feed() {
                 if (!commentPostId || !commentText.trim()) return;
                 const post = feed.find((x) => x.id === commentPostId);
                 if (!post) return;
-                if (commentPostId.startsWith("seed-")) {
-                  setCounts((prev) => ({
-                    ...prev,
-                    [commentPostId]: { ...getCounts(post), comments: getCounts(post).comments + 1 },
-                  }));
-                  setCommentText("");
-                  queryClient.invalidateQueries({ queryKey: ["feed-comments", commentPostId] });
-                  toast.success("Comentário adicionado!");
-                  return;
-                }
                 try {
                   const res = await commentFeedPostFn({
                     data: { postId: commentPostId, text: commentText.trim() },

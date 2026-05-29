@@ -1,10 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Market } from "@/store/viax-store";
-import { SEED_MARKETS } from "@/store/viax-store";
 import { normalizeMarketStatus } from "@/lib/market-status";
 import { filterCatalogMarkets } from "@/lib/markets-catalog";
-import { USE_SEED_FALLBACK } from "@/lib/data-source";
 
 function mapMarket(row: Record<string, unknown>): Market {
   return {
@@ -56,7 +54,7 @@ export function useMarkets() {
     staleTime: 60_000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
-    placeholderData: USE_SEED_FALLBACK ? filterCatalogMarkets(SEED_MARKETS) : undefined,
+    placeholderData: undefined,
   });
 }
 
@@ -65,7 +63,7 @@ export function useMarket(id: string) {
   return markets?.find((m) => m.id === id);
 }
 
-/** Markets from TanStack Query (seed placeholder in dev until fetch completes). */
+/** Markets from TanStack Query. */
 export function useCatalogMarkets(): Market[] {
   const { data } = useMarkets();
   return data ?? [];

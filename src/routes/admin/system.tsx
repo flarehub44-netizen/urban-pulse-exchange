@@ -5,6 +5,7 @@ import { useAdminPlatformSettings, useAdminUpdateSetting } from "@/hooks/use-adm
 import { copy } from "@/copy/pt-BR";
 import { AdminInlineError } from "@/components/admin/admin-inline-error";
 import { AdminAuditLog } from "@/components/admin/admin-audit-log";
+import { AdminMfaPanel } from "@/components/admin/admin-mfa-panel";
 
 export const Route = createFileRoute("/admin/system")({
   component: AdminSystemPage,
@@ -78,6 +79,8 @@ function AdminSystemPage() {
         <h1 className="text-lg font-semibold">{copy.admin.system.title}</h1>
         <p className="text-xs text-muted-foreground">Taxa · limites · regiões</p>
       </div>
+
+      <AdminMfaPanel />
 
       <div className="space-y-4 rounded-xl border bg-card/60 p-4 text-sm">
         <label className="block">
