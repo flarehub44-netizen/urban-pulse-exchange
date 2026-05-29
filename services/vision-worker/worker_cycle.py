@@ -7,10 +7,13 @@ import os
 from datetime import datetime, timezone
 
 from counter import CountLine, LineCrossCounter
-from frame_grab import grab_frame
+from frame_grab import grab_frames
 from supabase_client import SupabaseWorkerClient
 
 log = logging.getLogger("vision-worker.cycle")
+
+BURST_FRAMES = int(os.environ.get("VISION_BURST_FRAMES", "10"))
+BURST_FPS = int(os.environ.get("VISION_BURST_FPS", "4"))
 
 
 def process_camera(client: SupabaseWorkerClient, cam: dict) -> None:
@@ -19,18 +22,28 @@ def process_camera(client: SupabaseWorkerClient, cam: dict) -> None:
     if not url:
         return
 
-    frame = grab_frame(url)
-    if frame is None:
-        log.warning("No frame for camera %s", cam_id)
+    frames = grab_frames(url, count=BURST_FRAMES, fps=BURST_FPS)
+    if not frames:
+        log.warning("No frames for camera %s", cam_id)
         return
 
     line = CountLine.from_json(cam.get("count_line")) or CountLine(0.1, 0.5, 0.9, 0.5)
     counter = LineCrossCounter(line)
-    count = counter.process_frame(frame)
-    confidence = 0.7 if count > 0 else 0.55
+    for fr in frames:
+        counter.process_frame(fr)
+    count = counter.session_total
+
+    frame_ratio = min(1.0, len(frames) / max(BURST_FRAMES, 1))
+    confidence = round(0.5 + 0.3 * frame_ratio + (0.15 if count > 0 else 0.0), 2)
 
     result = client.ingest_metrics(cam_id, count, confidence)
-    log.info("Ingested camera=%s count=%s ok=%s", cam_id, count, result.get("ok"))
+    log.info(
+        "Ingested camera=%s frames=%d count=%s ok=%s",
+        cam_id,
+        len(frames),
+        count,
+        result.get("ok"),
+    )
 
 
 def run_cycle(client: SupabaseWorkerClient) -> tuple[int, int, int, str | None]:
