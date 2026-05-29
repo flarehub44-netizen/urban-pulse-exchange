@@ -175,11 +175,10 @@ export function AuthModal() {
 
   const clearAuthSearch = useCallback(() => {
     if (!urlAuth.auth && !urlAuth.deposit) return;
-    navigate({
-      search: (prev) => stripAuthModalSearch(prev as Record<string, unknown>),
-      replace: true,
-    });
-  }, [navigate, urlAuth.auth, urlAuth.deposit]);
+    const next = stripAuthModalSearch(search);
+    const params = new URLSearchParams(next as Record<string, string>);
+    window.history.replaceState(null, "", `${window.location.pathname}${params.size ? `?${params}` : ""}`);
+  }, [search, urlAuth.auth, urlAuth.deposit]);
 
   const handleClose = () => {
     close();

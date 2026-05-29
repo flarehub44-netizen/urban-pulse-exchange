@@ -78,7 +78,7 @@ export function WalletPanel({
   const [pixKey, setPixKey] = useState("");
   const [depositQr, setDepositQr] = useState<{
     qrCode: string;
-    qrCodeImg: string;
+    qrCodeImg?: string;
     intentId: string;
     providerId: string;
     expiresAt: string;

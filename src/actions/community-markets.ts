@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireRegisteredAuth } from "@/integrations/supabase/require-registered-middleware";
+import type { Json } from "@/integrations/supabase/types";
 
 async function adminRpc<T>(
   fn: () => PromiseLike<{ data: T | null; error: { message: string } | null }>,
@@ -72,7 +73,7 @@ export const getCommunityMarketPublicFn = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return result as {
       ok?: boolean;
-      market?: Record<string, unknown>;
+      market?: Json;
       is_creator?: boolean;
       reason?: string;
     };
@@ -90,7 +91,7 @@ export const getCommunityMarketFn = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return result as {
       ok?: boolean;
-      market?: Record<string, unknown>;
+      market?: Json;
       is_creator?: boolean;
       reason?: string;
     };
@@ -104,7 +105,7 @@ export const listPublicCommunityMarketsFn = createServerFn({ method: "GET" }).ha
   const { supabase } = await import("@/integrations/supabase/client");
   const { data, error } = await supabase.rpc("list_public_community_markets", { p_limit: 50 });
   if (error) throw new Error(error.message);
-  return (data ?? []) as unknown[];
+  return (data ?? []) as Json[];
 });
 
 export const listMyCommunityMarketsFn = createServerFn({ method: "GET" })
@@ -113,7 +114,7 @@ export const listMyCommunityMarketsFn = createServerFn({ method: "GET" })
     const { supabase } = getSupabaseCtx(context);
     const { data, error } = await supabase.rpc("list_my_community_markets");
     if (error) throw new Error(error.message);
-    return (data ?? []) as unknown[];
+    return (data ?? []) as Json[];
   });
 
 const resolveSchema = z.object({

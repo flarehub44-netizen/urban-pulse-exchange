@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getSupabaseCtx, type SupabaseFnContext } from "@/integrations/supabase/context";
+import type { Json } from "@/integrations/supabase/types";
 import { runFootballResolve, runFootballSync } from "@/lib/football-cron.server";
 
 async function assertAdmin(supabase: SupabaseFnContext["supabase"], userId: string) {
@@ -26,7 +27,7 @@ export const adminFootballSyncFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = getSupabaseCtx(context);
     await assertAdmin(supabase, userId);
-    return runFootballSync(data?.date);
+    return runFootballSync(data?.date) as Promise<Json>;
   });
 
 export const adminFootballResolveFn = createServerFn({ method: "POST" })
@@ -34,5 +35,5 @@ export const adminFootballResolveFn = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { supabase, userId } = getSupabaseCtx(context);
     await assertAdmin(supabase, userId);
-    return runFootballResolve();
+    return runFootballResolve() as Promise<Json>;
   });

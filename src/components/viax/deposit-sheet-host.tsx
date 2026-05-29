@@ -27,10 +27,9 @@ export function DepositSheetHost() {
     if (!next) {
       close();
       if (urlDeposit) {
-        navigate({
-          search: (prev) => stripAuthModalSearch(prev as Record<string, unknown>),
-          replace: true,
-        });
+        const nextSearch = stripAuthModalSearch(search);
+        const params = new URLSearchParams(nextSearch as Record<string, string>);
+        window.history.replaceState(null, "", `${window.location.pathname}${params.size ? `?${params}` : ""}`);
       }
     }
   };

@@ -40,7 +40,7 @@ export function QuickDepositSheet({
   const [amount, setAmount] = useState(String(suggestedAmount));
   const [qr, setQr] = useState<{
     qrCode: string;
-    qrCodeImg: string;
+    qrCodeImg?: string;
     intentId: string;
     expiresAt: string;
   } | null>(null);
