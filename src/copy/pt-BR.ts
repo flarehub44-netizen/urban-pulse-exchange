@@ -471,6 +471,8 @@ export const copy = {
     coverUploadError: "Não foi possível enviar a imagem. Tente outra foto.",
     coverTypeError: "Use JPEG, PNG ou WebP.",
     coverSizeError: "A imagem deve ter no máximo 2 MB.",
+    coverContentError: "Arquivo inválido ou corrompido. Envie uma foto real em JPEG, PNG ou WebP.",
+    coverDimensionsError: "A imagem é muito grande. Use no máximo 4096×4096 pixels.",
     visibilityLabel: "Quem pode participar",
     visibilityPublic: "Público — aparece na aba Outros",
     visibilityPrivate: "Privado — só quem tiver o link",

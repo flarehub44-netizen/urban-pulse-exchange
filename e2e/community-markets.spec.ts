@@ -14,6 +14,10 @@ test.describe("Mercados da comunidade", () => {
     await page.waitForTimeout(3000);
     const createBody = await page.locator("body").innerText();
     expect(/criar previsão|pergunta/i.test(createBody)).toBeTruthy();
+
+    const coverInput = page.locator('input[type="file"][accept*="image/jpeg"]');
+    await expect(coverInput).toHaveCount(1);
+    await expect(coverInput).toHaveAttribute("accept", /image\/webp/);
   });
 
   test("URL legada view=community abre aba Outros", async ({ page }) => {

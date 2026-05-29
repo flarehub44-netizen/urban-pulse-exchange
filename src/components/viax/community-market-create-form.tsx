@@ -10,6 +10,7 @@ import {
   validateCommunityEndsAt,
 } from "@/lib/community-market";
 import { uploadCommunityCover } from "@/lib/community-cover-upload";
+import { assertClientImageLimits } from "@/lib/image-upload-guard";
 import { copy } from "@/copy/pt-BR";
 import { useAuth } from "@/hooks/use-auth";
 import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
@@ -43,6 +44,19 @@ export function CommunityMarketCreateForm() {
 
   const onCoverChange = (file: File | null) => {
     if (coverPreview) URL.revokeObjectURL(coverPreview);
+    if (file) {
+      try {
+        assertClientImageLimits(file);
+      } catch (err: unknown) {
+        const code = err instanceof Error ? err.message : "";
+        if (code === "invalid_cover_type") toast.error(copy.community.coverTypeError);
+        else if (code === "invalid_cover_size") toast.error(copy.community.coverSizeError);
+        else toast.error(copy.community.coverUploadError);
+        setCoverFile(null);
+        setCoverPreview(null);
+        return;
+      }
+    }
     setCoverFile(file);
     setCoverPreview(file ? URL.createObjectURL(file) : null);
   };
@@ -78,6 +92,8 @@ export function CommunityMarketCreateForm() {
         const code = err instanceof Error ? err.message : "";
         if (code === "invalid_cover_type") toast.error(copy.community.coverTypeError);
         else if (code === "invalid_cover_size") toast.error(copy.community.coverSizeError);
+        else if (code === "invalid_cover_content") toast.error(copy.community.coverContentError);
+        else if (code === "invalid_cover_dimensions") toast.error(copy.community.coverDimensionsError);
         else toast.error(copy.community.coverUploadError);
         return;
       }
