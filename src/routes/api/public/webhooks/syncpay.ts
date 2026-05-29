@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import type { Json } from "@/integrations/supabase/types";
 import { validateWebhookSignature, type SyncPayWebhookPayload } from "@/lib/syncpay";
 import { assertRateLimit } from "@/lib/rate-limit.server";
 import { getServiceClient } from "@/lib/supabase-service.server";
