@@ -375,6 +375,7 @@ function ReferralRow({
           onRiskChange={onRiskChange}
           onNoteChange={onNoteChange}
           onTag={onTag}
+          onViewLinkedAccounts={onViewLinkedAccounts}
           tagging={tagging}
           showConfirm={showConfirm}
         />
@@ -613,7 +614,7 @@ function CaseTable({
       <h3 className="mb-3 text-sm font-semibold">{title}</h3>
       <MobileDataList
         items={cases}
-        keyFn={(c) => c.flag_id}
+        keyFn={(c) => String(c.flag_id)}
         emptyText={emptyText}
         renderCard={(c) => (
           <CaseMobileCard c={c} onViewLinkedAccounts={onViewLinkedAccounts} />

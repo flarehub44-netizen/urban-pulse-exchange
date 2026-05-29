@@ -46,7 +46,7 @@ export const Route = createFileRoute("/api/public/webhooks/syncpay")({
           {
             p_provider_id: data.id,
             p_event: event,
-            p_payload: payload as unknown as Record<string, unknown>,
+            p_payload: payload as unknown as Json,
             p_signature: signature,
             p_provider_event_id: providerEventId,
           },

@@ -40,7 +40,7 @@ export type ProfileSearch = {
 
 export const Route = createFileRoute("/_app/profile")({
   beforeLoad: ({ search }) => {
-    const tab = typeof search.tab === "string" ? search.tab : undefined;
+    const tab: string | undefined = typeof search.tab === "string" ? search.tab : undefined;
     if (tab === "posicoes") throw redirect({ to: "/positions" });
     if (tab === "carteira") throw redirect({ to: "/wallet" });
     if (tab === "config") throw redirect({ to: "/settings" });

@@ -21,8 +21,8 @@ async function handleFootballSync(request: Request) {
 
   const started = Date.now();
   try {
-    const result = await runFootballSync();
-    const status = result.ok === false ? 500 : 200;
+    const result = (await runFootballSync()) as { ok?: boolean };
+    const status = result?.ok === false ? 500 : 200;
     logApiMetric("cron.football_sync", {
       ok: status < 500,
       durationMs: Date.now() - started,

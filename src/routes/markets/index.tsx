@@ -180,7 +180,7 @@ function MarketsList() {
         navigate({ search: saved, replace: true });
       } else {
         navigate({
-          search: (prev) => ({ ...prev, status: "live", sort: "closing" }),
+          search: (prev: MarketsSearch) => ({ ...prev, status: "live" as const, sort: "closing" as const }),
           replace: true,
         });
       }

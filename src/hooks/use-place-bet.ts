@@ -17,7 +17,7 @@ export function usePlaceBet() {
       side: Side;
       stake: number;
       idempotencyKey?: string;
-    }) => placeBetFn({ data: { marketId, side, stake, idempotencyKey } }),
+    }) => placeBetFn({ data: { marketId, side, stake, idempotencyKey: idempotencyKey ?? crypto.randomUUID() } }),
 
     onMutate: async ({ marketId, side, stake }) => {
       await queryClient.cancelQueries({ queryKey: ["markets"] });
