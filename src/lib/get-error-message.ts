@@ -1,7 +1,7 @@
 import { copy } from "@/copy/pt-BR";
 
 /** Extracts a user-facing message from server-fn / mutation errors (not always `instanceof Error`). */
-export function getErrorMessage(error: unknown, fallback = copy.errors.generic): string {
+export function getErrorMessage(error: unknown, fallback: string = copy.errors.generic): string {
   if (error instanceof Error && error.message.trim()) {
     return error.message;
   }
