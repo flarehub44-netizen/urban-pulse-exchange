@@ -201,7 +201,11 @@ export function WalletPanel({
           });
         } else if (status.status === "failed" || status.status === "expired") {
           setDepositQr(null);
-          toast.error("QR Code expirado ou pagamento falhou. Tente novamente.");
+          toast.error(
+            status.failureReason === "payer_document_missing"
+              ? copy.wallet.depositPayerDocumentMissing
+              : copy.wallet.depositFailedGeneric,
+          );
         }
       } catch {
         /* silencioso */

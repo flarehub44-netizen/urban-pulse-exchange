@@ -2474,6 +2474,85 @@ export type Database = {
           },
         ]
       }
+      payer_document_events: {
+        Row: {
+          cpf_hash: string
+          document_last4: string | null
+          document_length: number | null
+          id: string
+          payment_intent_id: string | null
+          seen_at: string
+          source: string
+          user_id: string
+          webhook_event_id: string | null
+        }
+        Insert: {
+          cpf_hash: string
+          document_last4?: string | null
+          document_length?: number | null
+          id?: string
+          payment_intent_id?: string | null
+          seen_at?: string
+          source?: string
+          user_id: string
+          webhook_event_id?: string | null
+        }
+        Update: {
+          cpf_hash?: string
+          document_last4?: string | null
+          document_length?: number | null
+          id?: string
+          payment_intent_id?: string | null
+          seen_at?: string
+          source?: string
+          user_id?: string
+          webhook_event_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payer_document_events_payment_intent_id_fkey"
+            columns: ["payment_intent_id"]
+            isOneToOne: false
+            referencedRelation: "payment_intents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payer_document_events_payment_intent_id_fkey"
+            columns: ["payment_intent_id"]
+            isOneToOne: false
+            referencedRelation: "payment_intents_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payer_document_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payer_document_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profile_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payer_document_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payer_document_events_webhook_event_id_fkey"
+            columns: ["webhook_event_id"]
+            isOneToOne: false
+            referencedRelation: "syncpay_webhook_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_intents: {
         Row: {
           amount: number
@@ -4055,6 +4134,10 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_list_payer_document_clusters: {
+        Args: { p_limit?: number; p_min_accounts?: number }
+        Returns: Json
+      }
       admin_list_platform_events: { Args: never; Returns: Json }
       admin_list_traffic_templates: { Args: never; Returns: Json }
       admin_mark_impact_prize_fulfilled: {
@@ -4063,6 +4146,10 @@ export type Database = {
       }
       admin_pause_bets: {
         Args: { p_market_id: string; p_paused?: boolean }
+        Returns: Json
+      }
+      admin_payer_document_cluster: {
+        Args: { p_user_id: string }
         Returns: Json
       }
       admin_publish_football_market: {
@@ -4245,6 +4332,10 @@ export type Database = {
       complete_registration: {
         Args: { p_display_name?: string }
         Returns: Json
+      }
+      count_payer_linked_accounts: {
+        Args: { p_cpf_hash: string }
+        Returns: number
       }
       create_community_market: {
         Args: {
@@ -4650,6 +4741,10 @@ export type Database = {
         Returns: Json
       }
       resolve_partner_slug: { Args: { p_slug: string }; Returns: Json }
+      resolve_user_payer_cpf_hash: {
+        Args: { p_user_id: string }
+        Returns: string
+      }
       search_markets: {
         Args: { p_limit?: number; p_query: string }
         Returns: {
@@ -4691,6 +4786,16 @@ export type Database = {
           p_signature?: string
         }
         Returns: Json
+      }
+      service_record_payer_document_event: {
+        Args: {
+          p_document: string
+          p_intent_id?: string
+          p_source?: string
+          p_user_id: string
+          p_webhook_event_id?: string
+        }
+        Returns: undefined
       }
       service_refund_withdrawal: {
         Args: { p_amount: number; p_intent_id: string; p_user_id: string }

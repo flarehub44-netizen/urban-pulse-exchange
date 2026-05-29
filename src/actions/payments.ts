@@ -356,20 +356,28 @@ export const getDepositStatusFn = createServerFn({ method: "GET" })
     try {
       const { data: intent, error } = await service
         .from("payment_intents")
-        .select("id, status, amount, created_at, expires_at")
+        .select("id, status, amount, created_at, expires_at, meta")
         .eq("id", data.intentId)
         .eq("user_id", userId)
         .single();
 
       if (error || !intent) throw new Error("Intent não encontrado");
 
+      const meta =
+        intent.meta && typeof intent.meta === "object" && !Array.isArray(intent.meta)
+          ? (intent.meta as Record<string, unknown>)
+          : {};
+      const cpfCheck =
+        typeof meta.cpf_check === "string" && meta.cpf_check.trim() ? meta.cpf_check.trim() : null;
+
       logApiMetric("bff.get_deposit_status", { ok: true, durationMs: Date.now() - started });
-      return intent as {
-        id: string;
-        status: "pending" | "paid" | "failed" | "expired";
-        amount: number;
-        created_at: string;
-        expires_at: string | null;
+      return {
+        id: intent.id as string,
+        status: intent.status as "pending" | "paid" | "failed" | "expired",
+        amount: Number(intent.amount),
+        created_at: intent.created_at as string,
+        expires_at: (intent.expires_at as string | null) ?? null,
+        failureReason: cpfCheck,
       };
     } catch (e) {
       logApiMetric("bff.get_deposit_status", { ok: false, durationMs: Date.now() - started });

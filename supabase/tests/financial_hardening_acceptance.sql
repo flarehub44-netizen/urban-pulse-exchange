@@ -296,4 +296,33 @@ begin
 end;
 $$;
 
+-- ---------------------------------------------------------------------------
+-- 14) Deposit: block credit when payer document missing in webhook
+-- ---------------------------------------------------------------------------
+do $$
+declare
+  v_fn text;
+begin
+  select pg_get_functiondef(p.oid)
+  into v_fn
+  from pg_proc p
+  join pg_namespace n on n.oid = p.pronamespace
+  where n.nspname = 'public'
+    and p.proname = 'service_process_syncpay_webhook'
+  limit 1;
+
+  assert v_fn ilike '%payer_document_missing%',
+    'service_process_syncpay_webhook must handle payer_document_missing';
+
+  assert v_fn ilike '%deposit_payer_cpf_missing%',
+    'service_process_syncpay_webhook must set action deposit_payer_cpf_missing';
+
+  assert v_fn ilike '%record_user_risk_alert%',
+    'service_process_syncpay_webhook must call record_user_risk_alert for missing payer doc';
+
+  assert v_fn ilike '%if v_payer_doc is null then%',
+    'service_process_syncpay_webhook must branch on missing payer document';
+end;
+$$;
+
 rollback;

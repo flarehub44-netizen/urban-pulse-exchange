@@ -5,18 +5,29 @@ import {
   useAdminRiskAlerts,
   useAdminCpaFraudCases,
   useAdminCpaReferrals,
+  useAdminPayerDocumentCluster,
+  useAdminPayerDocumentClusters,
   useAdminTagCpaFraudCase,
   useAdminClearCpaFraudCases,
   useAdminSuspendCpaFraudPartners,
   useAdminBanCpaFraudUsers,
   type AdminCpaFraudCase,
   type AdminCpaReferral,
+  type AdminPayerLinkedAccount,
+  type ReferringPartnerSummary,
 } from "@/hooks/use-admin-dashboard";
 import { copy } from "@/copy/pt-BR";
 import { AdminInlineError } from "@/components/admin/admin-inline-error";
 import { cn } from "@/lib/utils";
 import { formatBRL } from "@/lib/parimutuel";
 import { DesktopTableWrap, MobileDataList, MobileFieldRow } from "@/components/ui/responsive-table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const MIN_ACTION_NOTE = 8;
 
@@ -61,6 +72,235 @@ function readMetaNumber(meta: Record<string, unknown> | null | undefined, key: s
   return null;
 }
 
+function payerLinkedCount(row: {
+  payer_linked_account_count?: number;
+  cpf_duplicate?: boolean;
+}) {
+  return Number(row.payer_linked_account_count ?? (row.cpf_duplicate ? 2 : 0));
+}
+
+function payerLast4(row: { payer_document_last4?: string | null; cpf_last4?: string | null }) {
+  return row.payer_document_last4 ?? row.cpf_last4 ?? null;
+}
+
+function formatPayerLinkedLabel(count: number) {
+  return copy.admin.risk.payerLinkedAccounts.replace("{{count}}", String(count));
+}
+
+function formatCpaReason(reason: string) {
+  if (reason === "duplicate_cpf") return copy.admin.risk.cpfDuplicate;
+  if (reason === "partner_shared_payer") return copy.admin.risk.partnerSharedPayerReason;
+  if (reason === "fast_cpa_qualification") return "CPA rápido";
+  return reason;
+}
+
+function formatCpaReasons(reasons: string[] | null | undefined) {
+  const list = reasons ?? [];
+  if (!list.length) return "—";
+  return list.map(formatCpaReason).join(", ");
+}
+
+function AccountPartnerLine({ account }: { account: AdminPayerLinkedAccount }) {
+  if (account.partner_handle) {
+    return (
+      <div className="mt-1 text-[10px] text-primary">
+        {copy.admin.risk.payerClusterPartner.replace("{{handle}}", account.partner_handle)}
+        {account.partner_slug ? (
+          <span className="ml-1 text-muted-foreground">({account.partner_slug})</span>
+        ) : null}
+      </div>
+    );
+  }
+  return (
+    <div className="mt-1 text-[10px] text-muted-foreground">{copy.admin.risk.payerClusterNoPartner}</div>
+  );
+}
+
+function ReferringPartnersSummary({ partners }: { partners: ReferringPartnerSummary[] }) {
+  if (!partners.length) return null;
+
+  return (
+    <div className="mt-2">
+      <p className="mb-1 text-[10px] uppercase text-muted-foreground">
+        {copy.admin.risk.payerClusterReferringPartners}
+      </p>
+      <div className="flex flex-wrap gap-1.5">
+        {partners.map((p) => (
+          <span
+            key={p.partner_id}
+            className={cn(
+              "rounded border px-2 py-0.5 text-[10px]",
+              (p.linked_referral_count ?? 0) >= 2
+                ? "border-warn/50 bg-warn/15 font-medium text-warn"
+                : "border-border/50 bg-surface/50 text-muted-foreground",
+            )}
+          >
+            {p.partner_handle ? `@${p.partner_handle}` : "—"}
+            {p.partner_slug ? ` · ${p.partner_slug}` : ""}
+            <span className="ml-1 mono">({p.linked_referral_count})</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PayerDocumentInfo({
+  last4,
+  linkedCount,
+  onViewLinked,
+}: {
+  last4: string | null;
+  linkedCount: number;
+  onViewLinked?: () => void;
+}) {
+  if (!last4 && linkedCount <= 0) return null;
+
+  return (
+    <div className="mt-0.5 space-y-0.5">
+      {last4 && (
+        <div className="text-[10px] text-muted-foreground">
+          {copy.admin.risk.payerLast4}: •••{last4}
+        </div>
+      )}
+      {linkedCount > 1 && (
+        <div className="flex flex-wrap items-center gap-1">
+          <span className="rounded border border-warn/40 bg-warn/10 px-1.5 py-0.5 text-[10px] font-medium text-warn">
+            {formatPayerLinkedLabel(linkedCount)}
+          </span>
+          {onViewLinked && (
+            <button
+              type="button"
+              onClick={onViewLinked}
+              className="text-[10px] text-primary hover:underline"
+            >
+              {copy.admin.risk.viewLinkedAccounts}
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function LinkedAccountsList({ accounts }: { accounts: AdminPayerLinkedAccount[] }) {
+  if (!accounts.length) {
+    return <p className="text-xs text-muted-foreground">{copy.admin.risk.payerClustersEmpty}</p>;
+  }
+
+  return (
+    <ul className="space-y-2">
+      {accounts.map((a) => (
+        <li
+          key={a.user_id}
+          className="rounded-lg border border-border/50 bg-surface/40 px-3 py-2 text-xs"
+        >
+          <div className="font-medium">{a.user_name}</div>
+          <div className="mono text-[10px] text-muted-foreground">@{a.user_handle}</div>
+          <AccountPartnerLine account={a} />
+          <div className="mt-1 flex flex-wrap gap-2 text-[10px] text-muted-foreground">
+            <span>{a.banned ? copy.admin.risk.payerClusterBanned : copy.admin.risk.payerClusterActive}</span>
+            {a.kyc_status && <span>KYC: {a.kyc_status}</span>}
+            {typeof a.balance === "number" && <span className="mono">{formatBRL(a.balance)}</span>}
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function PayerLinkedAccountsDialog({
+  userId,
+  userLabel,
+  open,
+  onOpenChange,
+}: {
+  userId: string | null;
+  userLabel: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const { data, isLoading, isError, error } = useAdminPayerDocumentCluster(userId, open);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{copy.admin.risk.viewLinkedAccounts}</DialogTitle>
+          <DialogDescription>{userLabel}</DialogDescription>
+        </DialogHeader>
+        {isLoading && <p className="text-xs text-muted-foreground">Carregando…</p>}
+        {isError && (
+          <p className="text-xs text-danger">{error instanceof Error ? error.message : "Erro"}</p>
+        )}
+        {data && (
+          <div className="space-y-3">
+            <p className="text-xs text-muted-foreground">
+              {copy.admin.risk.payerLast4}: •••{data.document_last4 ?? "—"} ·{" "}
+              {formatPayerLinkedLabel(data.linked_account_count)}
+            </p>
+            <ReferringPartnersSummary partners={data.referring_partners ?? []} />
+            <LinkedAccountsList accounts={data.accounts ?? []} />
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function PayerClustersSection() {
+  const { data: clusters, isLoading, isError, error } = useAdminPayerDocumentClusters();
+  const [expandedHash, setExpandedHash] = useState<string | null>(null);
+
+  return (
+    <div className="rounded-xl border bg-card/60 p-4">
+      <h3 className="mb-3 text-sm font-semibold">{copy.admin.risk.payerClustersTitle}</h3>
+      {isLoading && <p className="text-xs text-muted-foreground">Carregando…</p>}
+      {isError && (
+        <p className="text-xs text-danger">{error instanceof Error ? error.message : "Erro"}</p>
+      )}
+      {!isLoading && !clusters?.length && (
+        <p className="text-xs text-muted-foreground">{copy.admin.risk.payerClustersEmpty}</p>
+      )}
+      {!!clusters?.length && (
+        <div className="space-y-2">
+          {clusters.map((c) => (
+            <div key={c.cpf_hash} className="rounded-lg border border-border/50 bg-surface/30 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="text-xs">
+                  <span className="text-muted-foreground">{copy.admin.risk.payerLast4}:</span>{" "}
+                  <span className="mono font-medium">•••{c.document_last4 ?? "—"}</span>
+                  <span className="ml-2 rounded border border-warn/40 bg-warn/10 px-1.5 py-0.5 text-[10px] text-warn">
+                    {formatPayerLinkedLabel(c.account_count)}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setExpandedHash((prev) => (prev === c.cpf_hash ? null : c.cpf_hash))
+                  }
+                  className="text-[10px] text-primary hover:underline"
+                >
+                  {expandedHash === c.cpf_hash ? "Ocultar" : copy.admin.risk.viewLinkedAccounts}
+                </button>
+              </div>
+              <ReferringPartnersSummary partners={c.referring_partners ?? []} />
+              {expandedHash === c.cpf_hash && (
+                <div className="mt-3 border-t border-border/40 pt-3">
+                  <p className="mb-2 text-[10px] uppercase text-muted-foreground">
+                    {copy.admin.risk.payerClusterAccounts}
+                  </p>
+                  <LinkedAccountsList accounts={c.accounts ?? []} />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 type ReferralRowProps = {
   row: AdminCpaReferral;
   riskInput: Record<string, string>;
@@ -68,6 +308,7 @@ type ReferralRowProps = {
   onRiskChange: (userId: string, value: string) => void;
   onNoteChange: (userId: string, value: string) => void;
   onTag: (row: AdminCpaReferral, status: "open" | "confirmed" | "cleared" | "resolved") => void;
+  onViewLinkedAccounts: (row: AdminCpaReferral) => void;
   tagging: boolean;
   showConfirm: boolean;
 };
@@ -79,10 +320,13 @@ function ReferralRow({
   onRiskChange,
   onNoteChange,
   onTag,
+  onViewLinkedAccounts,
   tagging,
   showConfirm,
 }: ReferralRowProps) {
   const flagStatus = row.flag_status ?? (row.flagged ? "open" : null);
+  const linkedCount = payerLinkedCount(row);
+  const last4 = payerLast4(row);
   return (
     <tr
       key={row.user_id}
@@ -94,11 +338,13 @@ function ReferralRow({
         {row.cpf_last4 && (
           <div className="text-[10px] text-muted-foreground">
             {copy.admin.risk.cpfLast4}: •••{row.cpf_last4}
-            {row.cpf_duplicate && (
-              <span className="ml-1 text-warn">({copy.admin.risk.cpfDuplicate})</span>
-            )}
           </div>
         )}
+        <PayerDocumentInfo
+          last4={last4}
+          linkedCount={linkedCount}
+          onViewLinked={linkedCount > 0 ? () => onViewLinkedAccounts(row) : undefined}
+        />
       </td>
       <td className="px-3 py-2">
         <div className="font-medium">{row.partner_handle ? `@${row.partner_handle}` : "—"}</div>
@@ -217,8 +463,10 @@ function ReferralStatusBadge({ row }: { row: AdminCpaReferral }) {
 }
 
 function ReferralMobileCard(props: ReferralRowProps) {
-  const { row } = props;
+  const { row, onViewLinkedAccounts } = props;
   const flagStatus = row.flag_status ?? (row.flagged ? "open" : null);
+  const linkedCount = payerLinkedCount(row);
+  const last4 = payerLast4(row);
   return (
     <div
       className={cn(
@@ -233,11 +481,13 @@ function ReferralMobileCard(props: ReferralRowProps) {
         {row.cpf_last4 && (
           <div className="text-[10px] text-muted-foreground">
             {copy.admin.risk.cpfLast4}: •••{row.cpf_last4}
-            {row.cpf_duplicate && (
-              <span className="ml-1 text-warn">({copy.admin.risk.cpfDuplicate})</span>
-            )}
           </div>
         )}
+        <PayerDocumentInfo
+          last4={last4}
+          linkedCount={linkedCount}
+          onViewLinked={linkedCount > 0 ? () => onViewLinkedAccounts(row) : undefined}
+        />
       </MobileFieldRow>
       <MobileFieldRow label="Afiliado">
         <div className="font-medium">{row.partner_handle ? `@${row.partner_handle}` : "—"}</div>
@@ -300,12 +550,25 @@ function ReferralTable({
   );
 }
 
-function CaseMobileCard({ c }: { c: AdminCpaFraudCase }) {
+function CaseMobileCard({
+  c,
+  onViewLinkedAccounts,
+}: {
+  c: AdminCpaFraudCase;
+  onViewLinkedAccounts: (c: AdminCpaFraudCase) => void;
+}) {
+  const linkedCount = payerLinkedCount(c);
+  const last4 = payerLast4(c);
   return (
     <div className={cn("space-y-3", rowAccentClass(c.status, true), "rounded-lg p-1")}>
       <MobileFieldRow label="Usuário">
         <div className="font-medium">{c.user_name}</div>
         <div className="mono text-[10px] text-muted-foreground">@{c.user_handle}</div>
+        <PayerDocumentInfo
+          last4={last4}
+          linkedCount={linkedCount}
+          onViewLinked={linkedCount > 0 ? () => onViewLinkedAccounts(c) : undefined}
+        />
       </MobileFieldRow>
       <MobileFieldRow label="Afiliado">
         <div className="font-medium">{c.partner_handle ? `@${c.partner_handle}` : "—"}</div>
@@ -325,7 +588,7 @@ function CaseMobileCard({ c }: { c: AdminCpaFraudCase }) {
         )}
       </MobileFieldRow>
       <MobileFieldRow label="Motivos">
-        <span className="text-muted-foreground">{(c.reasons ?? []).join(", ") || "—"}</span>
+        <span className="text-muted-foreground">{formatCpaReasons(c.reasons)}</span>
       </MobileFieldRow>
       <MobileFieldRow label="Nota">
         <span className="text-muted-foreground">{c.notes ?? "—"}</span>
@@ -338,10 +601,12 @@ function CaseTable({
   title,
   cases,
   emptyText,
+  onViewLinkedAccounts,
 }: {
   title: string;
   cases: AdminCpaFraudCase[];
   emptyText: string;
+  onViewLinkedAccounts: (c: AdminCpaFraudCase) => void;
 }) {
   return (
     <div className="rounded-xl border bg-card/60 p-4">
@@ -350,7 +615,9 @@ function CaseTable({
         items={cases}
         keyFn={(c) => c.flag_id}
         emptyText={emptyText}
-        renderCard={(c) => <CaseMobileCard c={c} />}
+        renderCard={(c) => (
+          <CaseMobileCard c={c} onViewLinkedAccounts={onViewLinkedAccounts} />
+        )}
       />
       <DesktopTableWrap>
         <div className="overflow-x-auto rounded-lg border">
@@ -365,7 +632,10 @@ function CaseTable({
               </tr>
             </thead>
             <tbody>
-              {cases.map((c) => (
+              {cases.map((c) => {
+                const linkedCount = payerLinkedCount(c);
+                const last4 = payerLast4(c);
+                return (
                 <tr
                   key={c.flag_id}
                   className={cn("border-b border-border/40", rowAccentClass(c.status, true))}
@@ -373,6 +643,13 @@ function CaseTable({
                   <td className="px-3 py-2">
                     <div className="font-medium">{c.user_name}</div>
                     <div className="mono text-[10px] text-muted-foreground">@{c.user_handle}</div>
+                    <PayerDocumentInfo
+                      last4={last4}
+                      linkedCount={linkedCount}
+                      onViewLinked={
+                        linkedCount > 0 ? () => onViewLinkedAccounts(c) : undefined
+                      }
+                    />
                   </td>
                   <td className="px-3 py-2">
                     <div className="font-medium">
@@ -394,11 +671,12 @@ function CaseTable({
                     )}
                   </td>
                   <td className="px-3 py-2 text-[10px] text-muted-foreground">
-                    {(c.reasons ?? []).join(", ") || "—"}
+                    {formatCpaReasons(c.reasons)}
                   </td>
                   <td className="px-3 py-2 text-[10px] text-muted-foreground">{c.notes ?? "—"}</td>
                 </tr>
-              ))}
+              );
+              })}
             </tbody>
           </table>
         </div>
@@ -414,6 +692,8 @@ function AdminRiskPage() {
   const [riskInput, setRiskInput] = useState<Record<string, string>>({});
   const [noteInput, setNoteInput] = useState<Record<string, string>>({});
   const [bulkActionNote, setBulkActionNote] = useState("");
+  const [linkedDialogUserId, setLinkedDialogUserId] = useState<string | null>(null);
+  const [linkedDialogLabel, setLinkedDialogLabel] = useState("");
 
   const { data: alerts, isError, error: alertsError, refetch } = useAdminRiskAlerts(tab === "alerts");
   const {
@@ -578,6 +858,10 @@ function AdminRiskPage() {
     onNoteChange: (userId: string, value: string) =>
       setNoteInput((prev) => ({ ...prev, [userId]: value })),
     onTag: handleTag,
+    onViewLinkedAccounts: (row: AdminCpaReferral | AdminCpaFraudCase) => {
+      setLinkedDialogUserId(row.user_id);
+      setLinkedDialogLabel(`${row.user_name} (@${row.user_handle})`);
+    },
     tagging,
     showConfirm: true,
   };
@@ -628,6 +912,31 @@ function AdminRiskPage() {
               <p className="mt-1 text-xs text-muted-foreground">
                 {a.type} · {a.username ?? a.user_id}
               </p>
+              {a.type === "payer_document_missing" && (
+                <div className="mt-2 space-y-1 rounded-lg border border-warn/30 bg-surface/60 p-2 text-xs">
+                  <p className="text-warn">{copy.admin.risk.payerDocumentMissingHint}</p>
+                  <p>
+                    <span className="text-muted-foreground">Intent:</span>{" "}
+                    <span className="mono">{readMetaString(a.meta, "intent_id") ?? "—"}</span>
+                  </p>
+                  <p>
+                    <span className="text-muted-foreground">Valor:</span>{" "}
+                    <span className="mono">
+                      {formatBRL(readMetaNumber(a.meta, "amount") ?? 0)}
+                    </span>
+                  </p>
+                  <p>
+                    <span className="text-muted-foreground">Provider ID:</span>{" "}
+                    <span className="mono">{readMetaString(a.meta, "provider_id") ?? "—"}</span>
+                  </p>
+                  <p>
+                    <span className="text-muted-foreground">Evento provider:</span>{" "}
+                    <span className="mono">
+                      {readMetaString(a.meta, "provider_event_id") ?? "—"}
+                    </span>
+                  </p>
+                </div>
+              )}
               {a.type === "deposit_cpf_mismatch" && (
                 <div className="mt-2 space-y-1 rounded-lg border border-warn/30 bg-surface/60 p-2 text-xs">
                   <p>
@@ -740,6 +1049,8 @@ function AdminRiskPage() {
             </div>
           </div>
 
+          <PayerClustersSection />
+
           <div className="flex items-center justify-between gap-2">
             <h2 className="text-sm font-semibold">{copy.admin.risk.referralTitle}</h2>
             <label className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -779,19 +1090,38 @@ function AdminRiskPage() {
             title={copy.admin.risk.suspiciousSection}
             cases={openCases}
             emptyText={copy.admin.risk.noSuspicious}
+            onViewLinkedAccounts={referralRowProps.onViewLinkedAccounts}
           />
 
           <CaseTable
             title={copy.admin.risk.confirmedSection}
             cases={confirmedCases}
             emptyText={copy.admin.risk.noConfirmed}
+            onViewLinkedAccounts={referralRowProps.onViewLinkedAccounts}
           />
 
           {archivedCases.length > 0 && (
-            <CaseTable title="Arquivo (limpo / resolvido)" cases={archivedCases} emptyText="—" />
+            <CaseTable
+              title="Arquivo (limpo / resolvido)"
+              cases={archivedCases}
+              emptyText="—"
+              onViewLinkedAccounts={referralRowProps.onViewLinkedAccounts}
+            />
           )}
         </div>
       )}
+
+      <PayerLinkedAccountsDialog
+        userId={linkedDialogUserId}
+        userLabel={linkedDialogLabel}
+        open={linkedDialogUserId !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setLinkedDialogUserId(null);
+            setLinkedDialogLabel("");
+          }
+        }}
+      />
     </div>
   );
 }

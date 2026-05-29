@@ -178,6 +178,48 @@ export function useAdminRiskAlerts(enabled = true) {
   });
 }
 
+export type ReferringPartnerSummary = {
+  partner_id: string;
+  partner_handle: string | null;
+  partner_slug: string | null;
+  linked_referral_count: number;
+};
+
+export type AdminPayerLinkedAccount = {
+  user_id: string;
+  user_handle: string;
+  user_name: string;
+  created_at?: string;
+  kyc_status?: string;
+  balance?: number;
+  banned?: boolean;
+  first_seen_at?: string;
+  last_seen_at?: string;
+  partner_id?: string | null;
+  partner_handle?: string | null;
+  partner_slug?: string | null;
+  referred_at?: string | null;
+};
+
+export type AdminPayerDocumentCluster = {
+  ok?: boolean;
+  cpf_hash: string | null;
+  document_last4: string | null;
+  document_length: number | null;
+  linked_account_count: number;
+  referring_partners?: ReferringPartnerSummary[];
+  accounts: AdminPayerLinkedAccount[];
+};
+
+export type AdminPayerClusterSummary = {
+  cpf_hash: string;
+  document_last4: string | null;
+  document_length: number | null;
+  account_count: number;
+  referring_partners?: ReferringPartnerSummary[];
+  accounts: AdminPayerLinkedAccount[];
+};
+
 export type AdminCpaFraudCase = {
   flag_id: number;
   user_id: string;
@@ -197,6 +239,9 @@ export type AdminCpaFraudCase = {
   reviewed_by: string | null;
   created_at: string;
   updated_at: string;
+  payer_document_last4?: string | null;
+  payer_linked_account_count?: number;
+  cpf_duplicate?: boolean;
 };
 
 export type AdminCpaReferral = {
@@ -214,6 +259,8 @@ export type AdminCpaReferral = {
   flag_reasons: string[];
   cpf_last4: string | null;
   cpf_duplicate: boolean;
+  payer_document_last4?: string | null;
+  payer_linked_account_count?: number;
 };
 
 export function useAdminCpaFraudCases(status?: string) {
@@ -241,6 +288,36 @@ export function useAdminCpaReferrals(onlyFlagged = false) {
       if (error) throw error;
       return (data ?? []) as AdminCpaReferral[];
     },
+  });
+}
+
+export function useAdminPayerDocumentCluster(userId: string | null, enabled = false) {
+  return useQuery({
+    queryKey: ["admin", "payer-document-cluster", userId],
+    queryFn: async () => {
+      if (!userId) throw new Error("user_id required");
+      const { data, error } = await supabase.rpc("admin_payer_document_cluster", {
+        p_user_id: userId,
+      });
+      if (error) throw error;
+      return data as AdminPayerDocumentCluster;
+    },
+    enabled: enabled && Boolean(userId),
+  });
+}
+
+export function useAdminPayerDocumentClusters(enabled = true) {
+  return useQuery({
+    queryKey: ["admin", "payer-document-clusters"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_list_payer_document_clusters", {
+        p_min_accounts: 2,
+        p_limit: 50,
+      });
+      if (error) throw error;
+      return (data ?? []) as AdminPayerClusterSummary[];
+    },
+    enabled,
   });
 }
 

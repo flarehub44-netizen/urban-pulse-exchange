@@ -89,12 +89,20 @@ export function QuickDepositSheet({
           const retryAmount = getLastImpulseAmount();
           setQr(null);
           setAmount(String(retryAmount));
-          toast.error("QR Code expirado. Gere um novo código com o mesmo valor.", {
-            action: {
-              label: "Tentar de novo",
-              onClick: () => depositMut.mutate(retryAmount),
-            },
-          });
+          const isPayerDocMissing = status.failureReason === "payer_document_missing";
+          toast.error(
+            isPayerDocMissing
+              ? copy.wallet.depositPayerDocumentMissing
+              : "QR Code expirado. Gere um novo código com o mesmo valor.",
+            isPayerDocMissing
+              ? undefined
+              : {
+                  action: {
+                    label: "Tentar de novo",
+                    onClick: () => depositMut.mutate(retryAmount),
+                  },
+                },
+          );
         }
       } catch {
         pollErrors.current += 1;

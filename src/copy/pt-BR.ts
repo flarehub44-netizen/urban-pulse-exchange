@@ -309,7 +309,7 @@ export const copy = {
     cpfRequiredBody:
       "Para depositar ou sacar via Pix, informe o CPF da conta que fará o pagamento. Ele precisa ser o mesmo usado no seu banco.",
     cpfPixHint:
-      "Use o CPF da conta que fará o Pix. Se o pagador usar outro CPF, o valor entra na carteira, mas a equipe recebe um alerta para revisão.",
+      "Use o CPF da conta que fará o Pix. O pagador precisa ser identificado pelo processador; sem isso o depósito não é creditado.",
     cpfSaveContinue: "Salvar e continuar",
     cpfSaved: "CPF cadastrado. Você já pode usar Pix.",
     withdrawPending: "Saque em processamento — aguardando confirmação do Pix.",
@@ -322,6 +322,9 @@ export const copy = {
     withdrawKycBody: "Para sacar acima de R$ 100, aguarde a aprovação do KYC pela equipe ViaX.",
     pixWithdrawNote:
       "O valor é reservado ao solicitar. A transferência Pix é confirmada em instantes ou até 1 dia útil.",
+    depositPayerDocumentMissing:
+      "Pagamento recebido pelo processador, mas não foi possível validar o documento do pagador. O saldo não foi creditado — contate o suporte.",
+    depositFailedGeneric: "QR Code expirado ou pagamento falhou. Tente novamente.",
   },
 
   positions: {
@@ -1233,6 +1236,20 @@ export const copy = {
         "Banir usuários com fraude confirmada? A conta fica suspensa (sem apagar histórico).",
       cpfDuplicate: "CPF duplicado",
       cpfLast4: "CPF",
+      payerLast4: "Pagador",
+      payerLinkedAccounts: "{{count}} contas no mesmo pagador",
+      viewLinkedAccounts: "Ver contas ligadas",
+      payerClustersTitle: "Clusters de pagador (Pix)",
+      payerClustersEmpty: "Nenhum documento de pagador ligado a mais de uma conta.",
+      payerClusterAccounts: "Contas no cluster",
+      payerClusterPartner: "Indicado por @{{handle}}",
+      payerClusterNoPartner: "Sem indicação CPA",
+      payerClusterReferringPartners: "Creators afetados",
+      partnerSharedPayerReason: "Mesmo pagador em 2+ indicações do creator",
+      payerClusterBanned: "Banida",
+      payerClusterActive: "Ativa",
+      payerDocumentMissingHint:
+        "Crédito bloqueado: webhook SyncPay sem documento do pagador. Reconciliar no painel SyncPay.",
       autoHeuristic: "Auto",
       noCases: "Nenhum caso marcado.",
       noReferrals: "Nenhuma conversão CPA encontrada.",

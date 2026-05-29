@@ -31,6 +31,16 @@ Gerado por `scripts/gen-rpc-index.mjs`.
 - `public.admin_list_active_partners` � supabase/migrations/20260709000000_partner_cpa_admin.sql
 - `public.admin_list_cameras` � supabase/migrations/20260527000000_admin_control_center.sql
 - `public.admin_list_cameras` � supabase/migrations/20260604000000_camera_pipeline.sql
+- `public.admin_list_cpa_fraud_cases` — payer_linked_account_count; supabase/migrations/20260903120000_payer_document_events.sql
+- `public.admin_list_cpa_referrals` — payer_linked_account_count; supabase/migrations/20260903120000_payer_document_events.sql
+- `public.admin_payer_document_cluster` — contas + creators indicadores; supabase/migrations/20260905120000_payer_cluster_referring_partners.sql
+- `public.admin_list_payer_document_clusters` — clusters + `referring_partners`; supabase/migrations/20260905120000_payer_cluster_referring_partners.sql
+- `public.payer_cluster_referring_partners` — agregação partner por `cpf_hash`; supabase/migrations/20260905120000_payer_cluster_referring_partners.sql
+- `public.evaluate_cpa_fraud_heuristics` — motivo `partner_shared_payer`; supabase/migrations/20260905120000_payer_cluster_referring_partners.sql
+- `public.count_payer_linked_accounts` — service_role; supabase/migrations/20260903120000_payer_document_events.sql
+- `public.resolve_user_payer_cpf_hash` — service_role; supabase/migrations/20260903120000_payer_document_events.sql
+- `public.service_record_payer_document_event` — webhook Pix cash-in; supabase/migrations/20260903120000_payer_document_events.sql
+- `public.service_process_syncpay_webhook` — bloqueia crédito sem documento pagador; supabase/migrations/20260904120000_deposit_block_payer_document_missing.sql
 - `public.admin_list_daily_polls` � supabase/migrations/20260710000000_admin_events_hub.sql
 - `public.admin_list_football_drafts` � supabase/migrations/20260701000000_football_markets.sql
 - `public.admin_list_football_live` � supabase/migrations/20260702000000_football_gaps.sql
@@ -314,6 +324,12 @@ Gerado por `scripts/gen-rpc-index.mjs`.
   - src/hooks/use-admin-dashboard.ts
 - `admin_list_cameras`
   - src/hooks/use-admin-dashboard.ts
+- `admin_list_payer_document_clusters`
+  - src/hooks/use-admin-dashboard.ts
+  - src/routes/admin/risk.tsx
+- `admin_payer_document_cluster`
+  - src/hooks/use-admin-dashboard.ts
+  - src/routes/admin/risk.tsx
 - `admin_list_daily_polls`
   - src/hooks/use-admin-events.ts
 - `admin_list_football_drafts`
