@@ -6651,24 +6651,15 @@ export type Database = {
         }
         Returns: Json
       }
-      place_football_bet:
-        | {
-            Args: {
-              p_market_id: string
-              p_outcome: Database["public"]["Enums"]["football_outcome"]
-              p_stake: number
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_idempotency_key?: string
-              p_market_id: string
-              p_outcome: Database["public"]["Enums"]["football_outcome"]
-              p_stake: number
-            }
-            Returns: Json
-          }
+      place_football_bet: {
+        Args: {
+          p_idempotency_key?: string
+          p_market_id: string
+          p_outcome: Database["public"]["Enums"]["football_outcome"]
+          p_stake: number
+        }
+        Returns: Json
+      }
       place_football_bet_as: {
         Args: {
           p_market_id: string
