@@ -4712,6 +4712,8 @@ export type Database = {
         }
         Returns: Json
       }
+      prune_camera_metrics: { Args: { p_days?: number }; Returns: number }
+      prune_market_history: { Args: { p_days?: number }; Returns: number }
       record_comeback_if_needed: { Args: never; Returns: Json }
       record_market_view: { Args: { p_market_id: string }; Returns: undefined }
       record_oracle_snapshot: { Args: { p_market_id: string }; Returns: number }
