@@ -9,6 +9,10 @@ const LEGACY_API_KEY = process.env.SYNCPAY_API_KEY ?? "";
 const WEBHOOK_SECRET = process.env.SYNCPAY_WEBHOOK_SECRET ?? "";
 const CASHIN_PATH = process.env.SYNCPAY_CASHIN_PATH ?? "/api/partner/v1/cash-in";
 const CASHOUT_PATH = process.env.SYNCPAY_CASHOUT_PATH ?? "/api/partner/v1/cash-out";
+const CASHOUT_STATUS_PATH =
+  process.env.SYNCPAY_CASHOUT_STATUS_PATH ?? "/api/partner/v1/cash-out/{id}";
+const CASHIN_STATUS_PATH =
+  process.env.SYNCPAY_CASHIN_STATUS_PATH ?? "/api/partner/v1/cash-in/{id}";
 const WEBHOOK_URL = process.env.SYNCPAY_WEBHOOK_URL ?? "";
 const AUTH_TOKEN_PATH = "/api/partner/v1/auth-token";
 const REQUEST_TIMEOUT_MS = 10_000;
@@ -319,6 +323,51 @@ export async function createPixPayout(opts: {
     id: raw.reference_id ?? raw.id ?? opts.correlationId,
     status: (raw.status?.toUpperCase() as PixPayoutResponse["status"]) ?? "SUBMITTED",
   };
+}
+
+/**
+ * Consulta status de um Pix Out (saque) já submetido.
+ * Retorna `null` se o provider responder 404.
+ */
+export async function getPixPayoutStatus(
+  providerId: string,
+): Promise<{ id: string; status: PixPayoutResponse["status"]; raw: unknown } | null> {
+  const path = CASHOUT_STATUS_PATH.replace("{id}", encodeURIComponent(providerId));
+  try {
+    const raw = await request<SyncPayCashOutRaw & Record<string, unknown>>(path, {
+      method: "GET",
+    });
+    return {
+      id: (raw.reference_id ?? raw.id ?? providerId) as string,
+      status: (raw.status?.toUpperCase() as PixPayoutResponse["status"]) ?? "PENDING",
+      raw,
+    };
+  } catch (err) {
+    if (err instanceof SyncPayHttpError && err.status === 404) return null;
+    throw err;
+  }
+}
+
+/**
+ * Consulta status de uma cobrança Pix In já submetida.
+ */
+export async function getPixChargeStatus(
+  providerId: string,
+): Promise<{ id: string; status: PixChargeResponse["status"]; raw: unknown } | null> {
+  const path = CASHIN_STATUS_PATH.replace("{id}", encodeURIComponent(providerId));
+  try {
+    const raw = await request<SyncPayCashInRaw & Record<string, unknown>>(path, {
+      method: "GET",
+    });
+    return {
+      id: (raw.identifier ?? providerId) as string,
+      status: (raw.status?.toUpperCase() as PixChargeResponse["status"]) ?? "PENDING",
+      raw,
+    };
+  } catch (err) {
+    if (err instanceof SyncPayHttpError && err.status === 404) return null;
+    throw err;
+  }
 }
 
 /**

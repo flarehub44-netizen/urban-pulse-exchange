@@ -70,6 +70,7 @@ import { Route as AppMarketsCreateRouteImport } from './routes/_app/markets.crea
 import { Route as AppFeedPostIdRouteImport } from './routes/_app/feed.$postId'
 import { Route as ApiPublicWebhooksSyncpayRouteImport } from './routes/api/public/webhooks/syncpay'
 import { Route as ApiPublicSnapshotProxySplatRouteImport } from './routes/api/public/snapshot-proxy/$'
+import { Route as ApiPublicHooksReconcileSyncpayPayoutsRouteImport } from './routes/api/public/hooks/reconcile-syncpay-payouts'
 import { Route as ApiPublicHlsProxySplatRouteImport } from './routes/api/public/hls-proxy/$'
 import { Route as ApiPublicCronImpactXpCreditRouteImport } from './routes/api/public/cron/impact-xp-credit'
 import { Route as ApiPublicCronImpactMonthlyFinalizeRouteImport } from './routes/api/public/cron/impact-monthly-finalize'
@@ -383,6 +384,12 @@ const ApiPublicSnapshotProxySplatRoute =
     path: '/api/public/snapshot-proxy/$',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksReconcileSyncpayPayoutsRoute =
+  ApiPublicHooksReconcileSyncpayPayoutsRouteImport.update({
+    id: '/api/public/hooks/reconcile-syncpay-payouts',
+    path: '/api/public/hooks/reconcile-syncpay-payouts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHlsProxySplatRoute = ApiPublicHlsProxySplatRouteImport.update({
   id: '/api/public/hls-proxy/$',
   path: '/api/public/hls-proxy/$',
@@ -484,6 +491,7 @@ export interface FileRoutesByFullPath {
   '/api/public/cron/impact-monthly-finalize': typeof ApiPublicCronImpactMonthlyFinalizeRoute
   '/api/public/cron/impact-xp-credit': typeof ApiPublicCronImpactXpCreditRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
+  '/api/public/hooks/reconcile-syncpay-payouts': typeof ApiPublicHooksReconcileSyncpayPayoutsRoute
   '/api/public/snapshot-proxy/$': typeof ApiPublicSnapshotProxySplatRoute
   '/api/public/webhooks/syncpay': typeof ApiPublicWebhooksSyncpayRoute
 }
@@ -548,6 +556,7 @@ export interface FileRoutesByTo {
   '/api/public/cron/impact-monthly-finalize': typeof ApiPublicCronImpactMonthlyFinalizeRoute
   '/api/public/cron/impact-xp-credit': typeof ApiPublicCronImpactXpCreditRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
+  '/api/public/hooks/reconcile-syncpay-payouts': typeof ApiPublicHooksReconcileSyncpayPayoutsRoute
   '/api/public/snapshot-proxy/$': typeof ApiPublicSnapshotProxySplatRoute
   '/api/public/webhooks/syncpay': typeof ApiPublicWebhooksSyncpayRoute
 }
@@ -618,6 +627,7 @@ export interface FileRoutesById {
   '/api/public/cron/impact-monthly-finalize': typeof ApiPublicCronImpactMonthlyFinalizeRoute
   '/api/public/cron/impact-xp-credit': typeof ApiPublicCronImpactXpCreditRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
+  '/api/public/hooks/reconcile-syncpay-payouts': typeof ApiPublicHooksReconcileSyncpayPayoutsRoute
   '/api/public/snapshot-proxy/$': typeof ApiPublicSnapshotProxySplatRoute
   '/api/public/webhooks/syncpay': typeof ApiPublicWebhooksSyncpayRoute
 }
@@ -688,6 +698,7 @@ export interface FileRouteTypes {
     | '/api/public/cron/impact-monthly-finalize'
     | '/api/public/cron/impact-xp-credit'
     | '/api/public/hls-proxy/$'
+    | '/api/public/hooks/reconcile-syncpay-payouts'
     | '/api/public/snapshot-proxy/$'
     | '/api/public/webhooks/syncpay'
   fileRoutesByTo: FileRoutesByTo
@@ -752,6 +763,7 @@ export interface FileRouteTypes {
     | '/api/public/cron/impact-monthly-finalize'
     | '/api/public/cron/impact-xp-credit'
     | '/api/public/hls-proxy/$'
+    | '/api/public/hooks/reconcile-syncpay-payouts'
     | '/api/public/snapshot-proxy/$'
     | '/api/public/webhooks/syncpay'
   id:
@@ -821,6 +833,7 @@ export interface FileRouteTypes {
     | '/api/public/cron/impact-monthly-finalize'
     | '/api/public/cron/impact-xp-credit'
     | '/api/public/hls-proxy/$'
+    | '/api/public/hooks/reconcile-syncpay-payouts'
     | '/api/public/snapshot-proxy/$'
     | '/api/public/webhooks/syncpay'
   fileRoutesById: FileRoutesById
@@ -844,6 +857,7 @@ export interface RootRouteChildren {
   ApiPublicCronImpactMonthlyFinalizeRoute: typeof ApiPublicCronImpactMonthlyFinalizeRoute
   ApiPublicCronImpactXpCreditRoute: typeof ApiPublicCronImpactXpCreditRoute
   ApiPublicHlsProxySplatRoute: typeof ApiPublicHlsProxySplatRoute
+  ApiPublicHooksReconcileSyncpayPayoutsRoute: typeof ApiPublicHooksReconcileSyncpayPayoutsRoute
   ApiPublicSnapshotProxySplatRoute: typeof ApiPublicSnapshotProxySplatRoute
   ApiPublicWebhooksSyncpayRoute: typeof ApiPublicWebhooksSyncpayRoute
 }
@@ -1277,6 +1291,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicSnapshotProxySplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/reconcile-syncpay-payouts': {
+      id: '/api/public/hooks/reconcile-syncpay-payouts'
+      path: '/api/public/hooks/reconcile-syncpay-payouts'
+      fullPath: '/api/public/hooks/reconcile-syncpay-payouts'
+      preLoaderRoute: typeof ApiPublicHooksReconcileSyncpayPayoutsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hls-proxy/$': {
       id: '/api/public/hls-proxy/$'
       path: '/api/public/hls-proxy/$'
@@ -1512,6 +1533,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicCronImpactMonthlyFinalizeRoute,
   ApiPublicCronImpactXpCreditRoute: ApiPublicCronImpactXpCreditRoute,
   ApiPublicHlsProxySplatRoute: ApiPublicHlsProxySplatRoute,
+  ApiPublicHooksReconcileSyncpayPayoutsRoute:
+    ApiPublicHooksReconcileSyncpayPayoutsRoute,
   ApiPublicSnapshotProxySplatRoute: ApiPublicSnapshotProxySplatRoute,
   ApiPublicWebhooksSyncpayRoute: ApiPublicWebhooksSyncpayRoute,
 }
