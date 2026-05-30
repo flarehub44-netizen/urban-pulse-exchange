@@ -6371,6 +6371,7 @@ export type Database = {
       }
       cron_close_football_bets: { Args: never; Returns: Json }
       daily_check_in: { Args: never; Returns: Json }
+      delete_league: { Args: { p_league_id: string }; Returns: Json }
       division_for_xp: {
         Args: { p_xp: number }
         Returns: Database["public"]["Enums"]["division_tier"]
