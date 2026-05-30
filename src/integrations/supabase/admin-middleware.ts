@@ -1,4 +1,4 @@
-import { createMiddleware } from "@tanstack/react-start";
+import { createMiddleware } from "@tanstack/start-client-core";
 import { requireSupabaseAuth } from "./auth-middleware";
 
 /**
