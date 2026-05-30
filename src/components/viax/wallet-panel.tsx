@@ -413,6 +413,10 @@ export function WalletPanel({
                   alt="QR Code Pix"
                   className="mx-auto size-48 rounded-xl border"
                 />
+              ) : depositQr.qrCode ? (
+                <div className="mx-auto rounded-xl border bg-white p-3">
+                  <QRCodeSVG value={depositQr.qrCode} size={180} level="M" />
+                </div>
               ) : (
                 <div className="mx-auto flex size-48 items-center justify-center rounded-xl border bg-surface-2">
                   <QrCode className="size-16 text-muted-foreground" />
