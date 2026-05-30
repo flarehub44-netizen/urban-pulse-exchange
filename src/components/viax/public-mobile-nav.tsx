@@ -6,7 +6,7 @@ import { useAuthPublic } from "@/hooks/use-auth-public";
 import { cn } from "@/lib/utils";
 
 const linkClass =
-  "flex flex-col items-center gap-0.5 rounded-lg px-1.5 py-2 text-[10px] text-muted-foreground hover:bg-surface/60 hover:text-foreground";
+  "flex flex-col items-center gap-0.5 rounded-lg px-1 py-2 text-[10px] text-muted-foreground hover:bg-surface/60 hover:text-foreground [&>span]:max-w-full [&>span]:truncate";
 
 export function PublicMobileNav() {
   const { isRegistered } = useAuthPublic();
