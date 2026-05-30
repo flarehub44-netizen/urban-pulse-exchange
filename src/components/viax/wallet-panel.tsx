@@ -507,9 +507,7 @@ export function WalletPanel({
                     onChange={(e) => setPixKey(e.target.value)}
                     className="mt-1 w-full rounded-xl border bg-surface px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
                   />
-                  {Number(walletAmount) > 100 && (
-                    <p className="mt-1 text-[11px] text-warn">{copy.wallet.withdrawKycHint}</p>
-                  )}
+                  {/* KYC hint temporariamente desativado */}
                 </div>
               )}
 
