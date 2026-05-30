@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware.server";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getSupabaseCtx } from "@/integrations/supabase/context";
 
 const placeFootballBetSchema = z.object({
