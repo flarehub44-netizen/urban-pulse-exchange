@@ -1,5 +1,5 @@
 import { createMiddleware } from "@tanstack/start-client-core";
-import { requireSupabaseAuth } from "./auth-middleware.server";
+import { requireSupabaseAuth } from "./auth-middleware";
 
 /**
  * Server-side admin gate composed on top of `requireSupabaseAuth`.
