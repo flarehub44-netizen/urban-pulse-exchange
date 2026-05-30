@@ -221,7 +221,7 @@ async function loadFeed(
   let query = supabase
     .from("feed_posts")
     .select(
-      "id,text,market_id,likes,comments,reposts,tag,created_at,profile_public(id, name, handle, avatar, division, accuracy, roi, streak, volume_24h, city, neighborhood)",
+      "id,text,market_id,likes,comments,reposts,tag,created_at,profile_public!feed_posts_user_id_fkey(id, name, handle, avatar, division, accuracy, roi, streak, volume_24h, city, neighborhood)",
     )
     .order("created_at", { ascending: false })
     .limit(options?.limit ?? 40);
