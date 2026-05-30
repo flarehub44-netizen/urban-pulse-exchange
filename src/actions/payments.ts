@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware.server";
 import { requireRegisteredAuth } from "@/integrations/supabase/require-registered-middleware";
 import { getSupabaseCtx } from "@/integrations/supabase/context";
 import { createPixCharge, createPixPayout, SyncPayHttpError } from "@/lib/syncpay";

@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware.server";
 import type { SupabaseFnContext } from "@/integrations/supabase/context";
 import { supabase } from "@/integrations/supabase/client";
 
