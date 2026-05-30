@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Copy, QrCode, Clock, Wallet, Gift } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { initiateDepositFn, getDepositStatusFn } from "@/actions/payments";
 import { getOrCreateDeviceId } from "@/lib/device-id";
@@ -165,6 +166,10 @@ export function QuickDepositSheet({
                 alt="QR Code Pix"
                 className="mx-auto size-48 rounded-xl border"
               />
+            ) : qr.qrCode ? (
+              <div className="mx-auto rounded-xl border bg-white p-3">
+                <QRCodeSVG value={qr.qrCode} size={180} level="M" />
+              </div>
             ) : (
               <div className="mx-auto flex size-48 items-center justify-center rounded-xl border bg-surface-2">
                 <QrCode className="size-16 text-muted-foreground" />
