@@ -109,7 +109,7 @@ function LeaguesPage() {
     <div className="space-y-6">
       <div>
         <h1 className="heading-page text-2xl">
-          <span className="text-highlight">Ligas</span> Privadas
+          Suas <span className="text-highlight">Ligas</span>
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Crie um grupo com amigos e compita no ranking da sua liga.
@@ -269,6 +269,16 @@ function LeaguesPage() {
               <div className="mt-2 flex items-center gap-2">
                 <span className="mono text-xs text-muted-foreground border border-dashed border-border/60 rounded px-2 py-0.5">
                   {league.invite_code}
+                </span>
+                <span
+                  className={cn(
+                    "text-[10px] rounded px-1.5 py-0.5 border",
+                    league.is_public
+                      ? "border-primary/40 text-primary bg-primary/10"
+                      : "border-border text-muted-foreground",
+                  )}
+                >
+                  {league.is_public ? "🌐 Pública" : "🔒 Privada"}
                 </span>
                 <button
                   type="button"
