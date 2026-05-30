@@ -10,6 +10,30 @@ export function useSupabaseRealtime() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    // Coalesce bursts of market updates into one cache write per frame to
+    // avoid O(N*M) re-renders during high-traffic events.
+    const pendingMarkets = new Map<string, Market>();
+    let flushHandle: number | null = null;
+    const flush = () => {
+      flushHandle = null;
+      if (pendingMarkets.size === 0) return;
+      const patches = new Map(pendingMarkets);
+      pendingMarkets.clear();
+      queryClient.setQueryData<Market[]>(["markets"], (old) =>
+        old?.map((m) => {
+          const u = patches.get(m.id);
+          return u ? { ...m, pool: u.pool, participants: u.participants } : m;
+        }) ?? old,
+      );
+    };
+    const schedule = () => {
+      if (flushHandle !== null) return;
+      flushHandle =
+        typeof requestAnimationFrame !== "undefined"
+          ? requestAnimationFrame(flush)
+          : (setTimeout(flush, 50) as unknown as number);
+    };
+
     // Channel 1 — market pool updates (real bets from any session)
     const marketsCh = supabase
       .channel("markets-pool", { config: { private: true } })
@@ -18,17 +42,8 @@ export function useSupabaseRealtime() {
         { event: "UPDATE", schema: "public", table: "markets" },
         (payload) => {
           const updated = mapMarket(payload.new as Record<string, unknown>);
-
-          // Update TanStack Query cache
-          queryClient.setQueryData<Market[]>(
-            ["markets"],
-            (old) =>
-              old?.map((m) =>
-                m.id === updated.id
-                  ? { ...m, pool: updated.pool, participants: updated.participants }
-                  : m,
-              ) ?? old,
-          );
+          pendingMarkets.set(updated.id, updated);
+          schedule();
         },
       )
       .subscribe();
