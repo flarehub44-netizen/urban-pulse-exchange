@@ -90,7 +90,7 @@ async function addSecurityHeaders(response: Response): Promise<Response> {
       // 'strict-dynamic' propagates trust to scripts loaded by nonce'd scripts (dynamic imports).
       // 'self' is kept as fallback for browsers that don't support 'strict-dynamic'.
       `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
-      `script-src-elem 'self' 'nonce-${nonce}' 'strict-dynamic' https://viax.lovable.app`,
+      `script-src-elem 'self' 'nonce-${nonce}' https://viax.life https://viax.lovable.app https://*.lovable.app https://*.lovable.dev`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src https://fonts.gstatic.com",
       `img-src ${CSP_IMG_SRC}`,
