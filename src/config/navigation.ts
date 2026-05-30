@@ -63,7 +63,7 @@ export const bottomNavPrimary: NavItem[] = [
   { to: "/markets", label: copy.nav.markets, icon: Radio, matchPrefix: true },
   { to: "/markets", label: copy.nav.football, icon: Flag, search: { segment: "futebol" } },
   { to: "/live", label: copy.nav.live, icon: Map },
-  { to: "/profile", label: copy.nav.account, icon: User, matchPrefix: true },
+  { to: "/profile", label: "Conta", icon: User, matchPrefix: true },
 ];
 
 /** Secondary routes in mobile "Mais" sheet */

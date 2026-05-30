@@ -17,7 +17,7 @@ export function PublicNav({ variant = "shell" }: PublicNavProps) {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-3">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:gap-4 sm:px-6">
         <Link to="/" className="flex shrink-0 items-center gap-2">
           <Logo />
           <span className="font-semibold tracking-tight">ViaX</span>
@@ -59,11 +59,11 @@ export function PublicNav({ variant = "shell" }: PublicNavProps) {
             </Link>
           )}
         </nav>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {!isRegistered && (
             <AuthModalTrigger
               mode="login"
-              className="rounded-lg border bg-card px-3 py-2 text-sm font-medium hover:bg-surface"
+              className="whitespace-nowrap rounded-lg border bg-card px-2.5 py-1.5 text-xs font-medium hover:bg-surface sm:px-3 sm:py-2 sm:text-sm"
             >
               {copy.auth.loginCta}
             </AuthModalTrigger>
@@ -72,7 +72,7 @@ export function PublicNav({ variant = "shell" }: PublicNavProps) {
             <button
               type="button"
               onClick={() => openDeposit({ amount: 200, source: "public_nav" })}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 sm:px-4 sm:py-2 sm:text-sm"
             >
               {copy.auth.depositAndPlayCta} <ArrowRight className="size-3.5" />
             </button>
@@ -80,7 +80,7 @@ export function PublicNav({ variant = "shell" }: PublicNavProps) {
             <AuthModalTrigger
               mode="signup"
               depositAfter
-              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 sm:px-4 sm:py-2 sm:text-sm"
             >
               {copy.auth.registerCta} <ArrowRight className="size-3.5" />
             </AuthModalTrigger>
@@ -88,7 +88,7 @@ export function PublicNav({ variant = "shell" }: PublicNavProps) {
             <AuthModalTrigger
               mode="signup"
               depositAfter
-              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 sm:px-4 sm:py-2 sm:text-sm"
             >
               {copy.auth.depositAndPlayCta} <ArrowRight className="size-3.5" />
             </AuthModalTrigger>

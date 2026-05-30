@@ -141,7 +141,7 @@ export function BottomNav() {
                   <Icon
                     className={cn("size-5", active && "drop-shadow-[0_0_8px_var(--color-primary)]")}
                   />
-                  {it.label}
+                  <span className="max-w-full truncate whitespace-nowrap px-1">{it.label}</span>
                   {it.to === "/profile" && it.search?.tab === "posicoes" && (
                     <NavCountBadge count={openPositions} />
                   )}
