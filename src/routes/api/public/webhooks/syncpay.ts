@@ -21,23 +21,31 @@ export const Route = createFileRoute("/api/public/webhooks/syncpay")({
 
         const rawBody = await request.text();
         const signature = request.headers.get("x-syncpay-signature") ?? "";
-        // F06: accept only the canonical header; the x-event-id fallback was a
-        // footgun that could confuse deduplication if the provider changes headers.
-        const providerEventId = request.headers.get("x-syncpay-event-id");
-
-        if (!providerEventId) return json({ error: "missing_provider_event_id" }, 400);
-
-        const valid = await validateWebhookSignature(rawBody, signature);
-        if (!valid) {
-          console.error("[SyncPay Webhook] Invalid signature � rejected");
-          return json({ error: "invalid_signature" }, 401);
-        }
 
         let payload: SyncPayWebhookPayload;
         try {
           payload = JSON.parse(rawBody) as SyncPayWebhookPayload;
         } catch {
           return json({ error: "invalid_json" }, 400);
+        }
+
+        // F06: dedupe id — try canonical header, common alternates, then payload fields.
+        const providerEventId =
+          request.headers.get("x-syncpay-event-id") ??
+          request.headers.get("x-event-id") ??
+          request.headers.get("x-webhook-id") ??
+          (payload as unknown as { event_id?: string; id?: string })?.event_id ??
+          (payload?.data?.id ? `${payload.event}:${payload.data.id}` : null);
+
+        if (!providerEventId) return json({ error: "missing_provider_event_id" }, 400);
+
+        const valid = await validateWebhookSignature(rawBody, signature);
+        if (!valid) {
+          console.error("[SyncPay Webhook] Invalid signature - rejected", {
+            hasSignature: Boolean(signature),
+            providerEventId,
+          });
+          return json({ error: "invalid_signature" }, 401);
         }
 
         const { event, data } = payload;
