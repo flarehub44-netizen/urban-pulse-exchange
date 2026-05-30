@@ -17,6 +17,7 @@ import { getOrCreateDeviceId } from "@/lib/device-id";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Copy, QrCode, Clock } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import { copy } from "@/copy/pt-BR";
 import { useBalanceSeries } from "@/hooks/use-balance-series";
 import { RegisterRequiredCta } from "@/components/auth/register-required-cta";
