@@ -4702,6 +4702,16 @@ export type Database = {
         Args: { p_market_id: string }
         Returns: Json
       }
+      process_syncpay_webhook_event: {
+        Args: {
+          p_event: string
+          p_payload: Json
+          p_provider_id: string
+          p_received_at?: string
+          p_signature?: string
+        }
+        Returns: Json
+      }
       record_comeback_if_needed: { Args: never; Returns: Json }
       record_market_view: { Args: { p_market_id: string }; Returns: undefined }
       record_oracle_snapshot: { Args: { p_market_id: string }; Returns: number }
