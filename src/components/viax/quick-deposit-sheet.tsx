@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Copy, QrCode, Clock, Wallet, Gift } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { initiateDepositFn, getDepositStatusFn } from "@/actions/payments";
 import { getOrCreateDeviceId } from "@/lib/device-id";
