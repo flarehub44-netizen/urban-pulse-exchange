@@ -7,11 +7,13 @@ let _client: ReturnType<typeof createClient<Database>> | null = null;
 export function getServiceClient() {
   if (!_client) {
     const url = process.env.SUPABASE_URL;
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const key =
+      process.env.SUPABASE_SERVICE_ROLE_KEY ||
+      process.env.VIAX_SUPABASE_SERVICE_ROLE_KEY;
     if (!url || !key) {
       const missing = [
         ...(!url ? ["SUPABASE_URL"] : []),
-        ...(!key ? ["SUPABASE_SERVICE_ROLE_KEY"] : []),
+        ...(!key ? ["SUPABASE_SERVICE_ROLE_KEY (or VIAX_SUPABASE_SERVICE_ROLE_KEY)"] : []),
       ];
       throw new Error(`Supabase service role not configured (missing: ${missing.join(", ")})`);
     }
