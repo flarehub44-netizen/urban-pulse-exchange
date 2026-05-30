@@ -7,18 +7,24 @@ export function usePlaceFootballBet() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      marketId,
-      outcome,
-      stake,
-    }: {
+    mutationFn: (vars: {
       marketId: string;
       outcome: FootballOutcome;
       stake: number;
-    }) =>
-      placeFootballBetFn({
-        data: { marketId, outcome, stake, idempotencyKey: crypto.randomUUID() },
-      }),
+      idempotencyKey?: string;
+    }) => {
+      // Persist key on variables so React Query retries reuse the same UUID
+      // and the server-side unique index dedupes — no double billing.
+      if (!vars.idempotencyKey) vars.idempotencyKey = crypto.randomUUID();
+      return placeFootballBetFn({
+        data: {
+          marketId: vars.marketId,
+          outcome: vars.outcome,
+          stake: vars.stake,
+          idempotencyKey: vars.idempotencyKey,
+        },
+      });
+    },
 
     onSuccess: (_, { marketId }) => {
       queryClient.invalidateQueries({ queryKey: ["football-markets"] });
