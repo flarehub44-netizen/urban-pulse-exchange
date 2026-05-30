@@ -45,6 +45,11 @@ export function SignupForm({ onSuccess, onNeedsVerify }: SignupFormProps) {
       toast.error(copy.auth.nameMin);
       return;
     }
+    const handleTrim = handle.trim().replace(/^@+/, "");
+    if (!/^[a-zA-Z0-9_]{3,20}$/.test(handleTrim)) {
+      toast.error(copy.auth.handleInvalid);
+      return;
+    }
     if (!isValidCpf(cpf)) {
       toast.error(copy.auth.cpfInvalid);
       return;
