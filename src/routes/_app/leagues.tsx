@@ -2,13 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { Trophy, Users, Plus, Link2, LogIn, LogOut, Crown } from "lucide-react";
+import { Trophy, Users, Plus, Link2, LogIn, LogOut, Crown, Trash2 } from "lucide-react";
 import {
   useMyLeagues,
   useLeagueLeaderboard,
   useCreateLeague,
   useJoinLeague,
   useLeaveLeague,
+  useDeleteLeague,
 } from "@/hooks/use-leagues";
 import { cn } from "@/lib/utils";
 import type { Division } from "@/store/viax-store";
@@ -54,6 +55,7 @@ function LeaguesPage() {
   const { mutateAsync: create, isPending: creating } = useCreateLeague();
   const { mutateAsync: join, isPending: joining } = useJoinLeague();
   const { mutateAsync: leave } = useLeaveLeague();
+  const { mutateAsync: deleteLeague, isPending: deleting } = useDeleteLeague();
 
   const selectedLeague = leagues.find((l) => l.id === selectedLeagueId);
 
@@ -100,6 +102,22 @@ function LeaguesPage() {
       toast.error("Erro ao sair da liga.");
     }
   };
+
+  const handleDelete = async (leagueId: string, leagueName: string) => {
+    if (!window.confirm(`Excluir a liga "${leagueName}"? Essa ação não pode ser desfeita.`)) return;
+    try {
+      const res = await deleteLeague(leagueId);
+      if (res.ok) {
+        toast.success(`Liga "${leagueName}" excluída.`);
+        if (selectedLeagueId === leagueId) setSelectedLeagueId(null);
+      } else {
+        toast.error("Não foi possível excluir a liga.");
+      }
+    } catch {
+      toast.error("Erro ao excluir liga.");
+    }
+  };
+
 
   const copyInvite = (code: string) => {
     navigator.clipboard.writeText(code).then(() => toast.success("Código copiado!"));
@@ -309,7 +327,16 @@ function LeaguesPage() {
               <Trophy className="size-4 text-warn" />
               {selectedLeague.name} — <span className="text-highlight">Ranking</span>
             </h2>
-            {!selectedLeague.is_creator && (
+            {selectedLeague.is_creator ? (
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={() => handleDelete(selectedLeague.id, selectedLeague.name)}
+                className="inline-flex items-center gap-1 rounded-lg border border-down/30 px-2 py-1 text-xs text-down hover:bg-down/10 disabled:opacity-50"
+              >
+                <Trash2 className="size-3" /> {deleting ? "Excluindo…" : "Excluir liga"}
+              </button>
+            ) : (
               <button
                 type="button"
                 onClick={() => handleLeave(selectedLeague.id, selectedLeague.name)}

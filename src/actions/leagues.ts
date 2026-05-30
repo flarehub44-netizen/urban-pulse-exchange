@@ -77,6 +77,22 @@ export const leaveLeagueFn = createServerFn({ method: "POST" })
     return res as { ok: boolean };
   });
 
+export const deleteLeagueFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ league_id: z.string().uuid() }))
+  .handler(async ({ context, data }) => {
+    const { supabase } = getSupabaseCtx(context);
+    const { data: res, error } = await (supabase.rpc as unknown as (
+      fn: string,
+      params: Record<string, unknown>,
+    ) => Promise<{ data: unknown; error: { message: string } | null }>)(
+      "delete_league",
+      { p_league_id: data.league_id },
+    );
+    if (error) throw new Error(error.message);
+    return res as { ok: boolean; reason?: string };
+  });
+
 export const getLeagueLeaderboardFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator(z.object({ league_id: z.string().uuid() }))

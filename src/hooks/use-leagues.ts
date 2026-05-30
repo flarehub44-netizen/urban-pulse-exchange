@@ -4,6 +4,7 @@ import {
   createLeagueFn,
   joinLeagueFn,
   leaveLeagueFn,
+  deleteLeagueFn,
   getLeagueLeaderboardFn,
 } from "@/actions/leagues";
 
@@ -49,5 +50,16 @@ export function useLeaveLeague() {
   return useMutation({
     mutationFn: (league_id: string) => leaveLeagueFn({ data: { league_id } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["leagues"] }),
+  });
+}
+
+export function useDeleteLeague() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (league_id: string) => deleteLeagueFn({ data: { league_id } }),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ["leagues"] });
+      await qc.refetchQueries({ queryKey: ["leagues"] });
+    },
   });
 }
