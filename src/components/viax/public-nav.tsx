@@ -17,7 +17,7 @@ export function PublicNav({ variant = "shell" }: PublicNavProps) {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-3">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:gap-4 sm:px-6">
         <Link to="/" className="flex shrink-0 items-center gap-2">
           <Logo />
           <span className="font-semibold tracking-tight">ViaX</span>
