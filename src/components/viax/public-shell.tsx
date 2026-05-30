@@ -9,7 +9,7 @@ type PublicShellProps = {
 
 export function PublicShell({ children }: PublicShellProps) {
   return (
-    <div className="min-h-screen bg-background pb-20 md:pb-0">
+    <div className="min-h-screen overflow-x-hidden bg-background pb-20 md:pb-0">
       <PublicNav variant="shell" />
 
       <main className="mx-auto max-w-7xl px-4 py-6 lg:px-6">{children}</main>
