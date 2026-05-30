@@ -45,6 +45,7 @@ function LeaguesPage() {
   const { data: leagues = [], isLoading } = useMyLeagues();
   const [selectedLeagueId, setSelectedLeagueId] = useState<string | null>(null);
   const [createName, setCreateName] = useState("");
+  const [createIsPublic, setCreateIsPublic] = useState(false);
   const [joinCode, setJoinCode] = useState("");
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
@@ -59,11 +60,12 @@ function LeaguesPage() {
   const handleCreate = async () => {
     if (!createName.trim()) return;
     try {
-      const res = await create(createName.trim());
+      const res = await create({ name: createName.trim(), is_public: createIsPublic });
       toast.success(`Liga "${res.name}" criada!`, {
         description: `Código de convite: ${res.invite_code}`,
       });
       setCreateName("");
+      setCreateIsPublic(false);
       setShowCreate(false);
       setSelectedLeagueId(res.id);
     } catch {
@@ -107,7 +109,7 @@ function LeaguesPage() {
     <div className="space-y-6">
       <div>
         <h1 className="heading-page text-2xl">
-          <span className="text-highlight">Ligas</span> Privadas
+          Suas <span className="text-highlight">Ligas</span>
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Crie um grupo com amigos e compita no ranking da sua liga.
@@ -163,6 +165,32 @@ function LeaguesPage() {
               className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
             >
               {creating ? "Criando…" : "Criar"}
+            </button>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setCreateIsPublic(false)}
+              className={cn(
+                "rounded-lg border px-3 py-1.5 text-xs transition",
+                !createIsPublic
+                  ? "border-primary/60 bg-primary/15 text-primary"
+                  : "border-border text-muted-foreground hover:bg-surface",
+              )}
+            >
+              🔒 Privada (só com código)
+            </button>
+            <button
+              type="button"
+              onClick={() => setCreateIsPublic(true)}
+              className={cn(
+                "rounded-lg border px-3 py-1.5 text-xs transition",
+                createIsPublic
+                  ? "border-primary/60 bg-primary/15 text-primary"
+                  : "border-border text-muted-foreground hover:bg-surface",
+              )}
+            >
+              🌐 Pública (qualquer um vê)
             </button>
           </div>
         </motion.div>
@@ -241,6 +269,16 @@ function LeaguesPage() {
               <div className="mt-2 flex items-center gap-2">
                 <span className="mono text-xs text-muted-foreground border border-dashed border-border/60 rounded px-2 py-0.5">
                   {league.invite_code}
+                </span>
+                <span
+                  className={cn(
+                    "text-[10px] rounded px-1.5 py-0.5 border",
+                    league.is_public
+                      ? "border-primary/40 text-primary bg-primary/10"
+                      : "border-border text-muted-foreground",
+                  )}
+                >
+                  {league.is_public ? "🌐 Pública" : "🔒 Privada"}
                 </span>
                 <button
                   type="button"

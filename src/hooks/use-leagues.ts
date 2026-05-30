@@ -27,8 +27,12 @@ export function useLeagueLeaderboard(leagueId: string | null) {
 export function useCreateLeague() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (name: string) => createLeagueFn({ data: { name } }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["leagues"] }),
+    mutationFn: (input: { name: string; is_public?: boolean }) =>
+      createLeagueFn({ data: input }),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ["leagues"] });
+      await qc.refetchQueries({ queryKey: ["leagues"] });
+    },
   });
 }
 

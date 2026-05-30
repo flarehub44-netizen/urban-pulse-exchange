@@ -6344,7 +6344,9 @@ export type Database = {
         }
         Returns: Json
       }
-      create_league: { Args: { p_name: string }; Returns: Json }
+      create_league:
+        | { Args: { p_name: string }; Returns: Json }
+        | { Args: { p_is_public?: boolean; p_name: string }; Returns: Json }
       create_market: {
         Args: {
           p_ai_confidence?: number

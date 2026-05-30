@@ -9,6 +9,7 @@ export type League = {
   invite_code: string;
   is_creator: boolean;
   member_count: number;
+  is_public: boolean;
 };
 
 export type LeagueMember = {
@@ -33,12 +34,17 @@ export const getMyLeaguesFn = createServerFn({ method: "GET" })
 
 export const createLeagueFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(z.object({ name: z.string().min(2).max(40) }))
+  .inputValidator(
+    z.object({ name: z.string().min(2).max(40), is_public: z.boolean().optional() }),
+  )
   .handler(async ({ context, data }) => {
     const { supabase } = getSupabaseCtx(context);
-    const { data: res, error } = await supabase.rpc("create_league", { p_name: data.name });
+    const { data: res, error } = await supabase.rpc("create_league", {
+      p_name: data.name,
+      p_is_public: data.is_public ?? false,
+    });
     if (error) throw new Error(error.message);
-    return res as { id: string; name: string; invite_code: string };
+    return res as { id: string; name: string; invite_code: string; is_public: boolean };
   });
 
 export const joinLeagueFn = createServerFn({ method: "POST" })
