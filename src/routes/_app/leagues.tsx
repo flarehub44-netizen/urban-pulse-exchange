@@ -167,6 +167,32 @@ function LeaguesPage() {
               {creating ? "Criando…" : "Criar"}
             </button>
           </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setCreateIsPublic(false)}
+              className={cn(
+                "rounded-lg border px-3 py-1.5 text-xs transition",
+                !createIsPublic
+                  ? "border-primary/60 bg-primary/15 text-primary"
+                  : "border-border text-muted-foreground hover:bg-surface",
+              )}
+            >
+              🔒 Privada (só com código)
+            </button>
+            <button
+              type="button"
+              onClick={() => setCreateIsPublic(true)}
+              className={cn(
+                "rounded-lg border px-3 py-1.5 text-xs transition",
+                createIsPublic
+                  ? "border-primary/60 bg-primary/15 text-primary"
+                  : "border-border text-muted-foreground hover:bg-surface",
+              )}
+            >
+              🌐 Pública (qualquer um vê)
+            </button>
+          </div>
         </motion.div>
       )}
 
