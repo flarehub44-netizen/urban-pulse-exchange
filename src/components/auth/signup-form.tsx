@@ -11,6 +11,7 @@ type SignupFormProps = {
 
 export function SignupForm({ onSuccess, onNeedsVerify }: SignupFormProps) {
   const [name, setName] = useState("");
+  const [handle, setHandle] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [cpf, setCpf] = useState("");
@@ -44,6 +45,11 @@ export function SignupForm({ onSuccess, onNeedsVerify }: SignupFormProps) {
       toast.error(copy.auth.nameMin);
       return;
     }
+    const handleTrim = handle.trim().replace(/^@+/, "");
+    if (!/^[a-zA-Z0-9_]{3,20}$/.test(handleTrim)) {
+      toast.error(copy.auth.handleInvalid);
+      return;
+    }
     if (!isValidCpf(cpf)) {
       toast.error(copy.auth.cpfInvalid);
       return;
@@ -66,7 +72,7 @@ export function SignupForm({ onSuccess, onNeedsVerify }: SignupFormProps) {
         toast.success(copy.auth.verifySent);
         onNeedsVerify();
       } else {
-        await runPostRegistrationFlow(name.trim());
+        await runPostRegistrationFlow(name.trim(), handleTrim);
         toast.success(copy.auth.signupSuccess);
         onSuccess();
       }
@@ -90,6 +96,25 @@ export function SignupForm({ onSuccess, onNeedsVerify }: SignupFormProps) {
           onChange={(e) => setName(e.target.value)}
           className="mt-1 w-full rounded-lg border bg-surface px-3 py-2"
         />
+      </label>
+      <label className="block text-sm">
+        <span className="text-muted-foreground">{copy.auth.handleLabel}</span>
+        <div className="mt-1 flex items-center rounded-lg border bg-surface px-3 py-2 focus-within:ring-1 focus-within:ring-primary">
+          <span className="text-muted-foreground">@</span>
+          <input
+            type="text"
+            required
+            minLength={3}
+            maxLength={20}
+            autoComplete="username"
+            pattern="[a-zA-Z0-9_]{3,20}"
+            value={handle}
+            onChange={(e) => setHandle(e.target.value.replace(/^@+/, ""))}
+            className="ml-1 w-full bg-transparent outline-none"
+            placeholder="seu_usuario"
+          />
+        </div>
+        <span className="mt-1 block text-xs text-muted-foreground">{copy.auth.handleHint}</span>
       </label>
       <label className="block text-sm">
         <span className="text-muted-foreground">{copy.auth.emailLabel}</span>
