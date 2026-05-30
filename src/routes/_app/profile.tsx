@@ -122,15 +122,15 @@ function Profile() {
 
       <div className="rounded-2xl border bg-gradient-to-br from-primary/10 via-card/60 to-card/40 p-6 backdrop-blur">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-          <img src={me.avatar} className="size-20 rounded-2xl border bg-surface" alt={me.name} />
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <h1 className="heading-page text-2xl">
+          <img src={me.avatar} className="size-20 shrink-0 rounded-2xl border bg-surface" alt={me.name} />
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="heading-page text-2xl break-words [overflow-wrap:anywhere] min-w-0">
                 <span className="text-highlight">{me.name}</span>
               </h1>
               <DivisionBadge division={me.division} />
             </div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground break-words">
               @{me.handle} · São Paulo · Pinheiros
             </div>
             <div className="mt-3 flex items-center gap-3">
