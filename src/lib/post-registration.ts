@@ -5,7 +5,10 @@ import { getOrCreateDeviceId } from "@/lib/device-id";
 
 const DONE_KEY = "viax_post_registration_done";
 
-export async function runPostRegistrationFlow(displayName?: string | null) {
+export async function runPostRegistrationFlow(
+  displayName?: string | null,
+  handle?: string | null,
+) {
   if (typeof window === "undefined") return;
   const uid = (await supabase.auth.getUser()).data.user?.id;
   if (!uid) return;
@@ -26,6 +29,15 @@ export async function runPostRegistrationFlow(displayName?: string | null) {
 
     const payload = data as { ok?: boolean; reason?: string };
     if (payload?.ok === false && payload?.reason === "email_not_confirmed") return;
+
+    const trimmedHandle = handle?.trim();
+    if (trimmedHandle) {
+      const { error: handleErr } = await supabase.rpc("update_profile", {
+        p_handle: trimmedHandle,
+      });
+      if (handleErr) console.warn("[auth] set handle:", handleErr.message);
+    }
+
 
     try {
       const bonus = await grantEmailLinkBonusFn({ data: undefined });
