@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireAdminAuth } from "@/integrations/supabase/admin-middleware";
 import { requireRegisteredAuth } from "@/integrations/supabase/require-registered-middleware";
 import type { Json } from "@/integrations/supabase/types";
 
@@ -162,21 +163,21 @@ export const voidCommunityMarketFn = createServerFn({ method: "POST" })
   });
 
 export const getAdminCommunityMarketsFn = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminAuth])
   .handler(async ({ context }) => {
     const { supabase } = getSupabaseCtx(context);
     return adminRpc(() => supabase.rpc("get_admin_community_markets_list"));
   });
 
 export const getAdminCommunityReportsFn = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminAuth])
   .handler(async ({ context }) => {
     const { supabase } = getSupabaseCtx(context);
     return adminRpc(() => supabase.rpc("get_admin_community_reports", { p_limit: 50 }));
   });
 
 export const adminVoidCommunityMarketFn = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminAuth])
   .inputValidator(z.object({ marketId: z.string(), reason: z.string().optional() }))
   .handler(async ({ data, context }) => {
     const { supabase } = getSupabaseCtx(context);

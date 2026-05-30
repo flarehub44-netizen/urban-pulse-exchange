@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireAdminAuth } from "@/integrations/supabase/admin-middleware";
 import { getSupabaseCtx } from "@/integrations/supabase/context";
 import { mapSupabaseBusinessError } from "@/lib/server-errors";
 
@@ -88,7 +89,7 @@ export const getMyEventImpactSummaryFn = createServerFn({ method: "GET" })
   });
 
 export const adminListMonthlyImpactWinnersFn = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminAuth])
   .inputValidator(z.object({ month: z.string().optional() }).optional())
   .handler(async ({ data, context }) => {
     const { supabase } = getSupabaseCtx(context);
@@ -100,7 +101,7 @@ export const adminListMonthlyImpactWinnersFn = createServerFn({ method: "GET" })
   });
 
 export const adminMarkImpactPrizeFulfilledFn = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminAuth])
   .inputValidator(z.object({ winner_id: z.string().uuid(), notes: z.string().max(500).optional() }))
   .handler(async ({ data, context }) => {
     const { supabase } = getSupabaseCtx(context);

@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireAdminAuth } from "@/integrations/supabase/admin-middleware";
 import { getSupabaseCtx } from "@/integrations/supabase/context";
 import { getServiceClient } from "@/lib/supabase-service.server";
 
@@ -9,16 +9,10 @@ const banSchema = z.object({
 });
 
 export const adminBanCpaFraudUsersFn = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminAuth])
   .inputValidator(banSchema)
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = getSupabaseCtx(context);
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("is_admin")
-      .eq("id", userId)
-      .single();
-    if (!profile?.is_admin) throw new Error("Admin only");
+    const { supabase } = getSupabaseCtx(context);
     const service = getServiceClient();
 
     const { data: rpcData, error } = await supabase.rpc("admin_ban_cpa_fraud_users", {
