@@ -103,6 +103,22 @@ function LeaguesPage() {
     }
   };
 
+  const handleDelete = async (leagueId: string, leagueName: string) => {
+    if (!window.confirm(`Excluir a liga "${leagueName}"? Essa ação não pode ser desfeita.`)) return;
+    try {
+      const res = await deleteLeague(leagueId);
+      if (res.ok) {
+        toast.success(`Liga "${leagueName}" excluída.`);
+        if (selectedLeagueId === leagueId) setSelectedLeagueId(null);
+      } else {
+        toast.error("Não foi possível excluir a liga.");
+      }
+    } catch {
+      toast.error("Erro ao excluir liga.");
+    }
+  };
+
+
   const copyInvite = (code: string) => {
     navigator.clipboard.writeText(code).then(() => toast.success("Código copiado!"));
   };
