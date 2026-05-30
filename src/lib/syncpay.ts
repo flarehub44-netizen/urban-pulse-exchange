@@ -9,6 +9,10 @@ const LEGACY_API_KEY = process.env.SYNCPAY_API_KEY ?? "";
 const WEBHOOK_SECRET = process.env.SYNCPAY_WEBHOOK_SECRET ?? "";
 const CASHIN_PATH = process.env.SYNCPAY_CASHIN_PATH ?? "/api/partner/v1/cash-in";
 const CASHOUT_PATH = process.env.SYNCPAY_CASHOUT_PATH ?? "/api/partner/v1/cash-out";
+const CASHOUT_STATUS_PATH =
+  process.env.SYNCPAY_CASHOUT_STATUS_PATH ?? "/api/partner/v1/cash-out/{id}";
+const CASHIN_STATUS_PATH =
+  process.env.SYNCPAY_CASHIN_STATUS_PATH ?? "/api/partner/v1/cash-in/{id}";
 const WEBHOOK_URL = process.env.SYNCPAY_WEBHOOK_URL ?? "";
 const AUTH_TOKEN_PATH = "/api/partner/v1/auth-token";
 const REQUEST_TIMEOUT_MS = 10_000;
