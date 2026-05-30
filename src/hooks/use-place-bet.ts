@@ -7,17 +7,25 @@ export function usePlaceBet() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      marketId,
-      side,
-      stake,
-      idempotencyKey,
-    }: {
+    mutationFn: (vars: {
       marketId: string;
       side: Side;
       stake: number;
       idempotencyKey?: string;
-    }) => placeBetFn({ data: { marketId, side, stake, idempotencyKey: idempotencyKey ?? crypto.randomUUID() } }),
+    }) => {
+      // Persist the key on the variables object so React Query retries reuse
+      // it instead of generating a new UUID each attempt — prevents double
+      // billing on network timeouts.
+      if (!vars.idempotencyKey) vars.idempotencyKey = crypto.randomUUID();
+      return placeBetFn({
+        data: {
+          marketId: vars.marketId,
+          side: vars.side,
+          stake: vars.stake,
+          idempotencyKey: vars.idempotencyKey,
+        },
+      });
+    },
 
     onMutate: async ({ marketId, side, stake }) => {
       await queryClient.cancelQueries({ queryKey: ["markets"] });
