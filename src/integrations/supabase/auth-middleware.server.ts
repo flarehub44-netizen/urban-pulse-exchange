@@ -5,7 +5,9 @@ import type { Database } from "./types";
 import { resolveSupabasePublicEnv } from "./env";
 
 export const requireSupabaseAuth = createMiddleware({ type: "function" }).server(
-  async ({ next, request }) => {
+  async (options) => {
+    const { next } = options;
+    const request = (options as unknown as { request?: Request }).request;
     const { url: SUPABASE_URL, publishableKey: SUPABASE_PUBLISHABLE_KEY } =
       resolveSupabasePublicEnv();
 
