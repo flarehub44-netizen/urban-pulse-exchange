@@ -2,13 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { Trophy, Users, Plus, Link2, LogIn, LogOut, Crown } from "lucide-react";
+import { Trophy, Users, Plus, Link2, LogIn, LogOut, Crown, Trash2 } from "lucide-react";
 import {
   useMyLeagues,
   useLeagueLeaderboard,
   useCreateLeague,
   useJoinLeague,
   useLeaveLeague,
+  useDeleteLeague,
 } from "@/hooks/use-leagues";
 import { cn } from "@/lib/utils";
 import type { Division } from "@/store/viax-store";
