@@ -28,15 +28,39 @@ export function useEnsureCpfForPix() {
   const hasCpf = hasValidProfileCpf(cpfQuery.data);
 
   const ensureCpf = useCallback(
-    (action: () => void) => {
+    async (action: () => void) => {
+      // Fast path: cached profile already has a valid CPF.
       if (hasCpf) {
         action();
         return;
       }
+      // Re-check against the DB before prompting — avoids asking for CPF
+      // when the local cache is stale (e.g., right after signup or after
+      // the user filled CPF in another tab/device).
+      if (!userId) {
+        pendingActionRef.current = action;
+        setSheetOpen(true);
+        return;
+      }
+      try {
+        const { data } = await supabase
+          .from("profiles")
+          .select("cpf")
+          .eq("id", userId)
+          .single();
+        const fresh = (data?.cpf as string | null) ?? null;
+        queryClient.setQueryData(["profile-cpf", userId], fresh);
+        if (hasValidProfileCpf(fresh)) {
+          action();
+          return;
+        }
+      } catch {
+        // fall through to the capture sheet
+      }
       pendingActionRef.current = action;
       setSheetOpen(true);
     },
-    [hasCpf],
+    [hasCpf, userId, queryClient],
   );
 
   const onCpfSaved = useCallback(() => {
