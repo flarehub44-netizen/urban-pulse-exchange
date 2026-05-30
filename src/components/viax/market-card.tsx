@@ -166,7 +166,7 @@ export function MarketCard({
         >
           <h3
             className={cn(
-              "font-medium text-foreground leading-snug",
+              "font-medium text-foreground leading-snug break-words [overflow-wrap:anywhere]",
               compact ? "text-sm" : "text-[15px]",
             )}
           >
