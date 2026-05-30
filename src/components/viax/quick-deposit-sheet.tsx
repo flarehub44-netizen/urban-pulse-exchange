@@ -139,7 +139,11 @@ export function QuickDepositSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-2xl pb-8" data-testid="quick-deposit-sheet">
+      <SheetContent
+        side="bottom"
+        className="rounded-t-2xl pb-8 sm:max-w-lg sm:mx-auto sm:inset-x-0 sm:rounded-2xl sm:bottom-6 max-h-[92vh] overflow-y-auto"
+        data-testid="quick-deposit-sheet"
+      >
         <SheetHeader className="mb-4">
           <SheetTitle className="flex items-center gap-2">
             <Wallet className="size-4 text-primary" />
