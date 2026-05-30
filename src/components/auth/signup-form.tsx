@@ -11,6 +11,7 @@ type SignupFormProps = {
 
 export function SignupForm({ onSuccess, onNeedsVerify }: SignupFormProps) {
   const [name, setName] = useState("");
+  const [handle, setHandle] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [cpf, setCpf] = useState("");
