@@ -4,6 +4,7 @@ import {
   createLeagueFn,
   joinLeagueFn,
   leaveLeagueFn,
+  deleteLeagueFn,
   getLeagueLeaderboardFn,
 } from "@/actions/leagues";
 
