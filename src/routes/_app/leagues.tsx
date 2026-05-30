@@ -55,6 +55,7 @@ function LeaguesPage() {
   const { mutateAsync: create, isPending: creating } = useCreateLeague();
   const { mutateAsync: join, isPending: joining } = useJoinLeague();
   const { mutateAsync: leave } = useLeaveLeague();
+  const { mutateAsync: deleteLeague, isPending: deleting } = useDeleteLeague();
 
   const selectedLeague = leagues.find((l) => l.id === selectedLeagueId);
 
