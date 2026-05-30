@@ -72,7 +72,7 @@ export function SignupForm({ onSuccess, onNeedsVerify }: SignupFormProps) {
         toast.success(copy.auth.verifySent);
         onNeedsVerify();
       } else {
-        await runPostRegistrationFlow(name.trim());
+        await runPostRegistrationFlow(name.trim(), handleTrim);
         toast.success(copy.auth.signupSuccess);
         onSuccess();
       }
