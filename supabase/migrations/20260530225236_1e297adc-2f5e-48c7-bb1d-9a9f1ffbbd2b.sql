@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.list_public_community_markets(integer) TO anon, authenticated, service_role;
