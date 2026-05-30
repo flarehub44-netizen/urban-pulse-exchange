@@ -89,7 +89,7 @@ export const getMyEventImpactSummaryFn = createServerFn({ method: "GET" })
   });
 
 export const adminListMonthlyImpactWinnersFn = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminAuth])
   .inputValidator(z.object({ month: z.string().optional() }).optional())
   .handler(async ({ data, context }) => {
     const { supabase } = getSupabaseCtx(context);
