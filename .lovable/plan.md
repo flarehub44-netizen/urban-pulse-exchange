@@ -1,20 +1,21 @@
-O erro ainda acontece porque o runtime onde o app está executando não tem `SUPABASE_SERVICE_ROLE_KEY` disponível. Eu confirmei isso nos logs publicados: há registros recentes de `SUPABASE_SERVICE_ROLE_KEY not configured in production`, e a lista de secrets do projeto mostra `SUPABASE_URL` e `SUPABASE_PUBLISHABLE_KEY`, mas não mostra `SUPABASE_SERVICE_ROLE_KEY`.
+## Objetivo
 
-Plano de correção:
+Limpar do painel de segurança as ~155 findings repetidas do tipo `authenticated_security_definer_function_executable` — todas referentes a funções RPC da aplicação (`admin_*`, `place_football_bet`, `_compute_*`, etc.) que já fazem checagem interna de autorização (`assert_admin_mfa`, `has_role`, etc.).
 
-1. Adicionar o secret no ambiente do projeto
-   - Criar `SUPABASE_SERVICE_ROLE_KEY` como secret de backend do projeto.
-   - Usar a chave `service_role` do Supabase em `rzhffxiicufqcabmhscq`, não a chave anon/publishable.
-   - Não colocar essa chave no frontend nem com prefixo `VITE_`.
+A decisão de aceitar esse risco já foi tomada e registrada na security memory na rodada anterior; falta apenas aplicar o `ignore` em cada finding individual.
 
-2. Validar se o app publicado está lendo o secret certo
-   - Após adicionar o secret, testar novamente a geração do Pix no domínio usado em produção.
-   - Checar os logs publicados por `SUPABASE_SERVICE_ROLE_KEY` e `Supabase service role not configured`.
+## Passos
 
-3. Se ainda falhar, ajustar fallback de compatibilidade
-   - Revisar os pontos server-side que leem `SUPABASE_SERVICE_ROLE_KEY`.
-   - Se necessário, aceitar também um nome alternativo seguro, por exemplo `SUPABASE_SERVICE_KEY`, para contornar restrições de nomes reservados em algum provedor, mantendo tudo server-side.
+1. Parsear o arquivo colado e extrair o `cache_key` (internal_id) de cada uma das ~155 linhas.
+2. Chamar `security--manage_security_finding` em lote (uma única call com array `operations`) com:
+   - `operation: "ignore"`
+   - `scanner_name: "authenticated_security_definer_function_executable"`
+   - `internal_id`: cada cache_key extraído
+   - `explanation`: "RPC da aplicação com checagem interna de autorização (assert_admin_mfa / has_role). Risco aceito — ver security memory."
+3. Confirmar via `security--get_scan_results` que o contador caiu.
 
-4. Melhorar o diagnóstico do erro
-   - Trocar a mensagem genérica por uma mensagem operacional mais clara nos logs, indicando exatamente quais variáveis faltam no runtime publicado.
-   - Manter a resposta para o usuário sem expor detalhes sensíveis.
+## Não faz parte
+
+- Nenhuma alteração de schema, função ou código frontend.
+- Nenhum revoke de EXECUTE — a postura "aceitar e ignorar" continua valendo.
+- Security memory já está atualizada; não será reescrita.
