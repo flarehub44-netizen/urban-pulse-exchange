@@ -327,7 +327,16 @@ function LeaguesPage() {
               <Trophy className="size-4 text-warn" />
               {selectedLeague.name} — <span className="text-highlight">Ranking</span>
             </h2>
-            {!selectedLeague.is_creator && (
+            {selectedLeague.is_creator ? (
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={() => handleDelete(selectedLeague.id, selectedLeague.name)}
+                className="inline-flex items-center gap-1 rounded-lg border border-down/30 px-2 py-1 text-xs text-down hover:bg-down/10 disabled:opacity-50"
+              >
+                <Trash2 className="size-3" /> {deleting ? "Excluindo…" : "Excluir liga"}
+              </button>
+            ) : (
               <button
                 type="button"
                 onClick={() => handleLeave(selectedLeague.id, selectedLeague.name)}
