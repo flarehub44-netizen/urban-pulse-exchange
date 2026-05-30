@@ -101,7 +101,7 @@ export const adminListMonthlyImpactWinnersFn = createServerFn({ method: "GET" })
   });
 
 export const adminMarkImpactPrizeFulfilledFn = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminAuth])
   .inputValidator(z.object({ winner_id: z.string().uuid(), notes: z.string().max(500).optional() }))
   .handler(async ({ data, context }) => {
     const { supabase } = getSupabaseCtx(context);
