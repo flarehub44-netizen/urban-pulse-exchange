@@ -98,6 +98,25 @@ export function SignupForm({ onSuccess, onNeedsVerify }: SignupFormProps) {
         />
       </label>
       <label className="block text-sm">
+        <span className="text-muted-foreground">{copy.auth.handleLabel}</span>
+        <div className="mt-1 flex items-center rounded-lg border bg-surface px-3 py-2 focus-within:ring-1 focus-within:ring-primary">
+          <span className="text-muted-foreground">@</span>
+          <input
+            type="text"
+            required
+            minLength={3}
+            maxLength={20}
+            autoComplete="username"
+            pattern="[a-zA-Z0-9_]{3,20}"
+            value={handle}
+            onChange={(e) => setHandle(e.target.value.replace(/^@+/, ""))}
+            className="ml-1 w-full bg-transparent outline-none"
+            placeholder="seu_usuario"
+          />
+        </div>
+        <span className="mt-1 block text-xs text-muted-foreground">{copy.auth.handleHint}</span>
+      </label>
+      <label className="block text-sm">
         <span className="text-muted-foreground">{copy.auth.emailLabel}</span>
         <input
           type="email"
