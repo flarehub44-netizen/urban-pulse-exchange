@@ -45,6 +45,7 @@ function LeaguesPage() {
   const { data: leagues = [], isLoading } = useMyLeagues();
   const [selectedLeagueId, setSelectedLeagueId] = useState<string | null>(null);
   const [createName, setCreateName] = useState("");
+  const [createIsPublic, setCreateIsPublic] = useState(false);
   const [joinCode, setJoinCode] = useState("");
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
@@ -59,11 +60,12 @@ function LeaguesPage() {
   const handleCreate = async () => {
     if (!createName.trim()) return;
     try {
-      const res = await create(createName.trim());
+      const res = await create({ name: createName.trim(), is_public: createIsPublic });
       toast.success(`Liga "${res.name}" criada!`, {
         description: `Código de convite: ${res.invite_code}`,
       });
       setCreateName("");
+      setCreateIsPublic(false);
       setShowCreate(false);
       setSelectedLeagueId(res.id);
     } catch {
