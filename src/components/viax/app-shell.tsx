@@ -31,7 +31,7 @@ export function AppShell({ children }: AppShellProps) {
       <CasinoBoot />
       <div className="flex">
         <AppSidebar />
-        <div className="flex min-h-screen flex-1 flex-col">
+        <div className="flex min-h-screen min-w-0 flex-1 flex-col overflow-x-hidden">
           <Topbar />
           <main className="app-canvas relative flex-1 px-4 pb-24 pt-6 lg:px-6 lg:pb-10">
             <div className="relative z-10">{children}</div>
