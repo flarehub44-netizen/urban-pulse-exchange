@@ -1,1 +1,18 @@
 project_id = "rzhffxiicufqcabmhscq"
+
+[auth]
+site_url = "https://viax.life"
+additional_redirect_urls = [
+  "https://viax.life/**",
+  "https://viax-urban-pulse.douglaspinheirosantos94.workers.dev/**",
+  "https://viax.lovable.app/**",
+  "http://localhost:5173/**",
+]
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
+[auth.email]
+max_frequency = "1m0s"
+otp_length = 8

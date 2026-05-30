@@ -6,8 +6,13 @@
   "main": "src/server.ts",
   // Required at deploy (wrangler secret put or Dashboard → Variables):
   //   SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, SUPABASE_SERVICE_ROLE_KEY
-  //   API_FOOTBALL_KEY, CRON_SECRET
+  //   API_FOOTBALL_KEY, CRON_SECRET, CRON_HMAC_SECRET, VELOCITY_HMAC_SECRET
   //   SYNCPAY_API_URL, SYNCPAY_CLIENT_ID, SYNCPAY_CLIENT_SECRET, SYNCPAY_WEBHOOK_SECRET
+  //   SYNCPAY_WEBHOOK_URL (https://viax.life/api/public/webhooks/syncpay)
+  // Lovable Cloud (viax.life): set the same keys in Project → Cloud → Environment variables.
+  "vars": {
+    "PUBLIC_DOMAIN": "viax.life",
+  },
   "triggers": {
     "crons": [
       "*/30 * * * *",

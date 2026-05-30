@@ -129,8 +129,19 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 
 type ScheduledContext = { waitUntil: (p: Promise<unknown>) => void };
 
+/** Cloudflare/Lovable bindings arrive on `env`; copy string secrets into process.env for server code. */
+function bindWorkerEnv(env: unknown): void {
+  if (!env || typeof env !== "object") return;
+  for (const [key, value] of Object.entries(env as Record<string, unknown>)) {
+    if (typeof value === "string" && value.length > 0) {
+      process.env[key] ??= value;
+    }
+  }
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    bindWorkerEnv(env);
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
@@ -146,7 +157,8 @@ export default {
    * Primary football cron executor (see docs/OPS_CRONS.md).
    * HTTP /api/cron/* is for manual runs with CRON_SECRET only.
    */
-  scheduled(event: { cron?: string }, _env: unknown, ctx: ScheduledContext) {
+  scheduled(event: { cron?: string }, env: unknown, ctx: ScheduledContext) {
+    bindWorkerEnv(env);
     if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return;
     const cron = event.cron ?? "";
     ctx.waitUntil(

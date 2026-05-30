@@ -264,22 +264,1228 @@ export type Database = {
           region_id?: string
           vehicle_count?: number
         }
-        Relationships: [
-          {
-            foreignKeyName: "camera_metrics_camera_id_fkey"
-            columns: ["camera_id"]
-            isOneToOne: false
-            referencedRelation: "cameras"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "camera_metrics_region_id_fkey"
-            columns: ["region_id"]
-            isOneToOne: false
-            referencedRelation: "regions"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
+      }
+      camera_metrics_default: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2025m01: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2025m02: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2025m03: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2025m04: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2025m05: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2025m06: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2025m07: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2025m08: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2025m09: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2025m10: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2025m11: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2025m12: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2026m01: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2026m02: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2026m03: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2026m04: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2026m05: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2026m06: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2026m07: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2026m08: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2026m09: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2026m10: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2026m11: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2026m12: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2027m01: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2027m02: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2027m03: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2027m04: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2027m05: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2027m06: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2027m07: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2027m08: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2027m09: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2027m10: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2027m11: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
+      }
+      camera_metrics_new_y2027m12: {
+        Row: {
+          avg_speed_estimate: number | null
+          camera_id: string
+          confidence: number
+          flow_estimate: number
+          id: number
+          recorded_at: string
+          region_id: string
+          vehicle_count: number
+        }
+        Insert: {
+          avg_speed_estimate?: number | null
+          camera_id: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id: string
+          vehicle_count?: number
+        }
+        Update: {
+          avg_speed_estimate?: number | null
+          camera_id?: string
+          confidence?: number
+          flow_estimate?: number
+          id?: number
+          recorded_at?: string
+          region_id?: string
+          vehicle_count?: number
+        }
+        Relationships: []
       }
       camera_upstreams: {
         Row: {
@@ -1533,15 +2739,784 @@ export type Database = {
           p?: number
           recorded_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "market_history_market_id_fkey"
-            columns: ["market_id"]
-            isOneToOne: false
-            referencedRelation: "markets"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
+      }
+      market_history_default: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2025m01: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2025m02: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2025m03: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2025m04: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2025m05: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2025m06: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2025m07: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2025m08: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2025m09: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2025m10: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2025m11: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2025m12: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2026m01: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2026m02: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2026m03: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2026m04: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2026m05: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2026m06: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2026m07: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2026m08: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2026m09: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2026m10: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2026m11: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2026m12: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2027m01: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2027m02: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2027m03: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2027m04: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2027m05: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2027m06: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2027m07: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2027m08: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2027m09: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2027m10: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2027m11: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      market_history_new_y2027m12: {
+        Row: {
+          id: number
+          market_id: string
+          p: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: number
+          market_id: string
+          p: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: number
+          market_id?: string
+          p?: number
+          recorded_at?: string
+        }
+        Relationships: []
       }
       market_reports: {
         Row: {
@@ -3003,6 +4978,58 @@ export type Database = {
         }
         Relationships: []
       }
+      security_velocity_events: {
+        Row: {
+          action: string
+          created_at: string
+          device_hash: string | null
+          id: number
+          ip_hash: string
+          meta: Json
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          device_hash?: string | null
+          id?: number
+          ip_hash: string
+          meta?: Json
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          device_hash?: string | null
+          id?: number
+          ip_hash?: string
+          meta?: Json
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "security_velocity_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "security_velocity_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profile_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "security_velocity_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       syncpay_webhook_events: {
         Row: {
           created_at: string
@@ -4292,6 +6319,7 @@ export type Database = {
       }
       assert_admin: { Args: never; Returns: undefined }
       assert_admin_action_note: { Args: { p_note: string }; Returns: undefined }
+      assert_admin_mfa: { Args: never; Returns: undefined }
       assert_community_market_access: {
         Args: {
           p_access_token?: string
@@ -4386,6 +6414,11 @@ export type Database = {
       }
       enqueue_event_impact_xp: {
         Args: { p_market_id: string }
+        Returns: undefined
+      }
+      ensure_future_partitions: { Args: never; Returns: undefined }
+      ensure_monthly_partition: {
+        Args: { p_month: string; p_parent: unknown }
         Returns: undefined
       }
       evaluate_cpa_fraud_heuristics: {
@@ -4566,6 +6599,7 @@ export type Database = {
         Returns: undefined
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_admin_mfa_required: { Args: never; Returns: boolean }
       is_allowed_stream_url: { Args: { p_url: string }; Returns: boolean }
       is_casino_enabled: { Args: never; Returns: boolean }
       is_current_user_admin: { Args: never; Returns: boolean }
@@ -4594,6 +6628,10 @@ export type Database = {
       maybe_send_deposit_nudge: { Args: never; Returns: Json }
       min_minority_ratio: { Args: never; Returns: number }
       min_oracle_confidence: { Args: never; Returns: number }
+      monthly_withdrawn_brl_for_cpf_hash: {
+        Args: { p_cpf_hash: string; p_timezone?: string }
+        Returns: number
+      }
       normalize_cpf_digits: { Args: { p_document: string }; Returns: string }
       open_market: {
         Args: { p_market_id: string; p_min_minority_ratio?: number }
@@ -4625,6 +6663,10 @@ export type Database = {
         Args: { p_default: number; p_key: string }
         Returns: number
       }
+      payer_cluster_referring_partners: {
+        Args: { p_cpf_hash: string }
+        Returns: Json
+      }
       pick_casino_spin_outcome: { Args: never; Returns: Json }
       pick_traffic_template_random: {
         Args: { p_exclude_id?: string }
@@ -4639,24 +6681,15 @@ export type Database = {
         }
         Returns: Json
       }
-      place_football_bet:
-        | {
-            Args: {
-              p_market_id: string
-              p_outcome: Database["public"]["Enums"]["football_outcome"]
-              p_stake: number
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_idempotency_key?: string
-              p_market_id: string
-              p_outcome: Database["public"]["Enums"]["football_outcome"]
-              p_stake: number
-            }
-            Returns: Json
-          }
+      place_football_bet: {
+        Args: {
+          p_idempotency_key?: string
+          p_market_id: string
+          p_outcome: Database["public"]["Enums"]["football_outcome"]
+          p_stake: number
+        }
+        Returns: Json
+      }
       place_football_bet_as: {
         Args: {
           p_market_id: string
@@ -4670,6 +6703,18 @@ export type Database = {
         Args: { p_market_id: string }
         Returns: Json
       }
+      process_syncpay_webhook_event: {
+        Args: {
+          p_event: string
+          p_payload: Json
+          p_provider_id: string
+          p_received_at?: string
+          p_signature?: string
+        }
+        Returns: Json
+      }
+      prune_camera_metrics: { Args: { p_days?: number }; Returns: number }
+      prune_market_history: { Args: { p_days?: number }; Returns: number }
       record_comeback_if_needed: { Args: never; Returns: Json }
       record_market_view: { Args: { p_market_id: string }; Returns: undefined }
       record_oracle_snapshot: { Args: { p_market_id: string }; Returns: number }
@@ -4765,6 +6810,10 @@ export type Database = {
         Args: { p_key: string; p_max: number; p_window_seconds: number }
         Returns: Json
       }
+      service_assert_velocity_limit: {
+        Args: { p_action: string; p_device_hash?: string; p_ip_hash: string }
+        Returns: Json
+      }
       service_credit_balance: {
         Args: { p_amount: number; p_intent_id: string; p_user_id: string }
         Returns: undefined
@@ -4777,6 +6826,7 @@ export type Database = {
         Args: { p_month?: string }
         Returns: Json
       }
+      service_fraud_cluster_sweep: { Args: never; Returns: Json }
       service_process_syncpay_webhook: {
         Args: {
           p_event: string
@@ -4794,6 +6844,16 @@ export type Database = {
           p_source?: string
           p_user_id: string
           p_webhook_event_id?: string
+        }
+        Returns: undefined
+      }
+      service_record_velocity_event: {
+        Args: {
+          p_action: string
+          p_device_hash?: string
+          p_ip_hash?: string
+          p_meta?: Json
+          p_user_id?: string
         }
         Returns: undefined
       }

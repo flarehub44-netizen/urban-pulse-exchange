@@ -17,7 +17,9 @@
 | `SYNCPAY_WEBHOOK_SECRET` | HMAC do webhook |
 | `SUPABASE_SERVICE_ROLE_KEY` | Atualizar intents / RPC de webhook |
 
-Registrar webhook: `https://<seu-worker>/api/public/webhooks/syncpay`
+Registrar webhook: `https://viax.life/api/public/webhooks/syncpay` (produção) ou `https://viax-urban-pulse.douglaspinheirosantos94.workers.dev/api/public/webhooks/syncpay` (Worker direto).
+
+**Lovable Cloud (`viax.life`):** configure as mesmas variáveis de ambiente do Worker em Project → Cloud → Environment variables (`SUPABASE_SERVICE_ROLE_KEY`, `VELOCITY_HMAC_SECRET`, `SYNCPAY_*`, etc.).
 
 Eventos necessários: `PAYOUT_COMPLETED`, `PAYOUT_FAILED` (e depósitos: `PAYMENT_RECEIVED`, etc.).
 

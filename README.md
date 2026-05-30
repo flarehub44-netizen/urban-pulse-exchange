@@ -61,4 +61,26 @@ GitHub Actions (`.github/workflows/ci.yml`): lint, testes unitários, build, E2E
 npm run deploy
 ```
 
-Secrets no Cloudflare: `SUPABASE_*`, `API_FOOTBALL_KEY` (futebol), etc. Ver `docs/FOOTBALL.md` e `docs/OPS_MARKETS.md`.
+### Cloudflare Worker (`viax-urban-pulse`)
+
+Secrets obrigatórios para Pix, velocity e webhooks:
+
+```bash
+npx wrangler secret put SUPABASE_URL
+npx wrangler secret put SUPABASE_PUBLISHABLE_KEY
+npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+npx wrangler secret put VELOCITY_HMAC_SECRET
+npx wrangler secret put CRON_HMAC_SECRET
+npx wrangler secret put SYNCPAY_WEBHOOK_URL   # https://viax.life/api/public/webhooks/syncpay
+# + SYNCPAY_API_KEY ou SYNCPAY_CLIENT_ID/SECRET, SYNCPAY_WEBHOOK_SECRET, API_FOOTBALL_KEY, CRON_SECRET
+```
+
+Ver também `docs/SYNCPAY_WITHDRAW.md`, `docs/FOOTBALL.md`, `docs/SECURITY.md`.
+
+### Lovable Cloud (`https://viax.life`)
+
+O domínio de produção é servido pelo **Lovable Cloud** (não pelo `workers.dev` direto). Configure as **mesmas** variáveis acima em **Project → Cloud → Environment variables** no painel Lovable, incluindo `SUPABASE_SERVICE_ROLE_KEY` e `VELOCITY_HMAC_SECRET`. Sem isso, depósito Pix falha com *Supabase service role not configured*.
+
+Auth Supabase: `supabase/config.toml` + `npx supabase config push` (Site URL `https://viax.life`).
+
+Webhook SyncPay: registrar `https://viax.life/api/public/webhooks/syncpay` no painel SyncPay.
