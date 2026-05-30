@@ -42,13 +42,14 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const displayError = (captured instanceof Error ? captured : null) ?? error;
   console.error("[root-error]", displayError);
   const router = useRouter();
+  // SECURITY: never render raw error.message — it can leak SQL fragments,
+  // server stack frames, table names, env keys or financial details. Only
+  // surface a generic copy string; the full error is logged server-side.
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold">{copy.root.errorTitle}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {displayError.message?.trim() || copy.root.errorDesc}
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">{copy.root.errorDesc}</p>
         <div className="mt-6 flex justify-center gap-2">
           <button
             onClick={() => {

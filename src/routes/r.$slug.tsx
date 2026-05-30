@@ -61,6 +61,26 @@ function PartnerRedirectPage() {
       }
       storePartnerRef(res.slug, res.campaign_id);
       const target = res.target ?? { path: "/dashboard" };
+      // Allowlist of safe internal prefixes for partner redirect targets.
+      // Prevents open-redirect via maliciously crafted partner.target.path.
+      const ALLOWED_PARTNER_PATHS = [
+        "/dashboard",
+        "/markets",
+        "/live",
+        "/football",
+        "/ranking",
+        "/feed",
+        "/leagues",
+        "/parceiros",
+      ] as const;
+      const isSafePath = (p: string | undefined): p is string =>
+        typeof p === "string" &&
+        p.startsWith("/") &&
+        !p.startsWith("//") &&
+        !p.startsWith("/api") &&
+        !p.startsWith("/admin") &&
+        ALLOWED_PARTNER_PATHS.some((prefix) => p === prefix || p.startsWith(`${prefix}/`));
+
       if (target.market_id) {
         navigate({
           to: "/markets/$marketId",
@@ -70,7 +90,8 @@ function PartnerRedirectPage() {
       } else if (target.city) {
         navigate({ to: "/live", search: { city: target.city }, replace: true });
       } else {
-        navigate({ to: (target.path as "/dashboard") || "/dashboard", replace: true });
+        const safe = isSafePath(target.path) ? target.path : "/dashboard";
+        navigate({ to: safe as "/dashboard", replace: true });
       }
     })();
     return () => {
