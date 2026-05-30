@@ -93,6 +93,10 @@ export function useSupabaseRealtime() {
     setupNotifChannel();
 
     return () => {
+      if (flushHandle !== null) {
+        if (typeof cancelAnimationFrame !== "undefined") cancelAnimationFrame(flushHandle);
+        else clearTimeout(flushHandle);
+      }
       supabase.removeChannel(marketsCh);
       supabase.removeChannel(feedCh);
       if (notifCh) supabase.removeChannel(notifCh);
