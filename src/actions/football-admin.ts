@@ -1,22 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { getSupabaseCtx, type SupabaseFnContext } from "@/integrations/supabase/context";
+import { requireAdminAuth } from "@/integrations/supabase/admin-middleware";
 import type { Json } from "@/integrations/supabase/types";
 import { runFootballResolve, runFootballSync } from "@/lib/football-cron.server";
 
-async function assertAdmin(supabase: SupabaseFnContext["supabase"], userId: string) {
-  const { data: profile, error } = await supabase
-    .from("profiles")
-    .select("is_admin")
-    .eq("id", userId)
-    .maybeSingle();
-  if (error) throw new Error(error.message);
-  if (!profile?.is_admin) throw new Error("Admin only");
-}
-
 export const adminFootballSyncFn = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminAuth])
   .inputValidator(
     z
       .object({
@@ -24,16 +13,12 @@ export const adminFootballSyncFn = createServerFn({ method: "POST" })
       })
       .optional(),
   )
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = getSupabaseCtx(context);
-    await assertAdmin(supabase, userId);
+  .handler(async ({ data }) => {
     return runFootballSync(data?.date) as Promise<Json>;
   });
 
 export const adminFootballResolveFn = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { supabase, userId } = getSupabaseCtx(context);
-    await assertAdmin(supabase, userId);
+  .middleware([requireAdminAuth])
+  .handler(async () => {
     return runFootballResolve() as Promise<Json>;
   });
