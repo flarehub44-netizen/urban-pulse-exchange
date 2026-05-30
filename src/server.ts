@@ -159,7 +159,7 @@ export default {
    */
   scheduled(event: { cron?: string }, env: unknown, ctx: ScheduledContext) {
     bindWorkerEnv(env);
-    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return;
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY && !process.env.VIAX_SUPABASE_SERVICE_ROLE_KEY) return;
     const cron = event.cron ?? "";
     ctx.waitUntil(
       (async () => {
