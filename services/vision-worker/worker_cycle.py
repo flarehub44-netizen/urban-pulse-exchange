@@ -14,11 +14,21 @@ log = logging.getLogger("vision-worker.cycle")
 
 BURST_FRAMES = int(os.environ.get("VISION_BURST_FRAMES", "10"))
 BURST_FPS = int(os.environ.get("VISION_BURST_FPS", "4"))
+APP_BASE_URL = os.environ.get("APP_BASE_URL", "https://viax.lovable.app").rstrip("/")
+
+
+def _resolve_url(url: str) -> str:
+    """Resolve relative proxy URLs (e.g. /api/public/hls-proxy/...) against APP_BASE_URL."""
+    if url.startswith("/"):
+        return f"{APP_BASE_URL}{url}"
+    return url
 
 
 def process_camera(client: SupabaseWorkerClient, cam: dict) -> None:
     cam_id = cam["id"]
     url = cam.get("stream_url")
+    if url:
+        url = _resolve_url(url)
     if not url:
         return
 
