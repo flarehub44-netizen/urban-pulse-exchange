@@ -66,6 +66,7 @@ import { Route as AppNotificationsRouteImport } from './routes/_app/notification
 import { Route as AppLeaguesRouteImport } from './routes/_app/leagues'
 import { Route as AppFeedRouteImport } from './routes/_app/feed'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
+import { Route as AppBetsHistoryRouteImport } from './routes/_app/bets-history'
 import { Route as AppProfileUserIdRouteImport } from './routes/_app/profile.$userId'
 import { Route as AppMarketsCreateRouteImport } from './routes/_app/markets.create'
 import { Route as AppFeedPostIdRouteImport } from './routes/_app/feed.$postId'
@@ -363,6 +364,11 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
+const AppBetsHistoryRoute = AppBetsHistoryRouteImport.update({
+  id: '/bets-history',
+  path: '/bets-history',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProfileUserIdRoute = AppProfileUserIdRouteImport.update({
   id: '/$userId',
   path: '/$userId',
@@ -443,6 +449,7 @@ export interface FileRoutesByFullPath {
   '/parceiros': typeof ParceirosRoute
   '/ranking': typeof RankingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/bets-history': typeof AppBetsHistoryRoute
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRouteWithChildren
   '/leagues': typeof AppLeaguesRoute
@@ -509,6 +516,7 @@ export interface FileRoutesByTo {
   '/parceiros': typeof ParceirosRoute
   '/ranking': typeof RankingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/bets-history': typeof AppBetsHistoryRoute
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRouteWithChildren
   '/leagues': typeof AppLeaguesRoute
@@ -581,6 +589,7 @@ export interface FileRoutesById {
   '/parceiros': typeof ParceirosRoute
   '/ranking': typeof RankingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_app/bets-history': typeof AppBetsHistoryRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/feed': typeof AppFeedRouteWithChildren
   '/_app/leagues': typeof AppLeaguesRoute
@@ -653,6 +662,7 @@ export interface FileRouteTypes {
     | '/parceiros'
     | '/ranking'
     | '/sitemap.xml'
+    | '/bets-history'
     | '/dashboard'
     | '/feed'
     | '/leagues'
@@ -719,6 +729,7 @@ export interface FileRouteTypes {
     | '/parceiros'
     | '/ranking'
     | '/sitemap.xml'
+    | '/bets-history'
     | '/dashboard'
     | '/feed'
     | '/leagues'
@@ -790,6 +801,7 @@ export interface FileRouteTypes {
     | '/parceiros'
     | '/ranking'
     | '/sitemap.xml'
+    | '/_app/bets-history'
     | '/_app/dashboard'
     | '/_app/feed'
     | '/_app/leagues'
@@ -1275,6 +1287,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/bets-history': {
+      id: '/_app/bets-history'
+      path: '/bets-history'
+      fullPath: '/bets-history'
+      preLoaderRoute: typeof AppBetsHistoryRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/profile/$userId': {
       id: '/_app/profile/$userId'
       path: '/$userId'
@@ -1480,6 +1499,7 @@ const AppProfileRouteWithChildren = AppProfileRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
+  AppBetsHistoryRoute: typeof AppBetsHistoryRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppFeedRoute: typeof AppFeedRouteWithChildren
   AppLeaguesRoute: typeof AppLeaguesRoute
@@ -1493,6 +1513,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppBetsHistoryRoute: AppBetsHistoryRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppFeedRoute: AppFeedRouteWithChildren,
   AppLeaguesRoute: AppLeaguesRoute,
@@ -1562,3 +1583,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
