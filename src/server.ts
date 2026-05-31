@@ -66,6 +66,13 @@ const CSP_IMG_SRC = [
   "https://www.cetsp.com.br",
 ].join(" ");
 
+const CSP_SCRIPT_HASHES = [
+  "'sha256-IAcu3JfpZWtobFI2HR0D0+8pISSU3BW2WJn791heS40='",
+  "'sha256-zuArVEaD0JEWn0oRTsTDf0SIs1BWjJc1h+nvMc1w+6E='",
+  "'sha256-IlBMqZFDe0MAWOyRZASsffMFCeHUSc6O/6HYUq1e6uY='",
+  "'sha256-RLA8MUS4ttG0hXvS7orpYw3Ke7RWnEuzs06NFmVVp38='",
+].join(" ");
+
 // F07: per-request nonce for script-src.
 // For HTML responses the function buffers the body and injects nonce="" into
 // every <script> tag. Non-HTML responses (JSON, streams) skip buffering.
@@ -89,8 +96,8 @@ async function addSecurityHeaders(response: Response): Promise<Response> {
       "default-src 'self'",
       // 'strict-dynamic' propagates trust to scripts loaded by nonce'd scripts (dynamic imports).
       // 'self' is kept as fallback for browsers that don't support 'strict-dynamic'.
-      `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
-      `script-src-elem 'self' 'nonce-${nonce}' 'sha256-IAcu3JfpZWtobFI2HR0D0+8pISSU3BW2WJn791heS40=' 'sha256-zuArVEaD0JEWn0oRTsTDf0SIs1BWjJc1h+nvMc1w+6E=' 'sha256-IlBMqZFDe0MAWOyRZASsffMFCeHUSc6O/6HYUq1e6uY=' https://viax.life https://viax.lovable.app https://*.lovable.app https://*.lovable.dev https://cdn.gpteng.co`,
+      `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' ${CSP_SCRIPT_HASHES}`,
+      `script-src-elem 'self' 'nonce-${nonce}' ${CSP_SCRIPT_HASHES} https://viax.life https://viax.lovable.app https://*.lovable.app https://*.lovable.dev https://cdn.gpteng.co`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src https://fonts.gstatic.com",
       `img-src ${CSP_IMG_SRC}`,
