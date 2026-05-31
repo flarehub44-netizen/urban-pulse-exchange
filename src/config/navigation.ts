@@ -17,6 +17,7 @@ import {
   Flag,
   PlusCircle,
   Sparkles,
+  History,
 } from "lucide-react";
 
 export type NavSearch = Record<string, string>;
