@@ -71,6 +71,7 @@ export const bottomNavPrimary: NavItem[] = [
 export const bottomNavMore: NavItem[] = [
   { to: "/parceiros", label: "Afiliados", icon: Sparkles },
   { to: "/positions", label: copy.nav.positions, icon: Briefcase },
+  { to: "/bets-history", label: "Histórico", icon: History },
   { to: "/ranking", label: copy.nav.ranking, icon: Trophy },
   { to: "/feed", label: copy.nav.feed, icon: MessageSquare },
   { to: "/notifications", label: copy.nav.notifications, icon: Bell },
