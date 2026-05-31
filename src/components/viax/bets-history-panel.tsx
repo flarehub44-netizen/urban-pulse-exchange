@@ -121,7 +121,7 @@ export function BetsHistoryPanel({ filter, type, q }: Props) {
 
   const setSearch = (patch: Partial<{ filter: BetsHistoryFilter; type: BetsHistoryType; q: string }>) =>
     navigate({
-      search: (prev) => ({ ...prev, ...patch }),
+      search: (prev: Record<string, unknown>) => ({ ...prev, ...patch }),
     });
 
   return (
