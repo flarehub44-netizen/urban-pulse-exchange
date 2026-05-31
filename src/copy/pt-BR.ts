@@ -319,7 +319,7 @@ export const copy = {
     withdrawPending: "Saque em processamento — aguardando confirmação do Pix.",
     withdrawPaid: (amount: string) => `Saque de ${amount} transferido para sua chave Pix.`,
     withdrawFailed: "Não foi possível concluir o saque. O saldo foi estornado.",
-    pixAmountHint: "Valor mínimo: R$ 10 · máximo: R$ 5.000",
+    pixAmountHint: "Valor mínimo: R$ 7 · máximo: R$ 5.000",
     withdrawMinHint: "Valor mínimo: R$ 7 · máximo: R$ 5.000",
     withdrawKycHint: "Saques acima de R$ 100 exigem verificação de identidade (KYC).",
     withdrawKycTitle: "Verificação necessária",
