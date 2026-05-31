@@ -17,6 +17,7 @@ import {
   Calendar,
   UsersRound,
   TrafficCone,
+  ScrollText,
 } from "lucide-react";
 
 export type AdminNavItem = {
