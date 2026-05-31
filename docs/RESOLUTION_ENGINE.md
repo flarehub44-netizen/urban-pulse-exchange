@@ -12,10 +12,24 @@ Migrations: `20260522000000`–`20260525000001` (engine, ledger, security, oracl
 
 O job `viax-lifecycle` roda a cada minuto e chama `tick_market_lifecycle()`:
 
-1. `ingest_oracle_snapshots` — grava leituras em `oracle_snapshots`
-2. Promove `live` → `closing` (30 min antes do fim)
-3. Promove `live`/`closing` → `closed` após `ends_at`
-4. Resolve `closed` → oráculo → `settled` | `dispute` | `void`
+1. Promove `live` → `closing` (30 min antes do fim)
+2. Promove `live`/`closing` → `closed` após `ends_at`
+3. Resolve `closed` → `process_market_resolution()` → oráculo → `settled` | `dispute` | `void`
+
+Mercados de **futebol** seguem pipeline próprio: cron `/api/public/cron/football-resolve` →
+`resolve_football_fixture()` (API-Sports) → `settle_football_market()` ou
+`refund_football_market()`. Mercados de **comunidade** são resolvidos pelo criador via
+`resolve_community_market()` após `ends_at`.
+
+## Pagamento ao vencedor (parimutuel)
+
+- Casa retém 10% (`HOUSE_RETENTION`); 90% (`PRIZE_RATIO`) viram prêmio.
+- `payout = (stake / pool_vencedor) × (pool_total × 0.9)`.
+- `settle_market` / `settle_football_market` rodam em transação única:
+  atualizam `bets.payout`, `profiles.balance`, `profiles.pnl`, inserem em
+  `transactions` (`payout`), `notifications` (`win`) e `platform_ledger` (`house_fee`).
+- Void (lado minoritário < 5% — `MIN_MINORITY_RATIO`, ou pool vencedor = 0):
+  `refund_market` / `refund_football_market` devolvem o stake integral.
 
 Confirme em **Supabase Dashboard → Database → Extensions → pg_cron** e em `cron.job`.
 
