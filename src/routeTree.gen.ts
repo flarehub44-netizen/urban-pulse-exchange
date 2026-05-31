@@ -50,6 +50,7 @@ import { Route as AdminSettlementRouteImport } from './routes/admin/settlement'
 import { Route as AdminRiskRouteImport } from './routes/admin/risk'
 import { Route as AdminPartnersRouteImport } from './routes/admin/partners'
 import { Route as AdminMarketsRouteImport } from './routes/admin/markets'
+import { Route as AdminLogsRouteImport } from './routes/admin/logs'
 import { Route as AdminIntelligenceRouteImport } from './routes/admin/intelligence'
 import { Route as AdminFootballRouteImport } from './routes/admin/football'
 import { Route as AdminFinanceRouteImport } from './routes/admin/finance'
@@ -282,6 +283,11 @@ const AdminMarketsRoute = AdminMarketsRouteImport.update({
   path: '/markets',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminLogsRoute = AdminLogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminIntelligenceRoute = AdminIntelligenceRouteImport.update({
   id: '/intelligence',
   path: '/intelligence',
@@ -452,6 +458,7 @@ export interface FileRoutesByFullPath {
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/football': typeof AdminFootballRoute
   '/admin/intelligence': typeof AdminIntelligenceRoute
+  '/admin/logs': typeof AdminLogsRoute
   '/admin/markets': typeof AdminMarketsRoute
   '/admin/partners': typeof AdminPartnersRoute
   '/admin/risk': typeof AdminRiskRoute
@@ -517,6 +524,7 @@ export interface FileRoutesByTo {
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/football': typeof AdminFootballRoute
   '/admin/intelligence': typeof AdminIntelligenceRoute
+  '/admin/logs': typeof AdminLogsRoute
   '/admin/markets': typeof AdminMarketsRoute
   '/admin/partners': typeof AdminPartnersRoute
   '/admin/risk': typeof AdminRiskRoute
@@ -588,6 +596,7 @@ export interface FileRoutesById {
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/football': typeof AdminFootballRoute
   '/admin/intelligence': typeof AdminIntelligenceRoute
+  '/admin/logs': typeof AdminLogsRoute
   '/admin/markets': typeof AdminMarketsRoute
   '/admin/partners': typeof AdminPartnersRoute
   '/admin/risk': typeof AdminRiskRoute
@@ -659,6 +668,7 @@ export interface FileRouteTypes {
     | '/admin/finance'
     | '/admin/football'
     | '/admin/intelligence'
+    | '/admin/logs'
     | '/admin/markets'
     | '/admin/partners'
     | '/admin/risk'
@@ -724,6 +734,7 @@ export interface FileRouteTypes {
     | '/admin/finance'
     | '/admin/football'
     | '/admin/intelligence'
+    | '/admin/logs'
     | '/admin/markets'
     | '/admin/partners'
     | '/admin/risk'
@@ -794,6 +805,7 @@ export interface FileRouteTypes {
     | '/admin/finance'
     | '/admin/football'
     | '/admin/intelligence'
+    | '/admin/logs'
     | '/admin/markets'
     | '/admin/partners'
     | '/admin/risk'
@@ -1151,6 +1163,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMarketsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/logs': {
+      id: '/admin/logs'
+      path: '/logs'
+      fullPath: '/admin/logs'
+      preLoaderRoute: typeof AdminLogsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/intelligence': {
       id: '/admin/intelligence'
       path: '/intelligence'
@@ -1350,6 +1369,7 @@ interface AdminRouteRouteChildren {
   AdminFinanceRoute: typeof AdminFinanceRoute
   AdminFootballRoute: typeof AdminFootballRoute
   AdminIntelligenceRoute: typeof AdminIntelligenceRoute
+  AdminLogsRoute: typeof AdminLogsRoute
   AdminMarketsRoute: typeof AdminMarketsRoute
   AdminPartnersRoute: typeof AdminPartnersRoute
   AdminRiskRoute: typeof AdminRiskRoute
@@ -1369,6 +1389,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminFinanceRoute: AdminFinanceRoute,
   AdminFootballRoute: AdminFootballRoute,
   AdminIntelligenceRoute: AdminIntelligenceRoute,
+  AdminLogsRoute: AdminLogsRoute,
   AdminMarketsRoute: AdminMarketsRoute,
   AdminPartnersRoute: AdminPartnersRoute,
   AdminRiskRoute: AdminRiskRoute,

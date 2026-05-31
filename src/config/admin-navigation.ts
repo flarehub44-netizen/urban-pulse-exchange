@@ -17,6 +17,7 @@ import {
   Calendar,
   UsersRound,
   TrafficCone,
+  ScrollText,
 } from "lucide-react";
 
 export type AdminNavItem = {
@@ -46,6 +47,7 @@ export const adminNav: AdminNavItem[] = [
   { to: "/admin/events", label: copy.admin.nav.events, icon: Calendar },
   { to: "/admin/risk", label: copy.admin.nav.risk, icon: ShieldAlert },
   { to: "/admin/system", label: copy.admin.nav.system, icon: Settings },
+  { to: "/admin/logs", label: "Logs", icon: ScrollText },
   { to: "/admin/simulator", label: copy.admin.nav.simulator, icon: FlaskConical },
 ];
 
