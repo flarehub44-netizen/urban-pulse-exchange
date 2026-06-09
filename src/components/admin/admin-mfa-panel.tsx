@@ -64,7 +64,13 @@ export function AdminMfaPanel() {
         </span>
       </p>
       {!enrolled && (
-        <Button type="button" className="mt-3" size="sm" disabled={busy} onClick={() => void startEnroll()}>
+        <Button
+          type="button"
+          className="mt-3"
+          size="sm"
+          disabled={busy}
+          onClick={() => void startEnroll()}
+        >
           Configurar TOTP
         </Button>
       )}

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
@@ -313,6 +313,13 @@ function FootballHomepage() {
                         </p>
                       )}
                       {f.venue && <p className="text-xs text-muted-foreground">{f.venue}</p>}
+                      <Link
+                        to="/football/$marketId"
+                        params={{ marketId: `fb-${f.id}` }}
+                        className="mt-2 inline-block text-xs font-medium text-primary hover:underline"
+                      >
+                        Ver mercado →
+                      </Link>
                     </div>
                   </article>
                 );

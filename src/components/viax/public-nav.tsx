@@ -1,10 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Search } from "lucide-react";
 import { Logo } from "@/components/viax/sidebar";
 import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
 import { useDepositSheet } from "@/hooks/use-deposit-sheet";
 import { useAuthPublic } from "@/hooks/use-auth-public";
 import { copy } from "@/copy/pt-BR";
+import { MARKET_VERTICALS } from "@/lib/catalog-market";
 
 type PublicNavProps = {
   /** Landing uses terminal CTA; public shell uses deposit-first. */
@@ -22,42 +23,40 @@ export function PublicNav({ variant = "shell" }: PublicNavProps) {
           <Logo />
           <span className="font-semibold tracking-tight">ViaX</span>
         </Link>
-        <nav className="hidden gap-6 text-sm text-muted-foreground md:flex">
+        <nav className="hidden items-center gap-4 text-sm text-muted-foreground lg:flex">
           <Link
-            to="/markets"
-            search={{ segment: "transito" }}
+            to="/v/$vertical"
+            params={{ vertical: "transito" }}
             preload="intent"
             className="hover:text-foreground"
           >
             {copy.markets.transitoTab}
           </Link>
-          <Link to="/markets" search={{ segment: "futebol" }} className="hover:text-foreground">
-            {copy.markets.futebolTab}
+          <Link to="/copa" className="hover:text-foreground">
+            Copa 2026
           </Link>
-          <Link to="/markets" search={{ segment: "outros" }} className="hover:text-foreground">
-            {copy.markets.outrosTab}
-          </Link>
+          {MARKET_VERTICALS.filter((v) => !["transito", "copa", "comunidade"].includes(v.slug)).slice(0, 4).map((v) => (
+            <Link
+              key={v.slug}
+              to={v.slug === "copa" ? "/copa" : "/v/$vertical"}
+              params={v.slug === "copa" ? undefined : { vertical: v.slug }}
+              className="hover:text-foreground"
+            >
+              {v.label}
+            </Link>
+          ))}
           <Link to="/live" className="hover:text-foreground">
             Mapa
           </Link>
-          <Link to="/parceiros" className="hover:text-foreground">
-            Afiliados
-          </Link>
           <Link
-            to="/ranking"
-            search={{ auth: "signup", deposit: "1" }}
-            className="hover:text-foreground"
+            to="/v/$vertical"
+            params={{ vertical: "crypto" }}
+            search={{ q: "" }}
+            className="flex items-center gap-1.5 rounded-lg border border-border/70 px-2.5 py-1 text-xs hover:bg-muted/50"
           >
-            Ranking
+            <Search className="size-3.5" />
+            Buscar
           </Link>
-          <Link to="/urbanmind" className="hover:text-foreground">
-            UrbanMind
-          </Link>
-          {variant === "landing" && (
-            <Link to="/feed" className="hover:text-foreground">
-              Feed
-            </Link>
-          )}
         </nav>
         <div className="flex items-center gap-1.5 sm:gap-2">
           {!isRegistered && (

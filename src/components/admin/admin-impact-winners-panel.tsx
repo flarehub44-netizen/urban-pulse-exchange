@@ -22,7 +22,9 @@ export function AdminImpactWinnersPanel() {
     <section className="space-y-4 rounded-2xl border bg-card/60 p-4">
       <div>
         <h2 className="text-sm font-semibold">{copy.admin.community.impactWinnersTitle}</h2>
-        <p className="text-xs text-muted-foreground">{copy.admin.community.impactWinnersSubtitle}</p>
+        <p className="text-xs text-muted-foreground">
+          {copy.admin.community.impactWinnersSubtitle}
+        </p>
       </div>
 
       <label className="flex flex-col gap-1 text-xs">

@@ -5,6 +5,7 @@ import { renderErrorPage } from "./lib/error-page";
 import { runFootballResolve, runFootballSync } from "./lib/football-cron.server";
 import { runImpactMonthlyFinalize, runImpactXpCredit } from "./lib/impact-cron.server";
 import { runHealthCheck } from "./lib/health-check.server";
+import { runCryptoSlotOpen } from "./lib/crypto-cron.server";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -182,6 +183,7 @@ export default {
             await runImpactMonthlyFinalize();
           } else if (cron === "*/15 * * * *") {
             await runHealthCheck();
+            await runCryptoSlotOpen();
           }
         } catch (e) {
           console.error("[ScheduledCron]", cron, e);

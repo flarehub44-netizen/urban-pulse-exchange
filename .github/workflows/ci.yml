@@ -45,6 +45,7 @@ jobs:
           psql "$DATABASE_URL" -f supabase/tests/resolution_engine_acceptance.sql
           psql "$DATABASE_URL" -f supabase/tests/football_markets_acceptance.sql
           psql "$DATABASE_URL" -f supabase/tests/financial_hardening_acceptance.sql
+          psql "$DATABASE_URL" -f supabase/tests/multi_outcome_acceptance.sql
           psql "$DATABASE_URL" -f supabase/tests/security_definer_search_path_inventory.sql
 
   lighthouse:

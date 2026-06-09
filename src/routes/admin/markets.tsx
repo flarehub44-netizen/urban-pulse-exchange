@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AdminCreateMarketForm } from "@/components/viax/admin-create-market-form";
+import { AdminCreatePredictionMarketForm } from "@/components/admin/admin-create-prediction-market-form";
+import { AdminPredictionMarketsPanel } from "@/components/admin/admin-prediction-markets-panel";
 import { AdminDisputePanel } from "@/components/viax/admin-dispute-panel";
 import { AdminMarketsTable } from "@/components/admin/admin-markets-table";
 import { copy } from "@/copy/pt-BR";
@@ -9,7 +11,8 @@ export const Route = createFileRoute("/admin/markets")({
     tab:
       search.tab === "create" ||
       search.tab === "live" ||
-      search.tab === "disputes"
+      search.tab === "disputes" ||
+      search.tab === "multi"
         ? search.tab
         : undefined,
   }),
@@ -51,6 +54,17 @@ function AdminMarketsPage() {
           {copy.admin.markets.create}
         </Link>
         <Link
+          to="/admin/markets"
+          search={{ tab: "multi" }}
+          className={`rounded-full border px-3 py-1.5 text-xs transition ${
+            activeTab === "multi"
+              ? "border-primary/60 bg-primary/15 text-primary"
+              : "border-border bg-card text-muted-foreground hover:bg-surface-2"
+          }`}
+        >
+          Multi-outcome
+        </Link>
+        <Link
           to="/admin/community"
           className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground transition hover:bg-surface-2"
         >
@@ -68,6 +82,23 @@ function AdminMarketsPage() {
           Disputas & rascunhos
         </Link>
       </div>
+
+      {activeTab === "multi" && (
+        <>
+          <div className="rounded-xl border bg-card/60 p-4">
+            <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Criar multi-outcome
+            </h2>
+            <AdminCreatePredictionMarketForm />
+          </div>
+          <div className="rounded-xl border bg-card/60 p-4">
+            <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Mercados prediction
+            </h2>
+            <AdminPredictionMarketsPanel />
+          </div>
+        </>
+      )}
 
       {(activeTab === "create" || activeTab === "live") && (
         <div className="rounded-xl border bg-card/60 p-4">

@@ -10,3 +10,4 @@ export * from "./traffic";
 export * from "./bonuses";
 export * from "./traffic";
 export * from "./cameras";
+export * from "./prediction-markets";

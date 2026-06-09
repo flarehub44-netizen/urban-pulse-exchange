@@ -9,12 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VRouteImport } from './routes/v'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RankingRouteImport } from './routes/ranking'
+import { Route as PmRouteImport } from './routes/pm'
 import { Route as ParceirosRouteImport } from './routes/parceiros'
 import { Route as MarketsRouteImport } from './routes/markets'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as FootballRouteImport } from './routes/football'
+import { Route as CopaRouteImport } from './routes/copa'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as PartnerRouteRouteImport } from './routes/partner/route'
 import { Route as AuthRouteRouteImport } from './routes/auth/route'
@@ -23,8 +26,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PartnerIndexRouteImport } from './routes/partner/index'
 import { Route as MarketsIndexRouteImport } from './routes/markets/index'
 import { Route as FootballIndexRouteImport } from './routes/football/index'
+import { Route as CopaIndexRouteImport } from './routes/copa/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as RSlugRouteImport } from './routes/r.$slug'
+import { Route as PmMarketIdRouteImport } from './routes/pm/$marketId'
 import { Route as PartnerSubAffiliatesRouteImport } from './routes/partner/sub-affiliates'
 import { Route as PartnerRevenueRouteImport } from './routes/partner/revenue'
 import { Route as PartnerPerformanceRouteImport } from './routes/partner/performance'
@@ -67,6 +72,8 @@ import { Route as AppLeaguesRouteImport } from './routes/_app/leagues'
 import { Route as AppFeedRouteImport } from './routes/_app/feed'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppBetsHistoryRouteImport } from './routes/_app/bets-history'
+import { Route as VVerticalIndexRouteImport } from './routes/v/$vertical/index'
+import { Route as VVerticalTopicRouteImport } from './routes/v/$vertical/$topic'
 import { Route as AppProfileUserIdRouteImport } from './routes/_app/profile.$userId'
 import { Route as AppMarketsCreateRouteImport } from './routes/_app/markets.create'
 import { Route as AppFeedPostIdRouteImport } from './routes/_app/feed.$postId'
@@ -80,7 +87,13 @@ import { Route as ApiPublicCronHealthCheckRouteImport } from './routes/api/publi
 import { Route as ApiPublicCronFraudClusterSweepRouteImport } from './routes/api/public/cron/fraud-cluster-sweep'
 import { Route as ApiPublicCronFootballSyncRouteImport } from './routes/api/public/cron/football-sync'
 import { Route as ApiPublicCronFootballResolveRouteImport } from './routes/api/public/cron/football-resolve'
+import { Route as ApiPublicCronCryptoSlotRouteImport } from './routes/api/public/cron/crypto-slot'
 
+const VRoute = VRouteImport.update({
+  id: '/v',
+  path: '/v',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -89,6 +102,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const RankingRoute = RankingRouteImport.update({
   id: '/ranking',
   path: '/ranking',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PmRoute = PmRouteImport.update({
+  id: '/pm',
+  path: '/pm',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ParceirosRoute = ParceirosRouteImport.update({
@@ -109,6 +127,11 @@ const LiveRoute = LiveRouteImport.update({
 const FootballRoute = FootballRouteImport.update({
   id: '/football',
   path: '/football',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CopaRoute = CopaRouteImport.update({
+  id: '/copa',
+  path: '/copa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -150,6 +173,11 @@ const FootballIndexRoute = FootballIndexRouteImport.update({
   path: '/',
   getParentRoute: () => FootballRoute,
 } as any)
+const CopaIndexRoute = CopaIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CopaRoute,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -159,6 +187,11 @@ const RSlugRoute = RSlugRouteImport.update({
   id: '/r/$slug',
   path: '/r/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PmMarketIdRoute = PmMarketIdRouteImport.update({
+  id: '/$marketId',
+  path: '/$marketId',
+  getParentRoute: () => PmRoute,
 } as any)
 const PartnerSubAffiliatesRoute = PartnerSubAffiliatesRouteImport.update({
   id: '/sub-affiliates',
@@ -370,6 +403,16 @@ const AppBetsHistoryRoute = AppBetsHistoryRouteImport.update({
   path: '/bets-history',
   getParentRoute: () => AppRoute,
 } as any)
+const VVerticalIndexRoute = VVerticalIndexRouteImport.update({
+  id: '/$vertical/',
+  path: '/$vertical/',
+  getParentRoute: () => VRoute,
+} as any)
+const VVerticalTopicRoute = VVerticalTopicRouteImport.update({
+  id: '/$vertical/$topic',
+  path: '/$vertical/$topic',
+  getParentRoute: () => VRoute,
+} as any)
 const AppProfileUserIdRoute = AppProfileUserIdRouteImport.update({
   id: '/$userId',
   path: '/$userId',
@@ -444,18 +487,26 @@ const ApiPublicCronFootballResolveRoute =
     path: '/api/public/cron/football-resolve',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicCronCryptoSlotRoute = ApiPublicCronCryptoSlotRouteImport.update({
+  id: '/api/public/cron/crypto-slot',
+  path: '/api/public/cron/crypto-slot',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
   '/partner': typeof PartnerRouteRouteWithChildren
+  '/copa': typeof CopaRouteWithChildren
   '/football': typeof FootballRouteWithChildren
   '/live': typeof LiveRoute
   '/markets': typeof MarketsRouteWithChildren
   '/parceiros': typeof ParceirosRoute
+  '/pm': typeof PmRouteWithChildren
   '/ranking': typeof RankingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/v': typeof VRouteWithChildren
   '/bets-history': typeof AppBetsHistoryRoute
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRouteWithChildren
@@ -498,14 +549,19 @@ export interface FileRoutesByFullPath {
   '/partner/performance': typeof PartnerPerformanceRoute
   '/partner/revenue': typeof PartnerRevenueRoute
   '/partner/sub-affiliates': typeof PartnerSubAffiliatesRoute
+  '/pm/$marketId': typeof PmMarketIdRoute
   '/r/$slug': typeof RSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/copa/': typeof CopaIndexRoute
   '/football/': typeof FootballIndexRoute
   '/markets/': typeof MarketsIndexRoute
   '/partner/': typeof PartnerIndexRoute
   '/feed/$postId': typeof AppFeedPostIdRoute
   '/markets/create': typeof AppMarketsCreateRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
+  '/v/$vertical/$topic': typeof VVerticalTopicRoute
+  '/v/$vertical/': typeof VVerticalIndexRoute
+  '/api/public/cron/crypto-slot': typeof ApiPublicCronCryptoSlotRoute
   '/api/public/cron/football-resolve': typeof ApiPublicCronFootballResolveRoute
   '/api/public/cron/football-sync': typeof ApiPublicCronFootballSyncRoute
   '/api/public/cron/fraud-cluster-sweep': typeof ApiPublicCronFraudClusterSweepRoute
@@ -522,8 +578,10 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRouteRouteWithChildren
   '/live': typeof LiveRoute
   '/parceiros': typeof ParceirosRoute
+  '/pm': typeof PmRouteWithChildren
   '/ranking': typeof RankingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/v': typeof VRouteWithChildren
   '/bets-history': typeof AppBetsHistoryRoute
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRouteWithChildren
@@ -566,14 +624,19 @@ export interface FileRoutesByTo {
   '/partner/performance': typeof PartnerPerformanceRoute
   '/partner/revenue': typeof PartnerRevenueRoute
   '/partner/sub-affiliates': typeof PartnerSubAffiliatesRoute
+  '/pm/$marketId': typeof PmMarketIdRoute
   '/r/$slug': typeof RSlugRoute
   '/admin': typeof AdminIndexRoute
+  '/copa': typeof CopaIndexRoute
   '/football': typeof FootballIndexRoute
   '/markets': typeof MarketsIndexRoute
   '/partner': typeof PartnerIndexRoute
   '/feed/$postId': typeof AppFeedPostIdRoute
   '/markets/create': typeof AppMarketsCreateRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
+  '/v/$vertical/$topic': typeof VVerticalTopicRoute
+  '/v/$vertical': typeof VVerticalIndexRoute
+  '/api/public/cron/crypto-slot': typeof ApiPublicCronCryptoSlotRoute
   '/api/public/cron/football-resolve': typeof ApiPublicCronFootballResolveRoute
   '/api/public/cron/football-sync': typeof ApiPublicCronFootballSyncRoute
   '/api/public/cron/fraud-cluster-sweep': typeof ApiPublicCronFraudClusterSweepRoute
@@ -592,12 +655,15 @@ export interface FileRoutesById {
   '/auth': typeof AuthRouteRouteWithChildren
   '/partner': typeof PartnerRouteRouteWithChildren
   '/_app': typeof AppRouteWithChildren
+  '/copa': typeof CopaRouteWithChildren
   '/football': typeof FootballRouteWithChildren
   '/live': typeof LiveRoute
   '/markets': typeof MarketsRouteWithChildren
   '/parceiros': typeof ParceirosRoute
+  '/pm': typeof PmRouteWithChildren
   '/ranking': typeof RankingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/v': typeof VRouteWithChildren
   '/_app/bets-history': typeof AppBetsHistoryRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/feed': typeof AppFeedRouteWithChildren
@@ -640,14 +706,19 @@ export interface FileRoutesById {
   '/partner/performance': typeof PartnerPerformanceRoute
   '/partner/revenue': typeof PartnerRevenueRoute
   '/partner/sub-affiliates': typeof PartnerSubAffiliatesRoute
+  '/pm/$marketId': typeof PmMarketIdRoute
   '/r/$slug': typeof RSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/copa/': typeof CopaIndexRoute
   '/football/': typeof FootballIndexRoute
   '/markets/': typeof MarketsIndexRoute
   '/partner/': typeof PartnerIndexRoute
   '/_app/feed/$postId': typeof AppFeedPostIdRoute
   '/_app/markets/create': typeof AppMarketsCreateRoute
   '/_app/profile/$userId': typeof AppProfileUserIdRoute
+  '/v/$vertical/$topic': typeof VVerticalTopicRoute
+  '/v/$vertical/': typeof VVerticalIndexRoute
+  '/api/public/cron/crypto-slot': typeof ApiPublicCronCryptoSlotRoute
   '/api/public/cron/football-resolve': typeof ApiPublicCronFootballResolveRoute
   '/api/public/cron/football-sync': typeof ApiPublicCronFootballSyncRoute
   '/api/public/cron/fraud-cluster-sweep': typeof ApiPublicCronFraudClusterSweepRoute
@@ -666,12 +737,15 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/partner'
+    | '/copa'
     | '/football'
     | '/live'
     | '/markets'
     | '/parceiros'
+    | '/pm'
     | '/ranking'
     | '/sitemap.xml'
+    | '/v'
     | '/bets-history'
     | '/dashboard'
     | '/feed'
@@ -714,14 +788,19 @@ export interface FileRouteTypes {
     | '/partner/performance'
     | '/partner/revenue'
     | '/partner/sub-affiliates'
+    | '/pm/$marketId'
     | '/r/$slug'
     | '/admin/'
+    | '/copa/'
     | '/football/'
     | '/markets/'
     | '/partner/'
     | '/feed/$postId'
     | '/markets/create'
     | '/profile/$userId'
+    | '/v/$vertical/$topic'
+    | '/v/$vertical/'
+    | '/api/public/cron/crypto-slot'
     | '/api/public/cron/football-resolve'
     | '/api/public/cron/football-sync'
     | '/api/public/cron/fraud-cluster-sweep'
@@ -738,8 +817,10 @@ export interface FileRouteTypes {
     | '/auth'
     | '/live'
     | '/parceiros'
+    | '/pm'
     | '/ranking'
     | '/sitemap.xml'
+    | '/v'
     | '/bets-history'
     | '/dashboard'
     | '/feed'
@@ -782,14 +863,19 @@ export interface FileRouteTypes {
     | '/partner/performance'
     | '/partner/revenue'
     | '/partner/sub-affiliates'
+    | '/pm/$marketId'
     | '/r/$slug'
     | '/admin'
+    | '/copa'
     | '/football'
     | '/markets'
     | '/partner'
     | '/feed/$postId'
     | '/markets/create'
     | '/profile/$userId'
+    | '/v/$vertical/$topic'
+    | '/v/$vertical'
+    | '/api/public/cron/crypto-slot'
     | '/api/public/cron/football-resolve'
     | '/api/public/cron/football-sync'
     | '/api/public/cron/fraud-cluster-sweep'
@@ -807,12 +893,15 @@ export interface FileRouteTypes {
     | '/auth'
     | '/partner'
     | '/_app'
+    | '/copa'
     | '/football'
     | '/live'
     | '/markets'
     | '/parceiros'
+    | '/pm'
     | '/ranking'
     | '/sitemap.xml'
+    | '/v'
     | '/_app/bets-history'
     | '/_app/dashboard'
     | '/_app/feed'
@@ -855,14 +944,19 @@ export interface FileRouteTypes {
     | '/partner/performance'
     | '/partner/revenue'
     | '/partner/sub-affiliates'
+    | '/pm/$marketId'
     | '/r/$slug'
     | '/admin/'
+    | '/copa/'
     | '/football/'
     | '/markets/'
     | '/partner/'
     | '/_app/feed/$postId'
     | '/_app/markets/create'
     | '/_app/profile/$userId'
+    | '/v/$vertical/$topic'
+    | '/v/$vertical/'
+    | '/api/public/cron/crypto-slot'
     | '/api/public/cron/football-resolve'
     | '/api/public/cron/football-sync'
     | '/api/public/cron/fraud-cluster-sweep'
@@ -881,13 +975,17 @@ export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   PartnerRouteRoute: typeof PartnerRouteRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
+  CopaRoute: typeof CopaRouteWithChildren
   FootballRoute: typeof FootballRouteWithChildren
   LiveRoute: typeof LiveRoute
   MarketsRoute: typeof MarketsRouteWithChildren
   ParceirosRoute: typeof ParceirosRoute
+  PmRoute: typeof PmRouteWithChildren
   RankingRoute: typeof RankingRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  VRoute: typeof VRouteWithChildren
   RSlugRoute: typeof RSlugRoute
+  ApiPublicCronCryptoSlotRoute: typeof ApiPublicCronCryptoSlotRoute
   ApiPublicCronFootballResolveRoute: typeof ApiPublicCronFootballResolveRoute
   ApiPublicCronFootballSyncRoute: typeof ApiPublicCronFootballSyncRoute
   ApiPublicCronFraudClusterSweepRoute: typeof ApiPublicCronFraudClusterSweepRoute
@@ -902,6 +1000,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/v': {
+      id: '/v'
+      path: '/v'
+      fullPath: '/v'
+      preLoaderRoute: typeof VRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -914,6 +1019,13 @@ declare module '@tanstack/react-router' {
       path: '/ranking'
       fullPath: '/ranking'
       preLoaderRoute: typeof RankingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pm': {
+      id: '/pm'
+      path: '/pm'
+      fullPath: '/pm'
+      preLoaderRoute: typeof PmRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/parceiros': {
@@ -942,6 +1054,13 @@ declare module '@tanstack/react-router' {
       path: '/football'
       fullPath: '/football'
       preLoaderRoute: typeof FootballRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/copa': {
+      id: '/copa'
+      path: '/copa'
+      fullPath: '/copa'
+      preLoaderRoute: typeof CopaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app': {
@@ -1000,6 +1119,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FootballIndexRouteImport
       parentRoute: typeof FootballRoute
     }
+    '/copa/': {
+      id: '/copa/'
+      path: '/'
+      fullPath: '/copa/'
+      preLoaderRoute: typeof CopaIndexRouteImport
+      parentRoute: typeof CopaRoute
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
@@ -1013,6 +1139,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/r/$slug'
       preLoaderRoute: typeof RSlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/pm/$marketId': {
+      id: '/pm/$marketId'
+      path: '/$marketId'
+      fullPath: '/pm/$marketId'
+      preLoaderRoute: typeof PmMarketIdRouteImport
+      parentRoute: typeof PmRoute
     }
     '/partner/sub-affiliates': {
       id: '/partner/sub-affiliates'
@@ -1308,6 +1441,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBetsHistoryRouteImport
       parentRoute: typeof AppRoute
     }
+    '/v/$vertical/': {
+      id: '/v/$vertical/'
+      path: '/$vertical'
+      fullPath: '/v/$vertical/'
+      preLoaderRoute: typeof VVerticalIndexRouteImport
+      parentRoute: typeof VRoute
+    }
+    '/v/$vertical/$topic': {
+      id: '/v/$vertical/$topic'
+      path: '/$vertical/$topic'
+      fullPath: '/v/$vertical/$topic'
+      preLoaderRoute: typeof VVerticalTopicRouteImport
+      parentRoute: typeof VRoute
+    }
     '/_app/profile/$userId': {
       id: '/_app/profile/$userId'
       path: '/$userId'
@@ -1397,6 +1544,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/cron/football-resolve'
       fullPath: '/api/public/cron/football-resolve'
       preLoaderRoute: typeof ApiPublicCronFootballResolveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/cron/crypto-slot': {
+      id: '/api/public/cron/crypto-slot'
+      path: '/api/public/cron/crypto-slot'
+      fullPath: '/api/public/cron/crypto-slot'
+      preLoaderRoute: typeof ApiPublicCronCryptoSlotRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -1549,6 +1703,16 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface CopaRouteChildren {
+  CopaIndexRoute: typeof CopaIndexRoute
+}
+
+const CopaRouteChildren: CopaRouteChildren = {
+  CopaIndexRoute: CopaIndexRoute,
+}
+
+const CopaRouteWithChildren = CopaRoute._addFileChildren(CopaRouteChildren)
+
 interface FootballRouteChildren {
   FootballMarketIdRoute: typeof FootballMarketIdRoute
   FootballIndexRoute: typeof FootballIndexRoute
@@ -1576,19 +1740,45 @@ const MarketsRouteChildren: MarketsRouteChildren = {
 const MarketsRouteWithChildren =
   MarketsRoute._addFileChildren(MarketsRouteChildren)
 
+interface PmRouteChildren {
+  PmMarketIdRoute: typeof PmMarketIdRoute
+}
+
+const PmRouteChildren: PmRouteChildren = {
+  PmMarketIdRoute: PmMarketIdRoute,
+}
+
+const PmRouteWithChildren = PmRoute._addFileChildren(PmRouteChildren)
+
+interface VRouteChildren {
+  VVerticalTopicRoute: typeof VVerticalTopicRoute
+  VVerticalIndexRoute: typeof VVerticalIndexRoute
+}
+
+const VRouteChildren: VRouteChildren = {
+  VVerticalTopicRoute: VVerticalTopicRoute,
+  VVerticalIndexRoute: VVerticalIndexRoute,
+}
+
+const VRouteWithChildren = VRoute._addFileChildren(VRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
   AuthRouteRoute: AuthRouteRouteWithChildren,
   PartnerRouteRoute: PartnerRouteRouteWithChildren,
   AppRoute: AppRouteWithChildren,
+  CopaRoute: CopaRouteWithChildren,
   FootballRoute: FootballRouteWithChildren,
   LiveRoute: LiveRoute,
   MarketsRoute: MarketsRouteWithChildren,
   ParceirosRoute: ParceirosRoute,
+  PmRoute: PmRouteWithChildren,
   RankingRoute: RankingRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  VRoute: VRouteWithChildren,
   RSlugRoute: RSlugRoute,
+  ApiPublicCronCryptoSlotRoute: ApiPublicCronCryptoSlotRoute,
   ApiPublicCronFootballResolveRoute: ApiPublicCronFootballResolveRoute,
   ApiPublicCronFootballSyncRoute: ApiPublicCronFootballSyncRoute,
   ApiPublicCronFraudClusterSweepRoute: ApiPublicCronFraudClusterSweepRoute,

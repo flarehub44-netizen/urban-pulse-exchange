@@ -72,6 +72,15 @@ export async function runFootballSync(targetDate?: string): Promise<unknown> {
       return { ok: false, error: "API_FOOTBALL_KEY not configured", upserted: 0 };
     }
 
+    const { data: copaSetting } = await supabase
+      .from("platform_settings")
+      .select("value")
+      .eq("key", "copa_league_ids")
+      .maybeSingle();
+    const copaLeagueIds: number[] | null = Array.isArray(copaSetting?.value)
+      ? (copaSetting.value as number[])
+      : null;
+
     const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
     let autoApproved = 0;
 
@@ -89,6 +98,17 @@ export async function runFootballSync(targetDate?: string): Promise<unknown> {
         for (const f of fixtures) {
           await upsertFixture(supabase, f);
           upserted++;
+
+          if (copaLeagueIds?.length && copaLeagueIds.includes(f.api_league_id)) {
+            await supabase.from("market_topic_assignments").upsert(
+              {
+                market_id: `fb-${f.api_fixture_id}`,
+                source: "football",
+                topic_slug: "copa-2026",
+              },
+              { onConflict: "market_id,source,topic_slug" },
+            );
+          }
 
           const kickoffMs = new Date(f.kickoff_at).getTime();
           if (autoApproveEnabled && kickoffMs > Date.now() + TWO_HOURS_MS) {

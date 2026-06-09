@@ -163,38 +163,38 @@ export function AdminMarketsTable() {
         }}
       />
       <DesktopTableWrap>
-    <div className="overflow-x-auto rounded-xl border">
-      <table className="w-full min-w-[720px] text-left text-xs">
-        <thead className="border-b bg-surface/60 text-[10px] uppercase tracking-wider text-muted-foreground">
-          <tr>
-            <th className="px-3 py-2">Mercado</th>
-            <th className="px-3 py-2">Região</th>
-            <th className="px-3 py-2">{copy.admin.markets.tableStatus}</th>
-            <th className="px-3 py-2">{copy.admin.markets.tableVolume}</th>
-            <th className="px-3 py-2">SIM %</th>
-            <th className="px-3 py-2">Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {markets.map((m) => {
-            const vol = prizePool(m.pool);
-            const pYes = probability(m.pool, "YES");
-            return (
-              <tr key={m.id} className="border-b border-border/40 hover:bg-surface/30">
-                <td className="max-w-[200px] truncate px-3 py-2 font-medium">{m.question}</td>
-                <td className="px-3 py-2 text-muted-foreground">{m.region}</td>
-                <td className="px-3 py-2">
-                  <StatusPill status={m.status} frozen={m.frozen} />
-                </td>
-                <td className="px-3 py-2 mono">{formatBRL(vol)}</td>
-                <td className="px-3 py-2 mono text-up">{(pYes * 100).toFixed(0)}%</td>
-                <td className="px-3 py-2">{renderActions(m)}</td>
+        <div className="overflow-x-auto rounded-xl border">
+          <table className="w-full min-w-[720px] text-left text-xs">
+            <thead className="border-b bg-surface/60 text-[10px] uppercase tracking-wider text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2">Mercado</th>
+                <th className="px-3 py-2">Região</th>
+                <th className="px-3 py-2">{copy.admin.markets.tableStatus}</th>
+                <th className="px-3 py-2">{copy.admin.markets.tableVolume}</th>
+                <th className="px-3 py-2">SIM %</th>
+                <th className="px-3 py-2">Ações</th>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+            </thead>
+            <tbody>
+              {markets.map((m) => {
+                const vol = prizePool(m.pool);
+                const pYes = probability(m.pool, "YES");
+                return (
+                  <tr key={m.id} className="border-b border-border/40 hover:bg-surface/30">
+                    <td className="max-w-[200px] truncate px-3 py-2 font-medium">{m.question}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{m.region}</td>
+                    <td className="px-3 py-2">
+                      <StatusPill status={m.status} frozen={m.frozen} />
+                    </td>
+                    <td className="px-3 py-2 mono">{formatBRL(vol)}</td>
+                    <td className="px-3 py-2 mono text-up">{(pYes * 100).toFixed(0)}%</td>
+                    <td className="px-3 py-2">{renderActions(m)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </DesktopTableWrap>
     </>
   );

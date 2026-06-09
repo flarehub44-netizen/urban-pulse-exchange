@@ -183,84 +183,84 @@ export function AdminCommunityMarketsPanel() {
         )}
       />
       <DesktopTableWrap>
-      <div className="overflow-x-auto rounded-xl border">
-        <table className="w-full min-w-[800px] text-xs">
-          <thead className="border-b bg-surface/60 text-[10px] uppercase text-muted-foreground">
-            <tr>
-              <th className="px-3 py-2 text-left">Pergunta</th>
-              <th className="px-3 py-2 text-left">Criador</th>
-              <th className="px-3 py-2 text-left">Vis.</th>
-              <th className="px-3 py-2 text-left">Status</th>
-              <th className="px-3 py-2 text-right">Volume</th>
-              <th className="px-3 py-2 text-right">{copy.admin.community.betsCount}</th>
-              <th className="px-3 py-2 text-left">Denúncias</th>
-              <th className="px-3 py-2 text-left">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((m) => (
-              <tr key={m.id} className="border-b border-border/40">
-                <td className="max-w-[220px] truncate px-3 py-2 font-medium">{m.question}</td>
-                <td className="px-3 py-2">{m.creator_username ?? "—"}</td>
-                <td className="px-3 py-2">
-                  {m.visibility === "unlisted" ? (
-                    <span className="rounded bg-warn/10 px-1.5 py-0.5 text-[10px] text-warn">
-                      {copy.community.privateBadge}
-                    </span>
-                  ) : (
-                    "público"
-                  )}
-                </td>
-                <td className="px-3 py-2">{m.status}</td>
-                <td className="px-3 py-2 text-right mono">{formatBRL(Number(m.volume))}</td>
-                <td className="px-3 py-2 text-right mono">{m.bets_count ?? 0}</td>
-                <td className="px-3 py-2">
-                  {(m.pending_reports ?? 0) > 0 ? (
-                    <span className="text-warn">{m.pending_reports}</span>
-                  ) : (
-                    "0"
-                  )}
-                </td>
-                <td className="px-3 py-2">
-                  <div className="flex flex-wrap gap-1">
-                    <Link
-                      to="/markets/$marketId"
-                      params={{ marketId: m.id }}
-                      className="rounded border px-2 py-0.5 hover:bg-surface"
-                    >
-                      Ver
-                    </Link>
-                    {m.visibility === "unlisted" && m.access_token && (
-                      <button
-                        type="button"
-                        onClick={() => void onCopyInvite(m.id, m.access_token!)}
+        <div className="overflow-x-auto rounded-xl border">
+          <table className="w-full min-w-[800px] text-xs">
+            <thead className="border-b bg-surface/60 text-[10px] uppercase text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 text-left">Pergunta</th>
+                <th className="px-3 py-2 text-left">Criador</th>
+                <th className="px-3 py-2 text-left">Vis.</th>
+                <th className="px-3 py-2 text-left">Status</th>
+                <th className="px-3 py-2 text-right">Volume</th>
+                <th className="px-3 py-2 text-right">{copy.admin.community.betsCount}</th>
+                <th className="px-3 py-2 text-left">Denúncias</th>
+                <th className="px-3 py-2 text-left">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((m) => (
+                <tr key={m.id} className="border-b border-border/40">
+                  <td className="max-w-[220px] truncate px-3 py-2 font-medium">{m.question}</td>
+                  <td className="px-3 py-2">{m.creator_username ?? "—"}</td>
+                  <td className="px-3 py-2">
+                    {m.visibility === "unlisted" ? (
+                      <span className="rounded bg-warn/10 px-1.5 py-0.5 text-[10px] text-warn">
+                        {copy.community.privateBadge}
+                      </span>
+                    ) : (
+                      "público"
+                    )}
+                  </td>
+                  <td className="px-3 py-2">{m.status}</td>
+                  <td className="px-3 py-2 text-right mono">{formatBRL(Number(m.volume))}</td>
+                  <td className="px-3 py-2 text-right mono">{m.bets_count ?? 0}</td>
+                  <td className="px-3 py-2">
+                    {(m.pending_reports ?? 0) > 0 ? (
+                      <span className="text-warn">{m.pending_reports}</span>
+                    ) : (
+                      "0"
+                    )}
+                  </td>
+                  <td className="px-3 py-2">
+                    <div className="flex flex-wrap gap-1">
+                      <Link
+                        to="/markets/$marketId"
+                        params={{ marketId: m.id }}
                         className="rounded border px-2 py-0.5 hover:bg-surface"
                       >
-                        {copy.admin.community.copyInvite}
-                      </button>
-                    )}
-                    {m.status !== "settled" && m.status !== "void" && (
-                      <button
-                        type="button"
-                        disabled={voiding}
-                        onClick={() => void onVoid(m.id)}
-                        className="rounded border border-down/40 px-2 py-0.5 text-down disabled:opacity-50"
-                      >
-                        {copy.community.adminVoidCommunity}
-                      </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {!isLoading && filtered.length === 0 && (
-          <p className="hidden p-4 text-center text-xs text-muted-foreground md:block">
-            {copy.admin.community.empty}
-          </p>
-        )}
-      </div>
+                        Ver
+                      </Link>
+                      {m.visibility === "unlisted" && m.access_token && (
+                        <button
+                          type="button"
+                          onClick={() => void onCopyInvite(m.id, m.access_token!)}
+                          className="rounded border px-2 py-0.5 hover:bg-surface"
+                        >
+                          {copy.admin.community.copyInvite}
+                        </button>
+                      )}
+                      {m.status !== "settled" && m.status !== "void" && (
+                        <button
+                          type="button"
+                          disabled={voiding}
+                          onClick={() => void onVoid(m.id)}
+                          className="rounded border border-down/40 px-2 py-0.5 text-down disabled:opacity-50"
+                        >
+                          {copy.community.adminVoidCommunity}
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {!isLoading && filtered.length === 0 && (
+            <p className="hidden p-4 text-center text-xs text-muted-foreground md:block">
+              {copy.admin.community.empty}
+            </p>
+          )}
+        </div>
       </DesktopTableWrap>
     </div>
   );

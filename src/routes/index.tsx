@@ -50,6 +50,11 @@ const LandingAiAccuracyChart = lazy(() =>
     default: m.LandingAiAccuracyChart,
   })),
 );
+const CatalogHomeTrending = lazy(() =>
+  import("@/components/catalog/catalog-home-trending").then((m) => ({
+    default: m.CatalogHomeTrending,
+  })),
+);
 const SeasonalEventsStrip = lazy(() =>
   import("@/components/viax/seasonal-events-strip").then((m) => ({
     default: m.SeasonalEventsStrip,
@@ -225,6 +230,10 @@ function Landing() {
         </div>
         <Ticker />
       </section>
+
+      <Suspense fallback={<SectionFallback className="h-64" />}>
+        <CatalogHomeTrending />
+      </Suspense>
 
       <LandingSegmentPillars />
 
