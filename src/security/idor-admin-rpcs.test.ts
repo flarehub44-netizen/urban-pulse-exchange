@@ -15,6 +15,7 @@ const CRITICAL_ADMIN_RPCS = [
   "admin_ban_cpa_fraud_users",
   "get_admin_users_list",
   "admin_force_close",
+  "get_admin_dashboard_metrics",
 ] as const;
 
 describe("IDOR — admin RPCs", () => {
@@ -38,7 +39,9 @@ describe("IDOR — admin RPCs", () => {
       for (const rpc of CRITICAL_ADMIN_RPCS) {
         const { error } = await client.rpc(rpc, dummyArgs(rpc));
         expect(error, `RPC ${rpc} should reject non-admin`).not.toBeNull();
-        expect(error?.message ?? "").toMatch(/admin only|Admin only|Unauthorized/i);
+        expect(error?.message ?? "").toMatch(
+          /admin only|Admin only|Unauthorized|permission denied|42501/i,
+        );
       }
     },
   );

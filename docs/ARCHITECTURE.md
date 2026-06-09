@@ -40,6 +40,7 @@ flowchart LR
 | Carteira e extrato (`/profile?tab=carteira`)   | `getWalletOverviewFn`          | BFF (Worker ServerFn)                         |
 | Contexto de conta (partner/admin gating)       | `getAccountContextFn`          | BFF (Worker ServerFn)                         |
 | Muta??es financeiras (aposta, saque, dep?sito) | `src/actions/*` + RPC          | BFF (Worker ServerFn)                         |
+| Painel admin (`/admin/*`)                      | `src/actions/admin/*`          | BFF only (`requireAdminAuth`); RPC sem grant `authenticated` |
 | Webhooks/cron/proxy p?blico                    | `src/routes/api/public/*`      | Worker HTTP (rate limit + segredo/assinatura) |
 
 ### Endpoints agregadores (BFF)

@@ -21,7 +21,7 @@ function logFinancialReconciliationIssue(input: {
   console.error("[FinancialReconciliationIssue]", input);
 }
 
-function mapSyncPayDepositError(error: unknown): Error {
+export function mapSyncPayDepositError(error: unknown): Error {
   if (error instanceof SyncPayHttpError) {
     const looksLikeHtml = error.contentType.includes("text/html") || error.responseSnippet.includes("<!DOCTYPE");
     if (looksLikeHtml) {
@@ -42,7 +42,11 @@ function mapSyncPayDepositError(error: unknown): Error {
     }
   }
   const raw = error instanceof Error ? error.message : "";
-  if (raw.includes("syncpay_auth_html_error") || raw.includes("SyncPay: configure")) {
+  if (
+    raw.includes("syncpay_dns_error") ||
+    raw.includes("syncpay_auth_html_error") ||
+    raw.includes("SyncPay: configure")
+  ) {
     return new Error(
       "Pagamento Pix temporariamente indisponível. Nossa equipe foi alertada — tente novamente em alguns minutos.",
     );

@@ -1,5 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import {
+  adminDeleteDailyPollFn,
+  adminDeletePartnerEventFn,
+  adminDeletePlatformEventFn,
+  adminGetEventsHubOverviewFn,
+  adminListDailyPollsFn,
+  adminListPartnerEventsFn,
+  adminListPlatformEventsFn,
+  adminUpsertDailyPollFn,
+  adminUpsertPlatformEventFn,
+} from "@/actions/admin/events";
 
 export type AdminEventsOverview = {
   platform_events: { active: number; upcoming: number; ended: number };
@@ -45,11 +55,7 @@ export type AdminPartnerEventRow = {
 export function useAdminEventsOverview(enabled = true) {
   return useQuery({
     queryKey: ["admin", "events-overview"],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_get_events_hub_overview");
-      if (error) throw error;
-      return data as AdminEventsOverview;
-    },
+    queryFn: () => adminGetEventsHubOverviewFn() as Promise<AdminEventsOverview>,
     enabled,
   });
 }
@@ -57,11 +63,7 @@ export function useAdminEventsOverview(enabled = true) {
 export function useAdminPlatformEvents(enabled = true) {
   return useQuery({
     queryKey: ["admin", "platform-events"],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_list_platform_events");
-      if (error) throw error;
-      return (data ?? []) as AdminPlatformEvent[];
-    },
+    queryFn: () => adminListPlatformEventsFn() as Promise<AdminPlatformEvent[]>,
     enabled,
   });
 }
@@ -69,7 +71,7 @@ export function useAdminPlatformEvents(enabled = true) {
 export function useAdminUpsertPlatformEvent() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: {
+    mutationFn: (input: {
       id?: string | null;
       name: string;
       slug: string;
@@ -78,20 +80,7 @@ export function useAdminUpsertPlatformEvent() {
       endsAt: string;
       badgeIcon: string;
       xpBoost: number;
-    }) => {
-      const { data, error } = await supabase.rpc("admin_upsert_platform_event", {
-        p_id: (input.id ?? undefined) as string,
-        p_name: input.name,
-        p_slug: input.slug,
-        p_description: input.description,
-        p_starts_at: input.startsAt,
-        p_ends_at: input.endsAt,
-        p_badge_icon: input.badgeIcon,
-        p_xp_boost: input.xpBoost,
-      });
-      if (error) throw error;
-      return data;
-    },
+    }) => adminUpsertPlatformEventFn({ data: input }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin", "platform-events"] });
       qc.invalidateQueries({ queryKey: ["admin", "events-overview"] });
@@ -103,13 +92,7 @@ export function useAdminUpsertPlatformEvent() {
 export function useAdminDeletePlatformEvent() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (id: string) => {
-      const { data, error } = await supabase.rpc("admin_delete_platform_event", {
-        p_id: id,
-      });
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (id: string) => adminDeletePlatformEventFn({ data: { id } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin", "platform-events"] });
       qc.invalidateQueries({ queryKey: ["admin", "events-overview"] });
@@ -121,11 +104,7 @@ export function useAdminDeletePlatformEvent() {
 export function useAdminDailyPolls(enabled = true) {
   return useQuery({
     queryKey: ["admin", "daily-polls"],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_list_daily_polls", { p_limit: 30 });
-      if (error) throw error;
-      return (data ?? []) as AdminDailyPoll[];
-    },
+    queryFn: () => adminListDailyPollsFn() as Promise<AdminDailyPoll[]>,
     enabled,
   });
 }
@@ -133,15 +112,8 @@ export function useAdminDailyPolls(enabled = true) {
 export function useAdminUpsertDailyPoll() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { id?: string | null; question: string; pollDate: string }) => {
-      const { data, error } = await supabase.rpc("admin_upsert_daily_poll", {
-        p_id: (input.id ?? undefined) as string,
-        p_question: input.question,
-        p_poll_date: input.pollDate,
-      });
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (input: { id?: string | null; question: string; pollDate: string }) =>
+      adminUpsertDailyPollFn({ data: input }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin", "daily-polls"] });
       qc.invalidateQueries({ queryKey: ["admin", "events-overview"] });
@@ -152,11 +124,7 @@ export function useAdminUpsertDailyPoll() {
 export function useAdminDeleteDailyPoll() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (id: string) => {
-      const { data, error } = await supabase.rpc("admin_delete_daily_poll", { p_id: id });
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (id: string) => adminDeleteDailyPollFn({ data: { id } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin", "daily-polls"] });
       qc.invalidateQueries({ queryKey: ["admin", "events-overview"] });
@@ -167,15 +135,10 @@ export function useAdminDeleteDailyPoll() {
 export function useAdminPartnerEventsFeed(partnerId?: string | null, enabled = true) {
   return useQuery({
     queryKey: ["admin", "partner-events", partnerId ?? "all"],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_list_partner_events", {
-        p_limit: 50,
-        p_partner_id: undefined,
-        p_partner_query: partnerId ?? undefined,
-      });
-      if (error) throw error;
-      return (data ?? []) as AdminPartnerEventRow[];
-    },
+    queryFn: () =>
+      adminListPartnerEventsFn({
+        data: { partnerId: partnerId ?? undefined },
+      }) as Promise<AdminPartnerEventRow[]>,
     enabled,
   });
 }
@@ -183,11 +146,7 @@ export function useAdminPartnerEventsFeed(partnerId?: string | null, enabled = t
 export function useAdminDeletePartnerEvent() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (id: number) => {
-      const { data, error } = await supabase.rpc("admin_delete_partner_event", { p_id: id });
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (id: number) => adminDeletePartnerEventFn({ data: { id } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin", "partner-events"] });
       qc.invalidateQueries({ queryKey: ["admin", "events-overview"] });

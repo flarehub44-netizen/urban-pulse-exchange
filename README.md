@@ -26,7 +26,7 @@ npm run db:push       # aplicar migrations no remoto
 npm run db:types      # regenerar types TypeScript
 ```
 
-Documentação: [`docs/AUTH.md`](docs/AUTH.md), [`docs/FOOTBALL.md`](docs/FOOTBALL.md), [`docs/COMMUNITY_MARKETS.md`](docs/COMMUNITY_MARKETS.md), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/SLOS.md`](docs/SLOS.md), [`docs/DB_GOVERNANCE.md`](docs/DB_GOVERNANCE.md).
+Documentação: [`docs/AUTH.md`](docs/AUTH.md), [`docs/FOOTBALL.md`](docs/FOOTBALL.md), [`docs/COMMUNITY_MARKETS.md`](docs/COMMUNITY_MARKETS.md), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/SLOS.md`](docs/SLOS.md), [`docs/DB_GOVERNANCE.md`](docs/DB_GOVERNANCE.md), [`docs/RUNBOOK_FINANCE.md`](docs/RUNBOOK_FINANCE.md), [`docs/DEPLOY_CHECKLIST.md`](docs/DEPLOY_CHECKLIST.md).
 
 ## Scripts úteis
 

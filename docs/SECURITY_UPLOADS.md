@@ -44,6 +44,17 @@ Não há upload de avatar, KYC ou documentos no app hoje.
 - Validação server-side (Edge Function) com magic bytes e antivírus se necessário.
 - Nunca servir upload do usuário com `Content-Type` executável no mesmo domínio do app.
 
+## Bucket público — listagem (advisor Supabase)
+
+O bucket `community-covers` é **público para leitura** (URLs diretas nas capas), mas **não deve permitir listagem** de objetos por usuários anônimos (`public_bucket_allows_listing`).
+
+**Configuração recomendada (Dashboard → Storage → community-covers → Configuration):**
+
+- Public bucket: **sim** (read object by URL)
+- List objects: **desabilitado** para `anon` / público
+
+Objetos permanecem acessíveis apenas via URL conhecida (`.../storage/v1/object/public/community-covers/{userId}/...`), alinhado à validação em `create_community_market`.
+
 ## Checklist manual (regressão)
 
 1. **Legítimo:** PNG/JPEG/WebP &lt; 2 MB → mercado criado, capa visível na listagem.

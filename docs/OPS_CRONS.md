@@ -7,7 +7,7 @@
 | `0 * * * *` (a cada hora) | `runImpactXpCredit` — fila pós-settle (6h) |
 | `15 3 1 * *` (dia 1, 03:15 UTC ≈ 00:15 BRT) | `runImpactMonthlyFinalize` — Top 3 mensal |
 
-HTTP manual (com `CRON_SECRET` / HMAC): `POST /api/public/cron/impact-xp-credit`, `POST /api/public/cron/impact-monthly-finalize`.
+HTTP manual (com `CRON_SECRET` / HMAC): `POST /api/public/cron/impact-xp-credit`, `POST /api/public/cron/impact-monthly-finalize`, `POST /api/public/cron/health-check`.
 
 ## Política de execução (futebol)
 
@@ -35,6 +35,7 @@ As rotas também aplicam rate limiting por IP no Worker.
 | Football resolve        | `*/5 * * * *`  | Worker `scheduled` | `runFootballResolve()`                 | idem                                                  |
 | Impact XP credit        | `0 * * * *`    | Worker `scheduled` | `runImpactXpCredit()`                  | `SUPABASE_SERVICE_ROLE_KEY`                           |
 | Impact monthly Top 3    | `15 3 1 * *`   | Worker `scheduled` | `runImpactMonthlyFinalize()`           | idem                                                  |
+| Health check          | `*/15 * * * *` | Worker `scheduled` | `runHealthCheck()`                     | `SUPABASE_SERVICE_ROLE_KEY`                           |
 | SyncPay webhook         | sob demanda    | Worker HTTP        | `/api/public/webhooks/syncpay`         | `SUPABASE_SERVICE_ROLE_KEY`, `SYNCPAY_WEBHOOK_SECRET` |
 
 ## Futebol — manual

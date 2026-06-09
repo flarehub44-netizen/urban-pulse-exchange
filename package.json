@@ -29,6 +29,7 @@
     "check:realtime": "node scripts/check-realtime-private-channels.mjs",
     "check:admin-rpc": "node scripts/check-admin-rpc-grants.mjs",
     "check:secrets": "node scripts/check-client-bundle-secrets.mjs",
+    "check:deploy-env": "node scripts/check-deploy-env.mjs",
     "db:test-sql": "echo Run: psql $DATABASE_URL -f supabase/tests/resolution_engine_acceptance.sql"
   },
   "dependencies": {

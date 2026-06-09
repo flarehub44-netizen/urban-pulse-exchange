@@ -203,4 +203,12 @@ select public.hash_cpf_document('12345678909');
 1. Migrar RPCs de usuário de `SECURITY DEFINER` para `SECURITY INVOKER` com políticas RLS adequadas.
 2. Mover funções internas para schema não exposto e manter `public` apenas com API mínima.
 3. Retirar dependência de `pg_net` no `public` quando a plataforma permitir, ou encapsular uso em camada interna.
-4. Revisar endpoints admin para canal server-only (edge/service) em vez de chamadas diretas do cliente.
+4. ~~Revisar endpoints admin para canal server-only~~ — **Feito** (2026-10-09): migration `20261009120000_admin_rpc_server_only.sql` + `src/actions/admin/*` BFF.
+
+## Fase 3 — Admin BFF + lot 9/10 (2026-10-09)
+
+- Migration `20261009120000_admin_rpc_server_only.sql`: REVOKE EXECUTE de `admin_*` / `get_admin_*` para `authenticated`.
+- Migration `20261009130000_convert_social_read_rpcs_security_invoker_lot9.sql`: `get_public_active_bets`, `get_following_active_bets`, `get_public_trader_bets`.
+- Hooks admin migrados para ServerFns em `src/actions/admin/`.
+- Exceções permanentes documentadas: `place_bet`, `request_withdrawal`, settlement RPCs (financeiro transacional).
+

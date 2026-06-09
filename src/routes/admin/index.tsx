@@ -5,6 +5,7 @@ import {
   useAdminLiveFeed,
   useAdminSettlementQueue,
   useAdminPartnerApplications,
+  useAdminOpsHealth,
 } from "@/hooks/use-admin-dashboard";
 import { useAdminDepositFunnelMetrics } from "@/hooks/use-admin-deposit-funnel";
 import { AdminStatCard } from "@/components/admin/admin-stat-card";
@@ -27,6 +28,7 @@ function AdminOverviewPage() {
   const { data: settlementQueue } = useAdminSettlementQueue();
   const { data: partnerApps } = useAdminPartnerApplications();
   const { data: funnel } = useAdminDepositFunnelMetrics(7);
+  const { data: opsHealth } = useAdminOpsHealth();
 
   if (isError) {
     return <AdminInlineError error={error} onRetry={() => refetch()} />;
@@ -88,6 +90,21 @@ function AdminOverviewPage() {
           </p>
         </Link>
       </div>
+
+      {opsHealth && (
+        <div
+          className={`rounded-xl border p-4 ${opsHealth.ok ? "bg-emerald-500/5 border-emerald-500/30" : "bg-destructive/5 border-destructive/30"}`}
+        >
+          <h2 className="text-sm font-semibold">Saúde operacional</h2>
+          <p className="text-xs text-muted-foreground mt-1">
+            Lifecycle:{" "}
+            {opsHealth.checks.lifecycle_ok ? "OK" : "ATENÇÃO"} (
+            {opsHealth.checks.minutes_since_lifecycle_tick ?? "—"} min) · Pending &gt;24h:{" "}
+            {opsHealth.checks.pending_intents_over_24h} · Webhook failures 24h:{" "}
+            {opsHealth.checks.webhook_failures_24h}
+          </p>
+        </div>
+      )}
 
       <div className="rounded-xl border bg-card/40 p-4">
         <h2 className="text-sm font-semibold">Inbox operacional</h2>

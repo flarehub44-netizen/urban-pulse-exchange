@@ -1,6 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import type { Json } from "@/integrations/supabase/types";
+import {
+  adminDeleteTrafficTemplateFn,
+  adminGetTrafficSchedulerFn,
+  adminListTrafficTemplatesFn,
+  adminSetTrafficTemplateReadyFn,
+  adminTestTrafficTemplateFn,
+  adminUpdateTrafficSchedulerFn,
+  adminUpsertTrafficTemplateFn,
+} from "@/actions/admin/traffic";
 
 export type TrafficEventTemplate = {
   id: string;
@@ -50,11 +57,7 @@ const SCHEDULER_KEY = ["admin", "traffic-scheduler"] as const;
 export function useAdminTrafficTemplates() {
   return useQuery({
     queryKey: TEMPLATES_KEY,
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_list_traffic_templates");
-      if (error) throw error;
-      return (data ?? []) as TrafficEventTemplate[];
-    },
+    queryFn: () => adminListTrafficTemplatesFn() as Promise<TrafficEventTemplate[]>,
     refetchInterval: 20_000,
   });
 }
@@ -62,11 +65,7 @@ export function useAdminTrafficTemplates() {
 export function useAdminTrafficScheduler() {
   return useQuery({
     queryKey: SCHEDULER_KEY,
-    queryFn: async () => {
-      const { data, error } = await supabase.from("traffic_scheduler").select("*").eq("id", 1).maybeSingle();
-      if (error) throw error;
-      return data as TrafficScheduler | null;
-    },
+    queryFn: () => adminGetTrafficSchedulerFn() as Promise<TrafficScheduler | null>,
     refetchInterval: 15_000,
   });
 }
@@ -74,13 +73,11 @@ export function useAdminTrafficScheduler() {
 export function useAdminUpsertTrafficTemplate() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: Record<string, unknown>) => {
-      const { data, error } = await supabase.rpc("admin_upsert_traffic_template", {
-        p_payload: payload as unknown as Json,
-      });
-      if (error) throw error;
-      return data as { ok: boolean; id: string };
-    },
+    mutationFn: (payload: Record<string, unknown>) =>
+      adminUpsertTrafficTemplateFn({ data: { payload } }) as Promise<{
+        ok: boolean;
+        id: string;
+      }>,
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: TEMPLATES_KEY });
     },
@@ -89,32 +86,21 @@ export function useAdminUpsertTrafficTemplate() {
 
 export function useAdminTestTrafficTemplate() {
   return useMutation({
-    mutationFn: async (templateId: string) => {
-      const { data, error } = await supabase.rpc("admin_test_traffic_template", {
-        p_template_id: templateId,
-      });
-      if (error) throw error;
-      return data as {
+    mutationFn: (templateId: string) =>
+      adminTestTrafficTemplateFn({ data: { templateId } }) as Promise<{
         template_id: string;
         region_id: string | null;
         camera_id: string | null;
         cameras: TrafficTemplateCamera[];
-      };
-    },
+      }>,
   });
 }
 
 export function useAdminSetTrafficTemplateReady() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ready }: { id: string; ready: boolean }) => {
-      const { data, error } = await supabase.rpc("admin_set_traffic_template_ready", {
-        p_template_id: id,
-        p_ready: ready,
-      });
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: ({ id, ready }: { id: string; ready: boolean }) =>
+      adminSetTrafficTemplateReadyFn({ data: { templateId: id, ready } }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: TEMPLATES_KEY });
     },
@@ -124,13 +110,8 @@ export function useAdminSetTrafficTemplateReady() {
 export function useAdminUpdateTrafficScheduler() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: Record<string, unknown>) => {
-      const { data, error } = await supabase.rpc("admin_update_traffic_scheduler", {
-        p_payload: payload as unknown as Json,
-      });
-      if (error) throw error;
-      return data as TrafficScheduler;
-    },
+    mutationFn: (payload: Record<string, unknown>) =>
+      adminUpdateTrafficSchedulerFn({ data: { payload } }) as Promise<TrafficScheduler>,
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: SCHEDULER_KEY });
       void qc.invalidateQueries({ queryKey: ["traffic-public-state"] });
@@ -141,13 +122,11 @@ export function useAdminUpdateTrafficScheduler() {
 export function useAdminDeleteTrafficTemplate() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (templateId: string) => {
-      const { data, error } = await supabase.rpc("admin_delete_traffic_template", {
-        p_template_id: templateId,
-      });
-      if (error) throw error;
-      return data as { ok: boolean; deleted_id: string };
-    },
+    mutationFn: (templateId: string) =>
+      adminDeleteTrafficTemplateFn({ data: { templateId } }) as Promise<{
+        ok: boolean;
+        deleted_id: string;
+      }>,
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: TEMPLATES_KEY });
       void qc.invalidateQueries({ queryKey: ["traffic-public-state"] });

@@ -1,5 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import {
+  adminGetBonusLedgerFn,
+  adminGetBonusOverviewFn,
+  adminGrantUserBonusFn,
+  adminUpdateCasinoSpinWeightsFn,
+} from "@/actions/admin/bonuses";
 
 export type AdminBonusOverview = {
   period_days: number;
@@ -39,13 +44,8 @@ export type CasinoSpinWeight = {
 export function useAdminBonusOverview(days = 30, enabled = true) {
   return useQuery({
     queryKey: ["admin", "bonus-overview", days],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_admin_bonus_overview", {
-        p_days: days,
-      });
-      if (error) throw error;
-      return data as AdminBonusOverview;
-    },
+    queryFn: () =>
+      adminGetBonusOverviewFn({ data: { days } }) as Promise<AdminBonusOverview>,
     enabled,
   });
 }
@@ -53,13 +53,8 @@ export function useAdminBonusOverview(days = 30, enabled = true) {
 export function useAdminBonusLedger(limit = 100, enabled = true) {
   return useQuery({
     queryKey: ["admin", "bonus-ledger", limit],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_admin_bonus_ledger", {
-        p_limit: limit,
-      });
-      if (error) throw error;
-      return (data ?? []) as AdminBonusLedgerRow[];
-    },
+    queryFn: () =>
+      adminGetBonusLedgerFn({ data: { limit } }) as Promise<AdminBonusLedgerRow[]>,
     enabled,
   });
 }
@@ -67,7 +62,7 @@ export function useAdminBonusLedger(limit = 100, enabled = true) {
 export function useAdminGrantUserBonus() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({
+    mutationFn: ({
       userId,
       amount,
       kind,
@@ -77,16 +72,7 @@ export function useAdminGrantUserBonus() {
       amount: number;
       kind: "balance" | "xp";
       reason?: string;
-    }) => {
-      const { data, error } = await supabase.rpc("admin_grant_user_bonus", {
-        p_user_id: userId,
-        p_amount: amount,
-        p_kind: kind,
-        p_reason: reason ?? undefined,
-      });
-      if (error) throw error;
-      return data;
-    },
+    }) => adminGrantUserBonusFn({ data: { userId, amount, kind, reason } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin", "bonus-overview"] });
       qc.invalidateQueries({ queryKey: ["admin", "bonus-ledger"] });
@@ -98,13 +84,8 @@ export function useAdminGrantUserBonus() {
 export function useAdminUpdateSpinWeights() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (weights: CasinoSpinWeight[]) => {
-      const { data, error } = await supabase.rpc("admin_update_casino_spin_weights", {
-        p_weights: weights,
-      });
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (weights: CasinoSpinWeight[]) =>
+      adminUpdateCasinoSpinWeightsFn({ data: { weights } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin", "platform-settings"] });
     },

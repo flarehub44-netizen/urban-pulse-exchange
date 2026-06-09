@@ -1,4 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  adminApproveFootballFixtureFn,
+  adminDeleteFootballMarketFn,
+  adminListFootballDraftsFn,
+  adminListFootballLiveFn,
+  adminListFootballPendingFn,
+  adminPublishFootballMarketFn,
+  adminRejectFootballFixtureFn,
+  adminVoidFootballMarketFn,
+} from "@/actions/admin/football";
 import { adminFootballResolveFn, adminFootballSyncFn } from "@/actions/football-admin";
 import { useAdminUpdateSetting } from "@/hooks/use-admin-dashboard";
 import { supabase } from "@/integrations/supabase/client";
@@ -46,14 +56,8 @@ export type FootballLiveRow = {
 export function useAdminFootballPending(date?: string) {
   return useQuery({
     queryKey: ["admin-football-pending", date ?? "all"],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_list_football_pending", {
-        p_limit: 100,
-        p_date: date ?? undefined,
-      });
-      if (error) throw error;
-      return (data ?? []) as FootballPendingRow[];
-    },
+    queryFn: () =>
+      adminListFootballPendingFn({ data: { date, limit: 100 } }) as Promise<FootballPendingRow[]>,
     refetchInterval: 30_000,
   });
 }
@@ -61,13 +65,8 @@ export function useAdminFootballPending(date?: string) {
 export function useAdminFootballDrafts() {
   return useQuery({
     queryKey: ["admin-football-drafts"],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_list_football_drafts", {
-        p_limit: 100,
-      });
-      if (error) throw error;
-      return (data ?? []) as FootballDraftRow[];
-    },
+    queryFn: () =>
+      adminListFootballDraftsFn({ data: { limit: 100 } }) as Promise<FootballDraftRow[]>,
     refetchInterval: 15_000,
   });
 }
@@ -75,13 +74,8 @@ export function useAdminFootballDrafts() {
 export function useAdminFootballLive() {
   return useQuery({
     queryKey: ["admin-football-live"],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_list_football_live", {
-        p_limit: 100,
-      });
-      if (error) throw error;
-      return (data ?? []) as FootballLiveRow[];
-    },
+    queryFn: () =>
+      adminListFootballLiveFn({ data: { limit: 100 } }) as Promise<FootballLiveRow[]>,
     refetchInterval: 15_000,
   });
 }
@@ -89,13 +83,8 @@ export function useAdminFootballLive() {
 export function useAdminApproveFootballFixture() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (fixtureId: number) => {
-      const { data, error } = await supabase.rpc("admin_approve_football_fixture", {
-        p_fixture_id: fixtureId,
-      });
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (fixtureId: number) =>
+      adminApproveFootballFixtureFn({ data: { fixtureId } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-football-pending"] });
       qc.invalidateQueries({ queryKey: ["admin-football-drafts"] });
@@ -106,14 +95,8 @@ export function useAdminApproveFootballFixture() {
 export function useAdminRejectFootballFixture() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ fixtureId, reason }: { fixtureId: number; reason?: string }) => {
-      const { data, error } = await supabase.rpc("admin_reject_football_fixture", {
-        p_fixture_id: fixtureId,
-        p_reason: reason ?? undefined,
-      });
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: ({ fixtureId, reason }: { fixtureId: number; reason?: string }) =>
+      adminRejectFootballFixtureFn({ data: { fixtureId, reason } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-football-pending"] });
     },
@@ -123,13 +106,7 @@ export function useAdminRejectFootballFixture() {
 export function useAdminPublishFootballMarket() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (marketId: string) => {
-      const { data, error } = await supabase.rpc("admin_publish_football_market", {
-        p_market_id: marketId,
-      });
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (marketId: string) => adminPublishFootballMarketFn({ data: { marketId } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-football-drafts"] });
       qc.invalidateQueries({ queryKey: ["admin-football-live"] });
@@ -141,14 +118,8 @@ export function useAdminPublishFootballMarket() {
 export function useAdminVoidFootballMarket() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ marketId, reason }: { marketId: string; reason?: string }) => {
-      const { data, error } = await supabase.rpc("admin_void_football_market", {
-        p_market_id: marketId,
-        p_reason: reason ?? "admin_void",
-      });
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: ({ marketId, reason }: { marketId: string; reason?: string }) =>
+      adminVoidFootballMarketFn({ data: { marketId, reason } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-football-drafts"] });
       qc.invalidateQueries({ queryKey: ["admin-football-live"] });
@@ -161,13 +132,7 @@ export function useAdminVoidFootballMarket() {
 export function useAdminDeleteFootballMarket() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (marketId: string) => {
-      const { data, error } = await supabase.rpc("admin_delete_football_market" as never, {
-        p_market_id: marketId,
-      } as never);
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (marketId: string) => adminDeleteFootballMarketFn({ data: { marketId } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-football-drafts"] });
       qc.invalidateQueries({ queryKey: ["admin-football-live"] });

@@ -76,6 +76,7 @@ import { Route as ApiPublicHooksReconcileSyncpayPayoutsRouteImport } from './rou
 import { Route as ApiPublicHlsProxySplatRouteImport } from './routes/api/public/hls-proxy/$'
 import { Route as ApiPublicCronImpactXpCreditRouteImport } from './routes/api/public/cron/impact-xp-credit'
 import { Route as ApiPublicCronImpactMonthlyFinalizeRouteImport } from './routes/api/public/cron/impact-monthly-finalize'
+import { Route as ApiPublicCronHealthCheckRouteImport } from './routes/api/public/cron/health-check'
 import { Route as ApiPublicCronFraudClusterSweepRouteImport } from './routes/api/public/cron/fraud-cluster-sweep'
 import { Route as ApiPublicCronFootballSyncRouteImport } from './routes/api/public/cron/football-sync'
 import { Route as ApiPublicCronFootballResolveRouteImport } from './routes/api/public/cron/football-resolve'
@@ -419,6 +420,12 @@ const ApiPublicCronImpactMonthlyFinalizeRoute =
     path: '/api/public/cron/impact-monthly-finalize',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicCronHealthCheckRoute =
+  ApiPublicCronHealthCheckRouteImport.update({
+    id: '/api/public/cron/health-check',
+    path: '/api/public/cron/health-check',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicCronFraudClusterSweepRoute =
   ApiPublicCronFraudClusterSweepRouteImport.update({
     id: '/api/public/cron/fraud-cluster-sweep',
@@ -502,6 +509,7 @@ export interface FileRoutesByFullPath {
   '/api/public/cron/football-resolve': typeof ApiPublicCronFootballResolveRoute
   '/api/public/cron/football-sync': typeof ApiPublicCronFootballSyncRoute
   '/api/public/cron/fraud-cluster-sweep': typeof ApiPublicCronFraudClusterSweepRoute
+  '/api/public/cron/health-check': typeof ApiPublicCronHealthCheckRoute
   '/api/public/cron/impact-monthly-finalize': typeof ApiPublicCronImpactMonthlyFinalizeRoute
   '/api/public/cron/impact-xp-credit': typeof ApiPublicCronImpactXpCreditRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
@@ -569,6 +577,7 @@ export interface FileRoutesByTo {
   '/api/public/cron/football-resolve': typeof ApiPublicCronFootballResolveRoute
   '/api/public/cron/football-sync': typeof ApiPublicCronFootballSyncRoute
   '/api/public/cron/fraud-cluster-sweep': typeof ApiPublicCronFraudClusterSweepRoute
+  '/api/public/cron/health-check': typeof ApiPublicCronHealthCheckRoute
   '/api/public/cron/impact-monthly-finalize': typeof ApiPublicCronImpactMonthlyFinalizeRoute
   '/api/public/cron/impact-xp-credit': typeof ApiPublicCronImpactXpCreditRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
@@ -642,6 +651,7 @@ export interface FileRoutesById {
   '/api/public/cron/football-resolve': typeof ApiPublicCronFootballResolveRoute
   '/api/public/cron/football-sync': typeof ApiPublicCronFootballSyncRoute
   '/api/public/cron/fraud-cluster-sweep': typeof ApiPublicCronFraudClusterSweepRoute
+  '/api/public/cron/health-check': typeof ApiPublicCronHealthCheckRoute
   '/api/public/cron/impact-monthly-finalize': typeof ApiPublicCronImpactMonthlyFinalizeRoute
   '/api/public/cron/impact-xp-credit': typeof ApiPublicCronImpactXpCreditRoute
   '/api/public/hls-proxy/$': typeof ApiPublicHlsProxySplatRoute
@@ -715,6 +725,7 @@ export interface FileRouteTypes {
     | '/api/public/cron/football-resolve'
     | '/api/public/cron/football-sync'
     | '/api/public/cron/fraud-cluster-sweep'
+    | '/api/public/cron/health-check'
     | '/api/public/cron/impact-monthly-finalize'
     | '/api/public/cron/impact-xp-credit'
     | '/api/public/hls-proxy/$'
@@ -782,6 +793,7 @@ export interface FileRouteTypes {
     | '/api/public/cron/football-resolve'
     | '/api/public/cron/football-sync'
     | '/api/public/cron/fraud-cluster-sweep'
+    | '/api/public/cron/health-check'
     | '/api/public/cron/impact-monthly-finalize'
     | '/api/public/cron/impact-xp-credit'
     | '/api/public/hls-proxy/$'
@@ -854,6 +866,7 @@ export interface FileRouteTypes {
     | '/api/public/cron/football-resolve'
     | '/api/public/cron/football-sync'
     | '/api/public/cron/fraud-cluster-sweep'
+    | '/api/public/cron/health-check'
     | '/api/public/cron/impact-monthly-finalize'
     | '/api/public/cron/impact-xp-credit'
     | '/api/public/hls-proxy/$'
@@ -878,6 +891,7 @@ export interface RootRouteChildren {
   ApiPublicCronFootballResolveRoute: typeof ApiPublicCronFootballResolveRoute
   ApiPublicCronFootballSyncRoute: typeof ApiPublicCronFootballSyncRoute
   ApiPublicCronFraudClusterSweepRoute: typeof ApiPublicCronFraudClusterSweepRoute
+  ApiPublicCronHealthCheckRoute: typeof ApiPublicCronHealthCheckRoute
   ApiPublicCronImpactMonthlyFinalizeRoute: typeof ApiPublicCronImpactMonthlyFinalizeRoute
   ApiPublicCronImpactXpCreditRoute: typeof ApiPublicCronImpactXpCreditRoute
   ApiPublicHlsProxySplatRoute: typeof ApiPublicHlsProxySplatRoute
@@ -1357,6 +1371,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCronImpactMonthlyFinalizeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/cron/health-check': {
+      id: '/api/public/cron/health-check'
+      path: '/api/public/cron/health-check'
+      fullPath: '/api/public/cron/health-check'
+      preLoaderRoute: typeof ApiPublicCronHealthCheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cron/fraud-cluster-sweep': {
       id: '/api/public/cron/fraud-cluster-sweep'
       path: '/api/public/cron/fraud-cluster-sweep'
@@ -1571,6 +1592,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicCronFootballResolveRoute: ApiPublicCronFootballResolveRoute,
   ApiPublicCronFootballSyncRoute: ApiPublicCronFootballSyncRoute,
   ApiPublicCronFraudClusterSweepRoute: ApiPublicCronFraudClusterSweepRoute,
+  ApiPublicCronHealthCheckRoute: ApiPublicCronHealthCheckRoute,
   ApiPublicCronImpactMonthlyFinalizeRoute:
     ApiPublicCronImpactMonthlyFinalizeRoute,
   ApiPublicCronImpactXpCreditRoute: ApiPublicCronImpactXpCreditRoute,

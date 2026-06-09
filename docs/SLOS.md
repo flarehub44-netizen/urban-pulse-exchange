@@ -22,6 +22,7 @@
   - `bff.get_account_context`
   - `cron.football_sync`
   - `cron.football_resolve`
+  - `cron.health_check`
 
 ## Regras operacionais
 
