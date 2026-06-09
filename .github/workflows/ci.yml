@@ -19,6 +19,7 @@ jobs:
       SYNCPAY_WEBHOOK_SECRET: ${{ secrets.SYNCPAY_WEBHOOK_SECRET }}
       PLAYWRIGHT_TEST_EMAIL: ${{ secrets.PLAYWRIGHT_TEST_EMAIL }}
       PLAYWRIGHT_TEST_PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_PASSWORD }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
     steps:
       - uses: actions/checkout@v4
 
@@ -38,9 +39,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - name: SQL acceptance (optional, needs DATABASE_URL)
-        if: ${{ secrets.DATABASE_URL != '' }}
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        if: ${{ env.DATABASE_URL != '' }}
         run: |
           psql "$DATABASE_URL" -f supabase/tests/resolution_engine_acceptance.sql
           psql "$DATABASE_URL" -f supabase/tests/football_markets_acceptance.sql

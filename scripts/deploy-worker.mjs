@@ -16,7 +16,6 @@ if (!existsSync(lovableConfig) && !existsSync(join(root, "dist", "server", "serv
 console.log(`Deploying Worker with config: ${config}`);
 const result = spawnSync("npx", ["wrangler", "deploy", "--config", config], {
   stdio: "inherit",
-  shell: true,
   cwd: root,
 });
 process.exit(result.status ?? 1);
