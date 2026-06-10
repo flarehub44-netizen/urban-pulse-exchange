@@ -30,9 +30,7 @@ export function getNotificationLink(n: ViaXNotification): NotificationLink {
     case "rank":
       return { to: "/ranking" };
     case "league":
-      return n.leagueId
-        ? { to: "/leagues", search: { selected: n.leagueId } }
-        : { to: "/leagues" };
+      return n.leagueId ? { to: "/leagues", search: { selected: n.leagueId } } : { to: "/leagues" };
     case "market":
       return { to: "/markets", search: { status: "live" } };
     case "alert":

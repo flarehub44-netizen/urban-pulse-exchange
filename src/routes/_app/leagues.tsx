@@ -77,7 +77,10 @@ function LeaguesPage() {
       setShowCreate(false);
       setSelectedLeagueId(res.id);
     } catch (e) {
-      const msg = e instanceof Error && e.message.includes("league_limit") ? "Limite de 5 ligas." : copy.leagues.createError;
+      const msg =
+        e instanceof Error && e.message.includes("league_limit")
+          ? "Limite de 5 ligas."
+          : copy.leagues.createError;
       toast.error(msg);
     }
   };
@@ -303,7 +306,9 @@ function LeaguesPage() {
                 </div>
               </div>
               {league.season_label ? (
-                <p className="mt-1 text-[10px] text-muted-foreground">{copy.leagues.season(league.season_label)}</p>
+                <p className="mt-1 text-[10px] text-muted-foreground">
+                  {copy.leagues.season(league.season_label)}
+                </p>
               ) : null}
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <span className="mono text-xs text-muted-foreground border border-dashed border-border/60 rounded px-2 py-0.5">
@@ -391,7 +396,8 @@ function LeaguesPage() {
             <div>
               <h2 className="heading-section flex items-center gap-2">
                 <Trophy className="size-4 text-warn" />
-                {selectedLeague.name} — <span className="text-highlight">{copy.leagues.ranking}</span>
+                {selectedLeague.name} —{" "}
+                <span className="text-highlight">{copy.leagues.ranking}</span>
               </h2>
               {selectedLeague.season_label ? (
                 <p className="text-xs text-muted-foreground mt-1">

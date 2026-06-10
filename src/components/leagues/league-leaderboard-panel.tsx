@@ -37,13 +37,17 @@ export function LeagueLeaderboardPanel({
 }: LeagueLeaderboardPanelProps) {
   if (isLoading) {
     return (
-      <p className="text-sm text-center text-muted-foreground py-4">{copy.leagues.loadingRanking}</p>
+      <p className="text-sm text-center text-muted-foreground py-4">
+        {copy.leagues.loadingRanking}
+      </p>
     );
   }
 
   if (members.length === 0) {
     return (
-      <p className="text-sm text-center text-muted-foreground py-4">{copy.leagues.loadingRanking}</p>
+      <p className="text-sm text-center text-muted-foreground py-4">
+        {copy.leagues.loadingRanking}
+      </p>
     );
   }
 
@@ -99,7 +103,9 @@ export function LeagueLeaderboardPanel({
             </div>
             <div className="text-right shrink-0">
               <div className="text-xs font-semibold mono text-primary">{member.score ?? 0}</div>
-              <div className="text-[10px] text-muted-foreground">{divisionFromDb(member.division)}</div>
+              <div className="text-[10px] text-muted-foreground">
+                {divisionFromDb(member.division)}
+              </div>
             </div>
             {showKick && !member.is_me && onKick ? (
               <button

@@ -203,9 +203,7 @@ export const getLeagueActivityFn = createServerFn({ method: "GET" })
 
 export const kickLeagueMemberFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    z.object({ league_id: z.string().uuid(), user_id: z.string().uuid() }),
-  )
+  .inputValidator(z.object({ league_id: z.string().uuid(), user_id: z.string().uuid() }))
   .handler(async ({ context, data }) => {
     const { supabase } = getSupabaseCtx(context);
     const { data: res, error } = await supabase.rpc("kick_league_member", {
@@ -218,9 +216,7 @@ export const kickLeagueMemberFn = createServerFn({ method: "POST" })
 
 export const transferLeagueOwnershipFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    z.object({ league_id: z.string().uuid(), new_owner_id: z.string().uuid() }),
-  )
+  .inputValidator(z.object({ league_id: z.string().uuid(), new_owner_id: z.string().uuid() }))
   .handler(async ({ context, data }) => {
     const { supabase } = getSupabaseCtx(context);
     const { data: res, error } = await supabase.rpc("transfer_league_ownership", {

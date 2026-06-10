@@ -121,7 +121,7 @@ export function RankingPage() {
                     t.key === "global"
                       ? undefined
                       : (t.key as "cidade" | "bairro" | "amigos" | "impacto" | "ligas"),
-                  league: t.key === "ligas" ? leagueId ?? undefined : undefined,
+                  league: t.key === "ligas" ? (leagueId ?? undefined) : undefined,
                 },
                 replace: true,
               })
