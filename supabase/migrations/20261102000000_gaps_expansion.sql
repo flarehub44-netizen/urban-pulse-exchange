@@ -59,8 +59,7 @@ begin
 end;
 $$;
 
-revoke execute on function public.admin_void_prediction_market(text, text) from public;
-grant execute on function public.admin_void_prediction_market(text, text) to authenticated;
+revoke execute on function public.admin_void_prediction_market(text, text) from public, anon, authenticated;
 grant execute on function public.admin_void_prediction_market(text, text) to service_role;
 
 -- ---------------------------------------------------------------------------
@@ -125,8 +124,7 @@ begin
 end;
 $$;
 
-revoke execute on function public.admin_update_prediction_market(text, text, timestamptz, jsonb) from public;
-grant execute on function public.admin_update_prediction_market(text, text, timestamptz, jsonb) to authenticated;
+revoke execute on function public.admin_update_prediction_market(text, text, timestamptz, jsonb) from public, anon, authenticated;
 grant execute on function public.admin_update_prediction_market(text, text, timestamptz, jsonb) to service_role;
 
 -- ---------------------------------------------------------------------------

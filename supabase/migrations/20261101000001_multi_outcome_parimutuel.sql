@@ -170,6 +170,7 @@ begin
 end;
 $$;
 
+revoke execute on function public.place_outcome_bet(text, uuid, numeric, text) from public, anon, authenticated;
 grant execute on function public.place_outcome_bet(text, uuid, numeric, text) to authenticated;
 
 -- ---------------------------------------------------------------------------
@@ -232,8 +233,7 @@ begin
 end;
 $$;
 
-revoke execute on function public.settle_outcome_market(text, uuid) from public;
-grant execute on function public.settle_outcome_market(text, uuid) to authenticated;
+revoke execute on function public.settle_outcome_market(text, uuid) from public, anon, authenticated;
 grant execute on function public.settle_outcome_market(text, uuid) to service_role;
 
 -- ---------------------------------------------------------------------------
@@ -287,6 +287,5 @@ begin
 end;
 $$;
 
-revoke execute on function public.admin_create_prediction_market(text, text, public.market_vertical, timestamptz, jsonb, text, text, boolean) from public;
-grant execute on function public.admin_create_prediction_market(text, text, public.market_vertical, timestamptz, jsonb, text, text, boolean) to authenticated;
+revoke execute on function public.admin_create_prediction_market(text, text, public.market_vertical, timestamptz, jsonb, text, text, boolean) from public, anon, authenticated;
 grant execute on function public.admin_create_prediction_market(text, text, public.market_vertical, timestamptz, jsonb, text, text, boolean) to service_role;

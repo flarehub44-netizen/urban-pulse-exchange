@@ -299,8 +299,8 @@ begin
 end;
 $$;
 
-revoke execute on function public.cron_refresh_league_stats() from authenticated;
-revoke execute on function public.cron_advance_expired_league_seasons() from authenticated;
+revoke execute on function public.cron_refresh_league_stats() from public, anon, authenticated;
+revoke execute on function public.cron_advance_expired_league_seasons() from public, anon, authenticated;
 grant execute on function public.cron_refresh_league_stats() to service_role;
 grant execute on function public.cron_advance_expired_league_seasons() to service_role;
 
@@ -402,5 +402,8 @@ begin
 end;
 $$;
 
+revoke execute on function public.get_league_weekly_missions() from public, anon, authenticated;
 grant execute on function public.get_league_weekly_missions() to authenticated;
+
+revoke execute on function public.claim_league_weekly_bonus(uuid) from public, anon, authenticated;
 grant execute on function public.claim_league_weekly_bonus(uuid) to authenticated;

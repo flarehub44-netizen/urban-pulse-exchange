@@ -49,4 +49,5 @@ begin
 end;
 $$;
 
+revoke execute on function public.get_league_season_history(uuid, int) from public, anon, authenticated;
 grant execute on function public.get_league_season_history(uuid, int) to authenticated;

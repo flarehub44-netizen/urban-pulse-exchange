@@ -455,5 +455,8 @@ begin
 end;
 $$;
 
+revoke execute on function public.get_league_head_to_head(uuid, uuid) from public, anon, authenticated;
 grant execute on function public.get_league_head_to_head(uuid, uuid) to authenticated;
+
+revoke execute on function public.get_league_suggested_rival(uuid) from public, anon, authenticated;
 grant execute on function public.get_league_suggested_rival(uuid) to authenticated;

@@ -28,6 +28,7 @@
     "db:types": "node scripts/gen-supabase-types.mjs",
     "check:realtime": "node scripts/check-realtime-private-channels.mjs",
     "check:admin-rpc": "node scripts/check-admin-rpc-grants.mjs",
+    "check:security-grants": "node scripts/check-security-grants.mjs",
     "check:secrets": "node scripts/check-client-bundle-secrets.mjs",
     "check:deploy-env": "node scripts/check-deploy-env.mjs",
     "db:test-sql": "echo Run: psql $DATABASE_URL -f supabase/tests/resolution_engine_acceptance.sql"

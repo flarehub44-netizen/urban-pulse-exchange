@@ -213,6 +213,9 @@ begin
 end;
 $$;
 
+revoke execute on function public.list_catalog_markets(
+  public.market_vertical, text, text, text, int, int, text
+) from public, anon, authenticated;
 grant execute on function public.list_catalog_markets(
   public.market_vertical, text, text, text, int, int, text
 ) to anon, authenticated;
@@ -241,4 +244,5 @@ as $$
   where p_vertical is null or tc.vertical = p_vertical;
 $$;
 
+revoke execute on function public.list_catalog_topic_counts(public.market_vertical) from public, anon, authenticated;
 grant execute on function public.list_catalog_topic_counts(public.market_vertical) to anon, authenticated;

@@ -1,5 +1,8 @@
 -- Admin BFF grants for prediction markets + performance indexes
 
+revoke execute on function public.admin_create_prediction_market(
+  text, text, public.market_vertical, timestamptz, jsonb, text, text, boolean
+) from public, anon, authenticated;
 grant execute on function public.admin_create_prediction_market(
   text, text, public.market_vertical, timestamptz, jsonb, text, text, boolean
 ) to service_role;
@@ -66,7 +69,7 @@ begin
 end;
 $$;
 
-revoke execute on function public.cron_open_crypto_slot(int) from authenticated;
+revoke execute on function public.cron_open_crypto_slot(int) from public, anon, authenticated;
 grant execute on function public.cron_open_crypto_slot(int) to service_role;
 
 create or replace function public.place_crypto_slot_bet(
@@ -107,4 +110,5 @@ begin
 end;
 $$;
 
+revoke execute on function public.place_crypto_slot_bet(text, text, numeric) from public, anon, authenticated;
 grant execute on function public.place_crypto_slot_bet(text, text, numeric) to authenticated;

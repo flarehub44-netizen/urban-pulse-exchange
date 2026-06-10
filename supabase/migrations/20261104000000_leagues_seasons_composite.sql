@@ -858,15 +858,32 @@ end;
 $$;
 
 -- ---------------------------------------------------------------------------
--- Grants
+-- Grants (default-deny: revoke public/anon before explicit grant)
 -- ---------------------------------------------------------------------------
 
-grant execute on function public.refresh_league_member_stats(uuid) to authenticated, service_role;
+revoke execute on function public.refresh_league_member_stats(uuid) from public, anon, authenticated;
+grant execute on function public.refresh_league_member_stats(uuid) to service_role;
+
+revoke execute on function public.get_league_leaderboard(uuid) from public, anon, authenticated;
 grant execute on function public.get_league_leaderboard(uuid) to authenticated;
+
+revoke execute on function public.get_my_league_rank(uuid) from public, anon, authenticated;
 grant execute on function public.get_my_league_rank(uuid) to authenticated;
+
+revoke execute on function public.advance_league_season(uuid) from public, anon, authenticated;
 grant execute on function public.advance_league_season(uuid) to authenticated;
+
+revoke execute on function public.list_public_leagues(text, int) from public, anon, authenticated;
 grant execute on function public.list_public_leagues(text, int) to authenticated;
+
+revoke execute on function public.get_league_activity(uuid, int) from public, anon, authenticated;
 grant execute on function public.get_league_activity(uuid, int) to authenticated;
+
+revoke execute on function public.join_league_by_id(uuid) from public, anon, authenticated;
 grant execute on function public.join_league_by_id(uuid) to authenticated;
+
+revoke execute on function public.kick_league_member(uuid, uuid) from public, anon, authenticated;
 grant execute on function public.kick_league_member(uuid, uuid) to authenticated;
+
+revoke execute on function public.transfer_league_ownership(uuid, uuid) from public, anon, authenticated;
 grant execute on function public.transfer_league_ownership(uuid, uuid) to authenticated;
