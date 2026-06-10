@@ -320,11 +320,11 @@ export const copy = {
     withdrawPending: "Saque em processamento — aguardando confirmação do Pix.",
     withdrawPaid: (amount: string) => `Saque de ${amount} transferido para sua chave Pix.`,
     withdrawFailed: "Não foi possível concluir o saque. O saldo foi estornado.",
-    pixAmountHint: "Valor mínimo: R$ 7 · máximo: R$ 5.000",
-    withdrawMinHint: "Valor mínimo: R$ 7 · máximo: R$ 5.000",
-    withdrawKycHint: "Saques acima de R$ 100 exigem verificação de identidade (KYC).",
+    pixAmountHint: "Valor mínimo: 7 BRL · máximo: 5.000 BRL",
+    withdrawMinHint: "Valor mínimo: 7 BRL · máximo: 5.000 BRL",
+    withdrawKycHint: "Saques acima de 100 BRL exigem verificação de identidade (KYC).",
     withdrawKycTitle: "Verificação necessária",
-    withdrawKycBody: "Para sacar acima de R$ 100, aguarde a aprovação do KYC pela equipe ViaX.",
+    withdrawKycBody: "Para sacar acima de 100 BRL, aguarde a aprovação do KYC pela equipe ViaX.",
     pixWithdrawNote:
       "O valor é reservado ao solicitar. A transferência Pix é confirmada em instantes ou até 1 dia útil.",
     depositPayerDocumentMissing:
@@ -570,7 +570,7 @@ export const copy = {
     pendingCreditHint:
       "XP de impacto é creditado até 6 horas após a liquidação do evento (janela de moderação).",
     minEligibilityHint:
-      "Mínimo para ganhar XP: R$ 1.500 em volume qualificado e 12 participantes únicos por evento.",
+      "Mínimo para ganhar XP: 1.500 BRL em volume qualificado e 12 participantes únicos por evento.",
     eventCreditedToast: (xp: number) => `+${xp} XP de impacto creditados no seu total`,
     eventsCount: (n: number) => `${n} evento${n !== 1 ? "s" : ""} creditado${n !== 1 ? "s" : ""}`,
     regulationLinkLabel: "Regras do programa",
