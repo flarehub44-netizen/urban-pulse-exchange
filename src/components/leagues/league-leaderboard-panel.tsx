@@ -28,6 +28,8 @@ type LeagueLeaderboardPanelProps = {
   isLoading?: boolean;
   showKick?: boolean;
   onKick?: (userId: string) => void;
+  onCompare?: (userId: string) => void;
+  compareUserId?: string | null;
 };
 
 export function LeagueLeaderboardPanel({
@@ -35,6 +37,8 @@ export function LeagueLeaderboardPanel({
   isLoading,
   showKick,
   onKick,
+  onCompare,
+  compareUserId,
 }: LeagueLeaderboardPanelProps) {
   if (isLoading) {
     return (
@@ -56,12 +60,28 @@ export function LeagueLeaderboardPanel({
     <div className="space-y-2">
       {members.map((member, idx) => {
         const rank = member.rank ?? idx + 1;
+        const canCompare = onCompare && !member.is_me;
         return (
           <div
             key={member.user_id}
+            role={canCompare ? "button" : undefined}
+            tabIndex={canCompare ? 0 : undefined}
+            onClick={canCompare ? () => onCompare(member.user_id) : undefined}
+            onKeyDown={
+              canCompare
+                ? (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onCompare(member.user_id);
+                    }
+                  }
+                : undefined
+            }
             className={cn(
               "flex items-center gap-3 rounded-xl px-3 py-2",
               member.is_me ? "bg-primary/10 border border-primary/20" : "border border-border/50",
+              canCompare && "cursor-pointer hover:border-primary/30 hover:bg-surface/50",
+              compareUserId === member.user_id && "border-primary/50 ring-1 ring-primary/20",
             )}
           >
             <span
@@ -123,7 +143,10 @@ export function LeagueLeaderboardPanel({
             {showKick && !member.is_me && onKick ? (
               <button
                 type="button"
-                onClick={() => onKick(member.user_id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onKick(member.user_id);
+                }}
                 className="text-[10px] text-down hover:underline shrink-0"
               >
                 {copy.leagues.kickMember}

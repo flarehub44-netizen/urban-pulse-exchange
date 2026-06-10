@@ -31,8 +31,15 @@ import { LeagueLeaderboardPanel } from "@/components/leagues/league-leaderboard-
 import { LeagueSeasonCountdown } from "@/components/leagues/league-season-countdown";
 import { LeagueHallOfFame } from "@/components/leagues/league-hall-of-fame";
 import { LeagueWeeklyMission } from "@/components/leagues/league-weekly-mission";
+import { LeaguePublicPreview } from "@/components/leagues/league-public-preview";
+import { LeagueRivalryPanel } from "@/components/leagues/league-rivalry-panel";
 import { formatLeagueInviteUrl } from "@/lib/league-score";
 import { buildLeagueInviteMessage, buildWhatsAppShareUrl } from "@/lib/league-engagement";
+import {
+  LEAGUE_VERTICAL_OPTIONS,
+  formatLeagueVerticals,
+  type LeagueVerticalId,
+} from "@/lib/league-verticals";
 import { copy } from "@/copy/pt-BR";
 import { cn } from "@/lib/utils";
 
@@ -57,8 +64,11 @@ function LeaguesPage() {
   const [selectedLeagueId, setSelectedLeagueId] = useState<string | null>(selected ?? null);
   const [createName, setCreateName] = useState("");
   const [createIsPublic, setCreateIsPublic] = useState(false);
+  const [createVerticals, setCreateVerticals] = useState<LeagueVerticalId[]>([]);
   const [joinCode, setJoinCode] = useState("");
   const [publicQ, setPublicQ] = useState("");
+  const [publicVertical, setPublicVertical] = useState<string>("");
+  const [rivalUserId, setRivalUserId] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
   const [showActivity, setShowActivity] = useState(false);
@@ -67,9 +77,13 @@ function LeaguesPage() {
     if (selected) setSelectedLeagueId(selected);
   }, [selected]);
 
+  useEffect(() => {
+    setRivalUserId(null);
+  }, [selectedLeagueId]);
+
   const { data: leaderboard = [], isLoading: lbLoading } = useLeagueLeaderboard(selectedLeagueId);
   const { data: activity = [] } = useLeagueActivity(showActivity ? selectedLeagueId : null);
-  const { data: publicLeagues = [] } = usePublicLeagues(publicQ);
+  const { data: publicLeagues = [] } = usePublicLeagues(publicQ, publicVertical || undefined);
   const { mutateAsync: create, isPending: creating } = useCreateLeague();
   const { mutateAsync: join, isPending: joining } = useJoinLeague();
   const { mutateAsync: joinById, isPending: joiningPublic } = useJoinLeagueById();
@@ -83,12 +97,17 @@ function LeaguesPage() {
   const handleCreate = async () => {
     if (!createName.trim()) return;
     try {
-      const res = await create({ name: createName.trim(), is_public: createIsPublic });
+      const res = await create({
+        name: createName.trim(),
+        is_public: createIsPublic,
+        allowed_verticals: createVerticals.length > 0 ? createVerticals : undefined,
+      });
       toast.success(copy.leagues.joinSuccess(res.name), {
         description: `${copy.leagues.inviteCode}: ${res.invite_code}`,
       });
       setCreateName("");
       setCreateIsPublic(false);
+      setCreateVerticals([]);
       setShowCreate(false);
       setSelectedLeagueId(res.id);
     } catch (e) {
@@ -259,6 +278,37 @@ function LeaguesPage() {
               🌐 {copy.leagues.public}
             </button>
           </div>
+          <div className="mt-4 space-y-2">
+            <p className="text-xs font-medium text-muted-foreground">{copy.leagues.verticalsLabel}</p>
+            <p className="text-[10px] text-muted-foreground">{copy.leagues.verticalsHint}</p>
+            <div className="flex flex-wrap gap-2">
+              {LEAGUE_VERTICAL_OPTIONS.map((opt) => {
+                const active = createVerticals.includes(opt.id);
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() =>
+                      setCreateVerticals((prev) =>
+                        active ? prev.filter((v) => v !== opt.id) : [...prev, opt.id],
+                      )
+                    }
+                    className={cn(
+                      "rounded-lg border px-3 py-1.5 text-xs transition",
+                      active
+                        ? "border-primary/60 bg-primary/15 text-primary"
+                        : "border-border text-muted-foreground hover:bg-surface",
+                    )}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-[10px] text-muted-foreground">
+              {formatLeagueVerticals(createVerticals)}
+            </p>
+          </div>
         </motion.div>
       )}
 
@@ -332,6 +382,9 @@ function LeaguesPage() {
                   {copy.leagues.season(league.season_label)}
                 </p>
               ) : null}
+              <p className="mt-0.5 text-[10px] text-muted-foreground">
+                {formatLeagueVerticals(league.allowed_verticals)}
+              </p>
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <span className="mono text-xs text-muted-foreground border border-dashed border-border/60 rounded px-2 py-0.5">
                   {league.invite_code}
@@ -377,14 +430,28 @@ function LeaguesPage() {
 
       <section className="rounded-2xl border bg-card/40 p-4 space-y-3">
         <h2 className="heading-section text-sm">{copy.leagues.publicSection}</h2>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            value={publicQ}
-            onChange={(e) => setPublicQ(e.target.value)}
-            placeholder={copy.leagues.publicSearch}
-            className="w-full rounded-lg border bg-surface py-2 pl-9 pr-3 text-sm outline-none focus:border-primary/50"
-          />
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              value={publicQ}
+              onChange={(e) => setPublicQ(e.target.value)}
+              placeholder={copy.leagues.publicSearch}
+              className="w-full rounded-lg border bg-surface py-2 pl-9 pr-3 text-sm outline-none focus:border-primary/50"
+            />
+          </div>
+          <select
+            value={publicVertical}
+            onChange={(e) => setPublicVertical(e.target.value)}
+            className="rounded-lg border bg-surface px-3 py-2 text-sm outline-none focus:border-primary/50"
+          >
+            <option value="">{copy.leagues.filterVertical}</option>
+            {LEAGUE_VERTICAL_OPTIONS.map((opt) => (
+              <option key={opt.id} value={opt.id}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="space-y-2">
           {publicLeagues.length === 0 ? (
@@ -395,11 +462,19 @@ function LeaguesPage() {
                 key={pl.id}
                 className="flex items-center justify-between gap-3 rounded-xl border px-3 py-2 text-sm"
               >
-                <div>
+                <div className="min-w-0 flex-1">
                   <div className="font-medium">{pl.name}</div>
                   <div className="text-[11px] text-muted-foreground">
                     {copy.leagues.memberCount(pl.member_count)}
                     {pl.season_label ? ` · ${pl.season_label}` : ""}
+                    {" · "}
+                    {formatLeagueVerticals(pl.allowed_verticals)}
+                  </div>
+                  <div className="mt-1.5">
+                    <p className="text-[10px] text-muted-foreground mb-0.5">
+                      {copy.leagues.publicPreview}
+                    </p>
+                    <LeaguePublicPreview preview={pl.top_preview ?? []} />
                   </div>
                 </div>
                 {pl.is_member ? (
@@ -439,6 +514,9 @@ function LeaguesPage() {
                   {copy.leagues.season(selectedLeague.season_label)}
                 </p>
               ) : null}
+              <p className="text-xs text-muted-foreground">
+                {formatLeagueVerticals(selectedLeague.allowed_verticals)}
+              </p>
               <LeagueSeasonCountdown endsAt={selectedLeague.season_ends_at} className="mt-1" />
               <button
                 type="button"
@@ -482,10 +560,22 @@ function LeaguesPage() {
 
           <LeagueWeeklyMission leagueId={selectedLeague.id} />
 
+          <LeagueRivalryPanel
+            leagueId={selectedLeague.id}
+            opponentUserId={rivalUserId}
+            onClose={() => setRivalUserId(null)}
+          />
+
+          <p className="text-[10px] text-muted-foreground">{copy.leagues.compareHint}</p>
+
           <LeagueLeaderboardPanel
             members={leaderboard}
             isLoading={lbLoading}
             showKick={selectedLeague.is_creator}
+            compareUserId={rivalUserId}
+            onCompare={(userId) =>
+              setRivalUserId((prev) => (prev === userId ? null : userId))
+            }
             onKick={async (userId) => {
               await kick({ league_id: selectedLeague.id, user_id: userId });
               toast.success("Membro removido.");

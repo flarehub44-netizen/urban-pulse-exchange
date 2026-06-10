@@ -16,6 +16,8 @@ import {
   getLeagueSeasonHistoryFn,
   getLeagueWeeklyMissionsFn,
   claimLeagueWeeklyBonusFn,
+  getLeagueHeadToHeadFn,
+  getLeagueSuggestedRivalFn,
 } from "@/actions/leagues";
 
 export function useMyLeagues() {
@@ -45,10 +47,38 @@ export function useMyLeagueRank(leagueId: string | null) {
   });
 }
 
-export function usePublicLeagues(q = "") {
+export function usePublicLeagues(q = "", vertical?: string) {
   return useQuery({
-    queryKey: ["public-leagues", q],
-    queryFn: () => listPublicLeaguesFn({ data: { q: q || undefined } }),
+    queryKey: ["public-leagues", q, vertical ?? ""],
+    queryFn: () =>
+      listPublicLeaguesFn({
+        data: { q: q || undefined, vertical: vertical || undefined },
+      }),
+    staleTime: 60_000,
+  });
+}
+
+export function useLeagueHeadToHead(
+  leagueId: string | null,
+  opponentUserId: string | null,
+  enabled = true,
+) {
+  return useQuery({
+    queryKey: ["league-h2h", leagueId, opponentUserId],
+    queryFn: () =>
+      getLeagueHeadToHeadFn({
+        data: { league_id: leagueId!, opponent_user_id: opponentUserId! },
+      }),
+    enabled: !!leagueId && !!opponentUserId && enabled,
+    staleTime: 30_000,
+  });
+}
+
+export function useLeagueSuggestedRival(leagueId: string | null, enabled = true) {
+  return useQuery({
+    queryKey: ["league-suggested-rival", leagueId],
+    queryFn: () => getLeagueSuggestedRivalFn({ data: { league_id: leagueId! } }),
+    enabled: !!leagueId && enabled,
     staleTime: 60_000,
   });
 }
@@ -104,7 +134,11 @@ function invalidateLeagueQueries(qc: ReturnType<typeof useQueryClient>, leagueId
 export function useCreateLeague() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: { name: string; is_public?: boolean }) => createLeagueFn({ data: input }),
+    mutationFn: (input: {
+      name: string;
+      is_public?: boolean;
+      allowed_verticals?: string[];
+    }) => createLeagueFn({ data: input }),
     onSuccess: async () => {
       invalidateLeagueQueries(qc);
     },

@@ -807,6 +807,23 @@ export const copy = {
     badgeChampion: "Campeão de liga",
     badgePodium: "Pódio da liga",
     seasonRecapTitle: "Recap da temporada",
+    verticalsLabel: "Categorias da liga",
+    verticalsAll: "Todas as categorias",
+    verticalsHint: "Deixe vazio para contar todas as previsões.",
+    publicPreview: "Pódio atual",
+    publicPreviewEmpty: "Sem ranking ainda — seja o primeiro!",
+    filterVertical: "Filtrar por categoria",
+    rivalryTitle: "Rivalidade",
+    rivalryLoading: "Carregando confronto…",
+    rivalryClose: "Fechar rivalidade",
+    rivalryVolume: "Volume",
+    rivalryAccuracy: "Precisão",
+    rivalryVsYou: "vs rival",
+    rivalryCatchUp: (positions: number, scoreGap: number) =>
+      `Faltam ${positions} posição${positions !== 1 ? "ões" : ""} e ${Math.abs(scoreGap)} pts para ultrapassar`,
+    rivalryAhead: (positions: number) =>
+      `Você está ${positions} posição${positions !== 1 ? "ões" : ""} à frente`,
+    compareHint: "Toque em um rival para comparar",
   },
 
   poll: {

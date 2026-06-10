@@ -12,6 +12,32 @@ export type League = {
   is_public: boolean;
   season_label?: string;
   season_ends_at?: string;
+  allowed_verticals?: string[] | null;
+};
+
+export type LeaguePreviewEntry = {
+  rank: number;
+  score: number;
+  label: string;
+};
+
+export type LeagueHeadToHeadSide = {
+  user_id: string;
+  name: string;
+  rank: number;
+  score: number;
+  roi: number;
+  volume: number;
+  accuracy: number;
+};
+
+export type LeagueHeadToHead = {
+  ok: boolean;
+  reason?: string;
+  me?: LeagueHeadToHeadSide;
+  opponent?: LeagueHeadToHeadSide;
+  score_gap?: number;
+  rank_gap?: number;
 };
 
 export type LeagueMember = {
@@ -49,6 +75,8 @@ export type PublicLeague = {
   season_label: string;
   is_member: boolean;
   top_score: number;
+  allowed_verticals?: string[] | null;
+  top_preview?: LeaguePreviewEntry[];
 };
 
 export type LeagueActivityItem = {
@@ -89,12 +117,22 @@ export const getMyLeaguesFn = createServerFn({ method: "GET" })
 
 export const createLeagueFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(z.object({ name: z.string().min(2).max(40), is_public: z.boolean().optional() }))
+  .inputValidator(
+    z.object({
+      name: z.string().min(2).max(40),
+      is_public: z.boolean().optional(),
+      allowed_verticals: z.array(z.string()).optional(),
+    }),
+  )
   .handler(async ({ context, data }) => {
     const { supabase } = getSupabaseCtx(context);
     const { data: res, error } = await supabase.rpc("create_league", {
       p_name: data.name,
       p_is_public: data.is_public ?? false,
+      p_allowed_verticals:
+        data.allowed_verticals && data.allowed_verticals.length > 0
+          ? data.allowed_verticals
+          : null,
     });
     if (error) throw new Error(error.message);
     return res as {
@@ -193,13 +231,18 @@ export const getMyLeagueRankFn = createServerFn({ method: "GET" })
 export const listPublicLeaguesFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    z.object({ q: z.string().optional(), limit: z.number().int().min(1).max(48).optional() }),
+    z.object({
+      q: z.string().optional(),
+      limit: z.number().int().min(1).max(48).optional(),
+      vertical: z.string().optional(),
+    }),
   )
   .handler(async ({ context, data }) => {
     const { supabase } = getSupabaseCtx(context);
     const { data: res, error } = await supabase.rpc("list_public_leagues", {
       p_q: data.q ?? null,
       p_limit: data.limit ?? 24,
+      p_vertical: data.vertical ?? null,
     });
     if (error) throw new Error(error.message);
     return (Array.isArray(res) ? res : []) as PublicLeague[];
@@ -280,6 +323,33 @@ export const claimLeagueWeeklyBonusFn = createServerFn({ method: "POST" })
     });
     if (error) throw new Error(error.message);
     return res as { ok?: boolean; reason?: string; xp_awarded?: number };
+  });
+
+export const getLeagueHeadToHeadFn = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    z.object({ league_id: z.string().uuid(), opponent_user_id: z.string().uuid() }),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase } = getSupabaseCtx(context);
+    const { data: res, error } = await supabase.rpc("get_league_head_to_head", {
+      p_league_id: data.league_id,
+      p_opponent_user_id: data.opponent_user_id,
+    });
+    if (error) throw new Error(error.message);
+    return res as LeagueHeadToHead;
+  });
+
+export const getLeagueSuggestedRivalFn = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ league_id: z.string().uuid() }))
+  .handler(async ({ context, data }) => {
+    const { supabase } = getSupabaseCtx(context);
+    const { data: res, error } = await supabase.rpc("get_league_suggested_rival", {
+      p_league_id: data.league_id,
+    });
+    if (error) throw new Error(error.message);
+    return res as LeagueHeadToHead;
   });
 
 export const advanceLeagueSeasonFn = createServerFn({ method: "POST" })
