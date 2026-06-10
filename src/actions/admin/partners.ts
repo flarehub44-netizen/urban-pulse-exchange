@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireAdminAuth } from "@/integrations/supabase/admin-middleware.server";
 import type { Json } from "@/integrations/supabase/types";
 import { adminRpcCall } from "@/actions/admin/_helpers";
+import { adminUpdateSettingSchema } from "@/lib/platform-settings-keys";
 
 export const adminListPartnerApplicationsFn = createServerFn({ method: "GET" })
   .middleware([requireAdminAuth])
@@ -90,7 +91,7 @@ export const adminSetPartnerSubCreatorsFn = createServerFn({ method: "POST" })
 
 export const adminUpdateSettingFn = createServerFn({ method: "POST" })
   .middleware([requireAdminAuth])
-  .inputValidator(z.object({ key: z.string(), value: z.unknown() }))
+  .inputValidator(adminUpdateSettingSchema)
   .handler(async ({ data, context }) =>
     adminRpcCall("bff.admin.update_setting", context, (supabase) =>
       supabase.rpc("admin_update_setting", {

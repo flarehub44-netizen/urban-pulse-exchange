@@ -8,6 +8,7 @@ import {
   likeFeedPostFn,
   repostFeedPostFn,
   commentFeedPostFn,
+  FEED_TEXT_MAX,
 } from "@/actions/feed";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -126,19 +127,23 @@ function Feed() {
           <div className="flex-1">
             <textarea
               value={text}
-              onChange={(e) => setText(e.target.value)}
+              onChange={(e) => setText(e.target.value.slice(0, FEED_TEXT_MAX))}
+              maxLength={FEED_TEXT_MAX}
               placeholder="Compartilhe uma análise ou alerta urbano..."
               className="w-full resize-none rounded-lg border bg-surface px-3 py-2 text-sm outline-none focus:border-primary/60"
               rows={2}
             />
             <div className="mt-2 flex items-center justify-between">
-              <div className="text-[11px] text-muted-foreground">{text.length}/280</div>
+              <div className="text-[11px] text-muted-foreground">
+                {text.length}/{FEED_TEXT_MAX}
+              </div>
               <button
                 type="button"
                 onClick={async () => {
-                  if (!text.trim()) return;
+                  const body = text.trim().slice(0, FEED_TEXT_MAX);
+                  if (!body) return;
                   try {
-                    await createFeedPostFn({ data: { text: text.trim() } });
+                    await createFeedPostFn({ data: { text: body } });
                     setText("");
                     queryClient.invalidateQueries({ queryKey: ["feed"] });
                     toast.success("Publicado!");
@@ -378,7 +383,8 @@ function Feed() {
           <div className="mt-4 flex gap-2">
             <textarea
               value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
+              onChange={(e) => setCommentText(e.target.value.slice(0, FEED_TEXT_MAX))}
+              maxLength={FEED_TEXT_MAX}
               className="min-h-[72px] flex-1 resize-none rounded-lg border bg-surface px-3 py-2 text-sm outline-none focus:border-primary/60"
               placeholder="Seu comentário..."
             />
@@ -387,12 +393,13 @@ function Feed() {
               disabled={!commentText.trim()}
               className="self-end rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-40"
               onClick={async () => {
-                if (!commentPostId || !commentText.trim()) return;
+                const body = commentText.trim().slice(0, FEED_TEXT_MAX);
+                if (!commentPostId || !body) return;
                 const post = feed.find((x) => x.id === commentPostId);
                 if (!post) return;
                 try {
                   const res = await commentFeedPostFn({
-                    data: { postId: commentPostId, text: commentText.trim() },
+                    data: { postId: commentPostId, text: body },
                   });
                   setCounts((prev) => ({
                     ...prev,

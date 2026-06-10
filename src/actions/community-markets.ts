@@ -14,12 +14,14 @@ async function adminRpc<T>(
 }
 
 import { getSupabaseCtx } from "@/integrations/supabase/context";
+import { publicRateLimitMiddleware } from "@/lib/public-rate-limit-middleware.server";
+import { optionalHttpsUrlSchema } from "@/lib/url-validation";
 
 const createSchema = z.object({
   question: z.string().min(10).max(280),
   endsAt: z.string().datetime(),
   visibility: z.enum(["public", "unlisted"]),
-  coverUrl: z.string().url().optional(),
+  coverUrl: optionalHttpsUrlSchema,
 });
 
 export const createCommunityMarketFn = createServerFn({ method: "POST" })
@@ -59,11 +61,9 @@ const communityMarketDetailSchema = z.object({
   accessToken: z.string().optional(),
 });
 
-/**
- * @public Intentionally unauthenticated — returns read-only market data for sharing/preview.
- * Rate-limited via assertRateLimit at the BFF layer.
- */
+/** @public Unauthenticated — read-only market data for sharing/preview. */
 export const getCommunityMarketPublicFn = createServerFn({ method: "GET" })
+  .middleware([publicRateLimitMiddleware("community-market-detail", { max: 90, windowMs: 60_000 })])
   .inputValidator(communityMarketDetailSchema)
   .handler(async ({ data }) => {
     const { supabase } = await import("@/integrations/supabase/client");
@@ -98,11 +98,10 @@ export const getCommunityMarketFn = createServerFn({ method: "GET" })
     };
   });
 
-/**
- * @public Intentionally unauthenticated — lists public community markets for discovery.
- * Rate-limited via assertRateLimit at the BFF layer.
- */
-export const listPublicCommunityMarketsFn = createServerFn({ method: "GET" }).handler(async () => {
+/** @public Unauthenticated — lists public community markets for discovery. */
+export const listPublicCommunityMarketsFn = createServerFn({ method: "GET" })
+  .middleware([publicRateLimitMiddleware("community-markets-list", { max: 60, windowMs: 60_000 })])
+  .handler(async () => {
   const { supabase } = await import("@/integrations/supabase/client");
   const { data, error } = await supabase.rpc("list_public_community_markets", { p_limit: 50 });
   if (error) throw new Error(error.message);

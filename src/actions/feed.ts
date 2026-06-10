@@ -3,8 +3,10 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware.server";
 import { getSupabaseCtx } from "@/integrations/supabase/context";
 
+export const FEED_TEXT_MAX = 280;
+
 const createPostSchema = z.object({
-  text: z.string().min(1).max(280),
+  text: z.string().min(1).max(FEED_TEXT_MAX),
   marketId: z.string().uuid().optional(),
   tag: z.enum(["Alerta", "Análise", "Previsão", "Insight"]).optional(),
 });
@@ -53,7 +55,7 @@ export const repostFeedPostFn = createServerFn({ method: "POST" })
 
 const commentSchema = z.object({
   postId: z.string().uuid(),
-  text: z.string().min(1).max(280),
+  text: z.string().min(1).max(FEED_TEXT_MAX),
 });
 
 export const commentFeedPostFn = createServerFn({ method: "POST" })

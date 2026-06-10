@@ -24,7 +24,10 @@ export const casinoDailySpinFn = createServerFn({ method: "POST" })
 export const casinoQuickDepositFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    z.object({ amount: z.number().positive().max(10_000), context: z.string().optional() }),
+    z.object({
+      amount: z.number().positive().max(10_000),
+      context: z.enum(["low_balance", "after_loss", "after_spin"]).optional(),
+    }),
   )
   .handler(async ({ context, data }) => {
     const { supabase } = getSupabaseCtx(context);

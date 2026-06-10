@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { casinoDailySpinFn, type SpinResult } from "@/actions/casino";
+import { casinoDailySpinFn, casinoQuickDepositFn, type SpinResult } from "@/actions/casino";
 import { useAuth } from "@/hooks/use-auth";
 import { invalidateWalletQueries } from "@/lib/query-invalidation";
 
@@ -43,14 +43,10 @@ export function useCasinoQuickDeposit() {
     }: {
       amount: number;
       context?: "low_balance" | "after_loss" | "after_spin";
-    }) => {
-      const { data, error } = await supabase.rpc("casino_quick_deposit", {
-        p_amount: amount,
-        p_context: context ?? "low_balance",
-      });
-      if (error) throw error;
-      return data as { balance: number; bonus_spin?: SpinResult };
-    },
+    }) =>
+      casinoQuickDepositFn({
+        data: { amount, context: context ?? "low_balance" },
+      }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["casino"] });
       invalidateWalletQueries(qc);

@@ -1,7 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware.server";
 import type { SupabaseFnContext } from "@/integrations/supabase/context";
 import { supabase } from "@/integrations/supabase/client";
+import { publicRateLimitMiddleware } from "@/lib/public-rate-limit-middleware.server";
 
 export type DailyPoll = {
   id: string;
@@ -12,11 +14,10 @@ export type DailyPoll = {
   my_vote: boolean | null;
 };
 
-/**
- * @public Intentionally unauthenticated — returns today's poll for display before login.
- * Rate-limited via assertRateLimit at the BFF layer.
- */
-export const getTodayPollFn = createServerFn({ method: "GET" }).handler(async () => {
+/** @public Unauthenticated — today's poll for display before login. */
+export const getTodayPollFn = createServerFn({ method: "GET" })
+  .middleware([publicRateLimitMiddleware("polls-today", { max: 120, windowMs: 60_000 })])
+  .handler(async () => {
   try {
     const today = new Date().toISOString().slice(0, 10);
     const { data, error } = (await supabase
@@ -38,11 +39,11 @@ export const getTodayPollFn = createServerFn({ method: "GET" }).handler(async ()
     console.warn("[polls] Today's poll unavailable:", error);
     return null;
   }
-});
+  });
 
 export const voteDailyPollFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { vote: boolean }) => d)
+  .inputValidator(z.object({ vote: z.boolean() }))
   .handler(async ({ context, data }) => {
     const { supabase } = context as unknown as SupabaseFnContext;
     const { data: res, error } = await supabase.rpc("vote_daily_poll", { p_vote: data.vote });

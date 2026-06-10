@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { publicRateLimitMiddleware } from "@/lib/public-rate-limit-middleware.server";
 
 export type PlatformEvent = {
   id: string;
@@ -18,11 +19,10 @@ function parseActiveEventsPayload(data: unknown): PlatformEvent[] {
   return rows as PlatformEvent[];
 }
 
-/**
- * @public Intentionally unauthenticated — returns read-only active platform events.
- * Rate-limited via assertRateLimit at the BFF layer.
- */
-export const getActiveEventsFn = createServerFn({ method: "GET" }).handler(async () => {
+/** @public Unauthenticated — read-only active platform events. */
+export const getActiveEventsFn = createServerFn({ method: "GET" })
+  .middleware([publicRateLimitMiddleware("active-events", { max: 120, windowMs: 60_000 })])
+  .handler(async () => {
   const { data, error } = await supabase.rpc("get_active_events");
   if (error) {
     throw new Error(error.message);
