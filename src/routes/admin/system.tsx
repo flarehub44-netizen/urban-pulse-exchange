@@ -24,6 +24,7 @@ function AdminSystemPage() {
   const [cpaMinDeposit, setCpaMinDeposit] = useState("50");
   const [cameraOracleEnabled, setCameraOracleEnabled] = useState(false);
   const [regionsSimulatorEnabled, setRegionsSimulatorEnabled] = useState(true);
+  const [cryptoShortTermEnabled, setCryptoShortTermEnabled] = useState(false);
 
   useEffect(() => {
     if (!settings) return;
@@ -51,6 +52,9 @@ function AdminSystemPage() {
     if (settings.regions_simulator_enabled != null) {
       setRegionsSimulatorEnabled(Boolean(settings.regions_simulator_enabled));
     }
+    if (settings.crypto_short_term_enabled != null) {
+      setCryptoShortTermEnabled(Boolean(settings.crypto_short_term_enabled));
+    }
   }, [settings]);
 
   if (isError) return <AdminInlineError error={error} onRetry={() => refetch()} />;
@@ -67,6 +71,7 @@ function AdminSystemPage() {
       await update({ key: "cpa_min_deposit_threshold", value: Number(cpaMinDeposit) });
       await update({ key: "camera_oracle_enabled", value: cameraOracleEnabled });
       await update({ key: "regions_simulator_enabled", value: regionsSimulatorEnabled });
+      await update({ key: "crypto_short_term_enabled", value: cryptoShortTermEnabled });
       toast.success("Configurações salvas.");
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Erro");
@@ -168,6 +173,14 @@ function AdminSystemPage() {
             onChange={(e) => setRegionsSimulatorEnabled(e.target.checked)}
           />
           <span className="text-xs">Simulador de regiões (pg_cron)</span>
+        </label>
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={cryptoShortTermEnabled}
+            onChange={(e) => setCryptoShortTermEnabled(e.target.checked)}
+          />
+          <span className="text-xs">Crypto slots curto prazo (cron + /v/crypto)</span>
         </label>
         <label className="block">
           <span className="text-xs text-muted-foreground">{copy.admin.system.impulseMaxHour}</span>

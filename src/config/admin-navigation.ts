@@ -18,6 +18,7 @@ import {
   UsersRound,
   TrafficCone,
   ScrollText,
+  PlusCircle,
 } from "lucide-react";
 
 export type AdminNavItem = {
@@ -29,6 +30,7 @@ export type AdminNavItem = {
 
 export const adminNav: AdminNavItem[] = [
   { to: "/admin", label: copy.admin.nav.overview, icon: LayoutDashboard },
+  { to: "/admin/create-event", label: "Criar evento", icon: PlusCircle },
   { to: "/admin/markets", label: copy.admin.nav.markets, icon: Radio },
   { to: "/admin/community", label: copy.admin.nav.community, icon: UsersRound },
   { to: "/admin/football", label: copy.admin.nav.football, icon: Flag },

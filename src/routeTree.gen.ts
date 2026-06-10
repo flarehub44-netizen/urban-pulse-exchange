@@ -60,6 +60,7 @@ import { Route as AdminIntelligenceRouteImport } from './routes/admin/intelligen
 import { Route as AdminFootballRouteImport } from './routes/admin/football'
 import { Route as AdminFinanceRouteImport } from './routes/admin/finance'
 import { Route as AdminEventsRouteImport } from './routes/admin/events'
+import { Route as AdminCreateEventRouteImport } from './routes/admin/create-event'
 import { Route as AdminCommunityRouteImport } from './routes/admin/community'
 import { Route as AdminBonusesRouteImport } from './routes/admin/bonuses'
 import { Route as AppWalletRouteImport } from './routes/_app/wallet'
@@ -343,6 +344,11 @@ const AdminEventsRoute = AdminEventsRouteImport.update({
   path: '/events',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminCreateEventRoute = AdminCreateEventRouteImport.update({
+  id: '/create-event',
+  path: '/create-event',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminCommunityRoute = AdminCommunityRouteImport.update({
   id: '/community',
   path: '/community',
@@ -519,6 +525,7 @@ export interface FileRoutesByFullPath {
   '/wallet': typeof AppWalletRoute
   '/admin/bonuses': typeof AdminBonusesRoute
   '/admin/community': typeof AdminCommunityRoute
+  '/admin/create-event': typeof AdminCreateEventRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/football': typeof AdminFootballRoute
@@ -594,6 +601,7 @@ export interface FileRoutesByTo {
   '/wallet': typeof AppWalletRoute
   '/admin/bonuses': typeof AdminBonusesRoute
   '/admin/community': typeof AdminCommunityRoute
+  '/admin/create-event': typeof AdminCreateEventRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/football': typeof AdminFootballRoute
@@ -676,6 +684,7 @@ export interface FileRoutesById {
   '/_app/wallet': typeof AppWalletRoute
   '/admin/bonuses': typeof AdminBonusesRoute
   '/admin/community': typeof AdminCommunityRoute
+  '/admin/create-event': typeof AdminCreateEventRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/football': typeof AdminFootballRoute
@@ -758,6 +767,7 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/admin/bonuses'
     | '/admin/community'
+    | '/admin/create-event'
     | '/admin/events'
     | '/admin/finance'
     | '/admin/football'
@@ -833,6 +843,7 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/admin/bonuses'
     | '/admin/community'
+    | '/admin/create-event'
     | '/admin/events'
     | '/admin/finance'
     | '/admin/football'
@@ -914,6 +925,7 @@ export interface FileRouteTypes {
     | '/_app/wallet'
     | '/admin/bonuses'
     | '/admin/community'
+    | '/admin/create-event'
     | '/admin/events'
     | '/admin/finance'
     | '/admin/football'
@@ -1357,6 +1369,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEventsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/create-event': {
+      id: '/admin/create-event'
+      path: '/create-event'
+      fullPath: '/admin/create-event'
+      preLoaderRoute: typeof AdminCreateEventRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/community': {
       id: '/admin/community'
       path: '/community'
@@ -1559,6 +1578,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteRouteChildren {
   AdminBonusesRoute: typeof AdminBonusesRoute
   AdminCommunityRoute: typeof AdminCommunityRoute
+  AdminCreateEventRoute: typeof AdminCreateEventRoute
   AdminEventsRoute: typeof AdminEventsRoute
   AdminFinanceRoute: typeof AdminFinanceRoute
   AdminFootballRoute: typeof AdminFootballRoute
@@ -1579,6 +1599,7 @@ interface AdminRouteRouteChildren {
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminBonusesRoute: AdminBonusesRoute,
   AdminCommunityRoute: AdminCommunityRoute,
+  AdminCreateEventRoute: AdminCreateEventRoute,
   AdminEventsRoute: AdminEventsRoute,
   AdminFinanceRoute: AdminFinanceRoute,
   AdminFootballRoute: AdminFootballRoute,

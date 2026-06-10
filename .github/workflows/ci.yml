@@ -38,6 +38,11 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+      - name: Production smoke (optional)
+        if: ${{ env.PLAYWRIGHT_SMOKE_PROD == '1' && env.PLAYWRIGHT_BASE_URL != '' }}
+        env:
+          PLAYWRIGHT_SMOKE_PROD: "1"
+        run: npx playwright test e2e/smoke-prod.spec.ts --project=chromium
       - name: SQL acceptance (optional, needs DATABASE_URL)
         if: ${{ env.DATABASE_URL != '' }}
         run: |
@@ -45,6 +50,7 @@ jobs:
           psql "$DATABASE_URL" -f supabase/tests/football_markets_acceptance.sql
           psql "$DATABASE_URL" -f supabase/tests/financial_hardening_acceptance.sql
           psql "$DATABASE_URL" -f supabase/tests/multi_outcome_acceptance.sql
+          psql "$DATABASE_URL" -f supabase/tests/multi_outcome_bet_flow.sql
           psql "$DATABASE_URL" -f supabase/tests/security_definer_search_path_inventory.sql
 
   lighthouse:

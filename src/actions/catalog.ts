@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getServiceClient } from "@/lib/supabase-service.server";
+import { logApiMetric } from "@/lib/structured-log.server";
 import { parseCatalogMarkets, type MarketVertical } from "@/lib/catalog-market";
 
 const catalogFiltersSchema = z.object({
@@ -24,9 +25,15 @@ function cacheKey(filters: z.infer<typeof catalogFiltersSchema>) {
 export const listCatalogMarketsFn = createServerFn({ method: "GET" })
   .validator(catalogFiltersSchema)
   .handler(async ({ data }) => {
+    const started = Date.now();
     const key = cacheKey(data);
     const hit = catalogCache.get(key);
     if (hit && hit.expires > Date.now()) {
+      logApiMetric("bff.list_catalog_markets", {
+        ok: true,
+        durationMs: Date.now() - started,
+        cache: "hit",
+      });
       return parseCatalogMarkets(hit.data);
     }
 
@@ -40,8 +47,20 @@ export const listCatalogMarketsFn = createServerFn({ method: "GET" })
       p_offset: data.offset ?? 0,
       p_q: data.q ?? undefined,
     });
-    if (error) throw error;
+    if (error) {
+      logApiMetric("bff.list_catalog_markets", {
+        ok: false,
+        durationMs: Date.now() - started,
+        cache: "miss",
+      });
+      throw error;
+    }
 
     catalogCache.set(key, { expires: Date.now() + CACHE_TTL_MS, data: rows });
+    logApiMetric("bff.list_catalog_markets", {
+      ok: true,
+      durationMs: Date.now() - started,
+      cache: "miss",
+    });
     return parseCatalogMarkets(rows);
   });

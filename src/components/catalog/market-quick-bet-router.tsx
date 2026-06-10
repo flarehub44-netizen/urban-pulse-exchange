@@ -9,6 +9,8 @@ import { formatPct } from "@/lib/parimutuel";
 import { cn } from "@/lib/utils";
 import { usePlaceBet } from "@/hooks/use-place-bet";
 import { usePlaceFootballBet } from "@/hooks/use-place-football-bet";
+import { usePlaceCryptoSlotBet } from "@/hooks/use-crypto-slot";
+import { usePlaceOutcomeBet } from "@/hooks/use-place-outcome-bet";
 import { useAuthPublic } from "@/hooks/use-auth-public";
 import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
 
@@ -21,6 +23,8 @@ export function MarketQuickBetRouter({ market, className }: MarketQuickBetRouter
   const { isRegistered } = useAuthPublic();
   const placeBet = usePlaceBet();
   const placeFootball = usePlaceFootballBet();
+  const placeCrypto = usePlaceCryptoSlotBet();
+  const placeOutcome = usePlaceOutcomeBet();
 
   const handleQuick = async (outcomeId: string, stake = 50) => {
     if (!isRegistered) return;
@@ -39,10 +43,26 @@ export function MarketQuickBetRouter({ market, className }: MarketQuickBetRouter
         stake,
         idempotencyKey: key,
       });
+    } else if (market.type === "crypto_slot") {
+      await placeCrypto.mutateAsync({
+        data: {
+          marketId: market.id,
+          side: outcomeId === "down" ? "down" : "up",
+          stake,
+        },
+      });
+    } else if (market.type === "multi_outcome") {
+      await placeOutcome.mutateAsync({
+        marketId: market.id,
+        outcomeId,
+        stake,
+        idempotencyKey: key,
+      });
     }
   };
 
-  const outcomes = market.outcomes.slice(0, market.type === "football_1x3" ? 3 : 2);
+  const maxOutcomes = market.type === "football_1x3" ? 3 : market.type === "multi_outcome" ? 4 : 2;
+  const outcomes = market.outcomes.slice(0, maxOutcomes);
 
   if (!isRegistered) {
     return (
@@ -63,7 +83,12 @@ export function MarketQuickBetRouter({ market, className }: MarketQuickBetRouter
         <button
           key={o.id}
           type="button"
-          disabled={placeBet.isPending || placeFootball.isPending}
+          disabled={
+            placeBet.isPending ||
+            placeFootball.isPending ||
+            placeCrypto.isPending ||
+            placeOutcome.isPending
+          }
           onClick={() => void handleQuick(o.id)}
           className={cn(
             "rounded-lg px-2 py-2 text-xs font-semibold transition",

@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 
 type StatusFilter = "all" | "live" | "scheduled" | "finished" | "favorites";
 
+const WC_LEAGUE_ID = 1;
 const TOP_LEAGUES = new Set([39, 140, 135, 78, 61, 2, 3, 71, 72, 13, 848, 11, 10, 9, 94, 88, 253]);
 
 export const Route = createFileRoute("/football/")({
@@ -330,13 +331,22 @@ function FootballHomepage() {
                         </p>
                       )}
                       {f.venue && <p className="text-xs text-muted-foreground">{f.venue}</p>}
-                      <Link
-                        to="/football/$marketId"
-                        params={{ marketId: `fb-${f.id}` }}
-                        className="mt-2 inline-block text-xs font-medium text-primary hover:underline"
-                      >
-                        Ver mercado →
-                      </Link>
+                      {f.leagueId === WC_LEAGUE_ID ? (
+                        <Link
+                          to="/copa"
+                          className="mt-2 inline-block text-xs font-medium text-primary hover:underline"
+                        >
+                          Ver no Hub Copa 2026 →
+                        </Link>
+                      ) : (
+                        <Link
+                          to="/football/$marketId"
+                          params={{ marketId: `fb-${f.id}` }}
+                          className="mt-2 inline-block text-xs font-medium text-primary hover:underline"
+                        >
+                          Ver mercado →
+                        </Link>
+                      )}
                     </div>
                   </article>
                 );

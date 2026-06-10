@@ -13,6 +13,7 @@ export function AdminLayout() {
       items: adminNav.filter((it) =>
         [
           "/admin",
+          "/admin/create-event",
           "/admin/markets",
           "/admin/football",
           "/admin/traffic-events",

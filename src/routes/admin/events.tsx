@@ -284,6 +284,31 @@ function AdminEventsPage() {
               label={copy.admin.events.communityReports}
               value={overview.community.pending_reports}
             />
+            {overview.prediction && (
+              <>
+                <AdminStatCard label="Prediction live" value={overview.prediction.live} />
+                <AdminStatCard
+                  label="Apostas N-way (24h)"
+                  value={overview.prediction.outcome_bets_24h}
+                />
+                <AdminStatCard
+                  label="Volume N-way (24h)"
+                  value={Number(overview.prediction.outcome_volume_24h).toFixed(0)}
+                />
+              </>
+            )}
+            {overview.engagement && (
+              <AdminStatCard
+                label="Traders c/ evento ativo (24h)"
+                value={overview.engagement.active_event_bets_24h}
+              />
+            )}
+            {overview.crypto_slots && (
+              <AdminStatCard
+                label={`Crypto slots ${overview.crypto_slots.enabled ? "on" : "off"}`}
+                value={overview.crypto_slots.live}
+              />
+            )}
           </div>
           <div className="flex flex-wrap gap-2">
             <Link

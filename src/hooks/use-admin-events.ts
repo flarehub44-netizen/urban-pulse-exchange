@@ -16,6 +16,13 @@ export type AdminEventsOverview = {
   daily_polls: { has_today: boolean; total: number };
   partner_events: { last_24h: number };
   markets: { live: number; dispute: number; draft: number };
+  prediction?: {
+    live: number;
+    outcome_bets_24h: number;
+    outcome_volume_24h: number;
+  };
+  engagement?: { active_event_bets_24h: number };
+  crypto_slots?: { enabled: boolean; live: number };
   football: { pending_fixtures: number };
   community: { pending_reports: number };
 };

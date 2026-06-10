@@ -1,5 +1,5 @@
 import { copy } from "@/copy/pt-BR";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import type { MarketsSearch } from "@/routes/markets";
 import { parseAuthModalSearch } from "@/lib/auth-modal-search";
 import { useMemo, useEffect, useState } from "react";
@@ -53,6 +53,15 @@ import { TrafficSlotWaiting } from "@/components/viax/traffic-slot-waiting";
 import { TrafficEndedCard } from "@/components/viax/traffic-ended-card";
 
 export const Route = createFileRoute("/markets/")({
+  beforeLoad: ({ search }) => {
+    const segment = parseMarketSegment(search as Record<string, unknown>);
+    if (segment === "futebol") {
+      throw redirect({ to: "/v/esportes" });
+    }
+    if (segment === "outros") {
+      throw redirect({ to: "/v/politica" });
+    }
+  },
   head: () => ({
     meta: [
       { title: "Mercados · ViaX" },

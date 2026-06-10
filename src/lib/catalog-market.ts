@@ -1,8 +1,13 @@
 import type { Side } from "@/lib/parimutuel";
 import type { FootballOutcome } from "@/lib/football-parimutuel";
 
-export type CatalogMarketType = "binary" | "football_1x3" | "multi_outcome";
-export type CatalogMarketSource = "platform" | "football" | "prediction" | "community";
+export type CatalogMarketType = "binary" | "football_1x3" | "multi_outcome" | "crypto_slot";
+export type CatalogMarketSource =
+  | "platform"
+  | "football"
+  | "prediction"
+  | "community"
+  | "crypto_slot";
 
 export type MarketVertical =
   | "transito"

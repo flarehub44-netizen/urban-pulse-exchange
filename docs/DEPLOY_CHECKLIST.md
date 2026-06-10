@@ -40,12 +40,22 @@ npm run deploy           # Worker (build + wrangler)
 
 ## Pós-deploy smoke
 
-- [ ] `GET /markets` carrega
+- [ ] `GET /` — trending + featured
+- [ ] `GET /v/crypto`, `/v/economia`, `/copa`, `/pm/pm-copa-winner-2026`
+- [ ] `GET /markets` — trânsito/slots (segment `transito` only; `futebol`/`outros` redirecionam)
 - [ ] Login trader OK
+- [ ] Admin `/admin/create-event` — hub de criação
 - [ ] Admin `/admin` — métricas e saúde operacional
+- [ ] Logs `bff.list_catalog_markets` — p95 &lt; 300ms (Cloudflare/Lovable)
 - [ ] `POST /api/public/cron/health-check` com `CRON_SECRET` → `ok: true`
 - [ ] Webhook SyncPay registrado: `https://viax.life/api/public/webhooks/syncpay`
 - [ ] Depósito Pix teste (R$ 10) em staging
+
+### Smoke automatizado (CI/prod)
+
+```bash
+PLAYWRIGHT_BASE_URL=https://viax.life PLAYWRIGHT_SMOKE_PROD=1 npx playwright test e2e/smoke-prod.spec.ts
+```
 
 ## Runbooks
 
