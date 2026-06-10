@@ -12,7 +12,6 @@ let consecutiveSyncFailures = 0;
 const CRON_ALERT_THRESHOLD = 3;
 const DATE_YMD_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-
 async function upsertOpsRun(
   supabase: SupabaseClient,
   key: "football_last_sync_run" | "football_last_resolve_run",
@@ -62,7 +61,8 @@ export async function runFootballSync(targetDate?: string): Promise<unknown> {
 
     const autoApproveEnabled = false;
     const currentYear = new Date().getUTCFullYear();
-    const syncDate = targetDate && DATE_YMD_RE.test(targetDate) ? targetDate : formatDateYmd(new Date());
+    const syncDate =
+      targetDate && DATE_YMD_RE.test(targetDate) ? targetDate : formatDateYmd(new Date());
     const dates = [syncDate];
     let upserted = 0;
     const errors: string[] = [];
@@ -87,11 +87,7 @@ export async function runFootballSync(targetDate?: string): Promise<unknown> {
     for (const date of dates) {
       try {
         const { fixtures, triedSeasons, seasonUsed, strategyUsed, attempts } =
-          await getFixturesByDateAllResilient(
-          date,
-          currentYear,
-          [2024, 2023, 2022],
-        );
+          await getFixturesByDateAllResilient(date, currentYear, [2024, 2023, 2022]);
         syncTraces.push(
           `${date}:strategy=${strategyUsed};responseCount=${fixtures.length};seasonUsed=${seasonUsed ?? "none"};tried=${triedSeasons.join(",") || "none"};attempts=${attempts.join("||")}`,
         );
@@ -119,7 +115,9 @@ export async function runFootballSync(targetDate?: string): Promise<unknown> {
           }
         }
         if (!fixtures.length) {
-          errors.push(`${date}: no-fixtures strategy=${strategyUsed}; seasons=${triedSeasons.join(",")}`);
+          errors.push(
+            `${date}: no-fixtures strategy=${strategyUsed}; seasons=${triedSeasons.join(",")}`,
+          );
         }
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);

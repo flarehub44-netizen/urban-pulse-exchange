@@ -67,9 +67,7 @@ export const adminDeleteTrafficTemplateFn = createServerFn({ method: "POST" })
 export const adminGetTrafficSchedulerFn = createServerFn({ method: "GET" })
   .middleware([requireAdminAuth])
   .handler(async ({ context }) => {
-    const { supabase } = (await import("@/integrations/supabase/context")).getSupabaseCtx(
-      context,
-    );
+    const { supabase } = (await import("@/integrations/supabase/context")).getSupabaseCtx(context);
     const { data, error } = await supabase
       .from("traffic_scheduler")
       .select("*")

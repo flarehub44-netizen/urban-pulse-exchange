@@ -181,7 +181,11 @@ export function FootballOrderBox({
       {insufficient && balance > 0 && (
         <div className="mt-2 flex flex-wrap items-center gap-2 rounded-lg border border-warn/30 bg-warn/5 px-3 py-2 text-xs">
           <span className="text-warn">Saldo insuficiente.</span>
-          <button type="button" onClick={() => setStake(maxAffordable)} className="text-primary hover:underline">
+          <button
+            type="button"
+            onClick={() => setStake(maxAffordable)}
+            className="text-primary hover:underline"
+          >
             Usar {formatBRL(maxAffordable)}
           </button>
         </div>
@@ -189,10 +193,26 @@ export function FootballOrderBox({
       {warn && <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">{warn}</p>}
 
       <div className="mt-4 space-y-2 rounded-xl border bg-surface/60 p-3 text-sm">
-        <Row label={copy.markets.prizeTotal} value={<span className="mono text-foreground">{formatBRL(totalPrize)}</span>} />
-        <Row label={copy.bet.yourShare} value={<span className="mono">{formatPct(share, 2)}</span>} />
-        <Row label={copy.football.estPayout} value={<span className="mono text-up">{formatBRL(est)}</span>} />
-        <Row label={copy.bet.estimatedReturn} value={<span className={cn("mono", roi >= 0 ? "text-up" : "text-down")}>{formatPct(roi, 1)}</span>} />
+        <Row
+          label={copy.markets.prizeTotal}
+          value={<span className="mono text-foreground">{formatBRL(totalPrize)}</span>}
+        />
+        <Row
+          label={copy.bet.yourShare}
+          value={<span className="mono">{formatPct(share, 2)}</span>}
+        />
+        <Row
+          label={copy.football.estPayout}
+          value={<span className="mono text-up">{formatBRL(est)}</span>}
+        />
+        <Row
+          label={copy.bet.estimatedReturn}
+          value={
+            <span className={cn("mono", roi >= 0 ? "text-up" : "text-down")}>
+              {formatPct(roi, 1)}
+            </span>
+          }
+        />
       </div>
 
       <p className="mt-2 text-[11px] text-muted-foreground">

@@ -43,11 +43,7 @@ export function useEnsureCpfForPix() {
         return;
       }
       try {
-        const { data } = await supabase
-          .from("profiles")
-          .select("cpf")
-          .eq("id", userId)
-          .single();
+        const { data } = await supabase.from("profiles").select("cpf").eq("id", userId).single();
         const fresh = (data?.cpf as string | null) ?? null;
         queryClient.setQueryData(["profile-cpf", userId], fresh);
         if (hasValidProfileCpf(fresh)) {

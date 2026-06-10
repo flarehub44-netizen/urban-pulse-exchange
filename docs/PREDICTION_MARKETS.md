@@ -4,12 +4,12 @@
 
 ViaX usa **parimutuel N vias** para mercados genéricos (`prediction_markets`), além dos modelos existentes:
 
-| Tipo | Tabela | Aposta |
-|------|--------|--------|
-| Binário urbano | `markets` | `place_bet` |
-| Futebol 1X3 | `football_markets` | `place_football_bet` |
-| Multi-outcome | `prediction_markets` + `market_outcomes` | `place_outcome_bet` |
-| Crypto slot | `crypto_slot_markets` | `place_crypto_slot_bet` |
+| Tipo           | Tabela                                   | Aposta                  |
+| -------------- | ---------------------------------------- | ----------------------- |
+| Binário urbano | `markets`                                | `place_bet`             |
+| Futebol 1X3    | `football_markets`                       | `place_football_bet`    |
+| Multi-outcome  | `prediction_markets` + `market_outcomes` | `place_outcome_bet`     |
+| Crypto slot    | `crypto_slot_markets`                    | `place_crypto_slot_bet` |
 
 ## Taxonomia
 
@@ -25,12 +25,12 @@ Frontend: `useUnifiedCatalog()` em [`src/hooks/use-catalog-markets.ts`](../src/h
 
 ## Rotas
 
-| Rota | Uso |
-|------|-----|
-| `/v/$vertical` | Página de categoria |
-| `/v/$vertical/$topic` | Subcategoria |
-| `/copa` | Hub Copa 2026 |
-| `/pm/$marketId` | Detalhe multi-outcome |
+| Rota                  | Uso                   |
+| --------------------- | --------------------- |
+| `/v/$vertical`        | Página de categoria   |
+| `/v/$vertical/$topic` | Subcategoria          |
+| `/copa`               | Hub Copa 2026         |
+| `/pm/$marketId`       | Detalhe multi-outcome |
 
 ## Admin
 

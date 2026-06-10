@@ -79,7 +79,7 @@ Ver também `docs/SYNCPAY_WITHDRAW.md`, `docs/FOOTBALL.md`, `docs/SECURITY.md`.
 
 ### Lovable Cloud (`https://viax.life`)
 
-O domínio de produção é servido pelo **Lovable Cloud** (não pelo `workers.dev` direto). Configure as **mesmas** variáveis acima em **Project → Cloud → Environment variables** no painel Lovable, incluindo `SUPABASE_SERVICE_ROLE_KEY` e `VELOCITY_HMAC_SECRET`. Sem isso, depósito Pix falha com *Supabase service role not configured*.
+O domínio de produção é servido pelo **Lovable Cloud** (não pelo `workers.dev` direto). Configure as **mesmas** variáveis acima em **Project → Cloud → Environment variables** no painel Lovable, incluindo `SUPABASE_SERVICE_ROLE_KEY` e `VELOCITY_HMAC_SECRET`. Sem isso, depósito Pix falha com _Supabase service role not configured_.
 
 Auth Supabase: `supabase/config.toml` + `npx supabase config push` (Site URL `https://viax.life`).
 

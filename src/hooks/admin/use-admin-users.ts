@@ -48,15 +48,8 @@ export function useAdminSetBetLimit() {
 export function useAdminUpdateKyc() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      userId,
-      status,
-      notes,
-    }: {
-      userId: string;
-      status: string;
-      notes?: string;
-    }) => adminUpdateKycStatusFn({ data: { userId, status, notes } }),
+    mutationFn: ({ userId, status, notes }: { userId: string; status: string; notes?: string }) =>
+      adminUpdateKycStatusFn({ data: { userId, status, notes } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "users"] }),
   });
 }

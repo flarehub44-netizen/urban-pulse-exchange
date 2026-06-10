@@ -226,43 +226,43 @@ function AdminFootballPage() {
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                disabled={publish.isPending || deleteMarket.isPending}
-                onClick={async () => {
-                  try {
-                    const result = await publish.mutateAsync(row.market_id);
-                    toast.success(publishSuccessMessage(result));
-                  } catch (e) {
-                    toast.error(getErrorMessage(e) ?? "Não foi possível publicar o jogo.");
-                  }
-                }}
-                className="rounded-md border border-primary/40 px-3 py-1.5 text-[10px] text-primary hover:bg-primary/10"
-              >
-                {copy.admin.football.publish}
-              </button>
-              <button
-                type="button"
-                disabled={publish.isPending || deleteMarket.isPending}
-                onClick={async () => {
-                  if (
-                    !window.confirm(
-                      copy.admin.football.deleteConfirm.replace("{id}", row.market_id),
-                    )
-                  ) {
-                    return;
-                  }
-                  try {
-                    await deleteMarket.mutateAsync(row.market_id);
-                    toast.success(copy.admin.football.deleteDone);
-                  } catch (e) {
-                    toast.error(getErrorMessage(e) ?? copy.admin.football.deleteFailed);
-                  }
-                }}
-                className="rounded-md border border-down/40 px-3 py-1.5 text-[10px] text-down hover:bg-down/10"
-              >
-                {copy.admin.football.deleteMarket}
-              </button>
+                <button
+                  type="button"
+                  disabled={publish.isPending || deleteMarket.isPending}
+                  onClick={async () => {
+                    try {
+                      const result = await publish.mutateAsync(row.market_id);
+                      toast.success(publishSuccessMessage(result));
+                    } catch (e) {
+                      toast.error(getErrorMessage(e) ?? "Não foi possível publicar o jogo.");
+                    }
+                  }}
+                  className="rounded-md border border-primary/40 px-3 py-1.5 text-[10px] text-primary hover:bg-primary/10"
+                >
+                  {copy.admin.football.publish}
+                </button>
+                <button
+                  type="button"
+                  disabled={publish.isPending || deleteMarket.isPending}
+                  onClick={async () => {
+                    if (
+                      !window.confirm(
+                        copy.admin.football.deleteConfirm.replace("{id}", row.market_id),
+                      )
+                    ) {
+                      return;
+                    }
+                    try {
+                      await deleteMarket.mutateAsync(row.market_id);
+                      toast.success(copy.admin.football.deleteDone);
+                    } catch (e) {
+                      toast.error(getErrorMessage(e) ?? copy.admin.football.deleteFailed);
+                    }
+                  }}
+                  className="rounded-md border border-down/40 px-3 py-1.5 text-[10px] text-down hover:bg-down/10"
+                >
+                  {copy.admin.football.deleteMarket}
+                </button>
               </div>
             </div>
           ))}

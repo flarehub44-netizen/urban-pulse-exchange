@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  estimatePayoutN,
-  minorityPoolRatioN,
-  poolTotalN,
-  probabilityN,
-} from "@/lib/parimutuel-n";
+import { estimatePayoutN, minorityPoolRatioN, poolTotalN, probabilityN } from "@/lib/parimutuel-n";
 
 describe("parimutuel-n", () => {
   const outcomes = [

@@ -33,9 +33,7 @@ function walk(dir, out = []) {
   return out;
 }
 
-const ALLOW_SERVICE_ROLE_MENTION = new Set([
-  "src/lib/supabase-key-guard.ts",
-]);
+const ALLOW_SERVICE_ROLE_MENTION = new Set(["src/lib/supabase-key-guard.ts"]);
 
 function isServerOnlyFile(rel) {
   return (
@@ -71,10 +69,7 @@ for (const path of files) {
     }
   }
 
-  if (
-    scanRoot.endsWith("src") &&
-    /import\.meta\.env\.VITE_[A-Z0-9_]*SERVICE_ROLE/.test(src)
-  ) {
+  if (scanRoot.endsWith("src") && /import\.meta\.env\.VITE_[A-Z0-9_]*SERVICE_ROLE/.test(src)) {
     console.error(`${rel}: VITE_* must not reference SERVICE_ROLE`);
     failed = true;
   }

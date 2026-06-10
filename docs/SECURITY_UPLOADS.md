@@ -2,9 +2,9 @@
 
 ## Superfície atual
 
-| Fluxo | Bucket | Tipos | Tamanho |
-|-------|--------|-------|---------|
-| Capa de mercado da comunidade | `community-covers` (público) | JPEG, PNG, WebP | 2 MB |
+| Fluxo                         | Bucket                       | Tipos           | Tamanho |
+| ----------------------------- | ---------------------------- | --------------- | ------- |
+| Capa de mercado da comunidade | `community-covers` (público) | JPEG, PNG, WebP | 2 MB    |
 
 Código: `src/lib/community-cover-upload.ts`, `src/lib/image-upload-guard.ts`, formulário em `src/components/viax/community-market-create-form.tsx`.
 

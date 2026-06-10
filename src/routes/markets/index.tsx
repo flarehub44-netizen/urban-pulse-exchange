@@ -26,11 +26,7 @@ import {
 import { EmptyState } from "@/components/viax/empty-state";
 import { cn } from "@/lib/utils";
 import { loadMarketsFilters, saveMarketsFilters } from "@/lib/markets-filter-persist";
-import {
-  isOpenBetStatus,
-  isSettledDisplay,
-  marketCatalogSortTier,
-} from "@/lib/market-status";
+import { isOpenBetStatus, isSettledDisplay, marketCatalogSortTier } from "@/lib/market-status";
 import {
   MARKET_CATEGORY_FILTERS,
   matchesStatusFilter,
@@ -142,7 +138,10 @@ function MarketsList() {
       : statusFiltersBase;
   const { data: trafficState, isLoading: trafficStateLoading } = useTrafficPublicState();
   const isTrafficEndedTab = segment === "transito" && statusKey === "ended";
-  const { data: endedSlots, isLoading: endedSlotsLoading } = useTrafficEndedMarkets(50, isTrafficEndedTab);
+  const { data: endedSlots, isLoading: endedSlotsLoading } = useTrafficEndedMarkets(
+    50,
+    isTrafficEndedTab,
+  );
   const category = search.category ?? null;
   const showFavorites = search.favorites === "1";
   const q = search.q ?? "";
@@ -180,7 +179,11 @@ function MarketsList() {
         navigate({ search: saved, replace: true });
       } else {
         navigate({
-          search: (prev: MarketsSearch) => ({ ...prev, status: "live" as const, sort: "closing" as const }),
+          search: (prev: MarketsSearch) => ({
+            ...prev,
+            status: "live" as const,
+            sort: "closing" as const,
+          }),
           replace: true,
         });
       }

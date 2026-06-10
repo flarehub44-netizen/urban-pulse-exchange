@@ -481,7 +481,11 @@ function Dashboard() {
               label="Saldo"
               icon={TrendingUp}
               value={
-                deferredReady ? <AnimatedNumber value={me.balance} format={formatBRL} /> : formatBRL(me.balance)
+                deferredReady ? (
+                  <AnimatedNumber value={me.balance} format={formatBRL} />
+                ) : (
+                  formatBRL(me.balance)
+                )
               }
               interactive
             />
@@ -492,7 +496,11 @@ function Dashboard() {
               icon={TrendingUp}
               value={
                 <span className={cn(pnlToday >= 0 ? "text-up" : "text-down")}>
-                  {deferredReady ? <AnimatedNumber value={pnlToday} format={formatBRL} /> : formatBRL(pnlToday)}
+                  {deferredReady ? (
+                    <AnimatedNumber value={pnlToday} format={formatBRL} />
+                  ) : (
+                    formatBRL(pnlToday)
+                  )}
                 </span>
               }
               sub={pnlToday >= 0 ? "Acumulado hoje" : "Perda acumulada hoje"}

@@ -42,12 +42,12 @@ order by created_at desc;
 
 ### Resolução
 
-| Causa | Ação |
-|-------|------|
-| Webhook nunca chegou | Reenviar evento no painel SyncPay ou POST manual com assinatura válida |
-| Assinatura inválida | Rotacionar secret no SyncPay + atualizar env; reenviar webhook |
+| Causa                    | Ação                                                                    |
+| ------------------------ | ----------------------------------------------------------------------- |
+| Webhook nunca chegou     | Reenviar evento no painel SyncPay ou POST manual com assinatura válida  |
+| Assinatura inválida      | Rotacionar secret no SyncPay + atualizar env; reenviar webhook          |
 | `payer_document` ausente | Migration `20260904120000` bloqueia crédito — verificar payload SyncPay |
-| Intent órfão | Rodar reconciliação (seção 4) |
+| Intent órfão             | Rodar reconciliação (seção 4)                                           |
 
 **Nunca** creditar saldo via `UPDATE profiles SET balance` manual. Usar sempre `service_process_syncpay_webhook` ou fluxo admin documentado.
 
@@ -86,11 +86,11 @@ where type = 'withdraw' and status = 'pending'
 order by created_at asc;
 ```
 
-| Causa | Ação |
-|-------|------|
-| `PAYOUT_COMPLETED` não recebido | Reconciliar via seção 4 |
-| `PAYOUT_FAILED` | `service_refund_withdrawal` deve ter estornado — confirmar saldo |
-| `unknown_provider_id` | Fallback por `correlation_id = intent_id` (migration `20260824000000`) |
+| Causa                           | Ação                                                                   |
+| ------------------------------- | ---------------------------------------------------------------------- |
+| `PAYOUT_COMPLETED` não recebido | Reconciliar via seção 4                                                |
+| `PAYOUT_FAILED`                 | `service_refund_withdrawal` deve ter estornado — confirmar saldo       |
+| `unknown_provider_id`           | Fallback por `correlation_id = intent_id` (migration `20260824000000`) |
 
 ---
 
@@ -145,12 +145,12 @@ Falha quando:
 
 ## 8. Checklist secrets (produção)
 
-| Item | Onde verificar |
-|------|----------------|
-| `cpf_hmac_secret` em `platform_settings` | SQL: `select key from platform_settings where key = 'cpf_hmac_secret'` |
-| Invite admin rotacionado (não `VIAX-OPS-2026`) | `admin_invites` — uso único |
-| `admin_allowlist` mínima | `select * from admin_allowlist` |
-| Leaked password protection | Supabase Dashboard → Auth → Password Security |
-| Bucket `community-covers` sem listagem pública | Storage → Policies → disable list for anon |
+| Item                                           | Onde verificar                                                         |
+| ---------------------------------------------- | ---------------------------------------------------------------------- |
+| `cpf_hmac_secret` em `platform_settings`       | SQL: `select key from platform_settings where key = 'cpf_hmac_secret'` |
+| Invite admin rotacionado (não `VIAX-OPS-2026`) | `admin_invites` — uso único                                            |
+| `admin_allowlist` mínima                       | `select * from admin_allowlist`                                        |
+| Leaked password protection                     | Supabase Dashboard → Auth → Password Security                          |
+| Bucket `community-covers` sem listagem pública | Storage → Policies → disable list for anon                             |
 
 Ver também [`DEPLOY_CHECKLIST.md`](./DEPLOY_CHECKLIST.md).

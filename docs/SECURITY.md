@@ -18,12 +18,12 @@ Não commitar chaves reais. Rotacionar anon key no Supabase se o repositório fo
 
 Em qualquer app Supabase no browser, ao estar logado você verá:
 
-| Header / dado | Risco |
-| ------------- | ----- |
-| `apikey` (JWT com `"role":"anon"`) | **Público por design** — vai no bundle (`VITE_SUPABASE_PUBLISHABLE_KEY`). Proteção = RLS + RPC, não esconder. |
-| `authorization: Bearer …` | **Sessão do usuário** — visível só no *seu* DevTools; se vazar (print, XSS), outra pessoa pode agir como você até expirar. |
-| `sb-project-ref`, URL do projeto | Não são segredos. |
-| `SUPABASE_SERVICE_ROLE_KEY` no Network | **Nunca** deve aparecer — só no Worker/servidor. |
+| Header / dado                          | Risco                                                                                                                      |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `apikey` (JWT com `"role":"anon"`)     | **Público por design** — vai no bundle (`VITE_SUPABASE_PUBLISHABLE_KEY`). Proteção = RLS + RPC, não esconder.              |
+| `authorization: Bearer …`              | **Sessão do usuário** — visível só no _seu_ DevTools; se vazar (print, XSS), outra pessoa pode agir como você até expirar. |
+| `sb-project-ref`, URL do projeto       | Não são segredos.                                                                                                          |
+| `SUPABASE_SERVICE_ROLE_KEY` no Network | **Nunca** deve aparecer — só no Worker/servidor.                                                                           |
 
 O app valida em runtime que a chave publicável não é `service_role` (`src/lib/supabase-key-guard.ts`).
 

@@ -69,11 +69,8 @@ export function useAdminRejectPartner() {
 export function useAdminUpdatePartnerTerms() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (vars: {
-      userId: string;
-      revenueSharePct: number;
-      cpaAmount: number | null;
-    }) => adminUpdatePartnerTermsFn({ data: vars }),
+    mutationFn: (vars: { userId: string; revenueSharePct: number; cpaAmount: number | null }) =>
+      adminUpdatePartnerTermsFn({ data: vars }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "active-partners"] }),
   });
 }

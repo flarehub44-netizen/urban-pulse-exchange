@@ -12,9 +12,9 @@ O backend extrai via `syncpay_extract_payer_document`. Sem documento, o depósit
 
 ## Comportamento ViaX
 
-| Payload | Intent | Saldo | Admin |
-|---------|--------|-------|-------|
-| Com documento | `paid` | creditado | clusters em `payer_document_events` |
+| Payload       | Intent   | Saldo         | Admin                                            |
+| ------------- | -------- | ------------- | ------------------------------------------------ |
+| Com documento | `paid`   | creditado     | clusters em `payer_document_events`              |
 | Sem documento | `failed` | não creditado | `user_risk_alerts` tipo `payer_document_missing` |
 
 Migration: `supabase/migrations/20260904120000_deposit_block_payer_document_missing.sql`

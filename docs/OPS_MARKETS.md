@@ -5,7 +5,7 @@
 | Job                         | Schedule    | Função                                                                 |
 | --------------------------- | ----------- | ---------------------------------------------------------------------- |
 | `viax-lifecycle`            | cada minuto | `tick_market_lifecycle()` — closing → closed → settled                 |
-| `viax-traffic-slots`        | cada minuto | `tick_traffic_slots()` — spawn de 1 slot de trânsito (após lifecycle) |
+| `viax-traffic-slots`        | cada minuto | `tick_traffic_slots()` — spawn de 1 slot de trânsito (após lifecycle)  |
 | `viax-refresh-demo-markets` | a cada 6h   | `refresh_demo_live_markets()` — **no-op** (legado `*-live` desativado) |
 
 **Trânsito em slots:** 1 mercado `is_traffic_slot` ao vivo por vez, duração padrão 1 min, próximo slot 15 min após o fim. Templates em `traffic_event_templates` (`ready=true` após teste no admin). Catálogo: `/admin/traffic-events`.

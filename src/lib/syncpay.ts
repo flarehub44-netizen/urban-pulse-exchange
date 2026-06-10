@@ -11,8 +11,7 @@ const CASHIN_PATH = process.env.SYNCPAY_CASHIN_PATH ?? "/api/partner/v1/cash-in"
 const CASHOUT_PATH = process.env.SYNCPAY_CASHOUT_PATH ?? "/api/partner/v1/cash-out";
 const CASHOUT_STATUS_PATH =
   process.env.SYNCPAY_CASHOUT_STATUS_PATH ?? "/api/partner/v1/cash-out/{id}";
-const CASHIN_STATUS_PATH =
-  process.env.SYNCPAY_CASHIN_STATUS_PATH ?? "/api/partner/v1/cash-in/{id}";
+const CASHIN_STATUS_PATH = process.env.SYNCPAY_CASHIN_STATUS_PATH ?? "/api/partner/v1/cash-in/{id}";
 const WEBHOOK_URL = process.env.SYNCPAY_WEBHOOK_URL ?? "";
 const AUTH_TOKEN_PATH = "/api/partner/v1/auth-token";
 const REQUEST_TIMEOUT_MS = 10_000;
@@ -25,10 +24,14 @@ let _cachedToken: { token: string; expiresAt: number } | null = null;
 async function getAuthToken(): Promise<string> {
   if (!CLIENT_SECRET) {
     if (LEGACY_API_KEY) {
-      console.warn("[SyncPay] usando SYNCPAY_API_KEY legado — migre para SYNCPAY_CLIENT_ID + SYNCPAY_CLIENT_SECRET");
+      console.warn(
+        "[SyncPay] usando SYNCPAY_API_KEY legado — migre para SYNCPAY_CLIENT_ID + SYNCPAY_CLIENT_SECRET",
+      );
       return LEGACY_API_KEY;
     }
-    throw new Error("SyncPay: configure SYNCPAY_CLIENT_ID + SYNCPAY_CLIENT_SECRET (ou SYNCPAY_API_KEY legado)");
+    throw new Error(
+      "SyncPay: configure SYNCPAY_CLIENT_ID + SYNCPAY_CLIENT_SECRET (ou SYNCPAY_API_KEY legado)",
+    );
   }
 
   const now = Date.now();
@@ -49,7 +52,8 @@ async function getAuthToken(): Promise<string> {
     if (!res.ok) {
       const body = await res.text().catch(() => "(empty)");
       const snippet = compactText(body);
-      const looksLikeHtml = res.headers.get("content-type")?.includes("text/html") || body.includes("<!DOCTYPE");
+      const looksLikeHtml =
+        res.headers.get("content-type")?.includes("text/html") || body.includes("<!DOCTYPE");
       const msg = looksLikeHtml
         ? `syncpay_auth_html_error: token endpoint retornou HTML (${res.status}) — verifique SYNCPAY_CLIENT_ID e SYNCPAY_CLIENT_SECRET`
         : `SyncPay auth token failed ${res.status}: ${snippet}`;

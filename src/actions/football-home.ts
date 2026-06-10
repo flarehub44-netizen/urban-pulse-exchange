@@ -132,11 +132,18 @@ export const getFootballHomepageFn = createServerFn({ method: "GET" })
     const now = Date.now();
     const hit = cache.get(key);
     if (hit && hit.expiresAt > now) {
-      return { ...hit.value, meta: { ...hit.value.meta, cacheHit: true } } satisfies FootballHomepagePayload;
+      return {
+        ...hit.value,
+        meta: { ...hit.value.meta, cacheHit: true },
+      } satisfies FootballHomepagePayload;
     }
 
     const season = Number.parseInt(data.date.slice(0, 4), 10);
-    const { fixtures: dtos } = await getFixturesByDateAllResilient(data.date, season, [2024, 2023, 2022]);
+    const { fixtures: dtos } = await getFixturesByDateAllResilient(
+      data.date,
+      season,
+      [2024, 2023, 2022],
+    );
     const fixtures = dtos.map(mapFixture).sort((a, b) => {
       const byKickoff = new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime();
       if (byKickoff !== 0) return byKickoff;

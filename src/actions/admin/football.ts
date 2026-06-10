@@ -49,9 +49,7 @@ export const adminApproveFootballFixtureFn = createServerFn({ method: "POST" })
 
 export const adminRejectFootballFixtureFn = createServerFn({ method: "POST" })
   .middleware([requireAdminAuth])
-  .inputValidator(
-    z.object({ fixtureId: z.number().int(), reason: z.string().optional() }),
-  )
+  .inputValidator(z.object({ fixtureId: z.number().int(), reason: z.string().optional() }))
   .handler(async ({ data, context }) =>
     adminRpcCall("bff.admin.reject_football_fixture", context, (supabase) =>
       supabase.rpc("admin_reject_football_fixture", {
@@ -72,9 +70,7 @@ export const adminPublishFootballMarketFn = createServerFn({ method: "POST" })
 
 export const adminVoidFootballMarketFn = createServerFn({ method: "POST" })
   .middleware([requireAdminAuth])
-  .inputValidator(
-    z.object({ marketId: z.string(), reason: z.string().optional() }),
-  )
+  .inputValidator(z.object({ marketId: z.string(), reason: z.string().optional() }))
   .handler(async ({ data, context }) =>
     adminRpcCall("bff.admin.void_football_market", context, (supabase) =>
       supabase.rpc("admin_void_football_market", {
@@ -89,8 +85,11 @@ export const adminDeleteFootballMarketFn = createServerFn({ method: "POST" })
   .inputValidator(z.object({ marketId: z.string() }))
   .handler(async ({ data, context }) =>
     adminRpcCall("bff.admin.delete_football_market", context, (supabase) =>
-      supabase.rpc("admin_delete_football_market" as never, {
-        p_market_id: data.marketId,
-      } as never),
+      supabase.rpc(
+        "admin_delete_football_market" as never,
+        {
+          p_market_id: data.marketId,
+        } as never,
+      ),
     ),
   );

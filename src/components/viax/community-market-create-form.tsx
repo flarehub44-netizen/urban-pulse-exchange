@@ -93,7 +93,8 @@ export function CommunityMarketCreateForm() {
         if (code === "invalid_cover_type") toast.error(copy.community.coverTypeError);
         else if (code === "invalid_cover_size") toast.error(copy.community.coverSizeError);
         else if (code === "invalid_cover_content") toast.error(copy.community.coverContentError);
-        else if (code === "invalid_cover_dimensions") toast.error(copy.community.coverDimensionsError);
+        else if (code === "invalid_cover_dimensions")
+          toast.error(copy.community.coverDimensionsError);
         else toast.error(copy.community.coverUploadError);
         return;
       }

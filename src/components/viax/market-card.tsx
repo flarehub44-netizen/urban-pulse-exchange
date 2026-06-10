@@ -40,11 +40,7 @@ import {
 } from "@/components/ui/dialog";
 import { useWatchlist } from "@/hooks/use-watchlist";
 import { cn } from "@/lib/utils";
-import {
-  canPlaceBets,
-  isMarketEndedForCatalog,
-  statusLabel,
-} from "@/lib/market-status";
+import { canPlaceBets, isMarketEndedForCatalog, statusLabel } from "@/lib/market-status";
 
 export function MarketCard({
   m,
@@ -280,7 +276,9 @@ export function MarketCard({
             <DialogTitle className="text-sm font-medium leading-snug line-clamp-2">
               {m.question}
             </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">{m.region}</DialogDescription>
+            <DialogDescription className="text-xs text-muted-foreground">
+              {m.region}
+            </DialogDescription>
           </DialogHeader>
           <div className="p-4">
             <OrderBox m={m} initialSide={quickBet ?? "YES"} onSuccess={() => setQuickBet(null)} />

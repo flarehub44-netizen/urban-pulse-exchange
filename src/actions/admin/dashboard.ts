@@ -95,9 +95,7 @@ export const adminGetPlatformSettingsFn = createServerFn({ method: "GET" })
 export const adminGetMarketOpsSettingsFn = createServerFn({ method: "GET" })
   .middleware([requireAdminAuth])
   .handler(async ({ context }) => {
-    const { supabase } = (await import("@/integrations/supabase/context")).getSupabaseCtx(
-      context,
-    );
+    const { supabase } = (await import("@/integrations/supabase/context")).getSupabaseCtx(context);
     const { data, error } = await supabase
       .from("platform_settings")
       .select("key, value")

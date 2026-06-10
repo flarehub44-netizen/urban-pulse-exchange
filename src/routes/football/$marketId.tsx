@@ -143,13 +143,18 @@ function FootballMarketPage() {
 
             <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
               <span>
-                Encerra em <Countdown to={new Date(m.betting_closes_at).getTime()} className="text-foreground" />
+                Encerra em{" "}
+                <Countdown
+                  to={new Date(m.betting_closes_at).getTime()}
+                  className="text-foreground"
+                />
               </span>
               <span className="inline-flex items-center gap-1">
                 <Users className="size-3" /> {m.participants} participantes
               </span>
               <span>
-                Volume no mercado <span className="mono text-foreground">{formatBRL(totalPool)}</span>
+                Volume no mercado{" "}
+                <span className="mono text-foreground">{formatBRL(totalPool)}</span>
               </span>
               <span>
                 Prêmio total <span className="mono text-foreground">{formatBRL(totalPrize)}</span>
@@ -160,23 +165,34 @@ function FootballMarketPage() {
               <div className="glass-strong rounded-xl border border-up/30 bg-up/5 p-4 shadow-[var(--shadow-glow-up)]">
                 <div className="text-xs uppercase tracking-wider text-up">↑ {home_team_name}</div>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-4xl font-semibold text-up mono">{(pHome * 100).toFixed(1)}</span>
+                  <span className="text-4xl font-semibold text-up mono">
+                    {(pHome * 100).toFixed(1)}
+                  </span>
                   <span className="text-sm text-up/70">%</span>
                 </div>
-                <div className="mt-1 text-[11px] mono text-muted-foreground">{formatBRL(m.pool_home)}</div>
+                <div className="mt-1 text-[11px] mono text-muted-foreground">
+                  {formatBRL(m.pool_home)}
+                </div>
               </div>
               <div className="glass-strong rounded-xl border border-down/30 bg-down/5 p-4 shadow-[var(--shadow-glow-down)]">
                 <div className="text-xs uppercase tracking-wider text-down">↓ {away_team_name}</div>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-4xl font-semibold text-down mono">{(pAway * 100).toFixed(1)}</span>
+                  <span className="text-4xl font-semibold text-down mono">
+                    {(pAway * 100).toFixed(1)}
+                  </span>
                   <span className="text-sm text-down/70">%</span>
                 </div>
-                <div className="mt-1 text-[11px] mono text-muted-foreground">{formatBRL(m.pool_away)}</div>
+                <div className="mt-1 text-[11px] mono text-muted-foreground">
+                  {formatBRL(m.pool_away)}
+                </div>
               </div>
             </div>
 
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-surface">
-              <div className="h-full bg-up" style={{ width: `${Math.max(0, Math.min(100, pHome * 100))}%` }} />
+              <div
+                className="h-full bg-up"
+                style={{ width: `${Math.max(0, Math.min(100, pHome * 100))}%` }}
+              />
             </div>
             <div className="mt-2 text-[10px] uppercase tracking-wider text-warn">Zona quente</div>
           </div>

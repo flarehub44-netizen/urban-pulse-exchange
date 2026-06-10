@@ -211,4 +211,3 @@ select public.hash_cpf_document('12345678909');
 - Migration `20261009130000_convert_social_read_rpcs_security_invoker_lot9.sql`: `get_public_active_bets`, `get_following_active_bets`, `get_public_trader_bets`.
 - Hooks admin migrados para ServerFns em `src/actions/admin/`.
 - Exceções permanentes documentadas: `place_bet`, `request_withdrawal`, settlement RPCs (financeiro transacional).
-

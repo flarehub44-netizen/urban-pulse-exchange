@@ -66,8 +66,12 @@ export function TrafficEndedCard({ market }: { market: TrafficEndedMarket }) {
           {format(market.endsAt, "HH:mm", { locale: ptBR })}
         </span>
         <span>{market.participants} participantes</span>
-        <span className="mono">{formatBRL(prizePool({ YES: market.poolYes, NO: market.poolNo }))}</span>
-        <span className="mono">pool {formatBRL(poolTotal({ YES: market.poolYes, NO: market.poolNo }))}</span>
+        <span className="mono">
+          {formatBRL(prizePool({ YES: market.poolYes, NO: market.poolNo }))}
+        </span>
+        <span className="mono">
+          pool {formatBRL(poolTotal({ YES: market.poolYes, NO: market.poolNo }))}
+        </span>
       </div>
     </Link>
   );

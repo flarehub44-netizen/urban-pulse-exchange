@@ -11,10 +11,10 @@ Complemento ao rate limit em Postgres (`security_velocity_events` / `service_ass
 
 ## Secrets no Worker
 
-| Variável | Uso |
-|----------|-----|
+| Variável               | Uso                                                          |
+| ---------------------- | ------------------------------------------------------------ |
 | `VELOCITY_HMAC_SECRET` | Hash de IP/dispositivo no BFF (`src/lib/velocity.server.ts`) |
-| `CRON_HMAC_SECRET` | Cron jobs incluindo `fraud-cluster-sweep` |
+| `CRON_HMAC_SECRET`     | Cron jobs incluindo `fraud-cluster-sweep`                    |
 
 ## Cron fraud cluster
 

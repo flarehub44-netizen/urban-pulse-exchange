@@ -1,14 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import {
-  ArrowRight,
-  BarChart3,
-  CheckCircle2,
-  Link2,
-  Sparkles,
-  Users,
-  Wallet,
-} from "lucide-react";
+import { ArrowRight, BarChart3, CheckCircle2, Link2, Sparkles, Users, Wallet } from "lucide-react";
 import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
 import { useAuth } from "@/hooks/use-auth";
 import { useMyPartnerStatus, useApplyPartner } from "@/hooks/use-partner";
@@ -38,14 +30,11 @@ export function PartnerProgramLanding() {
   const [tiktok, setTiktok] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  const formComplete =
-    bio.trim().length >= 20 && !!promotionChannels.trim() && !!instagram.trim();
+  const formComplete = bio.trim().length >= 20 && !!promotionChannels.trim() && !!instagram.trim();
 
-  const isActivePartner =
-    partnerStatus?.role === "partner" && partnerStatus?.status === "active";
+  const isActivePartner = partnerStatus?.role === "partner" && partnerStatus?.status === "active";
   const isApplicant = partnerStatus?.role === "applicant";
-  const canApply =
-    authReady && userId && isRegistered && !isActivePartner && !isApplicant;
+  const canApply = authReady && userId && isRegistered && !isActivePartner && !isApplicant;
 
   const validateApply = (): string | null => {
     if (bio.trim().length < 20) return copy.partner.landing.bioMinHint;
@@ -132,15 +121,10 @@ export function PartnerProgramLanding() {
           {copy.partner.landing.benefits.map((item, i) => {
             const Icon = benefitIcons[i] ?? Sparkles;
             return (
-              <div
-                key={item.title}
-                className="rounded-xl border bg-card/50 p-4"
-              >
+              <div key={item.title} className="rounded-xl border bg-card/50 p-4">
                 <Icon className="size-5 text-primary" />
                 <h3 className="mt-2 text-sm font-semibold">{item.title}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                  {item.body}
-                </p>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{item.body}</p>
               </div>
             );
           })}

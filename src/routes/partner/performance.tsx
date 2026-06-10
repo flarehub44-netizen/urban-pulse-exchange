@@ -13,9 +13,7 @@ function PartnerPerformancePage() {
   const { data: o } = usePartnerOverview();
   const { data: a } = usePartnerAnalytics();
   const hasAnyData =
-    (a?.active_bets_24h ?? 0) > 0 ||
-    (a?.new_referrals_7d ?? 0) > 0 ||
-    (o?.volume ?? 0) > 0;
+    (a?.active_bets_24h ?? 0) > 0 || (a?.new_referrals_7d ?? 0) > 0 || (o?.volume ?? 0) > 0;
 
   return (
     <div className="space-y-6">

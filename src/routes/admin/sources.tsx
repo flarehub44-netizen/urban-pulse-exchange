@@ -26,8 +26,12 @@ export const Route = createFileRoute("/admin/sources")({
 });
 
 function AdminSourcesPage() {
-  const { data: cameras, isError: camErr, error: camError, refetch: refetchCam } =
-    useAdminCameras();
+  const {
+    data: cameras,
+    isError: camErr,
+    error: camError,
+    refetch: refetchCam,
+  } = useAdminCameras();
   const { data: healthRows } = useAdminCameraHealth();
   const { data: workerStatus } = useVisionWorkerStatus();
   const healthById = useMemo(() => new Map((healthRows ?? []).map((h) => [h.id, h])), [healthRows]);

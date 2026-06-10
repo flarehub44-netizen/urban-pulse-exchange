@@ -44,8 +44,7 @@ export type CasinoSpinWeight = {
 export function useAdminBonusOverview(days = 30, enabled = true) {
   return useQuery({
     queryKey: ["admin", "bonus-overview", days],
-    queryFn: () =>
-      adminGetBonusOverviewFn({ data: { days } }) as Promise<AdminBonusOverview>,
+    queryFn: () => adminGetBonusOverviewFn({ data: { days } }) as Promise<AdminBonusOverview>,
     enabled,
   });
 }
@@ -53,8 +52,7 @@ export function useAdminBonusOverview(days = 30, enabled = true) {
 export function useAdminBonusLedger(limit = 100, enabled = true) {
   return useQuery({
     queryKey: ["admin", "bonus-ledger", limit],
-    queryFn: () =>
-      adminGetBonusLedgerFn({ data: { limit } }) as Promise<AdminBonusLedgerRow[]>,
+    queryFn: () => adminGetBonusLedgerFn({ data: { limit } }) as Promise<AdminBonusLedgerRow[]>,
     enabled,
   });
 }

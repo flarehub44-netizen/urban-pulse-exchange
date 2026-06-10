@@ -107,8 +107,7 @@ export function useAdminRiskAlerts(enabled = true) {
 export function useAdminCpaFraudCases(status?: string) {
   return useQuery({
     queryKey: ["admin", "cpa-fraud-cases", status ?? "all"],
-    queryFn: () =>
-      adminListCpaFraudCasesFn({ data: { status } }) as Promise<AdminCpaFraudCase[]>,
+    queryFn: () => adminListCpaFraudCasesFn({ data: { status } }) as Promise<AdminCpaFraudCase[]>,
   });
 }
 
@@ -134,8 +133,7 @@ export function useAdminPayerDocumentCluster(userId: string | null, enabled = fa
 export function useAdminPayerDocumentClusters(enabled = true) {
   return useQuery({
     queryKey: ["admin", "payer-document-clusters"],
-    queryFn: () =>
-      adminListPayerDocumentClustersFn() as Promise<AdminPayerClusterSummary[]>,
+    queryFn: () => adminListPayerDocumentClustersFn() as Promise<AdminPayerClusterSummary[]>,
     enabled,
   });
 }
@@ -176,13 +174,8 @@ export function useAdminClearCpaFraudCases() {
 export function useAdminSuspendCpaFraudPartners() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      actionNote,
-      partnerId,
-    }: {
-      actionNote: string;
-      partnerId?: string | null;
-    }) => adminSuspendCpaFraudPartnersFn({ data: { actionNote, partnerId } }),
+    mutationFn: ({ actionNote, partnerId }: { actionNote: string; partnerId?: string | null }) =>
+      adminSuspendCpaFraudPartnersFn({ data: { actionNote, partnerId } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin", "cpa-fraud-cases"] });
       qc.invalidateQueries({ queryKey: ["admin", "active-partners"] });

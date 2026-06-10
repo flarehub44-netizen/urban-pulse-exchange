@@ -6,9 +6,7 @@ import { isAllowedUpstreamUrl } from "@/lib/proxy-utils.server";
 // F05: fail-closed — wildcard CORS would let any site proxy live streams.
 // Without PUBLIC_DOMAIN no CORS headers are emitted; same-origin app requests
 // still work without CORS headers.
-const CORS_ORIGIN = process.env.PUBLIC_DOMAIN
-  ? `https://${process.env.PUBLIC_DOMAIN}`
-  : null;
+const CORS_ORIGIN = process.env.PUBLIC_DOMAIN ? `https://${process.env.PUBLIC_DOMAIN}` : null;
 
 const CORS_HEADERS: Record<string, string> = CORS_ORIGIN
   ? {
@@ -28,7 +26,6 @@ function b64urlDecode(s: string): string {
   const padded = s.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((s.length + 3) % 4);
   return atob(padded);
 }
-
 
 function rewritePlaylist(playlist: string, slug: string, playlistUrl: string): string {
   const base = new URL(playlistUrl);

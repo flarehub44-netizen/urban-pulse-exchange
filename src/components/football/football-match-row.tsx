@@ -17,9 +17,7 @@ export function FootballMatchRow({ market, kickoffLabel }: FootballMatchRowProps
   return (
     <div className="flex flex-col gap-3 border-b border-border/60 py-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0 flex-1">
-        {kickoffLabel && (
-          <p className="mb-1 text-xs text-muted-foreground">{kickoffLabel}</p>
-        )}
+        {kickoffLabel && <p className="mb-1 text-xs text-muted-foreground">{kickoffLabel}</p>}
         <Link to={market.detailPath} className="font-medium hover:text-primary">
           {market.question}
         </Link>
@@ -42,7 +40,7 @@ export function FootballMatchRow({ market, kickoffLabel }: FootballMatchRowProps
           ) : null,
         )}
       </div>
-      <MarketQuickBetRouter market={market} className="hidden" />
+      <MarketQuickBetRouter market={market} className="shrink-0 sm:w-48" />
     </div>
   );
 }

@@ -283,7 +283,9 @@ function AdminPartnersPage() {
                       }))
                     }
                   />
-                  <span className="text-muted-foreground">{copy.admin.partners.subCreatorsEnable}</span>
+                  <span className="text-muted-foreground">
+                    {copy.admin.partners.subCreatorsEnable}
+                  </span>
                 </label>
               )}
               {step >= 2 && (
@@ -455,120 +457,120 @@ function AdminPartnersPage() {
           }}
         />
         <DesktopTableWrap>
-        <div className="overflow-x-auto rounded-xl border">
-          <table className="w-full min-w-[720px] text-xs">
-            <thead className="border-b bg-surface/60 text-[10px] uppercase text-muted-foreground">
-              <tr>
-                <th className="px-3 py-2 text-left">Creator</th>
-                <th className="px-3 py-2 text-right">{copy.admin.partners.referrals}</th>
-                <th className="px-3 py-2 text-right">Saldo</th>
-                <th className="px-3 py-2 text-left">{copy.admin.partners.revenueShare}</th>
-                <th className="px-3 py-2 text-left">{copy.admin.partners.cpaAmount}</th>
-                <th className="px-3 py-2 text-left">Link</th>
-                <th className="px-3 py-2 text-left">{copy.admin.partners.subCreatorsEnable}</th>
-                <th className="px-3 py-2 text-left">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(active ?? []).map((p) => {
-                const terms = activeTerms[p.user_id];
-                if (!terms) return null;
-                return (
-                  <tr key={p.user_id} className="border-b border-border/40">
-                    <td className="px-3 py-2">
-                      <div className="font-medium">{p.name}</div>
-                      <div className="text-[10px] text-muted-foreground mono">@{p.handle}</div>
-                    </td>
-                    <td className="px-3 py-2 text-right mono">{p.referrals_count}</td>
-                    <td className="px-3 py-2 text-right mono">{formatBRL(Number(p.balance))}</td>
-                    <td className="px-3 py-2">
-                      <input
-                        type="number"
-                        step="0.01"
-                        min={0}
-                        max={1}
-                        value={terms.share}
-                        onChange={(e) =>
-                          setActiveTerms((prev) => ({
-                            ...prev,
-                            [p.user_id]: { ...terms, share: e.target.value },
-                          }))
-                        }
-                        className="w-20 rounded border bg-surface px-1 py-0.5 mono"
-                      />
-                    </td>
-                    <td className="px-3 py-2">
-                      <div className="flex items-center gap-2">
-                        <label className="flex items-center gap-1 text-[10px] text-muted-foreground">
+          <div className="overflow-x-auto rounded-xl border">
+            <table className="w-full min-w-[720px] text-xs">
+              <thead className="border-b bg-surface/60 text-[10px] uppercase text-muted-foreground">
+                <tr>
+                  <th className="px-3 py-2 text-left">Creator</th>
+                  <th className="px-3 py-2 text-right">{copy.admin.partners.referrals}</th>
+                  <th className="px-3 py-2 text-right">Saldo</th>
+                  <th className="px-3 py-2 text-left">{copy.admin.partners.revenueShare}</th>
+                  <th className="px-3 py-2 text-left">{copy.admin.partners.cpaAmount}</th>
+                  <th className="px-3 py-2 text-left">Link</th>
+                  <th className="px-3 py-2 text-left">{copy.admin.partners.subCreatorsEnable}</th>
+                  <th className="px-3 py-2 text-left">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(active ?? []).map((p) => {
+                  const terms = activeTerms[p.user_id];
+                  if (!terms) return null;
+                  return (
+                    <tr key={p.user_id} className="border-b border-border/40">
+                      <td className="px-3 py-2">
+                        <div className="font-medium">{p.name}</div>
+                        <div className="text-[10px] text-muted-foreground mono">@{p.handle}</div>
+                      </td>
+                      <td className="px-3 py-2 text-right mono">{p.referrals_count}</td>
+                      <td className="px-3 py-2 text-right mono">{formatBRL(Number(p.balance))}</td>
+                      <td className="px-3 py-2">
+                        <input
+                          type="number"
+                          step="0.01"
+                          min={0}
+                          max={1}
+                          value={terms.share}
+                          onChange={(e) =>
+                            setActiveTerms((prev) => ({
+                              ...prev,
+                              [p.user_id]: { ...terms, share: e.target.value },
+                            }))
+                          }
+                          className="w-20 rounded border bg-surface px-1 py-0.5 mono"
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="flex items-center gap-2">
+                          <label className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                            <input
+                              type="checkbox"
+                              checked={terms.useDefault}
+                              onChange={(e) =>
+                                setActiveTerms((prev) => ({
+                                  ...prev,
+                                  [p.user_id]: { ...terms, useDefault: e.target.checked },
+                                }))
+                              }
+                            />
+                            {copy.admin.partners.cpaUseDefault}
+                          </label>
+                          {!terms.useDefault && (
+                            <input
+                              type="number"
+                              min={0}
+                              step="1"
+                              value={terms.cpa}
+                              onChange={(e) =>
+                                setActiveTerms((prev) => ({
+                                  ...prev,
+                                  [p.user_id]: { ...terms, cpa: e.target.value },
+                                }))
+                              }
+                              className="w-20 rounded border bg-surface px-1 py-0.5 mono"
+                            />
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => onCopyReferral(p.slug)}
+                            className="rounded border px-2 py-1 text-[10px] hover:bg-surface"
+                          >
+                            Copiar link
+                          </button>
+                        </div>
+                      </td>
+                      <td className="px-3 py-2">
+                        <label className="flex items-center gap-1.5 text-[10px]">
                           <input
                             type="checkbox"
-                            checked={terms.useDefault}
-                            onChange={(e) =>
-                              setActiveTerms((prev) => ({
-                                ...prev,
-                                [p.user_id]: { ...terms, useDefault: e.target.checked },
-                              }))
-                            }
+                            checked={p.sub_creators_enabled === true}
+                            disabled={savingSubCreators}
+                            onChange={(e) => void onToggleSubCreators(p.user_id, e.target.checked)}
                           />
-                          {copy.admin.partners.cpaUseDefault}
+                          <span className="text-muted-foreground">
+                            {p.sub_creators_enabled ? "Ativo" : "Off"}
+                          </span>
                         </label>
-                        {!terms.useDefault && (
-                          <input
-                            type="number"
-                            min={0}
-                            step="1"
-                            value={terms.cpa}
-                            onChange={(e) =>
-                              setActiveTerms((prev) => ({
-                                ...prev,
-                                [p.user_id]: { ...terms, cpa: e.target.value },
-                              }))
-                            }
-                            className="w-20 rounded border bg-surface px-1 py-0.5 mono"
-                          />
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-3 py-2">
-                      <div className="flex items-center gap-2">
+                      </td>
+                      <td className="px-3 py-2">
                         <button
                           type="button"
-                          onClick={() => onCopyReferral(p.slug)}
-                          className="rounded border px-2 py-1 text-[10px] hover:bg-surface"
+                          disabled={savingTerms}
+                          onClick={() => onSaveActiveTerms(p.user_id)}
+                          className="rounded border px-2 py-1 text-[10px] disabled:opacity-50"
                         >
-                          Copiar link
+                          {copy.admin.partners.saveTerms}
                         </button>
-                      </div>
-                    </td>
-                    <td className="px-3 py-2">
-                      <label className="flex items-center gap-1.5 text-[10px]">
-                        <input
-                          type="checkbox"
-                          checked={p.sub_creators_enabled === true}
-                          disabled={savingSubCreators}
-                          onChange={(e) => void onToggleSubCreators(p.user_id, e.target.checked)}
-                        />
-                        <span className="text-muted-foreground">
-                          {p.sub_creators_enabled ? "Ativo" : "Off"}
-                        </span>
-                      </label>
-                    </td>
-                    <td className="px-3 py-2">
-                      <button
-                        type="button"
-                        disabled={savingTerms}
-                        onClick={() => onSaveActiveTerms(p.user_id)}
-                        className="rounded border px-2 py-1 text-[10px] disabled:opacity-50"
-                      >
-                        {copy.admin.partners.saveTerms}
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </DesktopTableWrap>
       </section>
     </div>

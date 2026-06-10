@@ -5,9 +5,7 @@ import { adminRpcCall } from "@/actions/admin/_helpers";
 
 export const adminForceCloseFn = createServerFn({ method: "POST" })
   .middleware([requireAdminAuth])
-  .inputValidator(
-    z.object({ marketId: z.string(), note: z.string().optional() }),
-  )
+  .inputValidator(z.object({ marketId: z.string(), note: z.string().optional() }))
   .handler(async ({ data, context }) =>
     adminRpcCall("bff.admin.force_close", context, (supabase) =>
       supabase.rpc("admin_force_close", {

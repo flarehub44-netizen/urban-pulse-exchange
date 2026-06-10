@@ -66,9 +66,7 @@ function PartnerLeaderboardPage() {
             <span className="mono text-sm text-muted-foreground w-6">#{i + 1}</span>
             <div className="min-w-0 flex-1">
               <div className="font-medium truncate">{r.name}</div>
-              <div className="text-xs text-muted-foreground truncate">
-                @{r.handle}
-              </div>
+              <div className="text-xs text-muted-foreground truncate">@{r.handle}</div>
             </div>
             <DivisionBadge division={r.tier as Division} />
             <span className="mono text-sm font-medium">{formatBRL(r.score)}</span>

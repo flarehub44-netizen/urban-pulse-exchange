@@ -128,7 +128,11 @@ describe("api-football requests", () => {
         json: async () => ({
           response: [
             {
-              fixture: { id: 2, date: "2026-05-27T19:00:00+00:00", status: { short: "NS", elapsed: null } },
+              fixture: {
+                id: 2,
+                date: "2026-05-27T19:00:00+00:00",
+                status: { short: "NS", elapsed: null },
+              },
               league: { id: 71, season: 2024, name: "Serie A", country: "Brazil" },
               teams: { home: { id: 1, name: "A" }, away: { id: 2, name: "B" } },
               goals: { home: null, away: null },
@@ -156,7 +160,11 @@ describe("api-football requests", () => {
       json: async () => ({
         response: [
           {
-            fixture: { id: 9, date: "2026-05-27T16:00:00+00:00", status: { short: "NS", elapsed: null } },
+            fixture: {
+              id: 9,
+              date: "2026-05-27T16:00:00+00:00",
+              status: { short: "NS", elapsed: null },
+            },
             league: { id: 39, season: 2026, name: "Premier League", country: "England" },
             teams: { home: { id: 1, name: "A" }, away: { id: 2, name: "B" } },
             goals: { home: null, away: null },
@@ -196,7 +204,11 @@ describe("api-football requests", () => {
         json: async () => ({
           response: [
             {
-              fixture: { id: 10, date: "2026-05-27T18:00:00+00:00", status: { short: "NS", elapsed: null } },
+              fixture: {
+                id: 10,
+                date: "2026-05-27T18:00:00+00:00",
+                status: { short: "NS", elapsed: null },
+              },
               league: { id: 71, season: 2024, name: "Serie A", country: "Brazil" },
               teams: { home: { id: 1, name: "A" }, away: { id: 2, name: "B" } },
               goals: { home: null, away: null },

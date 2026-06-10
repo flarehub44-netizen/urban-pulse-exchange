@@ -5,15 +5,9 @@
   "compatibility_flags": ["nodejs_compat"],
   "main": "dist/server/server.js",
   "vars": {
-    "PUBLIC_DOMAIN": "viax.life"
+    "PUBLIC_DOMAIN": "viax.life",
   },
   "triggers": {
-    "crons": [
-      "*/30 * * * *",
-      "*/5 * * * *",
-      "0 * * * *",
-      "15 3 1 * *",
-      "*/15 * * * *"
-    ]
-  }
+    "crons": ["*/30 * * * *", "*/5 * * * *", "0 * * * *", "15 3 1 * *", "*/15 * * * *"],
+  },
 }

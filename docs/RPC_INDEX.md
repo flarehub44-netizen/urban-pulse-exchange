@@ -588,5 +588,3 @@ Após `20260826020000_harden_rpc_execute_and_search_path.sql`, toda RPC `admin_*
 
 - Validação: `npm run check:admin-rpc`
 - Detalhes: [SECURITY.md](./SECURITY.md) (seção Admin RPC grants)
-
-

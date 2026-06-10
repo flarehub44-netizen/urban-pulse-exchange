@@ -4,13 +4,13 @@ Documento de referência operacional (não substitui parecer jurídico).
 
 ## Escopo
 
-| Dado | Tabela / local | Retenção mínima sugerida | Observações |
-|------|----------------|-------------------------|-------------|
-| Transações Pix | `payment_intents` | **5 anos** | Comentário em migration `20260827030000`; delete bloqueado por trigger |
-| Webhooks SyncPay | `syncpay_webhook_events` | **5 anos** (metadados) | `payload` completo: revisar redução após 24–36 meses |
-| Velocity (hash) | `security_velocity_events` | **12 meses** | Sem IP em claro; apenas `ip_hash` / `device_hash` |
-| Alertas de risco | `user_risk_alerts` | **5 anos** | Suporte a disputas e PLD |
-| Perfis / CPF | `profiles.cpf` | Vigência da conta + obrigações legais | CPF mascarado na UI via `mask_cpf` |
+| Dado             | Tabela / local             | Retenção mínima sugerida              | Observações                                                            |
+| ---------------- | -------------------------- | ------------------------------------- | ---------------------------------------------------------------------- |
+| Transações Pix   | `payment_intents`          | **5 anos**                            | Comentário em migration `20260827030000`; delete bloqueado por trigger |
+| Webhooks SyncPay | `syncpay_webhook_events`   | **5 anos** (metadados)                | `payload` completo: revisar redução após 24–36 meses                   |
+| Velocity (hash)  | `security_velocity_events` | **12 meses**                          | Sem IP em claro; apenas `ip_hash` / `device_hash`                      |
+| Alertas de risco | `user_risk_alerts`         | **5 anos**                            | Suporte a disputas e PLD                                               |
+| Perfis / CPF     | `profiles.cpf`             | Vigência da conta + obrigações legais | CPF mascarado na UI via `mask_cpf`                                     |
 
 ## Base legal (alto nível)
 

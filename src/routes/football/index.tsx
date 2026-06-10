@@ -14,10 +14,7 @@ import {
   CircleCheck,
 } from "lucide-react";
 import { useFootballHomepage, formatYmd } from "@/hooks/use-football-homepage";
-import {
-  loadFavoriteTeams,
-  toggleFavoriteTeam,
-} from "@/lib/football-home-favorites";
+import { loadFavoriteTeams, toggleFavoriteTeam } from "@/lib/football-home-favorites";
 import { InlineError } from "@/components/viax/inline-error";
 import { cn } from "@/lib/utils";
 
@@ -29,15 +26,7 @@ export const Route = createFileRoute("/football/")({
   component: FootballHomepage,
 });
 
-function SummaryCard({
-  icon,
-  label,
-  value,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: number;
-}) {
+function SummaryCard({ icon, label, value }: { icon: ReactNode; label: string; value: number }) {
   return (
     <div className="rounded-xl border border-border/70 bg-card/40 px-4 py-3">
       <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
@@ -120,7 +109,12 @@ function FootballHomepage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-lg font-semibold">Futebol</h1>
-          <p className="text-xs text-muted-foreground">Agenda diária com filtros rápidos</p>
+          <p className="text-xs text-muted-foreground">
+            Agenda diária com filtros rápidos ·{" "}
+            <Link to="/copa" className="text-primary hover:underline">
+              Hub Copa 2026
+            </Link>
+          </p>
         </div>
         <button
           type="button"
@@ -163,14 +157,24 @@ function FootballHomepage() {
           Hoje
         </button>
         <span className="text-xs text-muted-foreground">
-          {format(new Date(`${selectedDate}T00:00:00`), "EEEE, dd 'de' MMMM yyyy", { locale: ptBR })}
+          {format(new Date(`${selectedDate}T00:00:00`), "EEEE, dd 'de' MMMM yyyy", {
+            locale: ptBR,
+          })}
         </span>
         {isFetching && <span className="text-[11px] text-muted-foreground">Atualizando…</span>}
       </div>
 
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-        <SummaryCard icon={<Star className="size-3.5" />} label="Total jogos" value={counters.total} />
-        <SummaryCard icon={<Radio className="size-3.5 text-up" />} label="Ao vivo" value={counters.live} />
+        <SummaryCard
+          icon={<Star className="size-3.5" />}
+          label="Total jogos"
+          value={counters.total}
+        />
+        <SummaryCard
+          icon={<Radio className="size-3.5 text-up" />}
+          label="Ao vivo"
+          value={counters.live}
+        />
         <SummaryCard
           icon={<Clock3 className="size-3.5 text-sky-400" />}
           label="Agendados"
@@ -206,7 +210,9 @@ function FootballHomepage() {
           </button>
           <select
             value={leagueFilter}
-            onChange={(e) => setLeagueFilter(e.target.value === "all" ? "all" : Number(e.target.value))}
+            onChange={(e) =>
+              setLeagueFilter(e.target.value === "all" ? "all" : Number(e.target.value))
+            }
             className="rounded-md border bg-transparent px-3 py-1.5 text-xs"
           >
             <option value="all">Todas as ligas</option>
@@ -224,7 +230,14 @@ function FootballHomepage() {
             { key: "live", label: "Ao vivo", count: counters.live },
             { key: "scheduled", label: "Agendados", count: counters.scheduled },
             { key: "finished", label: "Encerrados", count: counters.finished },
-            { key: "favorites", label: "Favoritos", count: filteredFixtures.filter((f) => favoriteTeams.includes(f.homeTeam.id) || favoriteTeams.includes(f.awayTeam.id)).length },
+            {
+              key: "favorites",
+              label: "Favoritos",
+              count: filteredFixtures.filter(
+                (f) =>
+                  favoriteTeams.includes(f.homeTeam.id) || favoriteTeams.includes(f.awayTeam.id),
+              ).length,
+            },
           ].map((tab) => (
             <button
               key={tab.key}
@@ -237,7 +250,8 @@ function FootballHomepage() {
                   : "text-muted-foreground hover:bg-muted",
               )}
             >
-              {tab.label} <span className="ml-1 rounded-full bg-muted px-1.5 py-0.5">{tab.count}</span>
+              {tab.label}{" "}
+              <span className="ml-1 rounded-full bg-muted px-1.5 py-0.5">{tab.count}</span>
             </button>
           ))}
         </div>
@@ -253,7 +267,10 @@ function FootballHomepage() {
       {isLoading && (
         <div className="space-y-2">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-24 animate-pulse rounded-xl border border-border/70 bg-card/40" />
+            <div
+              key={i}
+              className="h-24 animate-pulse rounded-xl border border-border/70 bg-card/40"
+            />
           ))}
         </div>
       )}

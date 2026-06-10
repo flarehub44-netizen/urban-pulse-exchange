@@ -9,7 +9,10 @@ export const adminFootballSyncFn = createServerFn({ method: "POST" })
   .inputValidator(
     z
       .object({
-        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+        date: z
+          .string()
+          .regex(/^\d{4}-\d{2}-\d{2}$/)
+          .optional(),
       })
       .optional(),
   )

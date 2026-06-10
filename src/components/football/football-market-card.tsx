@@ -8,11 +8,7 @@ import type { FootballMarketRow } from "@/hooks/use-football-markets";
 import type { FootballOutcome } from "@/lib/football-parimutuel";
 import { probability3, prizePool3, type FootballPool } from "@/lib/football-parimutuel";
 import { formatBRL, formatCompact, formatPct } from "@/lib/parimutuel";
-import {
-  canPlaceBets,
-  isMarketEndedForCatalog,
-  statusLabel,
-} from "@/lib/market-status";
+import { canPlaceBets, isMarketEndedForCatalog, statusLabel } from "@/lib/market-status";
 import { FootballProbBar } from "@/components/football/football-prob-bar";
 import { FootballOrderBox } from "@/components/football/football-order-box";
 import { AnimatedNumber } from "@/components/viax/animated-number";

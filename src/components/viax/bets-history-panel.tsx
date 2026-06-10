@@ -49,8 +49,7 @@ function trafficToUnified(b: OpenBet): UnifiedBet {
 }
 
 function footballToUnified(b: FootballOpenBet): UnifiedBet {
-  const side =
-    b.outcome === "HOME" ? b.homeTeam : b.outcome === "AWAY" ? b.awayTeam : "Empate";
+  const side = b.outcome === "HOME" ? b.homeTeam : b.outcome === "AWAY" ? b.awayTeam : "Empate";
   return {
     id: b.id,
     kind: "football",
@@ -119,7 +118,9 @@ export function BetsHistoryPanel({ filter, type, q }: Props) {
     return { totalStake, totalPayout, net, wins, losses, winRate, count: filtered.length };
   }, [filtered]);
 
-  const setSearch = (patch: Partial<{ filter: BetsHistoryFilter; type: BetsHistoryType; q: string }>) =>
+  const setSearch = (
+    patch: Partial<{ filter: BetsHistoryFilter; type: BetsHistoryType; q: string }>,
+  ) =>
     navigate({
       search: (prev: Record<string, unknown>) => ({ ...prev, ...patch }),
     });
@@ -153,7 +154,9 @@ export function BetsHistoryPanel({ filter, type, q }: Props) {
           value={<span className="mono text-up">{formatBRL(kpis.totalPayout)}</span>}
         />
         <Kpi
-          icon={kpis.net >= 0 ? <TrendingUp className="size-3" /> : <TrendingDown className="size-3" />}
+          icon={
+            kpis.net >= 0 ? <TrendingUp className="size-3" /> : <TrendingDown className="size-3" />
+          }
           label="Resultado líquido"
           value={
             <span className={cn("mono", kpis.net >= 0 ? "text-up" : "text-down")}>

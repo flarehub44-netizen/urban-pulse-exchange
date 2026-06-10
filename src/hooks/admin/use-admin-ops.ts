@@ -1,13 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-  adminGetMarketOpsSettingsFn,
-  adminGetPlatformSettingsFn,
-} from "@/actions/admin/dashboard";
+import { adminGetMarketOpsSettingsFn, adminGetPlatformSettingsFn } from "@/actions/admin/dashboard";
 import { adminGetEventsHubOverviewFn } from "@/actions/admin/events";
-import {
-  adminGetCameraHealthFn,
-  adminGetVisionWorkerStatusFn,
-} from "@/actions/admin/cameras";
+import { adminGetCameraHealthFn, adminGetVisionWorkerStatusFn } from "@/actions/admin/cameras";
 
 type OpsRunStatus = {
   at: string;

@@ -47,7 +47,7 @@ type ApiFixtureItem = {
     status: { short: string; elapsed: number | null };
     venue?: { name?: string };
   };
-  league: { id: number; season: number; name: string; country: string };
+  league: { id: number; season: number; name: string; country: string; round?: string };
   teams: {
     home: { id: number; name: string; logo?: string };
     away: { id: number; name: string; logo?: string };
@@ -299,5 +299,92 @@ export function dateRangeDays(from: Date, days: number): string[] {
     d.setDate(d.getDate() + i);
     out.push(formatDateYmd(d));
   }
+  return out;
+}
+
+export type StandingRow = {
+  rank: number;
+  teamId: number;
+  teamName: string;
+  teamLogo: string | null;
+  points: number;
+  played: number;
+  group: string | null;
+};
+
+type ApiStandingTeam = {
+  group?: string;
+  team: { id: number; name: string; logo?: string };
+  rank: number;
+  points: number;
+  all: { played: number };
+};
+
+type ApiStandingsBlock = {
+  league: { id: number; season: number };
+  standings: ApiStandingTeam[][];
+};
+
+const standingsCache = new Map<string, { at: number; data: StandingRow[] }>();
+const STANDINGS_TTL_MS = 15 * 60 * 1000;
+
+export async function getStandings(leagueId: number, season: number): Promise<StandingRow[]> {
+  const key = `${leagueId}:${season}`;
+  const hit = standingsCache.get(key);
+  if (hit && hit.at + STANDINGS_TTL_MS > Date.now()) return hit.data;
+
+  const blocks = await apiGet<ApiStandingsBlock>("/standings", {
+    league: String(leagueId),
+    season: String(season),
+  });
+
+  const rows: StandingRow[] = [];
+  for (const block of blocks) {
+    for (const group of block.standings ?? []) {
+      for (const s of group) {
+        rows.push({
+          rank: s.rank,
+          teamId: s.team.id,
+          teamName: s.team.name,
+          teamLogo: s.team.logo ?? null,
+          points: s.points,
+          played: s.all.played,
+          group: s.group ?? null,
+        });
+      }
+    }
+  }
+
+  standingsCache.set(key, { at: Date.now(), data: rows });
+  return rows;
+}
+
+const knockoutCache = new Map<string, { at: number; data: ApiFootballFixtureDto[] }>();
+
+export async function getKnockoutFixtures(
+  leagueId: number,
+  season: number,
+): Promise<ApiFootballFixtureDto[]> {
+  const key = `ko:${leagueId}:${season}`;
+  const hit = knockoutCache.get(key);
+  if (hit && hit.at + STANDINGS_TTL_MS > Date.now()) return hit.data;
+
+  const rounds = ["Round of 16", "Quarter-finals", "Semi-finals", "Final"];
+  const out: ApiFootballFixtureDto[] = [];
+  for (const round of rounds) {
+    try {
+      const items = await apiGet<ApiFixtureItem>("/fixtures", {
+        league: String(leagueId),
+        season: String(season),
+        round,
+      });
+      for (const item of items) out.push(mapFixtureItem(item));
+      await sleep(300);
+    } catch {
+      // round may not exist yet
+    }
+  }
+
+  knockoutCache.set(key, { at: Date.now(), data: out });
   return out;
 }

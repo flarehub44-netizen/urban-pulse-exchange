@@ -58,9 +58,7 @@ describe("payment schemas", () => {
   });
 
   it("withdrawSchema accepts valid payload", () => {
-    expect(withdrawSchema.safeParse({ amount: 100, pixKey: "user@email.com" }).success).toBe(
-      true,
-    );
+    expect(withdrawSchema.safeParse({ amount: 100, pixKey: "user@email.com" }).success).toBe(true);
   });
 });
 

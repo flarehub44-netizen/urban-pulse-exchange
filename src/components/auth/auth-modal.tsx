@@ -69,7 +69,9 @@ function AuthModalBody({
       {variant === "sheet" ? (
         <>
           <SheetTitle className="text-xl font-semibold">{title}</SheetTitle>
-          <SheetDescription className="mt-1 text-sm text-muted-foreground">{subtitle}</SheetDescription>
+          <SheetDescription className="mt-1 text-sm text-muted-foreground">
+            {subtitle}
+          </SheetDescription>
         </>
       ) : (
         <>
@@ -78,9 +80,7 @@ function AuthModalBody({
         </>
       )}
       <div className="mt-6">
-        {mode === "login" && (
-          <LoginForm onSuccess={onFinishAuth} onForgotPassword={onForgot} />
-        )}
+        {mode === "login" && <LoginForm onSuccess={onFinishAuth} onForgotPassword={onForgot} />}
         {mode === "signup" && (
           <SignupForm
             onSuccess={() => {
@@ -177,7 +177,11 @@ export function AuthModal() {
     if (!urlAuth.auth && !urlAuth.deposit) return;
     const next = stripAuthModalSearch(search);
     const params = new URLSearchParams(next as Record<string, string>);
-    window.history.replaceState(null, "", `${window.location.pathname}${params.size ? `?${params}` : ""}`);
+    window.history.replaceState(
+      null,
+      "",
+      `${window.location.pathname}${params.size ? `?${params}` : ""}`,
+    );
   }, [search, urlAuth.auth, urlAuth.deposit]);
 
   const handleClose = () => {
@@ -259,10 +263,5 @@ export function AuthModal() {
       </Dialog>
     );
 
-  return shell(
-    <AuthModalBody
-      {...bodyProps}
-      variant={useMobileSheet ? "sheet" : "dialog"}
-    />,
-  );
+  return shell(<AuthModalBody {...bodyProps} variant={useMobileSheet ? "sheet" : "dialog"} />);
 }

@@ -43,12 +43,12 @@ const emptyEventForm = () => ({
 function isEventFormFilled(form: ReturnType<typeof emptyEventForm>) {
   return Boolean(
     form.name.trim() ||
-      form.slug.trim() ||
-      form.description.trim() ||
-      form.startsAt ||
-      form.endsAt ||
-      form.badgeIcon !== "🎉" ||
-      form.xpBoost !== "0",
+    form.slug.trim() ||
+    form.description.trim() ||
+    form.startsAt ||
+    form.endsAt ||
+    form.badgeIcon !== "🎉" ||
+    form.xpBoost !== "0",
   );
 }
 
@@ -101,9 +101,7 @@ function AdminEventsPage() {
 
   const eventFormActive = editingEventId != null || isEventFormFilled(eventForm);
   const pollFormActive =
-    editingPollId != null ||
-    Boolean(pollQuestion.trim()) ||
-    pollDate !== emptyPollState().pollDate;
+    editingPollId != null || Boolean(pollQuestion.trim()) || pollDate !== emptyPollState().pollDate;
 
   if (overviewError || seasonalError || pollsError || partnerError) {
     return (
@@ -315,7 +313,9 @@ function AdminEventsPage() {
                 <div className="font-medium">{copy.admin.events.opsFootballTitle}</div>
                 <div className="text-muted-foreground">
                   {copy.admin.events.opsAutoRules}:{" "}
-                  {opsStatus?.football.enabled ? copy.admin.events.opsEnabled : copy.admin.events.opsDisabled}
+                  {opsStatus?.football.enabled
+                    ? copy.admin.events.opsEnabled
+                    : copy.admin.events.opsDisabled}
                 </div>
                 <div className="text-muted-foreground">
                   Entradas fecham {opsStatus?.football.closeMinutes ?? 5} min antes · Janela sync -
@@ -327,7 +327,9 @@ function AdminEventsPage() {
                 <div className="text-muted-foreground">
                   {copy.admin.events.opsLastRun}:{" "}
                   {opsStatus?.football.lastSyncRun?.at
-                    ? format(new Date(opsStatus.football.lastSyncRun.at), "dd/MM HH:mm", { locale: ptBR })
+                    ? format(new Date(opsStatus.football.lastSyncRun.at), "dd/MM HH:mm", {
+                        locale: ptBR,
+                      })
                     : copy.admin.events.opsNoRun}
                 </div>
                 <Link to="/admin/football" className="text-primary hover:underline">
@@ -489,7 +491,10 @@ function AdminEventsPage() {
               const status = platformEventStatus(e.starts_at, e.ends_at);
               return (
                 <div
-                  className={cn("space-y-3", editingEventId === e.id && "rounded-lg ring-1 ring-primary/30")}
+                  className={cn(
+                    "space-y-3",
+                    editingEventId === e.id && "rounded-lg ring-1 ring-primary/30",
+                  )}
                 >
                   <MobileFieldRow label="Evento">
                     <span className="mr-2">{e.badge_icon}</span>
@@ -528,62 +533,62 @@ function AdminEventsPage() {
             }}
           />
           <DesktopTableWrap>
-          <div className="overflow-x-auto rounded-xl border">
-            <table className="w-full min-w-[640px] text-xs">
-              <thead className="border-b bg-surface/60 text-[10px] uppercase text-muted-foreground">
-                <tr>
-                  <th className="px-3 py-2 text-left">Evento</th>
-                  <th className="px-3 py-2 text-left">Status</th>
-                  <th className="px-3 py-2 text-left">Período</th>
-                  <th className="px-3 py-2 text-right">XP</th>
-                  <th className="px-3 py-2 text-left">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(seasonal ?? []).map((e) => {
-                  const status = platformEventStatus(e.starts_at, e.ends_at);
-                  return (
-                    <tr
-                      key={e.id}
-                      className={cn(
-                        "border-b border-border/40",
-                        editingEventId === e.id && "bg-primary/5",
-                      )}
-                    >
-                      <td className="px-3 py-2">
-                        <span className="mr-2">{e.badge_icon}</span>
-                        <span className="font-medium">{e.name}</span>
-                      </td>
-                      <td className="px-3 py-2">{statusLabel(status)}</td>
-                      <td className="px-3 py-2 text-muted-foreground">
-                        {format(new Date(e.starts_at), "dd/MM/yy HH:mm", { locale: ptBR })} –{" "}
-                        {format(new Date(e.ends_at), "dd/MM/yy HH:mm", { locale: ptBR })}
-                      </td>
-                      <td className="px-3 py-2 text-right mono">+{e.xp_boost}</td>
-                      <td className="px-3 py-2">
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={() => loadEventForEdit(e)}
-                            className="rounded border px-2 py-0.5 text-[10px]"
-                          >
-                            {copy.admin.events.editEvent}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => onDeleteEvent(e.id)}
-                            className="rounded border px-2 py-0.5 text-[10px] text-destructive"
-                          >
-                            {copy.admin.events.deleteEvent}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+            <div className="overflow-x-auto rounded-xl border">
+              <table className="w-full min-w-[640px] text-xs">
+                <thead className="border-b bg-surface/60 text-[10px] uppercase text-muted-foreground">
+                  <tr>
+                    <th className="px-3 py-2 text-left">Evento</th>
+                    <th className="px-3 py-2 text-left">Status</th>
+                    <th className="px-3 py-2 text-left">Período</th>
+                    <th className="px-3 py-2 text-right">XP</th>
+                    <th className="px-3 py-2 text-left">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(seasonal ?? []).map((e) => {
+                    const status = platformEventStatus(e.starts_at, e.ends_at);
+                    return (
+                      <tr
+                        key={e.id}
+                        className={cn(
+                          "border-b border-border/40",
+                          editingEventId === e.id && "bg-primary/5",
+                        )}
+                      >
+                        <td className="px-3 py-2">
+                          <span className="mr-2">{e.badge_icon}</span>
+                          <span className="font-medium">{e.name}</span>
+                        </td>
+                        <td className="px-3 py-2">{statusLabel(status)}</td>
+                        <td className="px-3 py-2 text-muted-foreground">
+                          {format(new Date(e.starts_at), "dd/MM/yy HH:mm", { locale: ptBR })} –{" "}
+                          {format(new Date(e.ends_at), "dd/MM/yy HH:mm", { locale: ptBR })}
+                        </td>
+                        <td className="px-3 py-2 text-right mono">+{e.xp_boost}</td>
+                        <td className="px-3 py-2">
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => loadEventForEdit(e)}
+                              className="rounded border px-2 py-0.5 text-[10px]"
+                            >
+                              {copy.admin.events.editEvent}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => onDeleteEvent(e.id)}
+                              className="rounded border px-2 py-0.5 text-[10px] text-destructive"
+                            >
+                              {copy.admin.events.deleteEvent}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </DesktopTableWrap>
         </div>
       )}
@@ -656,7 +661,10 @@ function AdminEventsPage() {
             emptyText={copy.admin.events.emptyPolls}
             renderCard={(p) => (
               <div
-                className={cn("space-y-3", editingPollId === p.id && "rounded-lg ring-1 ring-primary/30")}
+                className={cn(
+                  "space-y-3",
+                  editingPollId === p.id && "rounded-lg ring-1 ring-primary/30",
+                )}
               >
                 <MobileFieldRow label={copy.admin.events.pollDate}>
                   <span className="mono">{p.poll_date}</span>
@@ -692,53 +700,53 @@ function AdminEventsPage() {
             )}
           />
           <DesktopTableWrap>
-          <div className="overflow-x-auto rounded-xl border">
-            <table className="w-full min-w-[560px] text-xs">
-              <thead className="border-b bg-surface/60 text-[10px] uppercase text-muted-foreground">
-                <tr>
-                  <th className="px-3 py-2 text-left">{copy.admin.events.pollDate}</th>
-                  <th className="px-3 py-2 text-left">{copy.admin.events.question}</th>
-                  <th className="px-3 py-2 text-right">{copy.admin.events.votesYes}</th>
-                  <th className="px-3 py-2 text-right">{copy.admin.events.votesNo}</th>
-                  <th className="px-3 py-2 text-left">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(polls ?? []).map((p) => (
-                  <tr
-                    key={p.id}
-                    className={cn(
-                      "border-b border-border/40",
-                      editingPollId === p.id && "bg-primary/5",
-                    )}
-                  >
-                    <td className="px-3 py-2 mono">{p.poll_date}</td>
-                    <td className="px-3 py-2">{p.question}</td>
-                    <td className="px-3 py-2 text-right mono">{p.yes_count}</td>
-                    <td className="px-3 py-2 text-right mono">{p.no_count}</td>
-                    <td className="px-3 py-2">
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => loadPollForEdit(p)}
-                          className="rounded border px-2 py-0.5 text-[10px]"
-                        >
-                          {copy.admin.events.editPoll}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onDeletePoll(p.id)}
-                          className="rounded border px-2 py-0.5 text-[10px] text-destructive"
-                        >
-                          {copy.admin.events.deleteEvent}
-                        </button>
-                      </div>
-                    </td>
+            <div className="overflow-x-auto rounded-xl border">
+              <table className="w-full min-w-[560px] text-xs">
+                <thead className="border-b bg-surface/60 text-[10px] uppercase text-muted-foreground">
+                  <tr>
+                    <th className="px-3 py-2 text-left">{copy.admin.events.pollDate}</th>
+                    <th className="px-3 py-2 text-left">{copy.admin.events.question}</th>
+                    <th className="px-3 py-2 text-right">{copy.admin.events.votesYes}</th>
+                    <th className="px-3 py-2 text-right">{copy.admin.events.votesNo}</th>
+                    <th className="px-3 py-2 text-left">Ações</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {(polls ?? []).map((p) => (
+                    <tr
+                      key={p.id}
+                      className={cn(
+                        "border-b border-border/40",
+                        editingPollId === p.id && "bg-primary/5",
+                      )}
+                    >
+                      <td className="px-3 py-2 mono">{p.poll_date}</td>
+                      <td className="px-3 py-2">{p.question}</td>
+                      <td className="px-3 py-2 text-right mono">{p.yes_count}</td>
+                      <td className="px-3 py-2 text-right mono">{p.no_count}</td>
+                      <td className="px-3 py-2">
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => loadPollForEdit(p)}
+                            className="rounded border px-2 py-0.5 text-[10px]"
+                          >
+                            {copy.admin.events.editPoll}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onDeletePoll(p.id)}
+                            className="rounded border px-2 py-0.5 text-[10px] text-destructive"
+                          >
+                            {copy.admin.events.deleteEvent}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </DesktopTableWrap>
         </div>
       )}

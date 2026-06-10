@@ -12,7 +12,10 @@ export function TrafficLiveHero({ market }: { market: Market }) {
           <span className="absolute inline-flex size-full animate-ping rounded-full bg-up opacity-60" />
           <span className="relative inline-flex size-2 rounded-full bg-up" />
         </span>
-        <h2 id="traffic-live-heading" className="text-sm font-semibold uppercase tracking-wider text-up">
+        <h2
+          id="traffic-live-heading"
+          className="text-sm font-semibold uppercase tracking-wider text-up"
+        >
           <Radio className="mr-1 inline size-3.5" />
           {copy.traffic.liveHeroTitle}
         </h2>

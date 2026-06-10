@@ -68,7 +68,11 @@ export type AdminImpactWinnerRow = {
 
 export const getMonthlyImpactLeaderboardFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(z.object({ month: z.string().optional(), limit: z.number().int().min(1).max(100).optional() }).optional())
+  .inputValidator(
+    z
+      .object({ month: z.string().optional(), limit: z.number().int().min(1).max(100).optional() })
+      .optional(),
+  )
   .handler(async ({ data, context }) => {
     const { supabase } = getSupabaseCtx(context);
     const { data: res, error } = await supabase.rpc("get_monthly_impact_leaderboard", {

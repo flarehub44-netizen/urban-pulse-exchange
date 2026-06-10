@@ -29,7 +29,11 @@ export function DepositSheetHost() {
       if (urlDeposit) {
         const nextSearch = stripAuthModalSearch(search);
         const params = new URLSearchParams(nextSearch as Record<string, string>);
-        window.history.replaceState(null, "", `${window.location.pathname}${params.size ? `?${params}` : ""}`);
+        window.history.replaceState(
+          null,
+          "",
+          `${window.location.pathname}${params.size ? `?${params}` : ""}`,
+        );
       }
     }
   };

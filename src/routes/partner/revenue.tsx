@@ -57,7 +57,9 @@ function PartnerRevenuePage() {
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-xl border bg-card/60 p-3">
-          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Total período</p>
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
+            Total período
+          </p>
           <p className="mt-1 text-lg font-semibold">{formatBRL(totals.current)}</p>
         </div>
         <div className="rounded-xl border bg-card/60 p-3">

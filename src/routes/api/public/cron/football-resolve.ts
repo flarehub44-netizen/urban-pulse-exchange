@@ -13,7 +13,10 @@ function json(body: unknown, status = 200) {
 
 async function handleFootballResolve(request: Request) {
   const ip = request.headers.get("cf-connecting-ip") ?? "unknown";
-  const limited = await assertRateLimit(`cron:football-resolve:${ip}`, { max: 30, windowMs: 60_000 });
+  const limited = await assertRateLimit(`cron:football-resolve:${ip}`, {
+    max: 30,
+    windowMs: 60_000,
+  });
   if (limited) return limited;
 
   const denied = await assertCronAuth(request);

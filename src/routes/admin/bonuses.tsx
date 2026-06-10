@@ -237,8 +237,8 @@ function AdminBonusesPage() {
               Salvar
             </button>
           </div>
-        <div className="overflow-x-auto md:overflow-visible">
-          <table className="w-full text-xs md:min-w-[420px]">
+          <div className="overflow-x-auto md:overflow-visible">
+            <table className="w-full text-xs md:min-w-[420px]">
               <thead className="text-[10px] uppercase text-muted-foreground">
                 <tr>
                   <th className="py-1 text-left">Prêmio</th>
@@ -344,51 +344,51 @@ function AdminBonusesPage() {
           )}
         />
         <DesktopTableWrap>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px] text-xs">
-            <thead className="border-b bg-surface/40 text-[10px] uppercase text-muted-foreground">
-              <tr>
-                <th className="px-3 py-2 text-left">Quando</th>
-                <th className="px-3 py-2 text-left">Usuário</th>
-                <th className="px-3 py-2 text-left">Canal</th>
-                <th className="px-3 py-2 text-left">Detalhe</th>
-                <th className="px-3 py-2 text-right">Cash</th>
-                <th className="px-3 py-2 text-right">XP</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(ledger ?? []).map((row) => (
-                <tr key={`${row.kind}-${row.id}`} className="border-b border-border/40">
-                  <td className="px-3 py-2 text-muted-foreground whitespace-nowrap">
-                    {formatDistanceToNow(new Date(row.created_at), {
-                      addSuffix: true,
-                      locale: ptBR,
-                    })}
-                  </td>
-                  <td className="px-3 py-2 font-medium">{row.username}</td>
-                  <td className="px-3 py-2">{KIND_LABELS[row.kind] ?? row.kind}</td>
-                  <td className="px-3 py-2 text-muted-foreground">
-                    {row.label}
-                    {row.source ? ` · ${row.source}` : ""}
-                  </td>
-                  <td className="px-3 py-2 text-right mono">
-                    {Number(row.cash_amount) > 0 ? formatBRL(Number(row.cash_amount)) : "—"}
-                  </td>
-                  <td className="px-3 py-2 text-right mono">
-                    {Number(row.xp_amount) > 0 ? row.xp_amount : "—"}
-                  </td>
-                </tr>
-              ))}
-              {!ledger?.length && (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[720px] text-xs">
+              <thead className="border-b bg-surface/40 text-[10px] uppercase text-muted-foreground">
                 <tr>
-                  <td colSpan={6} className="px-3 py-6 text-center text-muted-foreground">
-                    Nenhuma distribuição registrada.
-                  </td>
+                  <th className="px-3 py-2 text-left">Quando</th>
+                  <th className="px-3 py-2 text-left">Usuário</th>
+                  <th className="px-3 py-2 text-left">Canal</th>
+                  <th className="px-3 py-2 text-left">Detalhe</th>
+                  <th className="px-3 py-2 text-right">Cash</th>
+                  <th className="px-3 py-2 text-right">XP</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {(ledger ?? []).map((row) => (
+                  <tr key={`${row.kind}-${row.id}`} className="border-b border-border/40">
+                    <td className="px-3 py-2 text-muted-foreground whitespace-nowrap">
+                      {formatDistanceToNow(new Date(row.created_at), {
+                        addSuffix: true,
+                        locale: ptBR,
+                      })}
+                    </td>
+                    <td className="px-3 py-2 font-medium">{row.username}</td>
+                    <td className="px-3 py-2">{KIND_LABELS[row.kind] ?? row.kind}</td>
+                    <td className="px-3 py-2 text-muted-foreground">
+                      {row.label}
+                      {row.source ? ` · ${row.source}` : ""}
+                    </td>
+                    <td className="px-3 py-2 text-right mono">
+                      {Number(row.cash_amount) > 0 ? formatBRL(Number(row.cash_amount)) : "—"}
+                    </td>
+                    <td className="px-3 py-2 text-right mono">
+                      {Number(row.xp_amount) > 0 ? row.xp_amount : "—"}
+                    </td>
+                  </tr>
+                ))}
+                {!ledger?.length && (
+                  <tr>
+                    <td colSpan={6} className="px-3 py-6 text-center text-muted-foreground">
+                      Nenhuma distribuição registrada.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </DesktopTableWrap>
       </div>
     </div>

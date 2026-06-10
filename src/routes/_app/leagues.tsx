@@ -118,7 +118,6 @@ function LeaguesPage() {
     }
   };
 
-
   const copyInvite = (code: string) => {
     navigator.clipboard.writeText(code).then(() => toast.success("Código copiado!"));
   };

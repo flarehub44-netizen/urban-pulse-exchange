@@ -83,7 +83,11 @@ test.describe("SyncPay — depósito staging", () => {
     });
   });
 
-  test("solicitar saque → webhook PAYOUT_COMPLETED → confirma", async ({ page, request, baseURL }) => {
+  test("solicitar saque → webhook PAYOUT_COMPLETED → confirma", async ({
+    page,
+    request,
+    baseURL,
+  }) => {
     await loginWithTestUser(page);
     await page.goto("/wallet?tab=withdraw");
     await page.waitForTimeout(2500);

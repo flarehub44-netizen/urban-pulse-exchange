@@ -38,8 +38,7 @@ export function TrafficSlotWaiting({
       </p>
       {lastEndedAt != null && (
         <p className="mt-3 text-xs text-muted-foreground">
-          {copy.traffic.lastEndedPrefix}{" "}
-          {format(lastEndedAt, "HH:mm", { locale: ptBR })}
+          {copy.traffic.lastEndedPrefix} {format(lastEndedAt, "HH:mm", { locale: ptBR })}
         </p>
       )}
     </section>

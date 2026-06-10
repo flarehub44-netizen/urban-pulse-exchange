@@ -41,7 +41,10 @@ test.describe("Mobile — rotas públicas", () => {
 
 test.describe("Mobile — app autenticado", () => {
   test.beforeEach(async ({ page }) => {
-    test.skip(!hasPlaywrightCredentials(), "Defina PLAYWRIGHT_TEST_EMAIL e PLAYWRIGHT_TEST_PASSWORD");
+    test.skip(
+      !hasPlaywrightCredentials(),
+      "Defina PLAYWRIGHT_TEST_EMAIL e PLAYWRIGHT_TEST_PASSWORD",
+    );
     await loginWithTestUser(page);
   });
 
@@ -64,7 +67,10 @@ test.describe("Mobile — app autenticado", () => {
 
 test.describe("Mobile — admin (requer usuário admin)", () => {
   test.beforeEach(async ({ page }) => {
-    test.skip(!hasPlaywrightCredentials(), "Defina PLAYWRIGHT_TEST_EMAIL e PLAYWRIGHT_TEST_PASSWORD");
+    test.skip(
+      !hasPlaywrightCredentials(),
+      "Defina PLAYWRIGHT_TEST_EMAIL e PLAYWRIGHT_TEST_PASSWORD",
+    );
     await loginWithTestUser(page);
   });
 
@@ -95,7 +101,10 @@ test.describe("Mobile — admin (requer usuário admin)", () => {
 
 test.describe("Mobile — partner", () => {
   test("partner portal sem overflow quando acessível", async ({ page }) => {
-    test.skip(!hasPlaywrightCredentials(), "Defina PLAYWRIGHT_TEST_EMAIL e PLAYWRIGHT_TEST_PASSWORD");
+    test.skip(
+      !hasPlaywrightCredentials(),
+      "Defina PLAYWRIGHT_TEST_EMAIL e PLAYWRIGHT_TEST_PASSWORD",
+    );
     await loginWithTestUser(page);
     await page.goto("/partner", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(2500);

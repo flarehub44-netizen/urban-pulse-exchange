@@ -3,7 +3,6 @@ import { listCatalogMarketsFn } from "@/actions/catalog";
 import { supabase } from "@/integrations/supabase/client";
 import {
   parseCatalogMarkets,
-  parseCatalogMarket,
   type CatalogMarket,
   type CatalogTopicCount,
   type MarketVertical,
@@ -83,42 +82,12 @@ export function usePredictionMarketDetail(marketId: string) {
 }
 
 export async function fetchCatalogMarketById(marketId: string): Promise<CatalogMarket | null> {
-  const { data, error } = await supabase
-    .from("prediction_markets")
-    .select("id, question, vertical, status, ends_at, image_url, participants")
-    .eq("id", marketId)
-    .maybeSingle();
-  if (error || !data) return null;
-
-  const { data: outcomes } = await supabase
-    .from("market_outcomes")
-    .select("id, slug, label, pool, sort_order")
-    .eq("market_id", marketId)
-    .order("sort_order");
-
-  const pools = outcomes ?? [];
-  const total = pools.reduce((s, o) => s + Number(o.pool), 0);
-
-  return parseCatalogMarket({
-    id: data.id,
-    type: "multi_outcome",
-    source: "prediction",
-    question: data.question,
-    vertical: data.vertical,
-    status: data.status,
-    endsAt: data.ends_at,
-    imageUrl: data.image_url,
-    volume: total,
-    participants: data.participants,
-    trend: 0,
-    outcomes: pools.map((o) => ({
-      id: o.id,
-      slug: o.slug,
-      label: o.label,
-      pool: Number(o.pool),
-      probability: total > 0 ? Number(o.pool) / total : 1 / pools.length,
-    })),
-    topics: [],
-    detailPath: `/pm/${data.id}`,
+  const { data, error } = await supabase.rpc("list_catalog_markets", {
+    p_status: "all",
+    p_limit: 48,
+    p_q: marketId,
   });
+  if (error) return null;
+  const markets = parseCatalogMarkets(data);
+  return markets.find((m) => m.id === marketId) ?? null;
 }

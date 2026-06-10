@@ -74,8 +74,7 @@ export function useAdminFootballDrafts() {
 export function useAdminFootballLive() {
   return useQuery({
     queryKey: ["admin-football-live"],
-    queryFn: () =>
-      adminListFootballLiveFn({ data: { limit: 100 } }) as Promise<FootballLiveRow[]>,
+    queryFn: () => adminListFootballLiveFn({ data: { limit: 100 } }) as Promise<FootballLiveRow[]>,
     refetchInterval: 15_000,
   });
 }
@@ -83,8 +82,7 @@ export function useAdminFootballLive() {
 export function useAdminApproveFootballFixture() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (fixtureId: number) =>
-      adminApproveFootballFixtureFn({ data: { fixtureId } }),
+    mutationFn: (fixtureId: number) => adminApproveFootballFixtureFn({ data: { fixtureId } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-football-pending"] });
       qc.invalidateQueries({ queryKey: ["admin-football-drafts"] });

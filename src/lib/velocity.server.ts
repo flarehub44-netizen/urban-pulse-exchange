@@ -47,7 +47,10 @@ export function readVelocityContext(): {
   const request = getRequest();
   const headers = request?.headers;
   return {
-    ip: headers?.get("cf-connecting-ip") ?? headers?.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown",
+    ip:
+      headers?.get("cf-connecting-ip") ??
+      headers?.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      "unknown",
     deviceId: headers?.get(DEVICE_HEADER),
     cfRay: headers?.get("cf-ray"),
   };

@@ -80,20 +80,17 @@ export const Route = createFileRoute("/api/public/hooks/reconcile-syncpay-payout
                 });
                 continue;
               }
-              const { error: rpcErr } = await supabase.rpc(
-                "service_process_syncpay_webhook",
-                {
-                  p_provider_id: providerId,
-                  p_event: event,
-                  p_payload: {
-                    event,
-                    data: { id: providerId, status: status.status, amount: intent.amount },
-                    source: "reconciliation",
-                  } as unknown as Json,
-                  p_signature: "reconciliation-cron",
-                  p_provider_event_id: `recon:${providerId}:${event}`,
-                },
-              );
+              const { error: rpcErr } = await supabase.rpc("service_process_syncpay_webhook", {
+                p_provider_id: providerId,
+                p_event: event,
+                p_payload: {
+                  event,
+                  data: { id: providerId, status: status.status, amount: intent.amount },
+                  source: "reconciliation",
+                } as unknown as Json,
+                p_signature: "reconciliation-cron",
+                p_provider_event_id: `recon:${providerId}:${event}`,
+              });
               if (rpcErr) {
                 console.error("[reconcile-syncpay] rpc failed (withdraw)", {
                   intentId: intent.id,
@@ -120,21 +117,18 @@ export const Route = createFileRoute("/api/public/hooks/reconcile-syncpay-payout
               }
               // Deposits require payer document; without it the RPC blocks the credit.
               // We pass through whatever the provider returned in `raw`.
-              const { error: rpcErr } = await supabase.rpc(
-                "service_process_syncpay_webhook",
-                {
-                  p_provider_id: providerId,
-                  p_event: event,
-                  p_payload: {
-                    event,
-                    data: { id: providerId, status: status.status, amount: intent.amount },
-                    provider_raw: status.raw,
-                    source: "reconciliation",
-                  } as unknown as Json,
-                  p_signature: "reconciliation-cron",
-                  p_provider_event_id: `recon:${providerId}:${event}`,
-                },
-              );
+              const { error: rpcErr } = await supabase.rpc("service_process_syncpay_webhook", {
+                p_provider_id: providerId,
+                p_event: event,
+                p_payload: {
+                  event,
+                  data: { id: providerId, status: status.status, amount: intent.amount },
+                  provider_raw: status.raw,
+                  source: "reconciliation",
+                } as unknown as Json,
+                p_signature: "reconciliation-cron",
+                p_provider_event_id: `recon:${providerId}:${event}`,
+              });
               if (rpcErr) {
                 console.error("[reconcile-syncpay] rpc failed (deposit)", {
                   intentId: intent.id,

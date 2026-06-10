@@ -96,13 +96,8 @@ export async function requireAdminRoute() {
   }
 
   if (await isAdminMfaRequired()) {
-    const { data: aal, error: aalError } =
-      await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-    if (
-      !aalError &&
-      aal?.currentLevel === "aal1" &&
-      aal?.nextLevel === "aal2"
-    ) {
+    const { data: aal, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (!aalError && aal?.currentLevel === "aal1" && aal?.nextLevel === "aal2") {
       throw redirect({
         to: "/settings",
         search: { mfa: "required" },

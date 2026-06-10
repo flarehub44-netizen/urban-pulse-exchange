@@ -110,14 +110,25 @@ async function addSecurityHeaders(response: Response): Promise<Response> {
 
   const contentType = response.headers.get("content-type") ?? "";
   if (!contentType.includes("text/html")) {
-    return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
   }
 
   // Buffer HTML, inject nonce into <script> tags (skips tags that already have one).
   // This covers TanStack Start's hydration inline scripts whose hash changes every request.
   const text = await response.text();
-  const patched = text.replace(/<script(?![^>]*\bnonce\b)(\b[^>]*)>/gi, `<script$1 nonce="${nonce}">`);
-  return new Response(patched, { status: response.status, statusText: response.statusText, headers });
+  const patched = text.replace(
+    /<script(?![^>]*\bnonce\b)(\b[^>]*)>/gi,
+    `<script$1 nonce="${nonce}">`,
+  );
+  return new Response(patched, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
 }
 
 // h3 swallows in-handler throws into a normal 500 Response with body
@@ -168,7 +179,8 @@ export default {
    */
   scheduled(event: { cron?: string }, env: unknown, ctx: ScheduledContext) {
     bindWorkerEnv(env);
-    if (!process.env.SUPABASE_SERVICE_ROLE_KEY && !process.env.VIAX_SUPABASE_SERVICE_ROLE_KEY) return;
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY && !process.env.VIAX_SUPABASE_SERVICE_ROLE_KEY)
+      return;
     const cron = event.cron ?? "";
     ctx.waitUntil(
       (async () => {

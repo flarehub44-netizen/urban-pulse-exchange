@@ -17,7 +17,9 @@ export async function assertRateLimit(
     // F03: fail-closed in production — a missing service role disables all rate
     // limiting, which is a silent DoS vector on high-traffic endpoints.
     if (process.env.NODE_ENV === "production") {
-      console.error("[RateLimit] FATAL: SUPABASE_SERVICE_ROLE_KEY not configured in production — refusing request to protect the system");
+      console.error(
+        "[RateLimit] FATAL: SUPABASE_SERVICE_ROLE_KEY not configured in production — refusing request to protect the system",
+      );
       return new Response(JSON.stringify({ error: "service_unavailable" }), {
         status: 503,
         headers: { "Content-Type": "application/json" },

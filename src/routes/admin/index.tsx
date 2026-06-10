@@ -97,8 +97,7 @@ function AdminOverviewPage() {
         >
           <h2 className="text-sm font-semibold">Saúde operacional</h2>
           <p className="text-xs text-muted-foreground mt-1">
-            Lifecycle:{" "}
-            {opsHealth.checks.lifecycle_ok ? "OK" : "ATENÇÃO"} (
+            Lifecycle: {opsHealth.checks.lifecycle_ok ? "OK" : "ATENÇÃO"} (
             {opsHealth.checks.minutes_since_lifecycle_tick ?? "—"} min) · Pending &gt;24h:{" "}
             {opsHealth.checks.pending_intents_over_24h} · Webhook failures 24h:{" "}
             {opsHealth.checks.webhook_failures_24h}

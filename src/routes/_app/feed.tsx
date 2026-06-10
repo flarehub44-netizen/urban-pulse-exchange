@@ -370,10 +370,10 @@ function Feed() {
                 </li>
               ))}
             {!commentsLoading && threadComments?.length === 0 && (
-                <li className="text-sm text-muted-foreground">
-                  Nenhum comentário ainda. Seja o primeiro!
-                </li>
-              )}
+              <li className="text-sm text-muted-foreground">
+                Nenhum comentário ainda. Seja o primeiro!
+              </li>
+            )}
           </ul>
           <div className="mt-4 flex gap-2">
             <textarea

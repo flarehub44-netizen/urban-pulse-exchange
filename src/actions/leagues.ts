@@ -34,9 +34,7 @@ export const getMyLeaguesFn = createServerFn({ method: "GET" })
 
 export const createLeagueFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    z.object({ name: z.string().min(2).max(40), is_public: z.boolean().optional() }),
-  )
+  .inputValidator(z.object({ name: z.string().min(2).max(40), is_public: z.boolean().optional() }))
   .handler(async ({ context, data }) => {
     const { supabase } = getSupabaseCtx(context);
     const { data: res, error } = await supabase.rpc("create_league", {
@@ -82,13 +80,12 @@ export const deleteLeagueFn = createServerFn({ method: "POST" })
   .inputValidator(z.object({ league_id: z.string().uuid() }))
   .handler(async ({ context, data }) => {
     const { supabase } = getSupabaseCtx(context);
-    const { data: res, error } = await (supabase.rpc as unknown as (
-      fn: string,
-      params: Record<string, unknown>,
-    ) => Promise<{ data: unknown; error: { message: string } | null }>)(
-      "delete_league",
-      { p_league_id: data.league_id },
-    );
+    const { data: res, error } = await (
+      supabase.rpc as unknown as (
+        fn: string,
+        params: Record<string, unknown>,
+      ) => Promise<{ data: unknown; error: { message: string } | null }>
+    )("delete_league", { p_league_id: data.league_id });
     if (error) throw new Error(error.message);
     return res as { ok: boolean; reason?: string };
   });

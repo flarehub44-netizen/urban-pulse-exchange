@@ -88,3 +88,47 @@ export const adminResolveOutcomeMarketFn = createServerFn({ method: "POST" })
       }),
     ),
   );
+
+export const adminVoidPredictionMarketFn = createServerFn({ method: "POST" })
+  .middleware([requireAdminAuth])
+  .validator(
+    z.object({
+      marketId: z.string(),
+      reason: z.string().optional(),
+    }),
+  )
+  .handler(async ({ data, context }) =>
+    adminRpcCall("admin.void_prediction_market", context, (supabase) =>
+      supabase.rpc("admin_void_prediction_market", {
+        p_market_id: data.marketId,
+        p_reason: data.reason ?? "admin_void",
+      }),
+    ),
+  );
+
+const updateOutcomeSchema = z.object({
+  id: z.string().uuid().optional(),
+  slug: z.string().optional(),
+  label: z.string(),
+});
+
+export const adminUpdatePredictionMarketFn = createServerFn({ method: "POST" })
+  .middleware([requireAdminAuth])
+  .validator(
+    z.object({
+      marketId: z.string(),
+      question: z.string().optional(),
+      endsAt: z.string().optional(),
+      outcomes: z.array(updateOutcomeSchema).optional(),
+    }),
+  )
+  .handler(async ({ data, context }) =>
+    adminRpcCall("admin.update_prediction_market", context, (supabase) =>
+      supabase.rpc("admin_update_prediction_market", {
+        p_market_id: data.marketId,
+        p_question: data.question ?? undefined,
+        p_ends_at: data.endsAt ?? undefined,
+        p_outcomes: data.outcomes ?? undefined,
+      }),
+    ),
+  );

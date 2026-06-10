@@ -64,8 +64,7 @@ function AdminTrafficEventsPage() {
     setGapSec(String(parseSec(scheduler.gap_after_end)));
   }, [scheduler]);
 
-  const regionName = (id: string | null) =>
-    regions?.find((r) => r.id === id)?.name ?? id ?? "—";
+  const regionName = (id: string | null) => regions?.find((r) => r.id === id)?.name ?? id ?? "—";
 
   const loadTemplate = (t: TrafficEventTemplate) => {
     setForm({
@@ -223,7 +222,9 @@ function AdminTrafficEventsPage() {
         <section className="rounded-xl border bg-card/40 p-4">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-medium">
-              {form.id ? copy.admin.trafficEvents.editTemplate : copy.admin.trafficEvents.newTemplate}
+              {form.id
+                ? copy.admin.trafficEvents.editTemplate
+                : copy.admin.trafficEvents.newTemplate}
             </h2>
             {form.id && (
               <button
@@ -394,7 +395,9 @@ function AdminTrafficEventsPage() {
                         t.active ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground",
                       )}
                     >
-                      {t.active ? copy.admin.trafficEvents.active : copy.admin.trafficEvents.inactive}
+                      {t.active
+                        ? copy.admin.trafficEvents.active
+                        : copy.admin.trafficEvents.inactive}
                     </span>
                   </div>
                 </div>

@@ -25,8 +25,8 @@ Autenticação exclusivamente por **e-mail e senha** (`signUpWithEmail` / `signI
 
 ## Erros comuns
 
-| Código / mensagem | Causa | Ação |
-|---|---|---|
-| Signup falha com e-mail vazio | Formulário enviado sem e-mail válido | Preencher e-mail e senha (≥ 6 caracteres) |
-| `signup_disabled` | Signups desativados no projeto | Habilitar em Auth → Providers → Email |
-| Redirect após confirmação falha | URL do Worker ausente | Adicionar domínio em URL Configuration |
+| Código / mensagem               | Causa                                | Ação                                      |
+| ------------------------------- | ------------------------------------ | ----------------------------------------- |
+| Signup falha com e-mail vazio   | Formulário enviado sem e-mail válido | Preencher e-mail e senha (≥ 6 caracteres) |
+| `signup_disabled`               | Signups desativados no projeto       | Habilitar em Auth → Providers → Email     |
+| Redirect após confirmação falha | URL do Worker ausente                | Adicionar domínio em URL Configuration    |

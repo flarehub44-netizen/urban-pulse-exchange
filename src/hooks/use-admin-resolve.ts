@@ -7,15 +7,7 @@ export function useAdminResolveMarket() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      marketId,
-      side,
-      note,
-    }: {
-      marketId: string;
-      side: Side;
-      note?: string;
-    }) =>
+    mutationFn: async ({ marketId, side, note }: { marketId: string; side: Side; note?: string }) =>
       adminResolveMarketFn({
         data: { marketId, winningSide: side, note },
       }),

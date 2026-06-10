@@ -13,10 +13,7 @@ const migrationsDir = join(root, "supabase", "migrations");
 
 const RPC_RE = /supabase\.rpc\(\s*["']((?:admin_|get_admin_)[^"']+)["']/g;
 
-const SERVER_ONLY_DIRS = [
-  join(srcDir, "actions", "admin"),
-  join(srcDir, "lib"),
-];
+const SERVER_ONLY_DIRS = [join(srcDir, "actions", "admin"), join(srcDir, "lib")];
 
 function walk(dir, acc = [], skipDirs = []) {
   for (const name of readdirSync(dir)) {

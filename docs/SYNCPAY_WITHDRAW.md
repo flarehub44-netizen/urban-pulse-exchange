@@ -10,12 +10,12 @@
 
 ## Variáveis de ambiente (Cloudflare Worker)
 
-| Variável | Uso |
-|----------|-----|
-| `SYNCPAY_API_URL` | Base da API (padrão `https://api.syncpay.com.br/v1`) |
-| `SYNCPAY_API_KEY` | Bearer para criar payouts |
-| `SYNCPAY_WEBHOOK_SECRET` | HMAC do webhook |
-| `SUPABASE_SERVICE_ROLE_KEY` | Atualizar intents / RPC de webhook |
+| Variável                    | Uso                                                  |
+| --------------------------- | ---------------------------------------------------- |
+| `SYNCPAY_API_URL`           | Base da API (padrão `https://api.syncpay.com.br/v1`) |
+| `SYNCPAY_API_KEY`           | Bearer para criar payouts                            |
+| `SYNCPAY_WEBHOOK_SECRET`    | HMAC do webhook                                      |
+| `SUPABASE_SERVICE_ROLE_KEY` | Atualizar intents / RPC de webhook                   |
 
 Registrar webhook: `https://viax.life/api/public/webhooks/syncpay` (produção) ou `https://viax-urban-pulse.douglaspinheirosantos94.workers.dev/api/public/webhooks/syncpay` (Worker direto).
 
@@ -44,14 +44,14 @@ npx wrangler secret put SYNCPAY_WEBHOOK_SECRET
 
 ## Troubleshooting
 
-| Sintoma | Causa provável |
-|---------|----------------|
-| `SYNCPAY_API_KEY not configured` | Secret ausente no Worker |
-| `Saldo insuficiente` | Saldo menor que o valor solicitado |
-| `kyc_required_cumulative` | Limite mensal R$ 100 por CPF sem KYC (todas as contas vinculadas) |
-| `cpf_required_for_withdrawal` | CPF não cadastrado no perfil |
+| Sintoma                          | Causa provável                                                                                   |
+| -------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `SYNCPAY_API_KEY not configured` | Secret ausente no Worker                                                                         |
+| `Saldo insuficiente`             | Saldo menor que o valor solicitado                                                               |
+| `kyc_required_cumulative`        | Limite mensal R$ 100 por CPF sem KYC (todas as contas vinculadas)                                |
+| `cpf_required_for_withdrawal`    | CPF não cadastrado no perfil                                                                     |
 | `unknown_provider_id` no webhook | `provider_id` não gravado no intent; fallback por `correlation_id` na migration `20260824000000` |
-| Saque pendente eterno | Webhook não chegou ou assinatura inválida — conferir painel SyncPay e logs do Worker |
+| Saque pendente eterno            | Webhook não chegou ou assinatura inválida — conferir painel SyncPay e logs do Worker             |
 
 ## Deploy
 

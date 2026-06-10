@@ -44,7 +44,9 @@ const env = parseEnv(envFile);
 const example = parseEnv(exampleFile);
 
 const missing = REQUIRED.filter((k) => !env[k]?.length);
-const undocumented = [...REQUIRED, ...WORKER_ONLY].filter((k) => !(k in example) && k.startsWith("VITE_") === false);
+const undocumented = [...REQUIRED, ...WORKER_ONLY].filter(
+  (k) => !(k in example) && k.startsWith("VITE_") === false,
+);
 
 if (missing.length && existsSync(envFile)) {
   console.error(`Missing in ${envFile}:`);

@@ -492,7 +492,9 @@ export function WalletPanel({
                   />
                   <span className="shrink-0 text-muted-foreground text-sm">BRL</span>
                 </div>
-                <p className="mt-1 text-[11px] text-muted-foreground">{copy.wallet.pixAmountHint}</p>
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  {copy.wallet.pixAmountHint}
+                </p>
               </div>
 
               {tab === "withdraw" && (

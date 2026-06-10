@@ -33,15 +33,15 @@ flowchart LR
 
 ## Matriz de acesso (cliente direto vs BFF)
 
-| Dom?nio                                        | Caminho principal              | Canal obrigat?rio                             |
-| ---------------------------------------------- | ------------------------------ | --------------------------------------------- |
-| Cat?logo p?blico (markets/live/ranking)        | hooks com `supabase.from(...)` | Cliente direto + RLS                          |
-| Dashboard autenticado (`/dashboard`)           | `getDashboardSnapshotFn`       | BFF (Worker ServerFn)                         |
-| Carteira e extrato (`/profile?tab=carteira`)   | `getWalletOverviewFn`          | BFF (Worker ServerFn)                         |
-| Contexto de conta (partner/admin gating)       | `getAccountContextFn`          | BFF (Worker ServerFn)                         |
-| Muta??es financeiras (aposta, saque, dep?sito) | `src/actions/*` + RPC          | BFF (Worker ServerFn)                         |
+| Dom?nio                                        | Caminho principal              | Canal obrigat?rio                                            |
+| ---------------------------------------------- | ------------------------------ | ------------------------------------------------------------ |
+| Cat?logo p?blico (markets/live/ranking)        | hooks com `supabase.from(...)` | Cliente direto + RLS                                         |
+| Dashboard autenticado (`/dashboard`)           | `getDashboardSnapshotFn`       | BFF (Worker ServerFn)                                        |
+| Carteira e extrato (`/profile?tab=carteira`)   | `getWalletOverviewFn`          | BFF (Worker ServerFn)                                        |
+| Contexto de conta (partner/admin gating)       | `getAccountContextFn`          | BFF (Worker ServerFn)                                        |
+| Muta??es financeiras (aposta, saque, dep?sito) | `src/actions/*` + RPC          | BFF (Worker ServerFn)                                        |
 | Painel admin (`/admin/*`)                      | `src/actions/admin/*`          | BFF only (`requireAdminAuth`); RPC sem grant `authenticated` |
-| Webhooks/cron/proxy p?blico                    | `src/routes/api/public/*`      | Worker HTTP (rate limit + segredo/assinatura) |
+| Webhooks/cron/proxy p?blico                    | `src/routes/api/public/*`      | Worker HTTP (rate limit + segredo/assinatura)                |
 
 ### Endpoints agregadores (BFF)
 
@@ -80,3 +80,47 @@ Refer?ncias:
 - [RESOLUTION_ENGINE.md](./RESOLUTION_ENGINE.md)
 - [OPS_CRONS.md](./OPS_CRONS.md)
 - [SECURITY.md](./SECURITY.md)
+- [PREDICTION_MARKETS.md](./PREDICTION_MARKETS.md)
+
+## Catálogo unificado e prediction markets (Polymarket-style)
+
+Mercados multi-outcome (`prediction_markets`, `market_outcomes`, `outcome_bets`) convivem com mercados legados (`markets`, `football_markets`) via RPC `list_catalog_markets`, que agrega volume, probabilidades e metadados para a UI.
+
+```mermaid
+flowchart TB
+  subgraph public [Shell pública]
+    home["/"]
+    vertical["/v/$vertical"]
+    copa["/copa"]
+    pm["/pm/$marketId"]
+  end
+  subgraph bff [BFF Worker]
+    catalogFn["listCatalogMarketsFn cache 30s"]
+    outcomeBetFn["placeOutcomeBetFn"]
+    copaDataFn["getCopaStandingsFn / getCopaKnockoutFn"]
+  end
+  subgraph db [Postgres RPC]
+    listCat["list_catalog_markets"]
+    placeBet["place_outcome_bet"]
+    settle["settle_outcome_market"]
+    voidPm["admin_void_prediction_market"]
+  end
+  vertical --> catalogFn
+  home --> catalogFn
+  pm --> outcomeBetFn
+  copa --> copaDataFn
+  catalogFn --> listCat
+  outcomeBetFn --> placeBet
+```
+
+| Fluxo                  | Entrada                                      | Saída                                                            |
+| ---------------------- | -------------------------------------------- | ---------------------------------------------------------------- |
+| Listagem catálogo      | `useUnifiedCatalog` → `listCatalogMarketsFn` | JSON normalizado em `src/lib/catalog-market.ts`                  |
+| Aposta N-way           | `placeOutcomeBetFn`                          | RPC `place_outcome_bet` (parimutuel por outcome)                 |
+| Admin criar/resolver   | `src/actions/admin/prediction-markets.ts`    | `admin_create_prediction_market`, `settle_outcome_market`        |
+| Admin editar/anular    | mesmo módulo                                 | `admin_update_prediction_market`, `admin_void_prediction_market` |
+| Copa standings/bracket | `src/actions/copa-football-data.ts`          | API-Football com cache 15 min no server                          |
+
+Rotas principais: `/v/{politica,crypto,tech,cultura,economia}`, `/copa` (5 abas), `/pm/$marketId` (detalhe + quick bet). Football legado (`/football`) linka para o hub Copa.
+
+Performance: cache LRU 30s no BFF para catálogo; índices em `prediction_markets(vertical, status, ends_at)`. Meta operacional: p95 catálogo &lt; 300ms pós-deploy (medir via logs `bff.list_catalog_markets`).

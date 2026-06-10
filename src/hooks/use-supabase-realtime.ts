@@ -19,11 +19,13 @@ export function useSupabaseRealtime() {
       if (pendingMarkets.size === 0) return;
       const patches = new Map(pendingMarkets);
       pendingMarkets.clear();
-      queryClient.setQueryData<Market[]>(["markets"], (old) =>
-        old?.map((m) => {
-          const u = patches.get(m.id);
-          return u ? { ...m, pool: u.pool, participants: u.participants } : m;
-        }) ?? old,
+      queryClient.setQueryData<Market[]>(
+        ["markets"],
+        (old) =>
+          old?.map((m) => {
+            const u = patches.get(m.id);
+            return u ? { ...m, pool: u.pool, participants: u.participants } : m;
+          }) ?? old,
       );
     };
     const schedule = () => {

@@ -99,7 +99,10 @@ const ok = results.filter((r) => !r.error).length;
 const failed = results.filter((r) => r.error);
 console.log(`Done in ${Date.now() - started}ms — ok: ${ok}, failed: ${failed.length}`);
 if (failed.length) {
-  console.error("Sample errors:", failed.slice(0, 3).map((r) => r.error?.message));
+  console.error(
+    "Sample errors:",
+    failed.slice(0, 3).map((r) => r.error?.message),
+  );
   process.exit(1);
 }
 

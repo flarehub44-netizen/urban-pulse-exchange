@@ -23,7 +23,8 @@ function logFinancialReconciliationIssue(input: {
 
 export function mapSyncPayDepositError(error: unknown): Error {
   if (error instanceof SyncPayHttpError) {
-    const looksLikeHtml = error.contentType.includes("text/html") || error.responseSnippet.includes("<!DOCTYPE");
+    const looksLikeHtml =
+      error.contentType.includes("text/html") || error.responseSnippet.includes("<!DOCTYPE");
     if (looksLikeHtml) {
       console.error("[SyncPayConfigIssue] syncpay_html_error_page", {
         status: error.status,
@@ -51,9 +52,10 @@ export function mapSyncPayDepositError(error: unknown): Error {
       "Pagamento Pix temporariamente indisponível. Nossa equipe foi alertada — tente novamente em alguns minutos.",
     );
   }
-  return error instanceof Error ? error : new Error("Falha ao criar cobrança Pix. Tente novamente.");
+  return error instanceof Error
+    ? error
+    : new Error("Falha ao criar cobrança Pix. Tente novamente.");
 }
-
 
 async function requireUserPixProfile(service: ReturnType<typeof getServiceClient>, userId: string) {
   const { data: profile, error } = await service
@@ -140,12 +142,12 @@ export const initiateDepositFn = createServerFn({ method: "POST" })
           correlationId: intent.id,
           description: `Depósito ViaX — ${formatBRL(data.amount)}`,
           expiresInMinutes: 30,
-        client: {
-          name,
-          cpf: cpfDigits,
-          email: email || undefined,
-          phone: phoneDigits || undefined,
-        },
+          client: {
+            name,
+            cpf: cpfDigits,
+            email: email || undefined,
+            phone: phoneDigits || undefined,
+          },
         });
       } catch (error) {
         const mappedError = mapSyncPayDepositError(error);

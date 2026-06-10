@@ -16,17 +16,17 @@ node scripts/check-deploy-env.mjs .env.local
 
 ## Variáveis obrigatórias
 
-| Variável | Lovable Cloud | Wrangler | Cliente (build) |
-|----------|---------------|----------|-----------------|
-| `VITE_SUPABASE_URL` | — | — | Sim |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | — | — | Sim |
-| `SUPABASE_URL` | Sim | Sim | — |
-| `SUPABASE_PUBLISHABLE_KEY` | Sim | Sim | — |
-| `SUPABASE_SERVICE_ROLE_KEY` | Sim | Sim | **Nunca** no client |
-| `VELOCITY_HMAC_SECRET` | Sim | Sim | — |
-| `CRON_SECRET` / `CRON_HMAC_SECRET` | Sim | Sim | — |
-| `SYNCPAY_*` | Sim | Sim | — |
-| `API_FOOTBALL_KEY` | Se futebol | Sim | — |
+| Variável                           | Lovable Cloud | Wrangler | Cliente (build)     |
+| ---------------------------------- | ------------- | -------- | ------------------- |
+| `VITE_SUPABASE_URL`                | —             | —        | Sim                 |
+| `VITE_SUPABASE_PUBLISHABLE_KEY`    | —             | —        | Sim                 |
+| `SUPABASE_URL`                     | Sim           | Sim      | —                   |
+| `SUPABASE_PUBLISHABLE_KEY`         | Sim           | Sim      | —                   |
+| `SUPABASE_SERVICE_ROLE_KEY`        | Sim           | Sim      | **Nunca** no client |
+| `VELOCITY_HMAC_SECRET`             | Sim           | Sim      | —                   |
+| `CRON_SECRET` / `CRON_HMAC_SECRET` | Sim           | Sim      | —                   |
+| `SYNCPAY_*`                        | Sim           | Sim      | —                   |
+| `API_FOOTBALL_KEY`                 | Se futebol    | Sim      | —                   |
 
 Ver [`.env.example`](../.env.example) e [`README.md`](../README.md).
 
@@ -54,10 +54,10 @@ npm run deploy           # Worker (build + wrangler)
 
 ## Decisão de runtime (atual)
 
-| Responsabilidade | Runtime |
-|------------------|---------|
-| SSR + ServerFns BFF | Lovable Cloud |
-| Crons (futebol, impact, health) | Cloudflare Worker `scheduled` |
-| Webhooks SyncPay | Ambos (URL produção → Lovable) |
+| Responsabilidade                | Runtime                        |
+| ------------------------------- | ------------------------------ |
+| SSR + ServerFns BFF             | Lovable Cloud                  |
+| Crons (futebol, impact, health) | Cloudflare Worker `scheduled`  |
+| Webhooks SyncPay                | Ambos (URL produção → Lovable) |
 
 Unificação em runtime único: backlog pós-90 dias.

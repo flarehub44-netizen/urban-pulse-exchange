@@ -2,11 +2,11 @@
 
 ## Viewports de referência
 
-| Dispositivo | Largura × altura |
-|-------------|------------------|
-| iPhone 13/14 | 390 × 844 |
-| Android médio | 360 × 800 |
-| Android grande | 412 × 915 |
+| Dispositivo    | Largura × altura |
+| -------------- | ---------------- |
+| iPhone 13/14   | 390 × 844        |
+| Android médio  | 360 × 800        |
+| Android grande | 412 × 915        |
 
 No DevTools: modo responsivo ou `npx playwright test --project=mobile-chrome`.
 

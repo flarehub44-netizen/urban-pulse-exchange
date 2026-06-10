@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Search } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Logo } from "@/components/viax/sidebar";
 import { AuthModalTrigger } from "@/components/auth/auth-modal-trigger";
+import { CatalogPublicSearch } from "@/components/catalog/catalog-public-search";
 import { useDepositSheet } from "@/hooks/use-deposit-sheet";
 import { useAuthPublic } from "@/hooks/use-auth-public";
 import { copy } from "@/copy/pt-BR";
@@ -35,28 +36,22 @@ export function PublicNav({ variant = "shell" }: PublicNavProps) {
           <Link to="/copa" className="hover:text-foreground">
             Copa 2026
           </Link>
-          {MARKET_VERTICALS.filter((v) => !["transito", "copa", "comunidade"].includes(v.slug)).slice(0, 4).map((v) => (
-            <Link
-              key={v.slug}
-              to={v.slug === "copa" ? "/copa" : "/v/$vertical"}
-              params={v.slug === "copa" ? undefined : { vertical: v.slug }}
-              className="hover:text-foreground"
-            >
-              {v.label}
-            </Link>
-          ))}
+          {MARKET_VERTICALS.filter((v) => !["transito", "copa", "comunidade"].includes(v.slug))
+            .slice(0, 4)
+            .map((v) => (
+              <Link
+                key={v.slug}
+                to={v.slug === "copa" ? "/copa" : "/v/$vertical"}
+                params={v.slug === "copa" ? undefined : { vertical: v.slug }}
+                className="hover:text-foreground"
+              >
+                {v.label}
+              </Link>
+            ))}
           <Link to="/live" className="hover:text-foreground">
             Mapa
           </Link>
-          <Link
-            to="/v/$vertical"
-            params={{ vertical: "crypto" }}
-            search={{ q: "" }}
-            className="flex items-center gap-1.5 rounded-lg border border-border/70 px-2.5 py-1 text-xs hover:bg-muted/50"
-          >
-            <Search className="size-3.5" />
-            Buscar
-          </Link>
+          <CatalogPublicSearch />
         </nav>
         <div className="flex items-center gap-1.5 sm:gap-2">
           {!isRegistered && (

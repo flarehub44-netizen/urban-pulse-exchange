@@ -72,10 +72,7 @@ function readMetaNumber(meta: Record<string, unknown> | null | undefined, key: s
   return null;
 }
 
-function payerLinkedCount(row: {
-  payer_linked_account_count?: number;
-  cpf_duplicate?: boolean;
-}) {
+function payerLinkedCount(row: { payer_linked_account_count?: number; cpf_duplicate?: boolean }) {
   return Number(row.payer_linked_account_count ?? (row.cpf_duplicate ? 2 : 0));
 }
 
@@ -112,7 +109,9 @@ function AccountPartnerLine({ account }: { account: AdminPayerLinkedAccount }) {
     );
   }
   return (
-    <div className="mt-1 text-[10px] text-muted-foreground">{copy.admin.risk.payerClusterNoPartner}</div>
+    <div className="mt-1 text-[10px] text-muted-foreground">
+      {copy.admin.risk.payerClusterNoPartner}
+    </div>
   );
 }
 
@@ -199,7 +198,9 @@ function LinkedAccountsList({ accounts }: { accounts: AdminPayerLinkedAccount[] 
           <div className="mono text-[10px] text-muted-foreground">@{a.user_handle}</div>
           <AccountPartnerLine account={a} />
           <div className="mt-1 flex flex-wrap gap-2 text-[10px] text-muted-foreground">
-            <span>{a.banned ? copy.admin.risk.payerClusterBanned : copy.admin.risk.payerClusterActive}</span>
+            <span>
+              {a.banned ? copy.admin.risk.payerClusterBanned : copy.admin.risk.payerClusterActive}
+            </span>
             {a.kyc_status && <span>KYC: {a.kyc_status}</span>}
             {typeof a.balance === "number" && <span className="mono">{formatBRL(a.balance)}</span>}
           </div>
@@ -616,9 +617,7 @@ function CaseTable({
         items={cases}
         keyFn={(c) => String(c.flag_id)}
         emptyText={emptyText}
-        renderCard={(c) => (
-          <CaseMobileCard c={c} onViewLinkedAccounts={onViewLinkedAccounts} />
-        )}
+        renderCard={(c) => <CaseMobileCard c={c} onViewLinkedAccounts={onViewLinkedAccounts} />}
       />
       <DesktopTableWrap>
         <div className="overflow-x-auto rounded-lg border">
@@ -637,46 +636,48 @@ function CaseTable({
                 const linkedCount = payerLinkedCount(c);
                 const last4 = payerLast4(c);
                 return (
-                <tr
-                  key={c.flag_id}
-                  className={cn("border-b border-border/40", rowAccentClass(c.status, true))}
-                >
-                  <td className="px-3 py-2">
-                    <div className="font-medium">{c.user_name}</div>
-                    <div className="mono text-[10px] text-muted-foreground">@{c.user_handle}</div>
-                    <PayerDocumentInfo
-                      last4={last4}
-                      linkedCount={linkedCount}
-                      onViewLinked={
-                        linkedCount > 0 ? () => onViewLinkedAccounts(c) : undefined
-                      }
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <div className="font-medium">
-                      {c.partner_handle ? `@${c.partner_handle}` : "—"}
-                    </div>
-                    <div className="text-[10px] text-muted-foreground">{c.partner_slug ?? ""}</div>
-                  </td>
-                  <td className="px-3 py-2">
-                    <span
-                      className={cn(
-                        "rounded border px-2 py-0.5 text-[10px] font-medium",
-                        statusBadgeClass(c.status),
+                  <tr
+                    key={c.flag_id}
+                    className={cn("border-b border-border/40", rowAccentClass(c.status, true))}
+                  >
+                    <td className="px-3 py-2">
+                      <div className="font-medium">{c.user_name}</div>
+                      <div className="mono text-[10px] text-muted-foreground">@{c.user_handle}</div>
+                      <PayerDocumentInfo
+                        last4={last4}
+                        linkedCount={linkedCount}
+                        onViewLinked={linkedCount > 0 ? () => onViewLinkedAccounts(c) : undefined}
+                      />
+                    </td>
+                    <td className="px-3 py-2">
+                      <div className="font-medium">
+                        {c.partner_handle ? `@${c.partner_handle}` : "—"}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">
+                        {c.partner_slug ?? ""}
+                      </div>
+                    </td>
+                    <td className="px-3 py-2">
+                      <span
+                        className={cn(
+                          "rounded border px-2 py-0.5 text-[10px] font-medium",
+                          statusBadgeClass(c.status),
+                        )}
+                      >
+                        {statusLabel(c.status)}
+                      </span>
+                      {c.is_cpa_counted && (
+                        <span className="ml-2 text-[10px] text-muted-foreground">CPA contando</span>
                       )}
-                    >
-                      {statusLabel(c.status)}
-                    </span>
-                    {c.is_cpa_counted && (
-                      <span className="ml-2 text-[10px] text-muted-foreground">CPA contando</span>
-                    )}
-                  </td>
-                  <td className="px-3 py-2 text-[10px] text-muted-foreground">
-                    {formatCpaReasons(c.reasons)}
-                  </td>
-                  <td className="px-3 py-2 text-[10px] text-muted-foreground">{c.notes ?? "—"}</td>
-                </tr>
-              );
+                    </td>
+                    <td className="px-3 py-2 text-[10px] text-muted-foreground">
+                      {formatCpaReasons(c.reasons)}
+                    </td>
+                    <td className="px-3 py-2 text-[10px] text-muted-foreground">
+                      {c.notes ?? "—"}
+                    </td>
+                  </tr>
+                );
               })}
             </tbody>
           </table>
@@ -696,7 +697,12 @@ function AdminRiskPage() {
   const [linkedDialogUserId, setLinkedDialogUserId] = useState<string | null>(null);
   const [linkedDialogLabel, setLinkedDialogLabel] = useState("");
 
-  const { data: alerts, isError, error: alertsError, refetch } = useAdminRiskAlerts(tab === "alerts");
+  const {
+    data: alerts,
+    isError,
+    error: alertsError,
+    refetch,
+  } = useAdminRiskAlerts(tab === "alerts");
   const {
     data: allCases,
     isError: isCpaCasesError,
@@ -877,8 +883,8 @@ function AdminRiskPage() {
         <p className="mt-2 rounded-lg border border-border/60 bg-surface/40 px-3 py-2 text-xs text-muted-foreground">
           Sweep automático de clusters: cron{" "}
           <code className="mono">/api/public/cron/fraud-cluster-sweep</code>. Enquanto{" "}
-          <code className="mono">fraud_cluster_sweep_dry_run</code> estiver ativo em Sistema, partners
-          não são suspensos automaticamente.
+          <code className="mono">fraud_cluster_sweep_dry_run</code> estiver ativo em Sistema,
+          partners não são suspensos automaticamente.
         </p>
       </div>
 
@@ -928,9 +934,7 @@ function AdminRiskPage() {
                   </p>
                   <p>
                     <span className="text-muted-foreground">Valor:</span>{" "}
-                    <span className="mono">
-                      {formatBRL(readMetaNumber(a.meta, "amount") ?? 0)}
-                    </span>
+                    <span className="mono">{formatBRL(readMetaNumber(a.meta, "amount") ?? 0)}</span>
                   </p>
                   <p>
                     <span className="text-muted-foreground">Provider ID:</span>{" "}
@@ -966,9 +970,7 @@ function AdminRiskPage() {
                   </p>
                   <p>
                     <span className="text-muted-foreground">Valor:</span>{" "}
-                    <span className="mono">
-                      {formatBRL(readMetaNumber(a.meta, "amount") ?? 0)}
-                    </span>
+                    <span className="mono">{formatBRL(readMetaNumber(a.meta, "amount") ?? 0)}</span>
                   </p>
                   <p>
                     <span className="text-muted-foreground">Provider ID:</span>{" "}

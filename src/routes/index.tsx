@@ -50,6 +50,11 @@ const LandingAiAccuracyChart = lazy(() =>
     default: m.LandingAiAccuracyChart,
   })),
 );
+const CatalogHomeFeatured = lazy(() =>
+  import("@/components/catalog/catalog-home-featured").then((m) => ({
+    default: m.CatalogHomeFeatured,
+  })),
+);
 const CatalogHomeTrending = lazy(() =>
   import("@/components/catalog/catalog-home-trending").then((m) => ({
     default: m.CatalogHomeTrending,
@@ -114,122 +119,66 @@ function Landing() {
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Nav />
 
-      {/* HERO */}
+      {/* HERO compacto — product-first */}
       <section className="relative overflow-hidden border-b border-border/60">
-        <div className="absolute inset-0 grid-bg opacity-30" />
-        <div className="pointer-events-none absolute -top-32 left-1/2 h-[640px] w-[1200px] -translate-x-1/2 bg-[var(--gradient-glow)]" />
-        <div className="relative mx-auto max-w-7xl px-6 pt-20 pb-16 lg:pt-28">
-          <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
-            <div>
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs text-primary"
-              >
-                <span className="size-1.5 rounded-full bg-primary animate-[pulse-glow_2s_ease-in-out_infinite]" />
-                {copy.landing.badge}
-              </motion.div>
-              <motion.h1
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.05 }}
-                className="heading-page mt-6 text-4xl leading-[1.06] md:text-5xl lg:text-6xl"
-              >
-                <span className="text-highlight">{copy.landing.heroTitleLead}</span>{" "}
-                {copy.landing.heroTitleTail}
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="text-lead mt-5 max-w-xl text-base"
-              >
-                {copy.landing.heroBody}
-              </motion.p>
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15 }}
-                className="mt-8 flex flex-wrap gap-3"
-              >
-                <AuthModalTrigger
-                  mode="signup"
-                  depositAfter
-                  className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary to-primary-glow px-5 py-3 font-medium text-primary-foreground shadow-[var(--shadow-glow-primary)] transition hover:brightness-110"
-                >
-                  {copy.auth.registerCta}{" "}
-                  <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
-                </AuthModalTrigger>
-                <AuthModalTrigger
-                  mode="login"
-                  className="inline-flex items-center gap-2 rounded-xl border bg-card px-4 py-3 text-sm font-medium hover:bg-surface-2"
-                >
-                  {copy.auth.loginCta}
-                </AuthModalTrigger>
-                <Link
-                  to="/markets"
-                  search={{ segment: "transito" }}
-                  className="inline-flex items-center gap-2 rounded-xl border bg-card px-4 py-3 text-sm font-medium hover:bg-surface-2"
-                >
-                  <Map className="size-4" />
-                  {copy.landing.ctaTransito}
-                </Link>
-                <Link
-                  to="/markets"
-                  search={{ segment: "futebol" }}
-                  className="inline-flex items-center gap-2 rounded-xl border bg-card px-4 py-3 text-sm font-medium hover:bg-surface-2"
-                >
-                  <Flag className="size-4" />
-                  {copy.landing.ctaFutebol}
-                </Link>
-                <Link
-                  to="/markets"
-                  search={{ segment: "outros" }}
-                  className="inline-flex items-center gap-2 rounded-xl border bg-card px-4 py-3 text-sm font-medium hover:bg-surface-2"
-                >
-                  <Sparkles className="size-4" />
-                  {copy.landing.ctaOutros}
-                </Link>
-                <Link
-                  to="/markets/create"
-                  className="inline-flex items-center gap-2 rounded-xl border border-primary/40 bg-primary/10 px-4 py-3 text-sm font-medium text-primary hover:bg-primary/20"
-                >
-                  {copy.landing.createMarketCta}
-                </Link>
-              </motion.div>
-
-              <div className="mt-10 grid max-w-xl grid-cols-2 gap-4 sm:grid-cols-4">
-                <KpiTile
-                  label="Volume 24h"
-                  value={<AnimatedNumber value={totalVol} format={formatBRL} />}
-                />
-                <KpiTile
-                  label="Trânsito ao vivo"
-                  value={<AnimatedNumber value={markets.length} />}
-                />
-                <KpiTile
-                  label={copy.landing.kpiCommunity}
-                  value={<AnimatedNumber value={communityMarkets.length} />}
-                />
-                <KpiTile
-                  label="Participantes"
-                  value={<AnimatedNumber value={totalPart} format={formatCompact} />}
-                />
-              </div>
-            </div>
-
-            {/* Terminal mock */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
+        <div className="absolute inset-0 grid-bg opacity-20" />
+        <div className="relative mx-auto max-w-7xl px-6 py-10 lg:py-12">
+          <motion.h1
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="heading-page text-3xl leading-tight md:text-4xl lg:text-5xl"
+          >
+            <span className="text-highlight">Previsões ao vivo</span> — trânsito, Copa, crypto e
+            mais.
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="mt-3 max-w-2xl text-base text-muted-foreground"
+          >
+            Mercados parimutuel em múltiplas categorias. 90% do pool para quem acerta.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="mt-6 flex flex-wrap gap-2"
+          >
+            <Link
+              to="/v/$vertical"
+              params={{ vertical: "crypto" }}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground"
             >
-              <TerminalMock />
-            </motion.div>
-          </div>
+              Explorar mercados <ArrowRight className="size-4" />
+            </Link>
+            <Link
+              to="/copa"
+              className="inline-flex rounded-xl border bg-card px-4 py-2.5 text-sm font-medium hover:bg-surface-2"
+            >
+              Copa 2026
+            </Link>
+            <Link
+              to="/v/$vertical"
+              params={{ vertical: "transito" }}
+              className="inline-flex rounded-xl border bg-card px-4 py-2.5 text-sm font-medium hover:bg-surface-2"
+            >
+              {copy.landing.ctaTransito}
+            </Link>
+            <AuthModalTrigger
+              mode="signup"
+              depositAfter
+              className="inline-flex rounded-xl border border-primary/40 bg-primary/10 px-4 py-2.5 text-sm font-medium text-primary"
+            >
+              {copy.auth.registerCta}
+            </AuthModalTrigger>
+          </motion.div>
         </div>
-        <Ticker />
       </section>
+
+      <Suspense fallback={<SectionFallback className="h-48" />}>
+        <CatalogHomeFeatured />
+      </Suspense>
 
       <Suspense fallback={<SectionFallback className="h-64" />}>
         <CatalogHomeTrending />
@@ -237,263 +186,276 @@ function Landing() {
 
       <LandingSegmentPillars />
 
-      <Suspense fallback={<SectionFallback className="h-28" />}>
-        <SeasonalEventsStrip variant="hero" />
-      </Suspense>
+      <details className="group border-b border-border/60">
+        <summary className="cursor-pointer list-none px-6 py-4 text-center text-sm font-medium text-muted-foreground hover:text-foreground [&::-webkit-details-marker]:hidden">
+          Saiba mais sobre o ViaX (trânsito, UrbanMind, ranking)
+        </summary>
+        <div>
+          <Suspense fallback={<SectionFallback className="h-28" />}>
+            <SeasonalEventsStrip variant="hero" />
+          </Suspense>
 
-      {/* HOW IT WORKS */}
-      <section className="mx-auto max-w-7xl px-6 py-24">
-        <SectionHeader
-          eyebrow={copy.landing.howUrbanEyebrow}
-          title={
-            <>
-              Da rua para a <span className="text-highlight">previsão</span>, em poucos passos.
-            </>
-          }
-        />
-        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-          {[
-            {
-              i: Radio,
-              t: copy.landing.step1,
-              d: copy.landing.step1Desc,
-            },
-            {
-              i: BarChart3,
-              t: copy.landing.step2,
-              d: copy.landing.step2Desc,
-            },
-            {
-              i: Brain,
-              t: copy.landing.step3,
-              d: copy.landing.step3Desc,
-            },
-            {
-              i: Trophy,
-              t: copy.landing.step4,
-              d: copy.landing.step4Desc,
-            },
-          ].map(({ i: Icon, t, d }, k) => (
-            <motion.div
-              key={k}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: k * 0.06 }}
-              className="surface-card"
-            >
-              <div className="inline-flex size-10 items-center justify-center rounded-xl border border-primary/30 bg-primary/10 text-primary">
-                <Icon className="size-5" />
-              </div>
-              <div className="mt-4 font-medium">{t}</div>
-              <div className="mt-1 text-sm text-muted-foreground">{d}</div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      <Suspense fallback={<SectionFallback className="h-64" />}>
-        <LandingLiveMarkets />
-      </Suspense>
-
-      {/* AI vs HUMANS */}
-      <section className="mx-auto max-w-7xl px-6 py-24">
-        <div className="grid items-center gap-12 lg:grid-cols-2">
-          <div>
+          {/* HOW IT WORKS */}
+          <section className="mx-auto max-w-7xl px-6 py-24">
             <SectionHeader
-              eyebrow="UrbanMind AI"
+              eyebrow={copy.landing.howUrbanEyebrow}
               title={
                 <>
-                  Sua leitura vs. a melhor <span className="text-highlight">IA urbana</span> do
-                  país.
+                  Da rua para a <span className="text-highlight">previsão</span>, em poucos passos.
                 </>
               }
-              align="left"
             />
-            <p className="mt-4 max-w-xl text-muted-foreground">{copy.landing.urbanMindLead}</p>
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <KpiTile label={copy.landing.kpiAiPrecision} value="78.4%" tone="primary" />
-              <KpiTile label={copy.landing.kpiHumanPrecision} value="64.1%" />
-              <KpiTile label="Mercados resolvidos" value="12.482" />
-              <KpiTile label="Volume movimentado" value="18,4 mi BRL" />
-            </div>
-          </div>
-          <Suspense fallback={<SectionFallback className="h-[280px]" />}>
-            <LandingAiAccuracyChart data={aiAcc} />
-          </Suspense>
-        </div>
-      </section>
-
-      {/* LIVE MAP */}
-      <section className="border-y border-border/60 bg-card/30">
-        <div className="mx-auto max-w-7xl px-6 py-20">
-          <SectionHeader
-            eyebrow={copy.landing.mapSectionEyebrow}
-            title={
-              <>
-                A cidade respira. Os <span className="text-highlight">mercados</span> também.
-              </>
-            }
-          />
-          <div className="mt-10 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-            <Suspense fallback={<SectionFallback className="h-[460px]" />}>
-              <CityHeatmap height={460} />
-            </Suspense>
-            <div className="space-y-3">
-              {markets.slice(0, 4).map((m) => (
-                <div
-                  key={m.id}
-                  className="flex items-center gap-3 rounded-xl border bg-card/60 p-3 backdrop-blur"
+            <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+              {[
+                {
+                  i: Radio,
+                  t: copy.landing.step1,
+                  d: copy.landing.step1Desc,
+                },
+                {
+                  i: BarChart3,
+                  t: copy.landing.step2,
+                  d: copy.landing.step2Desc,
+                },
+                {
+                  i: Brain,
+                  t: copy.landing.step3,
+                  d: copy.landing.step3Desc,
+                },
+                {
+                  i: Trophy,
+                  t: copy.landing.step4,
+                  d: copy.landing.step4Desc,
+                },
+              ].map(({ i: Icon, t, d }, k) => (
+                <motion.div
+                  key={k}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: k * 0.06 }}
+                  className="surface-card"
                 >
-                  <Sparkline
-                    data={m.history.map((h) => h.p)}
-                    stroke={m.trend >= 0 ? "var(--color-up)" : "var(--color-down)"}
-                    width={84}
-                    height={36}
-                  />
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm">{m.region}</div>
-                    <div className="text-[11px] text-muted-foreground">
-                      {copy.landing.prizeTotal} {formatBRL(prizePool(m.pool))}
-                    </div>
+                  <div className="inline-flex size-10 items-center justify-center rounded-xl border border-primary/30 bg-primary/10 text-primary">
+                    <Icon className="size-5" />
                   </div>
-                  <div className="text-right">
-                    <div className="mono text-up">
-                      {(probability(m.pool, "YES") * 100).toFixed(1)}%
-                    </div>
-                    <div className="mono text-[10px] text-down">
-                      {((1 - probability(m.pool, "YES")) * 100).toFixed(1)}%
-                    </div>
-                  </div>
-                </div>
+                  <div className="mt-4 font-medium">{t}</div>
+                  <div className="mt-1 text-sm text-muted-foreground">{d}</div>
+                </motion.div>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
+          </section>
 
-      {/* RANKINGS */}
-      <section className="mx-auto max-w-7xl px-6 py-24">
-        <SectionHeader
-          eyebrow="Rankings"
-          title={
-            <>
-              Top <span className="text-highlight">traders urbanos</span> · esta semana
-            </>
-          }
-        />
-        <div className="surface-card mt-10 overflow-hidden p-0">
-          <table className="w-full text-sm">
-            <thead className="bg-surface/60 text-[10px] uppercase tracking-wider text-muted-foreground">
-              <tr>
-                <th className="px-4 py-3 text-left">#</th>
-                <th className="px-4 py-3 text-left">Trader</th>
-                <th className="px-4 py-3 text-left">Divisão</th>
-                <th className="px-4 py-3 text-right">{copy.landing.leaderboardAccuracy}</th>
-                <th className="hidden sm:table-cell px-4 py-3 text-right">
-                  {copy.landing.leaderboardReturn}
-                </th>
-                <th className="hidden md:table-cell px-4 py-3 text-right">Volume</th>
-                <th className="hidden md:table-cell px-4 py-3 text-right">Crescimento</th>
-              </tr>
-            </thead>
-            <tbody>
-              {traders.slice(0, 5).map((t, i) => (
-                <tr key={t.id} className="border-t border-border/60 hover:bg-surface/40">
-                  <td className="px-4 py-3 mono text-muted-foreground">{i + 1}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      <img src={t.avatar} className="size-8 rounded-full bg-surface" alt={t.name} />
-                      <div>
-                        <div className="font-medium">{t.name}</div>
-                        <div className="text-[11px] text-muted-foreground">@{t.handle}</div>
+          <Suspense fallback={<SectionFallback className="h-64" />}>
+            <LandingLiveMarkets />
+          </Suspense>
+
+          {/* AI vs HUMANS */}
+          <section className="mx-auto max-w-7xl px-6 py-24">
+            <div className="grid items-center gap-12 lg:grid-cols-2">
+              <div>
+                <SectionHeader
+                  eyebrow="UrbanMind AI"
+                  title={
+                    <>
+                      Sua leitura vs. a melhor <span className="text-highlight">IA urbana</span> do
+                      país.
+                    </>
+                  }
+                  align="left"
+                />
+                <p className="mt-4 max-w-xl text-muted-foreground">{copy.landing.urbanMindLead}</p>
+                <div className="mt-6 grid grid-cols-2 gap-3">
+                  <KpiTile label={copy.landing.kpiAiPrecision} value="78.4%" tone="primary" />
+                  <KpiTile label={copy.landing.kpiHumanPrecision} value="64.1%" />
+                  <KpiTile label="Mercados resolvidos" value="12.482" />
+                  <KpiTile label="Volume movimentado" value="18,4 mi BRL" />
+                </div>
+              </div>
+              <Suspense fallback={<SectionFallback className="h-[280px]" />}>
+                <LandingAiAccuracyChart data={aiAcc} />
+              </Suspense>
+            </div>
+          </section>
+
+          {/* LIVE MAP */}
+          <section className="border-y border-border/60 bg-card/30">
+            <div className="mx-auto max-w-7xl px-6 py-20">
+              <SectionHeader
+                eyebrow={copy.landing.mapSectionEyebrow}
+                title={
+                  <>
+                    A cidade respira. Os <span className="text-highlight">mercados</span> também.
+                  </>
+                }
+              />
+              <div className="mt-10 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+                <Suspense fallback={<SectionFallback className="h-[460px]" />}>
+                  <CityHeatmap height={460} />
+                </Suspense>
+                <div className="space-y-3">
+                  {markets.slice(0, 4).map((m) => (
+                    <div
+                      key={m.id}
+                      className="flex items-center gap-3 rounded-xl border bg-card/60 p-3 backdrop-blur"
+                    >
+                      <Sparkline
+                        data={m.history.map((h) => h.p)}
+                        stroke={m.trend >= 0 ? "var(--color-up)" : "var(--color-down)"}
+                        width={84}
+                        height={36}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-sm">{m.region}</div>
+                        <div className="text-[11px] text-muted-foreground">
+                          {copy.landing.prizeTotal} {formatBRL(prizePool(m.pool))}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="mono text-up">
+                          {(probability(m.pool, "YES") * 100).toFixed(1)}%
+                        </div>
+                        <div className="mono text-[10px] text-down">
+                          {((1 - probability(m.pool, "YES")) * 100).toFixed(1)}%
+                        </div>
                       </div>
                     </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <DivisionBadge division={t.division} />
-                  </td>
-                  <td className="px-4 py-3 text-right mono">{(t.accuracy * 100).toFixed(1)}%</td>
-                  <td className="hidden sm:table-cell px-4 py-3 text-right mono text-up">
-                    +{(t.roi * 100).toFixed(0)}%
-                  </td>
-                  <td className="hidden md:table-cell px-4 py-3 text-right mono">
-                    {formatBRL(t.volume)}
-                  </td>
-                  <td className="hidden md:table-cell px-4 py-3 text-right mono">
-                    <span className={t.weeklyGrowth >= 0 ? "text-up" : "text-down"}>
-                      {t.weeklyGrowth >= 0 ? "▲" : "▼"}{" "}
-                      {(Math.abs(t.weeklyGrowth) * 100).toFixed(1)}%
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      {/* STATS */}
-      <section className="border-y border-border/60 bg-card/30">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-6 py-16 md:grid-cols-4">
-          {[
-            {
-              l: "Volume diário",
-              v: <AnimatedNumber value={totalVol} format={formatBRL} />,
-              i: Activity,
-            },
-            { l: "Mercados ao vivo", v: <AnimatedNumber value={markets.length} />, i: Radio },
-            { l: copy.landing.kpiAiPrecision, v: "78.4%", i: Brain },
-            {
-              l: "Traders ativos",
-              v: <AnimatedNumber value={totalPart} format={formatCompact} />,
-              i: Users,
-            },
-          ].map((s, i) => {
-            const Icon = s.i;
-            return (
-              <div key={i} className="surface-card">
-                <Icon className="size-4 text-primary" />
-                <div className="mt-3 text-2xl font-semibold">{s.v}</div>
-                <div className="text-xs text-muted-foreground">{s.l}</div>
+                  ))}
+                </div>
               </div>
-            );
-          })}
-        </div>
-      </section>
+            </div>
+          </section>
 
-      {/* MOBILE */}
-      <section className="mx-auto max-w-7xl px-6 py-24">
-        <div className="grid items-center gap-12 lg:grid-cols-2">
-          <div>
+          {/* RANKINGS */}
+          <section className="mx-auto max-w-7xl px-6 py-24">
             <SectionHeader
-              eyebrow="No celular"
+              eyebrow="Rankings"
               title={
                 <>
-                  Tudo no <span className="text-highlight">celular</span>.
+                  Top <span className="text-highlight">traders urbanos</span> · esta semana
                 </>
               }
-              align="left"
             />
-            <p className="mt-4 max-w-xl text-muted-foreground">{copy.landing.mobileBody}</p>
-            <ul className="mt-6 space-y-2 text-sm">
+            <div className="surface-card mt-10 overflow-hidden p-0">
+              <table className="w-full text-sm">
+                <thead className="bg-surface/60 text-[10px] uppercase tracking-wider text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3 text-left">#</th>
+                    <th className="px-4 py-3 text-left">Trader</th>
+                    <th className="px-4 py-3 text-left">Divisão</th>
+                    <th className="px-4 py-3 text-right">{copy.landing.leaderboardAccuracy}</th>
+                    <th className="hidden sm:table-cell px-4 py-3 text-right">
+                      {copy.landing.leaderboardReturn}
+                    </th>
+                    <th className="hidden md:table-cell px-4 py-3 text-right">Volume</th>
+                    <th className="hidden md:table-cell px-4 py-3 text-right">Crescimento</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {traders.slice(0, 5).map((t, i) => (
+                    <tr key={t.id} className="border-t border-border/60 hover:bg-surface/40">
+                      <td className="px-4 py-3 mono text-muted-foreground">{i + 1}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={t.avatar}
+                            className="size-8 rounded-full bg-surface"
+                            alt={t.name}
+                          />
+                          <div>
+                            <div className="font-medium">{t.name}</div>
+                            <div className="text-[11px] text-muted-foreground">@{t.handle}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <DivisionBadge division={t.division} />
+                      </td>
+                      <td className="px-4 py-3 text-right mono">
+                        {(t.accuracy * 100).toFixed(1)}%
+                      </td>
+                      <td className="hidden sm:table-cell px-4 py-3 text-right mono text-up">
+                        +{(t.roi * 100).toFixed(0)}%
+                      </td>
+                      <td className="hidden md:table-cell px-4 py-3 text-right mono">
+                        {formatBRL(t.volume)}
+                      </td>
+                      <td className="hidden md:table-cell px-4 py-3 text-right mono">
+                        <span className={t.weeklyGrowth >= 0 ? "text-up" : "text-down"}>
+                          {t.weeklyGrowth >= 0 ? "▲" : "▼"}{" "}
+                          {(Math.abs(t.weeklyGrowth) * 100).toFixed(1)}%
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* STATS */}
+          <section className="border-y border-border/60 bg-card/30">
+            <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-6 py-16 md:grid-cols-4">
               {[
-                "Bottom navigation com 5 atalhos",
-                "Cards full-width com swipe",
-                "Animações 60 fps",
-                "Notificações inteligentes",
-              ].map((f) => (
-                <li key={f} className="flex items-center gap-2">
-                  <Zap className="size-4 text-primary" /> {f}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="relative mx-auto flex w-full max-w-sm justify-center">
-            <PhoneMock />
-          </div>
+                {
+                  l: "Volume diário",
+                  v: <AnimatedNumber value={totalVol} format={formatBRL} />,
+                  i: Activity,
+                },
+                { l: "Mercados ao vivo", v: <AnimatedNumber value={markets.length} />, i: Radio },
+                { l: copy.landing.kpiAiPrecision, v: "78.4%", i: Brain },
+                {
+                  l: "Traders ativos",
+                  v: <AnimatedNumber value={totalPart} format={formatCompact} />,
+                  i: Users,
+                },
+              ].map((s, i) => {
+                const Icon = s.i;
+                return (
+                  <div key={i} className="surface-card">
+                    <Icon className="size-4 text-primary" />
+                    <div className="mt-3 text-2xl font-semibold">{s.v}</div>
+                    <div className="text-xs text-muted-foreground">{s.l}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* MOBILE */}
+          <section className="mx-auto max-w-7xl px-6 py-24">
+            <div className="grid items-center gap-12 lg:grid-cols-2">
+              <div>
+                <SectionHeader
+                  eyebrow="No celular"
+                  title={
+                    <>
+                      Tudo no <span className="text-highlight">celular</span>.
+                    </>
+                  }
+                  align="left"
+                />
+                <p className="mt-4 max-w-xl text-muted-foreground">{copy.landing.mobileBody}</p>
+                <ul className="mt-6 space-y-2 text-sm">
+                  {[
+                    "Bottom navigation com 5 atalhos",
+                    "Cards full-width com swipe",
+                    "Animações 60 fps",
+                    "Notificações inteligentes",
+                  ].map((f) => (
+                    <li key={f} className="flex items-center gap-2">
+                      <Zap className="size-4 text-primary" /> {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="relative mx-auto flex w-full max-w-sm justify-center">
+                <PhoneMock />
+              </div>
+            </div>
+          </section>
         </div>
-      </section>
+      </details>
 
       <PublicMobileNav />
 

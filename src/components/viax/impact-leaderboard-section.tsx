@@ -38,29 +38,20 @@ function PodiumCard({
       <Icon className={cn("size-8", color)} />
       <span className="mt-1 text-xs font-bold uppercase text-muted-foreground">#{rank}</span>
       <img
-        src={
-          entry.avatar ??
-          `https://api.dicebear.com/9.x/glass/svg?seed=${entry.user_id}`
-        }
+        src={entry.avatar ?? `https://api.dicebear.com/9.x/glass/svg?seed=${entry.user_id}`}
         alt=""
         className="mt-2 size-14 rounded-full border bg-surface"
       />
       <div className="mt-2 font-semibold line-clamp-1">{name}</div>
       <div className="text-xs text-muted-foreground">@{handle}</div>
-      {division && (
-        <DivisionBadge division={division as Division} className="mt-2" />
-      )}
+      {division && <DivisionBadge division={division as Division} className="mt-2" />}
       <div className="mt-2 mono text-sm font-semibold text-primary">{xp} XP</div>
-      {prizeLabel && (
-        <p className="mt-2 text-[10px] text-muted-foreground">{prizeLabel}</p>
-      )}
+      {prizeLabel && <p className="mt-2 text-[10px] text-muted-foreground">{prizeLabel}</p>}
       {fulfilled !== undefined && (
         <span
           className={cn(
             "mt-1 rounded-full px-2 py-0.5 text-[10px]",
-            fulfilled
-              ? "bg-up/15 text-up"
-              : "bg-warn/15 text-warn",
+            fulfilled ? "bg-up/15 text-up" : "bg-warn/15 text-warn",
           )}
         >
           {fulfilled ? copy.impact.fulfilledBadge : copy.impact.pendingPrizeBadge}
@@ -89,10 +80,7 @@ export function ImpactLeaderboardSection() {
 
   const leaderboard = data?.leaderboard ?? [];
   const winners = data?.winners ?? [];
-  const podiumSource =
-    winners.length >= 3
-      ? winners
-      : leaderboard.slice(0, 3);
+  const podiumSource = winners.length >= 3 ? winners : leaderboard.slice(0, 3);
   const periodLabel = data?.period_label ?? "";
 
   return (
@@ -100,7 +88,9 @@ export function ImpactLeaderboardSection() {
       <div className="rounded-xl border border-warn/30 bg-warn/5 px-4 py-3 text-sm">
         <p className="font-medium">{copy.impact.top3Title}</p>
         <p className="mt-1 text-xs text-muted-foreground">{copy.impact.top3Subtitle}</p>
-        <p className="mt-2 text-[10px] text-muted-foreground">{copy.impact.exclusivePrizeDisclaimer}</p>
+        <p className="mt-2 text-[10px] text-muted-foreground">
+          {copy.impact.exclusivePrizeDisclaimer}
+        </p>
       </div>
 
       {data && (
@@ -131,9 +121,7 @@ export function ImpactLeaderboardSection() {
                     ? copy.impact.prizeTier2
                     : copy.impact.prizeTier3
               }
-              fulfilled={
-                "fulfilled_at" in entry ? !!entry.fulfilled_at : undefined
-              }
+              fulfilled={"fulfilled_at" in entry ? !!entry.fulfilled_at : undefined}
             />
           ))}
         </div>

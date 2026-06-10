@@ -34,7 +34,8 @@ describe("currency copy — no R$ symbol in UI source", () => {
     const offenders: string[] = [];
     for (const file of collectSourceFiles(SRC_ROOT)) {
       const content = readFileSync(file, "utf8");
-      if (/R\$/.test(content)) offenders.push(file.replace(SRC_ROOT + "\\", "").replace(SRC_ROOT + "/", ""));
+      if (/R\$/.test(content))
+        offenders.push(file.replace(SRC_ROOT + "\\", "").replace(SRC_ROOT + "/", ""));
     }
     expect(offenders).toEqual([]);
   });
