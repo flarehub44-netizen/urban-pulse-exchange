@@ -36,9 +36,21 @@ export function LeagueHallOfFame({ leagueId }: LeagueHallOfFameProps) {
                 {formatDistanceToNow(new Date(row.ends_at), { addSuffix: true, locale: ptBR })}
               </div>
             </div>
-            <div className="flex shrink-0 items-center gap-1 text-xs text-warn">
-              <Crown className="size-3.5" />
-              <span className="truncate max-w-[120px]">{row.winner_name}</span>
+            <div className="text-right shrink-0">
+              <div className="flex items-center justify-end gap-1 text-xs text-warn">
+                <Crown className="size-3.5" />
+                <span className="truncate max-w-[120px]">{row.winner_name}</span>
+              </div>
+              {Array.isArray(row.top_scores) && row.top_scores.length > 1 ? (
+                <p className="text-[10px] text-muted-foreground mt-0.5">
+                  {copy.leagues.hallPodium(
+                    row.top_scores
+                      .slice(0, 3)
+                      .map((t) => `#${t.rank}`)
+                      .join(" · "),
+                  )}
+                </p>
+              ) : null}
             </div>
           </li>
         ))}

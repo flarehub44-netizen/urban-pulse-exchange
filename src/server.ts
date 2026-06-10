@@ -196,6 +196,8 @@ export default {
           } else if (cron === "*/15 * * * *") {
             await runHealthCheck();
             await runCryptoSlotOpen();
+            const { runLeagueCron } = await import("@/lib/league-cron.server");
+            await runLeagueCron();
           }
         } catch (e) {
           console.error("[ScheduledCron]", cron, e);

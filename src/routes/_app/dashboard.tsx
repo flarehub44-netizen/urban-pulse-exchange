@@ -95,6 +95,7 @@ import { buildDailyMission } from "@/lib/urbanmind-coach";
 import { useRecommendedMarkets } from "@/hooks/use-recommended-markets";
 import { useMyLeagues } from "@/hooks/use-leagues";
 import { LeagueDashboardRow } from "@/components/leagues/league-dashboard-row";
+import { LeagueWeeklyMission } from "@/components/leagues/league-weekly-mission";
 import { useTrendingTraders } from "@/hooks/use-trending-traders";
 import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
 import { WeeklyReportModal } from "@/components/viax/weekly-report-modal";
@@ -844,6 +845,9 @@ function Dashboard() {
               {myLeagues.slice(0, 2).map((league) => (
                 <LeagueDashboardRow key={league.id} league={league} />
               ))}
+            </div>
+            <div className="mt-3">
+              <LeagueWeeklyMission compact />
             </div>
           </div>
         ) : (

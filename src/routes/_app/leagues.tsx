@@ -30,6 +30,7 @@ import {
 import { LeagueLeaderboardPanel } from "@/components/leagues/league-leaderboard-panel";
 import { LeagueSeasonCountdown } from "@/components/leagues/league-season-countdown";
 import { LeagueHallOfFame } from "@/components/leagues/league-hall-of-fame";
+import { LeagueWeeklyMission } from "@/components/leagues/league-weekly-mission";
 import { formatLeagueInviteUrl } from "@/lib/league-score";
 import { buildLeagueInviteMessage, buildWhatsAppShareUrl } from "@/lib/league-engagement";
 import { copy } from "@/copy/pt-BR";
@@ -478,6 +479,8 @@ function LeaguesPage() {
               )}
             </div>
           </div>
+
+          <LeagueWeeklyMission leagueId={selectedLeague.id} />
 
           <LeagueLeaderboardPanel
             members={leaderboard}

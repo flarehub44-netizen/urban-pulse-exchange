@@ -14,6 +14,8 @@ import {
   transferLeagueOwnershipFn,
   advanceLeagueSeasonFn,
   getLeagueSeasonHistoryFn,
+  getLeagueWeeklyMissionsFn,
+  claimLeagueWeeklyBonusFn,
 } from "@/actions/leagues";
 
 export function useMyLeagues() {
@@ -57,6 +59,25 @@ export function useLeagueActivity(leagueId: string | null) {
     queryFn: () => getLeagueActivityFn({ data: { league_id: leagueId! } }),
     enabled: !!leagueId,
     staleTime: 30_000,
+  });
+}
+
+export function useLeagueWeeklyMissions() {
+  return useQuery({
+    queryKey: ["league-weekly-missions"],
+    queryFn: () => getLeagueWeeklyMissionsFn(),
+    staleTime: 60_000,
+  });
+}
+
+export function useClaimLeagueWeeklyBonus() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (league_id: string) => claimLeagueWeeklyBonusFn({ data: { league_id } }),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ["league-weekly-missions"] });
+      await qc.invalidateQueries({ queryKey: ["achievements"] });
+    },
   });
 }
 

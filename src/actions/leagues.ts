@@ -68,6 +68,16 @@ export type LeagueSeasonHistoryItem = {
   top_scores: Array<{ user_id: string; rank: number; score: number }>;
 };
 
+export type LeagueWeeklyMission = {
+  league_id: string;
+  league_name: string;
+  settled_count: number;
+  eligible: boolean;
+  claimed: boolean;
+  xp_reward: number;
+  season_label: string;
+};
+
 export const getMyLeaguesFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -249,6 +259,27 @@ export const getLeagueSeasonHistoryFn = createServerFn({ method: "GET" })
     });
     if (error) throw new Error(error.message);
     return (Array.isArray(res) ? res : []) as LeagueSeasonHistoryItem[];
+  });
+
+export const getLeagueWeeklyMissionsFn = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase } = getSupabaseCtx(context);
+    const { data, error } = await supabase.rpc("get_league_weekly_missions");
+    if (error) throw new Error(error.message);
+    return (Array.isArray(data) ? data : []) as LeagueWeeklyMission[];
+  });
+
+export const claimLeagueWeeklyBonusFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ league_id: z.string().uuid() }))
+  .handler(async ({ context, data }) => {
+    const { supabase } = getSupabaseCtx(context);
+    const { data: res, error } = await supabase.rpc("claim_league_weekly_bonus", {
+      p_league_id: data.league_id,
+    });
+    if (error) throw new Error(error.message);
+    return res as { ok?: boolean; reason?: string; xp_awarded?: number };
   });
 
 export const advanceLeagueSeasonFn = createServerFn({ method: "POST" })
