@@ -75,6 +75,7 @@ import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppBetsHistoryRouteImport } from './routes/_app/bets-history'
 import { Route as VVerticalIndexRouteImport } from './routes/v/$vertical/index'
 import { Route as VVerticalTopicRouteImport } from './routes/v/$vertical/$topic'
+import { Route as LeaguesJoinCodeRouteImport } from './routes/leagues/join.$code'
 import { Route as AppProfileUserIdRouteImport } from './routes/_app/profile.$userId'
 import { Route as AppMarketsCreateRouteImport } from './routes/_app/markets.create'
 import { Route as AppFeedPostIdRouteImport } from './routes/_app/feed.$postId'
@@ -419,6 +420,11 @@ const VVerticalTopicRoute = VVerticalTopicRouteImport.update({
   path: '/$vertical/$topic',
   getParentRoute: () => VRoute,
 } as any)
+const LeaguesJoinCodeRoute = LeaguesJoinCodeRouteImport.update({
+  id: '/leagues/join/$code',
+  path: '/leagues/join/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppProfileUserIdRoute = AppProfileUserIdRouteImport.update({
   id: '/$userId',
   path: '/$userId',
@@ -566,6 +572,7 @@ export interface FileRoutesByFullPath {
   '/feed/$postId': typeof AppFeedPostIdRoute
   '/markets/create': typeof AppMarketsCreateRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
+  '/leagues/join/$code': typeof LeaguesJoinCodeRoute
   '/v/$vertical/$topic': typeof VVerticalTopicRoute
   '/v/$vertical/': typeof VVerticalIndexRoute
   '/api/public/cron/crypto-slot': typeof ApiPublicCronCryptoSlotRoute
@@ -642,6 +649,7 @@ export interface FileRoutesByTo {
   '/feed/$postId': typeof AppFeedPostIdRoute
   '/markets/create': typeof AppMarketsCreateRoute
   '/profile/$userId': typeof AppProfileUserIdRoute
+  '/leagues/join/$code': typeof LeaguesJoinCodeRoute
   '/v/$vertical/$topic': typeof VVerticalTopicRoute
   '/v/$vertical': typeof VVerticalIndexRoute
   '/api/public/cron/crypto-slot': typeof ApiPublicCronCryptoSlotRoute
@@ -725,6 +733,7 @@ export interface FileRoutesById {
   '/_app/feed/$postId': typeof AppFeedPostIdRoute
   '/_app/markets/create': typeof AppMarketsCreateRoute
   '/_app/profile/$userId': typeof AppProfileUserIdRoute
+  '/leagues/join/$code': typeof LeaguesJoinCodeRoute
   '/v/$vertical/$topic': typeof VVerticalTopicRoute
   '/v/$vertical/': typeof VVerticalIndexRoute
   '/api/public/cron/crypto-slot': typeof ApiPublicCronCryptoSlotRoute
@@ -808,6 +817,7 @@ export interface FileRouteTypes {
     | '/feed/$postId'
     | '/markets/create'
     | '/profile/$userId'
+    | '/leagues/join/$code'
     | '/v/$vertical/$topic'
     | '/v/$vertical/'
     | '/api/public/cron/crypto-slot'
@@ -884,6 +894,7 @@ export interface FileRouteTypes {
     | '/feed/$postId'
     | '/markets/create'
     | '/profile/$userId'
+    | '/leagues/join/$code'
     | '/v/$vertical/$topic'
     | '/v/$vertical'
     | '/api/public/cron/crypto-slot'
@@ -966,6 +977,7 @@ export interface FileRouteTypes {
     | '/_app/feed/$postId'
     | '/_app/markets/create'
     | '/_app/profile/$userId'
+    | '/leagues/join/$code'
     | '/v/$vertical/$topic'
     | '/v/$vertical/'
     | '/api/public/cron/crypto-slot'
@@ -997,6 +1009,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   VRoute: typeof VRouteWithChildren
   RSlugRoute: typeof RSlugRoute
+  LeaguesJoinCodeRoute: typeof LeaguesJoinCodeRoute
   ApiPublicCronCryptoSlotRoute: typeof ApiPublicCronCryptoSlotRoute
   ApiPublicCronFootballResolveRoute: typeof ApiPublicCronFootballResolveRoute
   ApiPublicCronFootballSyncRoute: typeof ApiPublicCronFootballSyncRoute
@@ -1474,6 +1487,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VVerticalTopicRouteImport
       parentRoute: typeof VRoute
     }
+    '/leagues/join/$code': {
+      id: '/leagues/join/$code'
+      path: '/leagues/join/$code'
+      fullPath: '/leagues/join/$code'
+      preLoaderRoute: typeof LeaguesJoinCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app/profile/$userId': {
       id: '/_app/profile/$userId'
       path: '/$userId'
@@ -1799,6 +1819,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   VRoute: VRouteWithChildren,
   RSlugRoute: RSlugRoute,
+  LeaguesJoinCodeRoute: LeaguesJoinCodeRoute,
   ApiPublicCronCryptoSlotRoute: ApiPublicCronCryptoSlotRoute,
   ApiPublicCronFootballResolveRoute: ApiPublicCronFootballResolveRoute,
   ApiPublicCronFootballSyncRoute: ApiPublicCronFootballSyncRoute,

@@ -42,7 +42,7 @@ export const sidebarNav: NavItem[] = [
   { to: "/ranking", label: copy.nav.ranking, icon: Trophy },
   { to: "/feed", label: copy.nav.feed, icon: MessageSquare },
   ...(URBANMIND_UI_ENABLED ? [{ to: "/urbanmind", label: copy.nav.urbanmind, icon: Brain }] : []),
-  { to: "/leagues", label: "Ligas", icon: Shield },
+  { to: "/leagues", label: copy.nav.leagues, icon: Shield },
   { to: "/profile", label: copy.nav.account, icon: User, matchPrefix: true },
 ];
 

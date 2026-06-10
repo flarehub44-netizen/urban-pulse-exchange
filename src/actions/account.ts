@@ -177,6 +177,7 @@ function mapNotification(row: Record<string, unknown>): ViaXNotification {
     time: new Date(row.created_at as string).getTime(),
     read: Boolean(row.read),
     marketId: (row.market_id as string) ?? undefined,
+    leagueId: (row.league_id as string) ?? undefined,
   };
 }
 

@@ -4,6 +4,7 @@ export type NotificationLink =
   | { to: "/wallet" }
   | { to: "/positions" }
   | { to: "/ranking" }
+  | { to: "/leagues"; search?: { selected?: string } }
   | {
       to: "/markets";
       search?: { status?: "all" | "live" | "closing" | "dispute" | "resolved" | "draft" };
@@ -28,6 +29,10 @@ export function getNotificationLink(n: ViaXNotification): NotificationLink {
       return { to: "/wallet" };
     case "rank":
       return { to: "/ranking" };
+    case "league":
+      return n.leagueId
+        ? { to: "/leagues", search: { selected: n.leagueId } }
+        : { to: "/leagues" };
     case "market":
       return { to: "/markets", search: { status: "live" } };
     case "alert":

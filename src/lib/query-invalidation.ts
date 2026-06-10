@@ -11,6 +11,9 @@ export function invalidateEngagementQueries(queryClient: QueryClient) {
   queryClient.invalidateQueries({ queryKey: ["feed"] });
   queryClient.invalidateQueries({ queryKey: ["notifications"] });
   queryClient.invalidateQueries({ queryKey: ["engagement", "snapshot"] });
+  queryClient.invalidateQueries({ queryKey: ["leagues"] });
+  queryClient.invalidateQueries({ queryKey: ["league-leaderboard"] });
+  queryClient.invalidateQueries({ queryKey: ["league-rank"] });
 }
 
 export function invalidateAccountContextQueries(queryClient: QueryClient) {

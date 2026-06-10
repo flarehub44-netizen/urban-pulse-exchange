@@ -91,6 +91,7 @@ import { buildActionNowItems } from "@/lib/action-now";
 import { buildDailyMission } from "@/lib/urbanmind-coach";
 import { useRecommendedMarkets } from "@/hooks/use-recommended-markets";
 import { useMyLeagues } from "@/hooks/use-leagues";
+import { LeagueDashboardRow } from "@/components/leagues/league-dashboard-row";
 import { useTrendingTraders } from "@/hooks/use-trending-traders";
 import { useCasinoEnabled } from "@/hooks/use-casino-enabled";
 import { WeeklyReportModal } from "@/components/viax/weekly-report-modal";
@@ -795,24 +796,12 @@ function Dashboard() {
                 Sua <span className="text-highlight">liga</span>
               </h3>
               <Link to="/leagues" className="text-xs text-primary hover:underline">
-                Ver liga completa →
+                {copy.leagues.viewFull} →
               </Link>
             </div>
             <div className="mt-3 space-y-2">
               {myLeagues.slice(0, 2).map((league) => (
-                <Link
-                  key={league.id}
-                  to="/leagues"
-                  className="flex items-center justify-between gap-3 rounded-xl border bg-surface/50 px-3 py-2 text-sm hover:border-primary/30 transition"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate font-medium">{league.name}</div>
-                    <div className="text-[11px] text-muted-foreground">
-                      {league.member_count} membro{league.member_count !== 1 ? "s" : ""}
-                    </div>
-                  </div>
-                  <span className="shrink-0 text-xs text-primary">→</span>
-                </Link>
+                <LeagueDashboardRow key={league.id} league={league} />
               ))}
             </div>
           </div>
@@ -822,9 +811,9 @@ function Dashboard() {
             className="flex items-center justify-between gap-3 rounded-xl border border-dashed border-primary/30 px-4 py-3 text-sm hover:border-primary/50 hover:bg-primary/5 transition"
           >
             <span>
-              <span className="font-medium">Crie uma liga com amigos</span>
+              <span className="font-medium">{copy.leagues.dashboardCta}</span>
               <span className="mt-0.5 block text-xs text-muted-foreground">
-                Compete, sobe de divisão, ganha XP em grupo
+                {copy.leagues.dashboardCtaDesc}
               </span>
             </span>
             <span className="shrink-0 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground">

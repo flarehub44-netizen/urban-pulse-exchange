@@ -15,18 +15,33 @@ import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/viax/page-header";
 import { ImpactLeaderboardSection } from "@/components/viax/impact-leaderboard-section";
 import { ImpactProgramBanner } from "@/components/viax/impact-program-banner";
+import { useMyLeagues, useLeagueLeaderboard } from "@/hooks/use-leagues";
+import { LeagueLeaderboardPanel } from "@/components/leagues/league-leaderboard-panel";
+import { useEffect, useState } from "react";
 
 const tabs = [
   { key: "global" as const, label: "Global" },
   { key: "cidade" as const, label: "Cidade" },
   { key: "bairro" as const, label: "Bairro" },
   { key: "amigos" as const, label: "Destaques" },
+  { key: "ligas" as const, label: copy.leagues.rankingTab },
   { key: "impacto" as const, label: copy.ranking.impactTab },
 ];
 
 export function RankingPage() {
   const navigate = useNavigate({ from: "/ranking" });
-  const { tab = "global" } = Route.useSearch();
+  const { tab = "global", league: leagueSearch } = Route.useSearch();
+  const { data: myLeagues = [] } = useMyLeagues();
+  const [leagueId, setLeagueId] = useState<string | null>(leagueSearch ?? myLeagues[0]?.id ?? null);
+
+  useEffect(() => {
+    if (leagueSearch) setLeagueId(leagueSearch);
+    else if (!leagueId && myLeagues[0]?.id) setLeagueId(myLeagues[0].id);
+  }, [leagueSearch, myLeagues, leagueId]);
+
+  const { data: leagueBoard = [], isLoading: leagueLbLoading } = useLeagueLeaderboard(
+    tab === "ligas" ? leagueId : null,
+  );
   const { isRegistered: isRegisteredApp, userId } = useAuth();
   const { isRegistered: isRegisteredPublic } = useAuthPublic();
   const isRegistered = isRegisteredApp || isRegisteredPublic;
@@ -71,9 +86,11 @@ export function RankingPage() {
         description={
           tab === "impacto"
             ? copy.ranking.impactTabDesc
-            : tab === "amigos"
-              ? copy.ranking.followingSort
-              : copy.ranking.defaultSort
+            : tab === "ligas"
+              ? copy.leagues.subtitle
+              : tab === "amigos"
+                ? copy.ranking.followingSort
+                : copy.ranking.defaultSort
         }
       />
 
@@ -103,7 +120,8 @@ export function RankingPage() {
                   tab:
                     t.key === "global"
                       ? undefined
-                      : (t.key as "cidade" | "bairro" | "amigos" | "impacto"),
+                      : (t.key as "cidade" | "bairro" | "amigos" | "impacto" | "ligas"),
+                  league: t.key === "ligas" ? leagueId ?? undefined : undefined,
                 },
                 replace: true,
               })
@@ -122,6 +140,42 @@ export function RankingPage() {
 
       {tab === "impacto" ? (
         <ImpactLeaderboardSection />
+      ) : tab === "ligas" ? (
+        <div className="space-y-4">
+          {myLeagues.length === 0 ? (
+            <EmptyState
+              icon={Trophy}
+              title={copy.leagues.noLeagues}
+              description={copy.leagues.createFirst}
+              action={{ label: copy.leagues.create, to: "/leagues" }}
+            />
+          ) : (
+            <>
+              <label className="block text-xs text-muted-foreground">
+                {copy.leagues.selectLeague}
+                <select
+                  value={leagueId ?? ""}
+                  onChange={(e) => {
+                    const id = e.target.value || null;
+                    setLeagueId(id);
+                    navigate({
+                      search: { tab: "ligas", league: id ?? undefined },
+                      replace: true,
+                    });
+                  }}
+                  className="mt-1 w-full rounded-lg border bg-surface px-3 py-2 text-sm"
+                >
+                  {myLeagues.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <LeagueLeaderboardPanel members={leagueBoard} isLoading={leagueLbLoading} />
+            </>
+          )}
+        </div>
       ) : (
         <>
           {me && myIndex >= 0 && <RankBar trader={me} rank={myIndex + 1} />}

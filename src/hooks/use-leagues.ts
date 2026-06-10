@@ -3,9 +3,16 @@ import {
   getMyLeaguesFn,
   createLeagueFn,
   joinLeagueFn,
+  joinLeagueByIdFn,
   leaveLeagueFn,
   deleteLeagueFn,
   getLeagueLeaderboardFn,
+  getMyLeagueRankFn,
+  listPublicLeaguesFn,
+  getLeagueActivityFn,
+  kickLeagueMemberFn,
+  transferLeagueOwnershipFn,
+  advanceLeagueSeasonFn,
 } from "@/actions/leagues";
 
 export function useMyLeagues() {
@@ -22,7 +29,44 @@ export function useLeagueLeaderboard(leagueId: string | null) {
     queryFn: () => getLeagueLeaderboardFn({ data: { league_id: leagueId! } }),
     enabled: !!leagueId,
     staleTime: 30_000,
+    refetchInterval: leagueId ? 60_000 : false,
   });
+}
+
+export function useMyLeagueRank(leagueId: string | null) {
+  return useQuery({
+    queryKey: ["league-rank", leagueId],
+    queryFn: () => getMyLeagueRankFn({ data: { league_id: leagueId! } }),
+    enabled: !!leagueId,
+    staleTime: 60_000,
+  });
+}
+
+export function usePublicLeagues(q = "") {
+  return useQuery({
+    queryKey: ["public-leagues", q],
+    queryFn: () => listPublicLeaguesFn({ data: { q: q || undefined } }),
+    staleTime: 60_000,
+  });
+}
+
+export function useLeagueActivity(leagueId: string | null) {
+  return useQuery({
+    queryKey: ["league-activity", leagueId],
+    queryFn: () => getLeagueActivityFn({ data: { league_id: leagueId! } }),
+    enabled: !!leagueId,
+    staleTime: 30_000,
+  });
+}
+
+function invalidateLeagueQueries(qc: ReturnType<typeof useQueryClient>, leagueId?: string) {
+  void qc.invalidateQueries({ queryKey: ["leagues"] });
+  if (leagueId) {
+    void qc.invalidateQueries({ queryKey: ["league-leaderboard", leagueId] });
+    void qc.invalidateQueries({ queryKey: ["league-rank", leagueId] });
+    void qc.invalidateQueries({ queryKey: ["league-activity", leagueId] });
+  }
+  void qc.invalidateQueries({ queryKey: ["public-leagues"] });
 }
 
 export function useCreateLeague() {
@@ -30,8 +74,7 @@ export function useCreateLeague() {
   return useMutation({
     mutationFn: (input: { name: string; is_public?: boolean }) => createLeagueFn({ data: input }),
     onSuccess: async () => {
-      await qc.invalidateQueries({ queryKey: ["leagues"] });
-      await qc.refetchQueries({ queryKey: ["leagues"] });
+      invalidateLeagueQueries(qc);
     },
   });
 }
@@ -40,7 +83,15 @@ export function useJoinLeague() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (invite_code: string) => joinLeagueFn({ data: { invite_code } }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["leagues"] }),
+    onSuccess: () => invalidateLeagueQueries(qc),
+  });
+}
+
+export function useJoinLeagueById() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (league_id: string) => joinLeagueByIdFn({ data: { league_id } }),
+    onSuccess: () => invalidateLeagueQueries(qc),
   });
 }
 
@@ -48,7 +99,7 @@ export function useLeaveLeague() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (league_id: string) => leaveLeagueFn({ data: { league_id } }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["leagues"] }),
+    onSuccess: (_, leagueId) => invalidateLeagueQueries(qc, leagueId),
   });
 }
 
@@ -57,8 +108,33 @@ export function useDeleteLeague() {
   return useMutation({
     mutationFn: (league_id: string) => deleteLeagueFn({ data: { league_id } }),
     onSuccess: async () => {
-      await qc.invalidateQueries({ queryKey: ["leagues"] });
-      await qc.refetchQueries({ queryKey: ["leagues"] });
+      invalidateLeagueQueries(qc);
     },
+  });
+}
+
+export function useKickLeagueMember() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { league_id: string; user_id: string }) =>
+      kickLeagueMemberFn({ data: input }),
+    onSuccess: (_, vars) => invalidateLeagueQueries(qc, vars.league_id),
+  });
+}
+
+export function useTransferLeagueOwnership() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { league_id: string; new_owner_id: string }) =>
+      transferLeagueOwnershipFn({ data: input }),
+    onSuccess: (_, vars) => invalidateLeagueQueries(qc, vars.league_id),
+  });
+}
+
+export function useAdvanceLeagueSeason() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (league_id: string) => advanceLeagueSeasonFn({ data: { league_id } }),
+    onSuccess: (_, leagueId) => invalidateLeagueQueries(qc, leagueId),
   });
 }

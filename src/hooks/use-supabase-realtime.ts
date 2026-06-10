@@ -94,6 +94,18 @@ export function useSupabaseRealtime() {
 
     setupNotifChannel();
 
+    const leagueStatsCh = supabase
+      .channel("league-stats", { config: { private: true } })
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "league_member_stats" },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["league-leaderboard"] });
+          queryClient.invalidateQueries({ queryKey: ["league-rank"] });
+        },
+      )
+      .subscribe();
+
     return () => {
       if (flushHandle !== null) {
         if (typeof cancelAnimationFrame !== "undefined") cancelAnimationFrame(flushHandle);
@@ -102,6 +114,7 @@ export function useSupabaseRealtime() {
       supabase.removeChannel(marketsCh);
       supabase.removeChannel(feedCh);
       if (notifCh) supabase.removeChannel(notifCh);
+      supabase.removeChannel(leagueStatsCh);
     };
   }, [queryClient]);
 }

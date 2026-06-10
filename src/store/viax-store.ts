@@ -74,11 +74,12 @@ export interface RegionData {
 
 export interface ViaXNotification {
   id: string;
-  kind: "win" | "alert" | "rank" | "market" | "closing" | "refund" | "void";
+  kind: "win" | "alert" | "rank" | "market" | "closing" | "refund" | "void" | "league";
   text: string;
   time: number;
   read?: boolean;
   marketId?: string;
+  leagueId?: string;
 }
 
 export interface Transaction {
