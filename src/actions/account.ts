@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { requireRegisteredAuth } from "@/integrations/supabase/require-registered-middleware";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware.server";
+import { requireRegisteredAuth } from "@/integrations/supabase/require-registered-middleware.server";
 import { getSupabaseCtx, type SupabaseFnContext } from "@/integrations/supabase/context";
 import { callUntypedRpc } from "@/integrations/supabase/untyped-rpc";
 import type { Division, FeedPost, Side, Transaction, ViaXNotification } from "@/store/viax-store";

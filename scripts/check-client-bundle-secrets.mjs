@@ -19,6 +19,12 @@ const FORBIDDEN_SNIPPETS = [
 
 const FORBIDDEN_IMPORTS = ["integrations/supabase/client.server", "supabase/client.server"];
 
+const FORBIDDEN_CLIENT_BUNDLE_MARKERS = [
+  "AsyncLocalStorage",
+  "node:async_hooks",
+  "start-storage-context",
+];
+
 function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {
     const path = join(dir, name);
@@ -72,6 +78,15 @@ for (const path of files) {
   if (scanRoot.endsWith("src") && /import\.meta\.env\.VITE_[A-Z0-9_]*SERVICE_ROLE/.test(src)) {
     console.error(`${rel}: VITE_* must not reference SERVICE_ROLE`);
     failed = true;
+  }
+
+  if (scanRoot.includes("dist") && scanRoot.includes("client")) {
+    for (const marker of FORBIDDEN_CLIENT_BUNDLE_MARKERS) {
+      if (src.includes(marker)) {
+        console.error(`${rel}: client bundle must not reference ${marker}`);
+        failed = true;
+      }
+    }
   }
 }
 

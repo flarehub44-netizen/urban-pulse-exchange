@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireAdminAuth } from "@/integrations/supabase/admin-middleware";
+import { requireAdminAuth } from "@/integrations/supabase/admin-middleware.server";
 import { adminRpcCall } from "@/actions/admin/_helpers";
 
 export const adminListFootballPendingFn = createServerFn({ method: "GET" })
