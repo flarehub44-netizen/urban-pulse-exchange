@@ -1,4 +1,4 @@
-import { createMiddleware } from "@tanstack/react-start";
+import { createMiddleware } from "@tanstack/start-client-core";
 import type { SupabaseFnContext } from "@/integrations/supabase/context";
 import { AppError } from "@/lib/server-errors";
 
