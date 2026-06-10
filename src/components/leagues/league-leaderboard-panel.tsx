@@ -1,6 +1,7 @@
 import { Crown, Medal, Trophy } from "lucide-react";
 import { copy } from "@/copy/pt-BR";
 import type { LeagueMember } from "@/actions/leagues";
+import { formatDeltaRank } from "@/lib/league-engagement";
 import { cn } from "@/lib/utils";
 import type { Division } from "@/store/viax-store";
 
@@ -102,7 +103,19 @@ export function LeagueLeaderboardPanel({
               </div>
             </div>
             <div className="text-right shrink-0">
-              <div className="text-xs font-semibold mono text-primary">{member.score ?? 0}</div>
+              <div className="flex items-center justify-end gap-1">
+                {formatDeltaRank(member.delta_rank ?? 0) ? (
+                  <span
+                    className={cn(
+                      "text-[10px] mono font-medium",
+                      (member.delta_rank ?? 0) > 0 ? "text-up" : "text-down",
+                    )}
+                  >
+                    {formatDeltaRank(member.delta_rank ?? 0)}
+                  </span>
+                ) : null}
+                <div className="text-xs font-semibold mono text-primary">{member.score ?? 0}</div>
+              </div>
               <div className="text-[10px] text-muted-foreground">
                 {divisionFromDb(member.division)}
               </div>

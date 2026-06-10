@@ -2,13 +2,16 @@ import type { Market, Trader } from "@/store/viax-store";
 import type { OpenBet } from "@/hooks/use-bets";
 import { getMarketEdge } from "@/lib/market-edge";
 import { PRIZE_RATIO } from "@/lib/parimutuel";
+import { buildLeagueActionNowItems, type LeagueActionNowItem } from "@/lib/league-engagement";
+import type { League, LeagueRankSummary } from "@/actions/leagues";
 
 export type ActionNowItem =
   | { type: "position"; priority: number; bet: OpenBet; estPnL: number; minutesLeft: number }
   | { type: "closing"; priority: number; market: Market }
   | { type: "urbanmind"; priority: number; market: Market }
   | { type: "followed"; priority: number; trader: Trader }
-  | { type: "daily_mission"; priority: number; market: Market };
+  | { type: "daily_mission"; priority: number; market: Market }
+  | LeagueActionNowItem;
 
 const MS_15MIN = 15 * 60 * 1000;
 
@@ -19,6 +22,8 @@ export function buildActionNowItems(
   followedIds?: string[],
   traders?: Trader[],
   dailyMission?: Market,
+  leagues?: League[],
+  leagueRanks?: Record<string, LeagueRankSummary | undefined>,
 ): ActionNowItem[] {
   const now = Date.now();
   const items: ActionNowItem[] = [];
@@ -68,6 +73,10 @@ export function buildActionNowItems(
 
   if (dailyMission && (dailyMission.status === "live" || dailyMission.status === "closing")) {
     items.push({ type: "daily_mission", priority: 120, market: dailyMission });
+  }
+
+  if (leagues?.length && leagueRanks) {
+    items.push(...buildLeagueActionNowItems(leagues, leagueRanks));
   }
 
   return items.sort((a, b) => b.priority - a.priority);

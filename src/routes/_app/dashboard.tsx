@@ -77,7 +77,10 @@ const InviteFriendsCard = lazy(() =>
 function ChartFallback() {
   return <div className="h-[140px] animate-pulse rounded-xl bg-surface/60" />;
 }
-import { TrendingUp, Users } from "lucide-react";
+import { TrendingUp, Trophy, Users } from "lucide-react";
+import { useQueries } from "@tanstack/react-query";
+import { getMyLeagueRankFn } from "@/actions/leagues";
+import type { LeagueRankSummary } from "@/actions/leagues";
 import { PageHeader } from "@/components/viax/page-header";
 import { KpiTile } from "@/components/viax/kpi-tile";
 import { SurfaceCard } from "@/components/viax/surface-card";
@@ -204,6 +207,21 @@ function Dashboard() {
   const { ids: followedIds } = useFollowedTraders();
   const { data: followingBets } = useFollowingActiveBets();
   const { data: myLeagues = [] } = useMyLeagues();
+  const leagueRankQueries = useQueries({
+    queries: myLeagues.map((league) => ({
+      queryKey: ["league-rank", league.id],
+      queryFn: () => getMyLeagueRankFn({ data: { league_id: league.id } }),
+      staleTime: 60_000,
+      enabled: isRegistered,
+    })),
+  });
+  const leagueRanksById = useMemo(() => {
+    const map: Record<string, LeagueRankSummary | undefined> = {};
+    myLeagues.forEach((league, i) => {
+      map[league.id] = leagueRankQueries[i]?.data;
+    });
+    return map;
+  }, [myLeagues, leagueRankQueries]);
   const { data: trendingTraders = [] } = useTrendingTraders(3);
   useWinToast();
 
@@ -257,6 +275,8 @@ function Dashboard() {
     followedIds,
     traders,
     dailyMission,
+    myLeagues,
+    leagueRanksById,
   );
   const actionNowVisible = URBANMIND_UI_ENABLED
     ? actionNow
@@ -641,6 +661,27 @@ function Dashboard() {
                   >
                     <span className="text-[10px] uppercase text-muted-foreground">UrbanMind</span>
                     <div className="font-medium">Previsão · {item.market.region}</div>
+                  </Link>
+                );
+              }
+              if (item.type === "league") {
+                return (
+                  <Link
+                    key={`league-${item.league.id}`}
+                    to="/leagues"
+                    search={{ selected: item.league.id }}
+                    className={cn(
+                      "flex-1 rounded-xl border px-3 py-2 text-sm hover:border-primary/40",
+                      item.urgency === "urgent"
+                        ? "border-warn/40 bg-warn/10"
+                        : "border-primary/30 bg-primary/10",
+                    )}
+                  >
+                    <span className="inline-flex items-center gap-1 text-[10px] uppercase text-primary">
+                      <Trophy className="size-3" /> {copy.leagues.actionNowLabel}
+                    </span>
+                    <div className="line-clamp-1 font-medium">{item.league.name}</div>
+                    <div className="text-[10px] text-muted-foreground">{item.message}</div>
                   </Link>
                 );
               }

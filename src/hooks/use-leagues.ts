@@ -13,6 +13,7 @@ import {
   kickLeagueMemberFn,
   transferLeagueOwnershipFn,
   advanceLeagueSeasonFn,
+  getLeagueSeasonHistoryFn,
 } from "@/actions/leagues";
 
 export function useMyLeagues() {
@@ -59,12 +60,22 @@ export function useLeagueActivity(leagueId: string | null) {
   });
 }
 
+export function useLeagueSeasonHistory(leagueId: string | null) {
+  return useQuery({
+    queryKey: ["league-season-history", leagueId],
+    queryFn: () => getLeagueSeasonHistoryFn({ data: { league_id: leagueId! } }),
+    enabled: !!leagueId,
+    staleTime: 120_000,
+  });
+}
+
 function invalidateLeagueQueries(qc: ReturnType<typeof useQueryClient>, leagueId?: string) {
   void qc.invalidateQueries({ queryKey: ["leagues"] });
   if (leagueId) {
     void qc.invalidateQueries({ queryKey: ["league-leaderboard", leagueId] });
     void qc.invalidateQueries({ queryKey: ["league-rank", leagueId] });
     void qc.invalidateQueries({ queryKey: ["league-activity", leagueId] });
+    void qc.invalidateQueries({ queryKey: ["league-season-history", leagueId] });
   }
   void qc.invalidateQueries({ queryKey: ["public-leagues"] });
 }

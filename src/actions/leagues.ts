@@ -59,6 +59,15 @@ export type LeagueActivityItem = {
   stake: number | null;
 };
 
+export type LeagueSeasonHistoryItem = {
+  season_label: string;
+  starts_at: string;
+  ends_at: string;
+  winner_user_id: string | null;
+  winner_name: string;
+  top_scores: Array<{ user_id: string; rank: number; score: number }>;
+};
+
 export const getMyLeaguesFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -225,6 +234,21 @@ export const transferLeagueOwnershipFn = createServerFn({ method: "POST" })
     });
     if (error) throw new Error(error.message);
     return res as { ok: boolean; reason?: string };
+  });
+
+export const getLeagueSeasonHistoryFn = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    z.object({ league_id: z.string().uuid(), limit: z.number().int().min(1).max(24).optional() }),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase } = getSupabaseCtx(context);
+    const { data: res, error } = await supabase.rpc("get_league_season_history", {
+      p_league_id: data.league_id,
+      p_limit: data.limit ?? 12,
+    });
+    if (error) throw new Error(error.message);
+    return (Array.isArray(res) ? res : []) as LeagueSeasonHistoryItem[];
   });
 
 export const advanceLeagueSeasonFn = createServerFn({ method: "POST" })

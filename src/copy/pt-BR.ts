@@ -787,6 +787,12 @@ export const copy = {
     you: "(você)",
     betActivity: (name: string, stake: number) => `${name} previu · ${stake.toFixed(0)}`,
     joinActivity: (name: string) => `${name} entrou na liga`,
+    seasonEndsIn: "Temporada termina em",
+    shareWhatsApp: "Convidar no WhatsApp",
+    hallTitle: "Hall da fama",
+    hallEmpty: "Nenhuma temporada encerrada ainda.",
+    hallLoading: "Carregando histórico…",
+    actionNowLabel: "Sua liga",
   },
 
   poll: {

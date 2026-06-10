@@ -2,7 +2,18 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { Trophy, Users, Plus, Link2, LogIn, LogOut, Crown, Trash2, Search } from "lucide-react";
+import {
+  Trophy,
+  Users,
+  Plus,
+  Link2,
+  LogIn,
+  LogOut,
+  Crown,
+  Trash2,
+  Search,
+  MessageCircle,
+} from "lucide-react";
 import {
   useMyLeagues,
   useLeagueLeaderboard,
@@ -17,7 +28,10 @@ import {
   useAdvanceLeagueSeason,
 } from "@/hooks/use-leagues";
 import { LeagueLeaderboardPanel } from "@/components/leagues/league-leaderboard-panel";
+import { LeagueSeasonCountdown } from "@/components/leagues/league-season-countdown";
+import { LeagueHallOfFame } from "@/components/leagues/league-hall-of-fame";
 import { formatLeagueInviteUrl } from "@/lib/league-score";
+import { buildLeagueInviteMessage, buildWhatsAppShareUrl } from "@/lib/league-engagement";
 import { copy } from "@/copy/pt-BR";
 import { cn } from "@/lib/utils";
 
@@ -152,6 +166,13 @@ function LeaguesPage() {
 
   const copyInviteCode = (code: string) => {
     navigator.clipboard.writeText(code).then(() => toast.success(copy.leagues.codeCopied));
+  };
+
+  const shareWhatsApp = (leagueName: string, code: string) => {
+    const origin = typeof window !== "undefined" ? window.location.origin : undefined;
+    const message = buildLeagueInviteMessage(leagueName, code, origin);
+    const url = buildWhatsAppShareUrl(message);
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -334,7 +355,20 @@ function LeaguesPage() {
                 >
                   {copy.leagues.copyCode}
                 </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    shareWhatsApp(league.name, league.invite_code);
+                  }}
+                  className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] text-up hover:bg-up/10"
+                >
+                  <MessageCircle className="size-3" /> {copy.leagues.shareWhatsApp}
+                </button>
               </div>
+              {league.season_ends_at ? (
+                <LeagueSeasonCountdown endsAt={league.season_ends_at} className="mt-2" />
+              ) : null}
             </button>
           ))}
         </div>
@@ -404,6 +438,14 @@ function LeaguesPage() {
                   {copy.leagues.season(selectedLeague.season_label)}
                 </p>
               ) : null}
+              <LeagueSeasonCountdown endsAt={selectedLeague.season_ends_at} className="mt-1" />
+              <button
+                type="button"
+                onClick={() => shareWhatsApp(selectedLeague.name, selectedLeague.invite_code)}
+                className="mt-2 inline-flex items-center gap-1 text-xs text-up hover:underline"
+              >
+                <MessageCircle className="size-3.5" /> {copy.leagues.shareWhatsApp}
+              </button>
             </div>
             <div className="flex flex-wrap gap-2">
               {selectedLeague.is_creator ? (
@@ -465,6 +507,8 @@ function LeaguesPage() {
               ))}
             </ul>
           ) : null}
+
+          <LeagueHallOfFame leagueId={selectedLeague.id} />
         </motion.div>
       )}
     </div>
