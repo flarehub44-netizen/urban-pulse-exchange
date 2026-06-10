@@ -14,11 +14,11 @@ export const Route = createFileRoute("/v/$vertical/")({
 function VerticalPage() {
   const { vertical: raw } = Route.useParams();
   const search = Route.useSearch() as { q?: string };
+  const { data: cryptoSlot } = useActiveCryptoSlot();
   if (!isVerticalSlug(raw)) {
     return <p className="text-muted-foreground">Categoria inválida.</p>;
   }
   const vertical = raw as MarketVertical;
-  const { data: cryptoSlot } = useActiveCryptoSlot();
 
   return (
     <CatalogLayout

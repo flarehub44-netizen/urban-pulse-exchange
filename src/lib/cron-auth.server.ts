@@ -39,7 +39,7 @@ async function assertNonceNotReplayed(nonce: string): Promise<boolean> {
     p_window_seconds: MAX_CLOCK_SKEW_SECONDS,
   });
   if (error) return false;
-  return !Boolean((data as { limited?: boolean } | null)?.limited);
+  return !(data as { limited?: boolean } | null)?.limited;
 }
 
 export async function assertCronAuth(request: Request): Promise<Response | null> {
